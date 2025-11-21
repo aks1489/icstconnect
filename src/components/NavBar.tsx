@@ -16,7 +16,7 @@ const NavBar = () => {
                 <div className="container">
                     {/* Left: Logo */}
                     <a className="navbar-brand fw-bold text-dark" href="#">
-                        <i className="bi bi-bootstrap-fill me-2 text-primary"></i>
+                        <i className="bi bi-bootstrap-fill me-2" style={{ color: 'var(--primary-color)' }}></i>
                         Logo
                     </a>
 
@@ -49,23 +49,23 @@ const NavBar = () => {
             {/* Mobile Bottom Navbar */}
             <nav className="navbar fixed-bottom navbar-light bg-white shadow-lg d-lg-none border-top">
                 <div className="container-fluid d-flex justify-content-around py-2">
-                    <a className={`nav-link text-center ${activeLink === 'Home' ? 'text-primary' : 'text-dark'}`} href="#" onClick={() => handleLinkClick('Home')}>
+                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Home' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Home')}>
                         <i className="bi bi-house fs-4"></i>
                         <div className="small" style={{ fontSize: '0.7rem' }}>Home</div>
                     </a>
-                    <a className={`nav-link text-center ${activeLink === 'Courses' ? 'text-primary' : 'text-dark'}`} href="#" onClick={() => handleLinkClick('Courses')}>
+                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Courses' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Courses')}>
                         <i className="bi bi-book fs-4"></i>
                         <div className="small" style={{ fontSize: '0.7rem' }}>Courses</div>
                     </a>
-                    <a className={`nav-link text-center ${activeLink === 'Results' ? 'text-primary' : 'text-dark'}`} href="#" onClick={() => handleLinkClick('Results')}>
+                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Results' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Results')}>
                         <i className="bi bi-bar-chart fs-4"></i>
                         <div className="small" style={{ fontSize: '0.7rem' }}>Results</div>
                     </a>
-                    <a className={`nav-link text-center ${activeLink === 'Notifications' ? 'text-primary' : 'text-dark'}`} href="#" onClick={() => handleLinkClick('Notifications')}>
+                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Notifications' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Notifications')}>
                         <i className="bi bi-bell fs-4"></i>
                         <div className="small" style={{ fontSize: '0.7rem' }}>Notifs</div>
                     </a>
-                    <a className="nav-link text-dark text-center" href="#">
+                    <a className="nav-link text-center mobile-nav-link" href="#">
                         <i className="bi bi-person fs-4"></i>
                         <div className="small" style={{ fontSize: '0.7rem' }}>Login</div>
                     </a>

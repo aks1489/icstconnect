@@ -1,0 +1,12 @@
+:root {
+    --primary-color: #2c3e50;
+    /* Deep Slate/Charcoal */
+    --accent-color: #34495e;
+    /* Lighter Slate */
+    --active-bg: #f8f9fa;
+    /* Very light gray */
+    --text-muted: #6c757d;
+    /* Standard gray */
+    --hover-bg: rgba(44, 62, 80, 0.05);
+    /* Subtle slate tint */
+}
