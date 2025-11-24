@@ -1,31 +1,10 @@
 .nav-link-custom {
-    color: var(--text-muted);
     transition: all 0.3s ease;
     border-radius: 0.5rem;
     padding: 0.5rem 1rem !important;
 }
 
-.nav-link-custom:hover {
-    color: var(--primary-color);
-    background-color: var(--hover-bg);
-}
-
-.nav-link-custom.active {
-    color: var(--primary-color);
-    font-weight: 600;
-    background-color: var(--active-bg);
-}
-
 /* Mobile Bottom Nav Styles */
 .mobile-nav-link {
-    color: var(--text-muted);
     transition: color 0.3s ease;
-}
-
-.mobile-nav-link.active {
-    color: var(--primary-color) !important;
-}
-
-.mobile-nav-link:hover {
-    color: var(--accent-color);
 }

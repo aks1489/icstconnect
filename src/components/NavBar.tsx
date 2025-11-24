@@ -7,7 +7,12 @@ const NavBar = () => {
         setActiveLink(linkName);
     };
 
-    const navLinks = ['Home', 'Courses', 'Results', 'Notifications'];
+    const navLinks = [
+        { name: 'Home', className: 'text-primary', icon: 'bi-house' },
+        { name: 'Courses', className: 'text-success', icon: 'bi-book' },
+        { name: 'Results', className: 'text-danger', icon: 'bi-bar-chart' },
+        { name: 'Notifications', className: 'text-warning', icon: 'bi-bell' }
+    ];
 
     return (
         <>
@@ -24,13 +29,13 @@ const NavBar = () => {
                     <div className="collapse navbar-collapse">
                         <ul className="navbar-nav mx-auto mb-2 mb-lg-0">
                             {navLinks.map((link) => (
-                                <li className="nav-item" key={link}>
+                                <li className="nav-item" key={link.name}>
                                     <a
-                                        className={`nav-link mx-2 nav-link-custom ${activeLink === link ? 'active' : ''}`}
+                                        className={`nav-link mx-2 nav-link-custom ${link.className} ${activeLink === link.name ? 'fw-bold bg-light' : ''}`}
                                         href="#"
-                                        onClick={() => handleLinkClick(link)}
+                                        onClick={() => handleLinkClick(link.name)}
                                     >
-                                        {link}
+                                        {link.name}
                                     </a>
                                 </li>
                             ))}
@@ -38,7 +43,7 @@ const NavBar = () => {
 
                         {/* Right: Account Section */}
                         <div className="d-flex">
-                            <a href="#" className="btn btn-outline-dark rounded-pill px-4">
+                            <a href="#" className="btn btn-outline-primary rounded-pill px-4">
                                 Login
                             </a>
                         </div>
@@ -49,23 +54,18 @@ const NavBar = () => {
             {/* Mobile Bottom Navbar */}
             <nav className="navbar fixed-bottom navbar-light bg-white shadow-lg d-lg-none border-top">
                 <div className="container-fluid d-flex justify-content-around py-2">
-                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Home' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Home')}>
-                        <i className="bi bi-house fs-4"></i>
-                        <div className="small" style={{ fontSize: '0.7rem' }}>Home</div>
-                    </a>
-                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Courses' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Courses')}>
-                        <i className="bi bi-book fs-4"></i>
-                        <div className="small" style={{ fontSize: '0.7rem' }}>Courses</div>
-                    </a>
-                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Results' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Results')}>
-                        <i className="bi bi-bar-chart fs-4"></i>
-                        <div className="small" style={{ fontSize: '0.7rem' }}>Results</div>
-                    </a>
-                    <a className={`nav-link text-center mobile-nav-link ${activeLink === 'Notifications' ? 'active' : ''}`} href="#" onClick={() => handleLinkClick('Notifications')}>
-                        <i className="bi bi-bell fs-4"></i>
-                        <div className="small" style={{ fontSize: '0.7rem' }}>Notifs</div>
-                    </a>
-                    <a className="nav-link text-center mobile-nav-link" href="#">
+                    {navLinks.map((link) => (
+                        <a
+                            key={link.name}
+                            className={`nav-link text-center mobile-nav-link ${link.className} ${activeLink === link.name ? 'fw-bold bg-light' : ''}`}
+                            href="#"
+                            onClick={() => handleLinkClick(link.name)}
+                        >
+                            <i className={`bi ${link.icon} fs-4`}></i>
+                            <div className="small" style={{ fontSize: '0.7rem' }}>{link.name}</div>
+                        </a>
+                    ))}
+                    <a className="nav-link text-center mobile-nav-link text-primary" href="#">
                         <i className="bi bi-person fs-4"></i>
                         <div className="small" style={{ fontSize: '0.7rem' }}>Login</div>
                     </a>
