@@ -10,3 +10,13 @@
     --hover-bg: rgba(44, 62, 80, 0.05);
     /* Subtle slate tint */
 }
+
+.nav-link-custom {
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-link-custom.bg-light {
+    background-color: var(--active-bg) !important;
+    border-bottom-color: var(--primary-color);
+}

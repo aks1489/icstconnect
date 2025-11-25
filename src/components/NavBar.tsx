@@ -31,7 +31,7 @@ const NavBar = () => {
                             {navLinks.map((link) => (
                                 <li className="nav-item" key={link.name}>
                                     <a
-                                        className={`nav-link mx-2 nav-link-custom ${link.className} ${activeLink === link.name ? 'fw-bold bg-light' : ''}`}
+                                        className={`nav-link mx-2 nav-link-custom ${link.className} ${activeLink === link.name ? 'bg-light ' : ''}`}
                                         href="#"
                                         onClick={() => handleLinkClick(link.name)}
                                     >
@@ -57,7 +57,7 @@ const NavBar = () => {
                     {navLinks.map((link) => (
                         <a
                             key={link.name}
-                            className={`nav-link text-center mobile-nav-link ${link.className} ${activeLink === link.name ? 'fw-bold bg-light' : ''}`}
+                            className={`nav-link text-center mobile-nav-link ${link.className} ${activeLink === link.name ? 'bg-light' : ''}`}
                             href="#"
                             onClick={() => handleLinkClick(link.name)}
                         >
