@@ -20,3 +20,28 @@
     background-color: var(--active-bg) !important;
     border-bottom-color: var(--primary-color);
 }
+
+/* Hover and Active effects for Nav Links */
+.nav-link-custom.text-primary:hover,
+.nav-link-custom.text-primary.active {
+    background-color: var(--bs-primary, #0d6efd) !important;
+    color: white !important;
+}
+
+.nav-link-custom.text-success:hover,
+.nav-link-custom.text-success.active {
+    background-color: var(--bs-success, #198754) !important;
+    color: white !important;
+}
+
+.nav-link-custom.text-danger:hover,
+.nav-link-custom.text-danger.active {
+    background-color: var(--bs-danger, #dc3545) !important;
+    color: white !important;
+}
+
+.nav-link-custom.text-warning:hover,
+.nav-link-custom.text-warning.active {
+    background-color: var(--bs-warning, #ffc107) !important;
+    color: white !important;
+}

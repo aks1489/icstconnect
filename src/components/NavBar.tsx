@@ -8,10 +8,10 @@ const NavBar = () => {
     };
 
     const navLinks = [
-        { name: 'Home', className: 'text-primary', icon: 'bi-house' },
-        { name: 'Courses', className: 'text-success', icon: 'bi-book' },
-        { name: 'Results', className: 'text-danger', icon: 'bi-bar-chart' },
-        { name: 'Notifications', className: 'text-warning', icon: 'bi-bell' }
+        { name: 'Home', className: 'text-primary', btn_classname: 'btn btn-primary', icon: 'bi-house' },
+        { name: 'Courses', className: 'text-success', btn_classname: 'btn btn-success', icon: 'bi-book' },
+        { name: 'Results', className: 'text-danger', btn_classname: 'btn btn-danger', icon: 'bi-bar-chart' },
+        { name: 'Notifications', className: 'text-warning', btn_classname: 'btn btn-warning', icon: 'bi-bell' }
     ];
 
     return (
@@ -31,7 +31,7 @@ const NavBar = () => {
                             {navLinks.map((link) => (
                                 <li className="nav-item" key={link.name}>
                                     <a
-                                        className={`nav-link mx-2 nav-link-custom ${link.className} ${activeLink === link.name ? 'bg-light ' : ''}`}
+                                        className={`nav-link mx-2 nav-link-custom ${link.className} ${activeLink === link.name ? 'active rounded' : ''}`}
                                         href="#"
                                         onClick={() => handleLinkClick(link.name)}
                                     >
@@ -57,7 +57,7 @@ const NavBar = () => {
                     {navLinks.map((link) => (
                         <a
                             key={link.name}
-                            className={`nav-link text-center mobile-nav-link ${link.className} ${activeLink === link.name ? 'bg-light' : ''}`}
+                            className={`nav-link text-center mobile-nav-link nav-link-custom ${link.className} ${activeLink === link.name ? 'active rounded' : ''}`}
                             href="#"
                             onClick={() => handleLinkClick(link.name)}
                         >
