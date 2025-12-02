@@ -1,78 +1,65 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import AuthModal from './AuthModal'
 
 const NavBar = () => {
-    const [activeLink, setActiveLink] = useState('Home');
+    const [showAuthModal, setShowAuthModal] = useState(false)
+    const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
 
-    const handleLinkClick = (linkName: string) => {
-        setActiveLink(linkName);
-    };
-
-    const navLinks = [
-        { name: 'Home', className: 'text-primary', btn_classname: 'btn btn-primary', icon: 'bi-house' },
-        { name: 'Courses', className: 'text-success', btn_classname: 'btn btn-success', icon: 'bi-book' },
-        { name: 'Results', className: 'text-danger', btn_classname: 'btn btn-danger', icon: 'bi-bar-chart' },
-        { name: 'Notifications', className: 'text-warning', btn_classname: 'btn btn-warning', icon: 'bi-bell' }
-    ];
+    const handleLoginClick = () => {
+        setAuthMode('login')
+        setShowAuthModal(true)
+    }
 
     return (
         <>
-            {/* Desktop Navbar */}
-            <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3 d-none d-lg-block">
+            <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
                 <div className="container">
-                    {/* Left: Logo */}
-                    <a className="navbar-brand fw-bold text-dark" href="#">
-                        <i className="bi bi-bootstrap-fill me-2" style={{ color: 'var(--primary-color)' }}></i>
-                        Logo
-                    </a>
-
-                    {/* Center: Navigation Links */}
-                    <div className="collapse navbar-collapse">
-                        <ul className="navbar-nav mx-auto mb-2 mb-lg-0">
-                            {navLinks.map((link) => (
-                                <li className="nav-item" key={link.name}>
-                                    <a
-                                        className={`nav-link mx-2 nav-link-custom ${link.className} ${activeLink === link.name ? 'active rounded' : ''}`}
-                                        href="#"
-                                        onClick={() => handleLinkClick(link.name)}
-                                    >
-                                        {link.name}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-
-                        {/* Right: Account Section */}
-                        <div className="d-flex">
-                            <a href="#" className="btn btn-outline-primary rounded-pill px-4">
-                                Login
-                            </a>
+                    <a className="navbar-brand d-flex align-items-center" href="#">
+                        {/* Logo Placeholder */}
+                        <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style={{ width: '40px', height: '40px', fontSize: '1.2rem', fontWeight: 'bold' }}>
+                            I
                         </div>
+                        <div className="d-flex flex-column">
+                            <span className="fw-bold text-primary lh-1">ICST - Chowberia</span>
+                            <span className="text-muted small" style={{ fontSize: '0.7rem' }}>Institute of Computer Science and Technology</span>
+                        </div>
+                    </a>
+                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+                    <div className="collapse navbar-collapse" id="navbarNav">
+                        <ul className="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-custom active" aria-current="page" href="#">Home</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-custom" href="#courses">Courses</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-custom" href="#notifications">Notifications</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-custom" href="#gallery">Gallery</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-custom" href="#onlinetest">Online Test</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link nav-link-custom" href="#about">About Us</a>
+                            </li>
+                            <li className="nav-item ms-lg-3">
+                                <button className="btn btn-outline-primary rounded-pill px-4 d-flex align-items-center gap-2" onClick={handleLoginClick}>
+                                    <i className="bi bi-person-circle"></i>
+                                    <span>Login</span>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </nav>
-
-            {/* Mobile Bottom Navbar */}
-            <nav className="navbar fixed-bottom navbar-light bg-white shadow-lg d-lg-none border-top">
-                <div className="container-fluid d-flex justify-content-around py-2">
-                    {navLinks.map((link) => (
-                        <a
-                            key={link.name}
-                            className={`nav-link text-center mobile-nav-link nav-link-custom ${link.className} ${activeLink === link.name ? 'active rounded' : ''}`}
-                            href="#"
-                            onClick={() => handleLinkClick(link.name)}
-                        >
-                            <i className={`bi ${link.icon} fs-4`}></i>
-                            <div className="small" style={{ fontSize: '0.7rem' }}>{link.name}</div>
-                        </a>
-                    ))}
-                    <a className="nav-link text-center mobile-nav-link text-primary" href="#">
-                        <i className="bi bi-person fs-4"></i>
-                        <div className="small" style={{ fontSize: '0.7rem' }}>Login</div>
-                    </a>
-                </div>
-            </nav>
+            <AuthModal show={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode={authMode} />
         </>
-    );
-};
+    )
+}
 
-export default NavBar;
+export default NavBar
