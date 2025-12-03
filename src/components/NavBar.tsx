@@ -110,8 +110,4 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick }) =>
     )
 }
 
-// Default export for backward compatibility if needed, but we should use named exports
-const NavBar = () => {
-    return null
-}
-export default NavBar
+
