@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import './App.css'
-import NavBar from './components/NavBar'
+import MainLayout from './components/MainLayout'
 import HeroSection from './components/HeroSection'
 import TechTickerSection from './components/TechTickerSection'
 import StatsSection from './components/StatsSection'
@@ -16,8 +16,7 @@ import Footer from './components/Footer'
 function App() {
 
   return (
-    <>
-      <NavBar />
+    <MainLayout>
       <HeroSection />
       <TechTickerSection />
       <StatsSection />
@@ -27,7 +26,7 @@ function App() {
       <GallerySection />
       <TestSection />
       <Footer />
-    </>
+    </MainLayout>
   )
 }
 
