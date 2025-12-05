@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { NavigationHeader, NavigationFooter } from './NavBar'
-import AuthModal from './AuthModal'
+import { NavigationHeader, NavigationFooter } from '../NavBar'
+import AuthModal from '../../ui/AuthModal'
 
 interface MainLayoutProps {
     children: React.ReactNode
@@ -21,7 +21,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <NavigationHeader onLoginClick={handleLoginClick} />
             </header>
 
-            <main className="app-main">
+            <main className="app-main pb-[60px] lg:pb-0">
                 {children}
             </main>
 
