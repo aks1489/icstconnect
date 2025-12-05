@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Skeleton from '../components/ui/Skeleton'
 
 const Gallery = () => {
     const categories = ['All', 'Campus', 'Events', 'Classrooms', 'Students']
     const [activeCategory, setActiveCategory] = useState('All')
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1000)
+        return () => clearTimeout(timer)
+    }, [])
 
     const images = [
         {
@@ -95,25 +102,33 @@ const Gallery = () => {
 
                 {/* Image Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredImages.map((image) => (
-                        <div
-                            key={image.id}
-                            className="group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
-                        >
-                            <img
-                                src={image.src}
-                                alt={image.title}
-                                className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                <span className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">
-                                    {image.category}
-                                </span>
-                                <h3 className="text-white text-xl font-bold mb-1">{image.title}</h3>
-                                <p className="text-slate-300 text-sm">{image.desc}</p>
+                    {loading ? (
+                        [1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className="h-72 rounded-2xl overflow-hidden">
+                                <Skeleton className="w-full h-full" />
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        filteredImages.map((image) => (
+                            <div
+                                key={image.id}
+                                className="group relative h-72 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+                            >
+                                <img
+                                    src={image.src}
+                                    alt={image.title}
+                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                    <span className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">
+                                        {image.category}
+                                    </span>
+                                    <h3 className="text-white text-xl font-bold mb-1">{image.title}</h3>
+                                    <p className="text-slate-300 text-sm">{image.desc}</p>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>
