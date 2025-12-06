@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { NavigationHeader, NavigationFooter } from '../NavBar'
 import AuthModal from '../../ui/AuthModal'
 
+import Footer from '../Footer/Footer'
+
 interface MainLayoutProps {
     children: React.ReactNode
 }
@@ -25,9 +27,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {children}
             </main>
 
-            <footer className="app-footer">
+            <Footer />
+
+            <div className="lg:hidden">
                 <NavigationFooter onLoginClick={handleLoginClick} />
-            </footer>
+            </div>
 
             <AuthModal show={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode={authMode} />
         </div>

@@ -130,14 +130,14 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick }) =>
             <nav className="bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 w-full z-[1030] pb-[env(safe-area-inset-bottom)]">
                 <div className="w-full h-full">
                     <div className="flex justify-evenly items-center w-full h-full py-3">
-                        <a href="#" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        <Link to="/" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-house-door text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Home</span>
-                        </a>
-                        <a href="#courses" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        </Link>
+                        <Link to="/courses" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-book text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Courses</span>
-                        </a>
+                        </Link>
                         <div className="relative -top-5">
                             <button
                                 onClick={onLoginClick}
@@ -146,10 +146,10 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick }) =>
                                 <i className="bi bi-person text-xl"></i>
                             </button>
                         </div>
-                        <a href="#gallery" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        <Link to="/gallery" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-image text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Gallery</span>
-                        </a>
+                        </Link>
                         <Link to="/about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-info-circle text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">About</span>
