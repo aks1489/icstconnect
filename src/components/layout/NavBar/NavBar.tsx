@@ -25,7 +25,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
         { name: 'Notifications', href: '/notifications' },
         { name: 'Gallery', href: '/gallery' },
         { name: 'Online Test', href: '/online-test' },
-        { name: 'About Us', href: '/#about' },
+        { name: 'About Us', href: '/about' },
     ];
 
     return (
@@ -150,10 +150,10 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick }) =>
                             <i className="bi bi-image text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Gallery</span>
                         </a>
-                        <a href="#about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        <Link to="/about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-info-circle text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">About</span>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </nav>

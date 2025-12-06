@@ -11,6 +11,7 @@ const Notifications = lazy(() => import('./pages/Notifications'))
 const Gallery = lazy(() => import('./pages/Gallery'))
 const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
+const AboutUs = lazy(() => import('./pages/AboutUs'))
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/online-test" element={<OnlineTest />} />
             <Route path="/online-test/:testId" element={<TestPlayer />} />
+            <Route path="/about" element={<AboutUs />} />
           </Routes>
         </Suspense>
       </MainLayout>
