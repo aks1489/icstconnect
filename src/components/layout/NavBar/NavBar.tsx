@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import logo from '../../../assets/logo.jpg'
 
 interface NavigationProps {
     onLoginClick: () => void
@@ -39,9 +40,11 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <Link to="/" className="flex items-center gap-3 group no-underline">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-600 text-white flex items-center justify-center text-xl font-bold shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300">
-                                I
-                            </div>
+                            <img
+                                src={logo}
+                                alt="ICST Logo"
+                                className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300"
+                            />
                             <div className="flex flex-col">
                                 <span className="font-bold text-slate-800 text-lg leading-none tracking-tight">ICST</span>
                                 <span className="text-slate-500 text-[0.65rem] font-medium tracking-wider uppercase">Chowberia</span>
