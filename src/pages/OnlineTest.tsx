@@ -1,47 +1,26 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Skeleton from '../components/ui/Skeleton'
+import { api, type Test } from '../services/api'
 
 const OnlineTest = () => {
     const [loading, setLoading] = useState(true)
+    const [tests, setTests] = useState<Test[]>([])
 
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000)
-        return () => clearTimeout(timer)
-    }, [])
-
-    const tests = [
-        {
-            id: 'react-basics',
-            title: 'React.js Fundamentals',
-            description: 'Test your knowledge of React components, hooks, and state management.',
-            duration: '30 Mins',
-            questions: 15,
-            difficulty: 'Intermediate',
-            color: 'blue',
-            icon: 'bi-filetype-jsx'
-        },
-        {
-            id: 'js-es6',
-            title: 'JavaScript ES6+',
-            description: 'Assess your understanding of modern JavaScript features and syntax.',
-            duration: '45 Mins',
-            questions: 20,
-            difficulty: 'Advanced',
-            color: 'yellow',
-            icon: 'bi-filetype-js'
-        },
-        {
-            id: 'html-css',
-            title: 'HTML5 & CSS3 Mastery',
-            description: 'Check your proficiency in building responsive and semantic web layouts.',
-            duration: '20 Mins',
-            questions: 10,
-            difficulty: 'Beginner',
-            color: 'orange',
-            icon: 'bi-filetype-html'
+        const fetchTests = async () => {
+            try {
+                const data = await api.getTests()
+                setTests(data)
+            } catch (error) {
+                console.error('Error fetching tests:', error)
+            } finally {
+                setLoading(false)
+            }
         }
-    ]
+
+        fetchTests()
+    }, [])
 
     return (
         <div className="min-h-screen bg-slate-50 pt-24 pb-12">

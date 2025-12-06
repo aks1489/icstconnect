@@ -1,70 +1,35 @@
 import { useState, useEffect } from 'react'
 import CourseDetailsModal from '../components/ui/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
+import { api, type Course } from '../services/api'
 
 type Duration = '3 Months' | '6 Months' | '12 Months' | '18 Months' | 'All'
-
-interface Course {
-    id: number
-    title: string
-    duration: Duration
-    image: string
-    description: string
-    price: string
-}
-
-const coursesData: Course[] = [
-    // 3 Months Courses
-    ...Array.from({ length: 10 }).map((_, i) => ({
-        id: i + 1,
-        title: `Certificate in Basic Computing ${i + 1}`,
-        duration: '3 Months' as Duration,
-        image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        description: 'A short-term course designed to provide fundamental computer skills.',
-        price: '₹2,500'
-    })),
-    // 6 Months Courses
-    ...Array.from({ length: 10 }).map((_, i) => ({
-        id: i + 11,
-        title: `Diploma in Office Automation ${i + 1}`,
-        duration: '6 Months' as Duration,
-        image: 'https://images.unsplash.com/photo-1496171367470-9ed9a91ea931?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        description: 'Comprehensive training in office tools and administrative software.',
-        price: '₹5,000'
-    })),
-    // 12 Months Courses
-    ...Array.from({ length: 10 }).map((_, i) => ({
-        id: i + 21,
-        title: `Advanced Diploma in Software Engineering ${i + 1}`,
-        duration: '12 Months' as Duration,
-        image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        description: 'In-depth study of software development, algorithms, and system design.',
-        price: '₹12,000'
-    })),
-    // 18 Months Courses
-    ...Array.from({ length: 10 }).map((_, i) => ({
-        id: i + 31,
-        title: `Professional Master Diploma in IT ${i + 1}`,
-        duration: '18 Months' as Duration,
-        image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        description: 'An extensive program covering advanced IT concepts and project management.',
-        price: '₹18,000'
-    })),
-]
 
 const AllCourses = () => {
     const [activeFilter, setActiveFilter] = useState<Duration>('All')
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
     const [loading, setLoading] = useState(true)
+    const [courses, setCourses] = useState<Course[]>([])
 
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000)
-        return () => clearTimeout(timer)
+        const fetchCourses = async () => {
+            try {
+                const data = await api.getCourses()
+                setCourses(data)
+            } catch (error) {
+                console.error('Error fetching courses:', error)
+                // Fallback to empty or show error (optional)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchCourses()
     }, [])
 
     const filteredCourses = activeFilter === 'All'
-        ? coursesData
-        : coursesData.filter(course => course.duration === activeFilter)
+        ? courses
+        : courses.filter(course => course.duration === activeFilter)
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-slate-50">

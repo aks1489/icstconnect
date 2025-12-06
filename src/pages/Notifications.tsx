@@ -1,67 +1,28 @@
 
 import { useState, useEffect } from 'react'
 import Skeleton from '../components/ui/Skeleton'
+import { api, type Notification } from '../services/api'
 
 const Notifications = () => {
     const [loading, setLoading] = useState(true)
+    const [notifications, setNotifications] = useState<Notification[]>([])
 
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000)
-        return () => clearTimeout(timer)
+        const fetchNotifications = async () => {
+            try {
+                const data = await api.getNotifications()
+                setNotifications(data)
+            } catch (error) {
+                console.error('Error fetching notifications:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchNotifications()
     }, [])
 
-    const notifications = [
-        {
-            id: 1,
-            type: 'important',
-            title: 'Admission Open for 2025 Batch',
-            date: 'December 1, 2025',
-            message: 'Admissions are now open for the upcoming Web Development and Data Science batches. Early bird discounts available for the first 50 registrations.',
-            icon: 'bi-megaphone-fill',
-            color: 'text-blue-600',
-            bgColor: 'bg-blue-50'
-        },
-        {
-            id: 2,
-            type: 'alert',
-            title: 'Server Maintenance Scheduled',
-            date: 'November 28, 2025',
-            message: 'The student portal will be undergoing scheduled maintenance on Sunday, Dec 5th from 2:00 AM to 6:00 AM. Please plan your activities accordingly.',
-            icon: 'bi-exclamation-triangle-fill',
-            color: 'text-amber-600',
-            bgColor: 'bg-amber-50'
-        },
-        {
-            id: 3,
-            type: 'success',
-            title: 'New Course Launched: AI & Machine Learning',
-            date: 'November 25, 2025',
-            message: 'We are excited to announce our new advanced course in Artificial Intelligence and Machine Learning. Check the courses section for more details.',
-            icon: 'bi-check-circle-fill',
-            color: 'text-green-600',
-            bgColor: 'bg-green-50'
-        },
-        {
-            id: 4,
-            type: 'info',
-            title: 'Guest Lecture: Future of Tech',
-            date: 'November 20, 2025',
-            message: 'Join us for an exclusive session with industry experts discussing the future trends in technology and career opportunities.',
-            icon: 'bi-info-circle-fill',
-            color: 'text-purple-600',
-            bgColor: 'bg-purple-50'
-        },
-        {
-            id: 5,
-            type: 'info',
-            title: 'Holiday Notice',
-            date: 'November 15, 2025',
-            message: 'The institute will remain closed on November 18th on account of a public holiday. Online classes will resume as per schedule.',
-            icon: 'bi-calendar-event-fill',
-            color: 'text-slate-600',
-            bgColor: 'bg-slate-100'
-        }
-    ]
+
 
     return (
         <div className="min-h-screen bg-slate-50 pt-24 pb-12">
