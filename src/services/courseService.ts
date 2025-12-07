@@ -1,5 +1,5 @@
-import { supabase } from '../../../lib/supabase'
-import type { Course } from '../types'
+import { supabase } from '../lib/supabase'
+import type { Course } from '../types/course'
 import { courseImages, fallbackImage } from '../data/courseImages'
 
 export const courseService = {

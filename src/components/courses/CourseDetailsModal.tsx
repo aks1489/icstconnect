@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import type { Course } from '../types'
+import type { Course } from '../../types/course'
 
 interface CourseDetailsModalProps {
     course: Course | null

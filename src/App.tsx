@@ -6,7 +6,7 @@ import PageSkeleton from './components/ui/PageSkeleton'
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'))
-const CoursesPage = lazy(() => import('./features/courses/pages/CoursesPage'))
+const CoursesPage = lazy(() => import('./pages/Courses'))
 const Notifications = lazy(() => import('./pages/Notifications'))
 const Gallery = lazy(() => import('./pages/Gallery'))
 const OnlineTest = lazy(() => import('./pages/OnlineTest'))

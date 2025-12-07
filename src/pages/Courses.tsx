@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import CourseDetailsModal from '../components/CourseDetailsModal'
-import Skeleton from '../../../components/ui/Skeleton'
-import { courseService } from '../api/courseService'
-import type { Course } from '../types'
+import { useState, useEffect, useMemo } from 'react'
+import CourseDetailsModal from '../components/courses/CourseDetailsModal'
+import Skeleton from '../components/ui/Skeleton'
+import { courseService } from '../services/courseService'
+import type { Course } from '../types/course'
 
 type Duration = '3 Months' | '6 Months' | '12 Months' | '18 Months' | 'All'
 
@@ -27,9 +27,11 @@ const CoursesPage = () => {
         fetchCourses()
     }, [])
 
-    const filteredCourses = activeFilter === 'All'
-        ? courses
-        : courses.filter(course => course.duration === activeFilter)
+    const filteredCourses = useMemo(() => {
+        return activeFilter === 'All'
+            ? courses
+            : courses.filter(course => course.duration === activeFilter)
+    }, [activeFilter, courses])
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-slate-50">
