@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 
 const TestSection = () => {
     return (
@@ -15,10 +16,10 @@ const TestSection = () => {
                 <p className="text-xl lg:text-2xl mb-12 opacity-90 max-w-3xl mx-auto font-light leading-relaxed">
                     Take our online assessment to evaluate your knowledge and get certified. Join thousands of students who have already proven their expertise.
                 </p>
-                <button className="bg-white text-blue-600 px-10 py-4 rounded-full text-lg font-bold shadow-2xl hover:scale-105 hover:shadow-white/20 transition-all duration-300 flex items-center gap-3 mx-auto group">
+                <Link to="/online-test" className="bg-white text-blue-600 px-10 py-4 rounded-full text-lg font-bold shadow-2xl hover:scale-105 hover:shadow-white/20 transition-all duration-300 inline-flex items-center gap-3 mx-auto group">
                     Start Online Test
                     <i className="bi bi-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
-                </button>
+                </Link>
             </div>
         </section>
     )

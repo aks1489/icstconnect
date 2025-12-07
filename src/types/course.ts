@@ -11,7 +11,9 @@ export interface Course {
     duration: string
     fees: CourseFees
     syllabus: string[]
-    image: string
+    // image: string - Removed in favor of icons
+    icon: string
+    color: string
     description: string
     title: string // Computed for compatibility
     price: string // Computed for compatibility

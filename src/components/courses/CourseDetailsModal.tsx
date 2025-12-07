@@ -39,25 +39,21 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                 {/* Close Button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md text-slate-800 hover:bg-white transition-all z-10 shadow-sm"
+                    className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md text-slate-800 hover:bg-white transition-all z-50 shadow-sm"
                 >
                     <i className="bi bi-x-lg text-lg"></i>
                 </button>
 
-                {/* Hero Image */}
-                <div className="relative h-64 flex-shrink-0">
-                    <img
-                        src={course.image}
-                        alt={course.title}
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent flex items-end p-8">
-                        <div>
-                            <span className="inline-block px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold mb-3 shadow-lg shadow-blue-600/30">
-                                {course.duration}
-                            </span>
-                            <h2 className="text-3xl font-bold text-white leading-tight">{course.title}</h2>
-                        </div>
+                {/* Hero Header */}
+                <div className={`relative h-48 flex-shrink-0 ${course.color} flex items-center justify-center overflow-hidden`}>
+                    <div className="absolute inset-0 opacity-10 pattern-dots"></div>
+                    <i className={`bi ${course.icon} text-8xl text-current opacity-20 absolute -right-4 -bottom-4 transform rotate-12`}></i>
+
+                    <div className="relative z-10 text-center p-8 w-full">
+                        <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-slate-900 text-xs font-bold mb-3 shadow-sm border border-white/30">
+                            {course.duration}
+                        </span>
+                        <h2 className="text-3xl font-bold text-slate-900 leading-tight">{course.title}</h2>
                     </div>
                 </div>
 

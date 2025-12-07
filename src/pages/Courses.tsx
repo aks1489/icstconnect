@@ -96,13 +96,14 @@ const CoursesPage = () => {
                         </div>
                     ) : (
                         filteredCourses.map((course) => (
-                            <div key={course.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 flex flex-col h-full">
-                                <div className="relative h-48 overflow-hidden">
-                                    <img
-                                        src={course.image}
-                                        alt={course.title}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
+                            <div
+                                key={course.id}
+                                onClick={() => setSelectedCourse(course)}
+                                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 flex flex-col h-full cursor-pointer"
+                            >
+                                <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
+                                    <div className="absolute inset-0 opacity-10 pattern-dots"></div>
+                                    <i className={`bi ${course.icon} text-6xl relative z-10 transform transition-transform duration-500 group-hover:scale-110`}></i>
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
                                         {course.duration}
                                     </div>
