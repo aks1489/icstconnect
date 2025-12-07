@@ -6,7 +6,7 @@ import PageSkeleton from './components/ui/PageSkeleton'
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'))
-const AllCourses = lazy(() => import('./pages/AllCourses'))
+const CoursesPage = lazy(() => import('./features/courses/pages/CoursesPage'))
 const Notifications = lazy(() => import('./pages/Notifications'))
 const Gallery = lazy(() => import('./pages/Gallery'))
 const OnlineTest = lazy(() => import('./pages/OnlineTest'))
@@ -20,7 +20,7 @@ function App() {
         <Suspense fallback={<PageSkeleton />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/courses" element={<AllCourses />} />
+            <Route path="/courses" element={<CoursesPage />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/online-test" element={<OnlineTest />} />

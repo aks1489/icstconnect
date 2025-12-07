@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
-interface Course {
-    id: number
-    title: string
-    duration: string
-    image: string
-    description: string
-    price: string
-}
+import type { Course } from '../types'
 
 interface CourseDetailsModalProps {
     course: Course | null
@@ -90,30 +82,44 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
 
                     <div className="space-y-6">
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">About this Course</h3>
-                            <p className="text-slate-600 leading-relaxed">
-                                {course.description} This comprehensive course is designed to equip you with the essential skills needed in today's digital landscape.
-                                Whether you are starting from scratch or looking to upgrade your skills, our expert-led training ensures you gain practical, hands-on experience.
-                            </p>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">Course Syllabus</h3>
+                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                <ul className="grid grid-cols-1 gap-2">
+                                    {course.syllabus && course.syllabus.map((topic, index) => (
+                                        <li key={index} className="flex items-start gap-2 text-slate-700 font-medium">
+                                            <i className="bi bi-check-lg text-blue-600 mt-1"></i>
+                                            <span>{topic}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
 
+                        {course.fees && (
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 mb-3">Fee Structure</h3>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
+                                        <p className="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Admission</p>
+                                        <p className="text-xl font-bold text-slate-900">{course.fees.admission ? `₹${course.fees.admission}` : 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 text-center">
+                                        <p className="text-xs text-purple-600 font-bold uppercase tracking-wider mb-1">Monthly</p>
+                                        <p className="text-xl font-bold text-slate-900">{course.fees.monthly ? `₹${course.fees.monthly}` : 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center">
+                                        <p className="text-xs text-emerald-600 font-bold uppercase tracking-wider mb-1">Total</p>
+                                        <p className="text-xl font-bold text-slate-900">{course.fees.total ? `₹${course.fees.total}` : 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">What you'll learn</h3>
-                            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                {[
-                                    'Industry-standard tools & software',
-                                    'Real-world project experience',
-                                    'Professional portfolio building',
-                                    'Career guidance and support',
-                                    'Certificate of completion',
-                                    'Lifetime access to resources'
-                                ].map((item, index) => (
-                                    <li key={index} className="flex items-start gap-2 text-slate-600">
-                                        <i className="bi bi-check-circle-fill text-green-500 mt-1 flex-shrink-0"></i>
-                                        <span>{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                            <h3 className="text-xl font-bold text-slate-900 mb-3">Certification</h3>
+                            <p className="text-slate-600">
+                                Upon successful completion of this course, you will receive a verified certificate from ICST Chowberia, which is recognized by leading companies.
+                            </p>
                         </div>
                     </div>
                 </div>
