@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { NavigationHeader, NavigationFooter } from '../NavBar'
-import AuthModal from '../../ui/AuthModal'
+import AuthModal from '../../auth/AuthModal'
 
 import Footer from '../Footer/Footer'
 
@@ -8,19 +8,23 @@ interface MainLayoutProps {
     children: React.ReactNode
 }
 
+import { useAuth } from '../../../contexts/AuthContext'
+
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const [showAuthModal, setShowAuthModal] = useState(false)
-    const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
+    const { user, profile } = useAuth()
 
     const handleLoginClick = () => {
-        setAuthMode('login')
         setShowAuthModal(true)
     }
+
+    // Combine user and profile for role access
+    const authUser = user ? { ...user, role: profile?.role } : null
 
     return (
         <div className="app-shell">
             <header className="app-header">
-                <NavigationHeader onLoginClick={handleLoginClick} />
+                <NavigationHeader onLoginClick={handleLoginClick} user={authUser} />
             </header>
 
             <main className="app-main pb-[60px] lg:pb-0">
@@ -30,10 +34,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <Footer />
 
             <div className="lg:hidden">
-                <NavigationFooter onLoginClick={handleLoginClick} />
+                <NavigationFooter onLoginClick={handleLoginClick} user={authUser} />
             </div>
 
-            <AuthModal show={showAuthModal} onClose={() => setShowAuthModal(false)} initialMode={authMode} />
+            <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
         </div>
     )
 }
