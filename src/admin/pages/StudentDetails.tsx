@@ -49,7 +49,10 @@ export default function StudentDetails() {
                 .eq('id', id)
                 .single()
 
-            if (studentError) throw studentError
+            if (studentError) {
+                console.error('Error fetching student:', studentError)
+                throw new Error(`Failed to load student: ${studentError.message}`)
+            }
             setStudent(studentData)
 
             // 2. Fetch Enrollments
@@ -67,8 +70,12 @@ export default function StudentDetails() {
                 `)
                 .eq('student_id', id)
 
-            if (enrollmentError) throw enrollmentError
-            // Cast data to match interface (Supabase join returns array/object depending on relation, forcing cast here)
+            if (enrollmentError) {
+                console.error('Error fetching enrollments:', enrollmentError)
+                throw new Error(`Failed to load enrollments: ${enrollmentError.message}`)
+            }
+
+            // Cast data to match interface
             setEnrollments(enrollmentData as unknown as Enrollment[])
 
             // 3. Fetch All Courses (for assignment)
@@ -77,12 +84,31 @@ export default function StudentDetails() {
                 .select('id, course_name')
                 .order('course_name')
 
-            if (coursesError) throw coursesError
-            setAllCourses(coursesData || [])
+            if (coursesError) {
+                // Fallback to title if course_name doesn't exist (handling migration state)
+                if (coursesError.message?.includes('column "course_name" does not exist')) {
+                    const { data: fallbackData, error: fallbackError } = await supabase
+                        .from('courses')
+                        .select('id, title')
+                        .order('title')
 
-        } catch (error) {
+                    if (fallbackError) {
+                        console.error('Error fetching courses fallback:', fallbackError)
+                        throw new Error(`Failed to load courses: ${fallbackError.message}`)
+                    }
+                    // Map title to course_name
+                    setAllCourses(fallbackData?.map((c: any) => ({ ...c, course_name: c.title })) || [])
+                } else {
+                    console.error('Error fetching courses:', coursesError)
+                    throw new Error(`Failed to load courses: ${coursesError.message}`)
+                }
+            } else {
+                setAllCourses(coursesData || [])
+            }
+
+        } catch (error: any) {
             console.error('Error fetching data:', error)
-            alert('Error loading student details')
+            alert(error.message || 'Error loading student details')
         } finally {
             setLoading(false)
         }
