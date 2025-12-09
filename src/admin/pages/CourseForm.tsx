@@ -13,7 +13,8 @@ export default function CourseForm() {
         course_name: '',
         description: '',
         icon: 'bi-code-square',
-        color: 'text-indigo-600 bg-indigo-50'
+        color: 'text-indigo-600 bg-indigo-50',
+        duration_months: 6
     })
 
     const colorThemes = [
@@ -53,7 +54,8 @@ export default function CourseForm() {
                     course_name: data.course_name || '',
                     description: data.description || '',
                     icon: data.icon || 'bi-code-square',
-                    color: data.color || 'text-indigo-600 bg-indigo-50'
+                    color: data.color || 'text-indigo-600 bg-indigo-50',
+                    duration_months: data.duration_months || 6
                 })
             }
         } catch (error) {
@@ -138,6 +140,19 @@ export default function CourseForm() {
                                 placeholder="What will students learn in this course?"
                             />
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Duration (Months)</label>
+                        <select
+                            value={formData.duration_months}
+                            onChange={(e) => setFormData({ ...formData, duration_months: parseInt(e.target.value) })}
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                        >
+                            {[3, 6, 12, 18, 24].map(months => (
+                                <option key={months} value={months}>{months} Months</option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="h-px bg-slate-100"></div>

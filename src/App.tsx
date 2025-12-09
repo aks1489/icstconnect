@@ -14,6 +14,7 @@ const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 import AdminLogin from './pages/AdminLogin'
+import TeacherLogin from './pages/TeacherLogin'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 
@@ -21,6 +22,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import StudentLayout from './student/layout/StudentLayout'
 import StudentDashboard from './student/pages/Dashboard'
 import OfflineClasses from './student/pages/OfflineClasses'
+import StudentCalendar from './student/pages/Calendar'
 
 // Admin Imports
 import AdminLayout from './admin/layout/AdminLayout'
@@ -29,6 +31,18 @@ import ManageStudents from './admin/pages/Students'
 import StudentDetails from './admin/pages/StudentDetails'
 import AdminCourses from './admin/pages/Courses'
 import CourseForm from './admin/pages/CourseForm'
+import AdminCalendar from './admin/pages/Calendar'
+import ScheduleClass from './admin/pages/ScheduleClass'
+import AdminTeachers from './admin/pages/Teachers'
+import TeacherDetails from './admin/pages/TeacherDetails'
+
+// Teacher Imports
+import TeacherLayout from './teacher/layout/TeacherLayout'
+import TeacherDashboard from './teacher/pages/Dashboard'
+import TeacherCalendar from './teacher/pages/Calendar'
+import ActiveClasses from './teacher/pages/ActiveClasses'
+import ManageClass from './teacher/pages/ManageClass'
+import TeacherExams from './teacher/pages/Exams'
 
 
 // Simple Toast Component for global errors
@@ -91,6 +105,7 @@ function App() {
               <Route path="/about" element={<AboutUs />} />
               <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/teacher/login" element={<TeacherLogin />} />
               <Route path="/reset-password" element={<ResetPassword />} />
 
               {/* Catch all to Home - Only inside MainLayout */}
@@ -106,6 +121,7 @@ function App() {
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<StudentDashboard />} />
               <Route path="offline-classes" element={<OfflineClasses />} />
+              <Route path="calendar" element={<StudentCalendar />} />
             </Route>
 
             {/* Admin Routes - Independent Layout */}
@@ -121,6 +137,25 @@ function App() {
               <Route path="courses" element={<AdminCourses />} />
               <Route path="courses/new" element={<CourseForm />} />
               <Route path="courses/:id/edit" element={<CourseForm />} />
+              <Route path="calendar" element={<AdminCalendar />} />
+              <Route path="schedule" element={<ScheduleClass />} />
+              <Route path="teachers" element={<AdminTeachers />} />
+              <Route path="teachers/:id" element={<TeacherDetails />} />
+            </Route>
+
+            {/* Teacher Routes - Independent Layout */}
+            <Route path="/teacher" element={
+              <ProtectedRoute requireTeacher>
+                <TeacherLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<TeacherDashboard />} />
+              <Route path="calendar" element={<TeacherCalendar />} />
+              <Route path="active-classes" element={<ActiveClasses />} />
+              <Route path="classes/:courseId" element={<ManageClass />} />
+              <Route path="exams" element={<TeacherExams />} />
+              {/* Add more teacher routes here */}
             </Route>
 
           </Routes>

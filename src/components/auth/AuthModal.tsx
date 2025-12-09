@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 interface AuthModalProps {
     isOpen: boolean
@@ -264,7 +264,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </div>
 
                 {/* Footer Section */}
-                <div className="px-8 pb-8 text-center">
+                <div className="px-8 pb-8 text-center space-y-4">
+                    <div className="flex justify-center gap-4 text-xs font-medium text-slate-500">
+                        <Link to="/teacher/login" onClick={onClose} className="hover:text-emerald-600 transition-colors">Teacher Login</Link>
+                        <span className="text-slate-300">|</span>
+                        <Link to="/admin/login" onClick={onClose} className="hover:text-indigo-600 transition-colors">Admin Login</Link>
+                    </div>
                     <p className="text-xs text-slate-400">
                         By continuing, you agree to our Terms of Service and Privacy Policy.
                     </p>

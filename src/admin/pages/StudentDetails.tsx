@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
 interface StudentProfile {
@@ -7,7 +7,9 @@ interface StudentProfile {
     full_name: string
     email: string
     created_at: string
+    role: string
 }
+
 
 interface Enrollment {
     course_id: number
@@ -27,6 +29,7 @@ interface Course {
 
 export default function StudentDetails() {
     const { id } = useParams()
+    const navigate = useNavigate()
     const [student, setStudent] = useState<StudentProfile | null>(null)
     const [enrollments, setEnrollments] = useState<Enrollment[]>([])
     const [allCourses, setAllCourses] = useState<Course[]>([])
@@ -178,6 +181,25 @@ export default function StudentDetails() {
         }
     }
 
+    const handleMakeTeacher = async () => {
+        if (!window.confirm('Are you sure you want to promote this user to a Teacher? They will typically be removed from the student list.')) return
+
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ role: 'teacher' })
+                .eq('id', id)
+
+            if (error) throw error
+
+            alert('User promoted to Teacher successfully!')
+            navigate('/admin/students') // Go back to list as they might disappear from "Student" filtered lists
+        } catch (error) {
+            console.error('Error promoting user:', error)
+            alert('Failed to promote user')
+        }
+    }
+
     if (loading) return <div className="p-8 text-center">Loading details...</div>
     if (!student) return <div className="p-8 text-center">Student not found</div>
 
@@ -198,6 +220,9 @@ export default function StudentDetails() {
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800">{student.full_name}</h1>
                         <p className="text-slate-500">{student.email}</p>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${student.role === 'teacher' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                            {student.role || 'student'}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -297,6 +322,15 @@ export default function StudentDetails() {
                         <button className="w-full py-2.5 border border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-colors">
                             Deactivate Account
                         </button>
+
+                        {student.role !== 'teacher' && (
+                            <button
+                                onClick={handleMakeTeacher}
+                                className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-medium hover:bg-emerald-100 transition-colors mt-3"
+                            >
+                                Promote to Teacher
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

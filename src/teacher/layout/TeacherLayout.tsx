@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
-export default function AdminLayout() {
-    const { signOut } = useAuth()
+export default function TeacherLayout() {
+    const { signOut, user, profile } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -29,12 +29,10 @@ export default function AdminLayout() {
     }
 
     const navItems = [
-        { path: '/admin/dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
-        { path: '/admin/students', label: 'Students', icon: 'bi-people' },
-        { path: '/admin/teachers', label: 'Teachers', icon: 'bi-person-badge' },
-        { path: '/admin/courses', label: 'Courses', icon: 'bi-collection' },
-        { path: '/admin/calendar', label: 'Calendar', icon: 'bi-calendar-week' },
-        // Add more admin links here as needed
+        { path: '/teacher/dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
+        { path: '/teacher/active-classes', label: 'Active Classes', icon: 'bi-easel' },
+        { path: '/teacher/exams', label: 'Exams', icon: 'bi-file-earmark-text' },
+        { path: '/teacher/calendar', label: 'Calendar', icon: 'bi-calendar-event' },
     ]
 
     return (
@@ -60,11 +58,11 @@ export default function AdminLayout() {
                     {/* Logo Area */}
                     <div className="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-950 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                                <span className="text-xl font-bold">A</span>
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                                <span className="text-xl font-bold">T</span>
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold tracking-tight">Admin Portal</h1>
+                                <h1 className="text-lg font-bold tracking-tight">Teacher Portal</h1>
                                 <p className="text-xs text-slate-400">ICST Connect</p>
                             </div>
                         </div>
@@ -73,7 +71,7 @@ export default function AdminLayout() {
                     {/* Navigation */}
                     <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
-                            Main Menu
+                            Menu
                         </div>
                         {navItems.map((item) => {
                             const isActive = location.pathname === item.path
@@ -84,7 +82,7 @@ export default function AdminLayout() {
                                     className={`
                                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                                         ${isActive
-                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 translate-x-1'
+                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 translate-x-1'
                                             : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:translate-x-1'
                                         }
                                     `}
@@ -101,6 +99,15 @@ export default function AdminLayout() {
 
                     {/* User Profile / Logout */}
                     <div className="p-4 border-t border-slate-800 bg-slate-950 shrink-0">
+                        <div className="flex items-center gap-3 mb-4 px-2">
+                            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">
+                                {profile?.full_name?.charAt(0) || 'T'}
+                            </div>
+                            <div className="overflow-hidden">
+                                <p className="text-sm font-medium text-slate-200 truncate">{profile?.full_name || 'Teacher'}</p>
+                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                            </div>
+                        </div>
                         <button
                             onClick={handleSignOut}
                             className="flex items-center gap-3 w-full p-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 group"
@@ -127,7 +134,7 @@ export default function AdminLayout() {
                     >
                         <i className="bi bi-list text-2xl"></i>
                     </button>
-                    <span className="font-semibold text-slate-700 lg:hidden">Admin Panel</span>
+                    <span className="font-semibold text-slate-700 lg:hidden">Teacher Portal</span>
                     <div className="w-8 lg:hidden"></div> {/* Spacer for alignment */}
                 </header>
 

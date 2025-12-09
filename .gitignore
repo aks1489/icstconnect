@@ -35,3 +35,4 @@ admin_setup.sql
 update_courses_schema.sql
 update_schema.sql
 fix_enrollments_progress.sql
+update_full_schema.sql

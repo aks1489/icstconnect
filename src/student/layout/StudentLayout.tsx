@@ -20,6 +20,7 @@ export default function StudentLayout() {
                 <nav className="mt-4">
                     <Link to="/student/dashboard" className="block py-2 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Dashboard</Link>
                     <Link to="/student/offline-classes" className="block py-2 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Offline Classes</Link>
+                    <Link to="/student/calendar" className="block py-2 px-4 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Calendar</Link>
                 </nav>
                 <div className="absolute bottom-0 w-64 p-4 border-t">
                     <button onClick={handleSignOut} className="w-full text-left text-red-600 hover:text-red-800">
