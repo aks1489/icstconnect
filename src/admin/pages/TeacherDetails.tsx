@@ -7,6 +7,7 @@ interface TeacherProfile {
     full_name: string
     email: string
     created_at: string
+    teacher_id?: string
 }
 
 export default function TeacherDetails() {
@@ -15,18 +16,25 @@ export default function TeacherDetails() {
     const [teacher, setTeacher] = useState<TeacherProfile | null>(null)
     const [loading, setLoading] = useState(true)
 
+    // Edit ID state
+    const [isEditingId, setIsEditingId] = useState(false)
+    const [newTeacherId, setNewTeacherId] = useState('')
+
     useEffect(() => {
         if (id) fetchTeacher()
     }, [id])
 
     const fetchTeacher = async () => {
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', id)
             .single()
 
-        if (data) setTeacher(data)
+        if (data) {
+            setTeacher(data)
+            setNewTeacherId(data.teacher_id || '')
+        }
         setLoading(false)
     }
 
@@ -46,6 +54,24 @@ export default function TeacherDetails() {
         } catch (error) {
             console.error('Error:', error)
             alert('Failed to update role')
+        }
+    }
+
+    const handleUpdateId = async () => {
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ teacher_id: newTeacherId || null })
+                .eq('id', id)
+
+            if (error) throw error
+
+            setTeacher(prev => prev ? { ...prev, teacher_id: newTeacherId } : null)
+            setIsEditingId(false)
+            alert('Teacher ID updated successfully')
+        } catch (error) {
+            console.error('Error updating ID:', error)
+            alert('Failed to update Teacher ID')
         }
     }
 
@@ -73,8 +99,37 @@ export default function TeacherDetails() {
                             </div>
                         </div>
                         <div className="flex-1 pb-2 text-center md:text-left">
-                            <h1 className="text-3xl font-bold text-slate-800">{teacher.full_name}</h1>
-                            <div className="flex items-center justify-center md:justify-start gap-4 mt-1 text-slate-500">
+                            <div className="flex flex-col md:flex-row items-center gap-4">
+                                <h1 className="text-3xl font-bold text-slate-800">{teacher.full_name}</h1>
+                                {isEditingId ? (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            value={newTeacherId}
+                                            onChange={(e) => setNewTeacherId(e.target.value)}
+                                            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                                            placeholder="Enter ID..."
+                                        />
+                                        <button onClick={handleUpdateId} className="text-emerald-600 hover:text-emerald-700">
+                                            <i className="bi bi-check-lg text-xl"></i>
+                                        </button>
+                                        <button onClick={() => setIsEditingId(false)} className="text-red-500 hover:text-red-700">
+                                            <i className="bi bi-x-lg text-xl"></i>
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div
+                                        onClick={() => setIsEditingId(true)}
+                                        className="group cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full transition-colors"
+                                    >
+                                        <span className="text-sm font-mono font-bold text-slate-600">
+                                            {teacher.teacher_id || 'No ID Set'}
+                                        </span>
+                                        <i className="bi bi-pencil-fill text-xs text-slate-400 group-hover:text-slate-600"></i>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center justify-center md:justify-start gap-4 mt-2 text-slate-500">
                                 <span className="flex items-center gap-1.5"><i className="bi bi-envelope"></i> {teacher.email}</span>
                                 <span className="flex items-center gap-1.5"><i className="bi bi-calendar"></i> Joined {new Date(teacher.created_at).toLocaleDateString()}</span>
                             </div>

@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import CreateTeacherModal from '../../components/admin/CreateTeacherModal'
 
 interface TeacherProfile {
     id: string
     full_name: string
     email: string
     created_at: string
+    teacher_id?: string
     avatar_url?: string
 }
 
@@ -15,6 +17,7 @@ export default function Teachers() {
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
     useEffect(() => {
         fetchTeachers()
@@ -39,7 +42,8 @@ export default function Teachers() {
 
     const filteredTeachers = teachers.filter(teacher =>
         teacher.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        teacher.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        teacher.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        teacher.teacher_id?.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
     if (loading) return (
@@ -71,14 +75,14 @@ export default function Teachers() {
                             <i className="bi bi-list-ul"></i>
                         </button>
                     </div>
-                    {/* Placeholder for "Add Teacher" - usually done via Student Promotion or Invite */}
-                    <Link
-                        to="/admin/students"
+
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
                         className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-2"
                     >
                         <i className="bi bi-person-plus-fill"></i>
                         <span>Add Teacher</span>
-                    </Link>
+                    </button>
                 </div>
             </div>
 
@@ -87,7 +91,7 @@ export default function Teachers() {
                 <i className="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
                 <input
                     type="text"
-                    placeholder="Search by name or email..."
+                    placeholder="Search by name, email, or ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all shadow-sm"
@@ -102,7 +106,7 @@ export default function Teachers() {
                     </div>
                     <h3 className="text-lg font-bold text-slate-800">No Teachers Found</h3>
                     <p className="text-slate-500 mt-1 max-w-xs mx-auto">
-                        {searchTerm ? 'No matches for your search' : 'Promote a student to "Teacher" status to see them here.'}
+                        {searchTerm ? 'No matches for your search' : 'Add your first teacher to get started.'}
                     </p>
                 </div>
             ) : viewMode === 'grid' ? (
@@ -113,6 +117,11 @@ export default function Teachers() {
                                 <div className="absolute top-4 right-4">
                                     <div className="w-2 h-2 rounded-full bg-emerald-400 ring-4 ring-white/20"></div>
                                 </div>
+                                {teacher.teacher_id && (
+                                    <div className="absolute top-4 left-4 bg-black/20 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-mono text-white border border-white/10 shadow-sm">
+                                        {teacher.teacher_id}
+                                    </div>
+                                )}
                             </div>
                             <div className="px-6 pb-6 relative">
                                 <Link to={`/admin/teachers/${teacher.id}`} className="block -mt-12 mb-4">
@@ -161,6 +170,7 @@ export default function Teachers() {
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Teacher</th>
+                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
                                 <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
                                 <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
                                 <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
@@ -176,6 +186,13 @@ export default function Teachers() {
                                             </div>
                                             <span className="font-semibold text-slate-700">{teacher.full_name}</span>
                                         </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-sm font-mono text-slate-600">
+                                        {teacher.teacher_id ? (
+                                            <span className="bg-slate-100 px-2 py-1 rounded text-xs">{teacher.teacher_id}</span>
+                                        ) : (
+                                            <span className="text-slate-400 italic">--</span>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 text-sm text-slate-500">{teacher.email}</td>
                                     <td className="px-6 py-4 text-sm text-slate-500">{new Date(teacher.created_at).toLocaleDateString()}</td>
@@ -193,6 +210,12 @@ export default function Teachers() {
                     </table>
                 </div>
             )}
+
+            <CreateTeacherModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={fetchTeachers}
+            />
         </div>
     )
 }
