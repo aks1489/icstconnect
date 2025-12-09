@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
 interface StudentProfile {
@@ -92,8 +93,12 @@ export default function ManageStudents() {
                                         <div className="text-sm text-gray-500">{new Date(student.created_at).toLocaleDateString()}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button className="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-                                        <button className="text-red-600 hover:text-red-900">Delete</button>
+                                        <Link
+                                            to={`/admin/students/${student.id}`}
+                                            className="text-indigo-600 hover:text-indigo-900 mr-4 font-semibold"
+                                        >
+                                            View & Manage
+                                        </Link>
                                     </td>
                                 </tr>
                             ))

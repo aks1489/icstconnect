@@ -29,3 +29,8 @@ dist-ssr
 .env.local
 .env.*.local
 supabase_migration.sql
+admin_setup.sql
+.gitignore
+.gitignore
+update_courses_schema.sql
+update_schema.sql

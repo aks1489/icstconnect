@@ -70,9 +70,9 @@ export default function StudentDashboard() {
                 ) : (
                     courses.map((item) => (
                         <div key={item.course.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
-                            <div className={`p-6 ${item.course.color.split(' ')[1] || 'bg-gray-50'}`}>
-                                <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${item.course.color.split(' ')[0].replace('text-', 'bg-').replace('500', '100') || 'bg-blue-100'}`}>
-                                    <i className={`bi ${item.course.icon} text-2xl ${item.course.color.split(' ')[0] || 'text-blue-600'}`}></i>
+                            <div className={`p-6 ${(item.course.color || '').split(' ')[1] || 'bg-gray-50'}`}>
+                                <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${(item.course.color || '').split(' ')[0].replace('text-', 'bg-').replace('500', '100') || 'bg-blue-100'}`}>
+                                    <i className={`bi ${item.course.icon} text-2xl ${(item.course.color || '').split(' ')[0] || 'text-blue-600'}`}></i>
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900">{item.course.title}</h3>
                                 <p className="text-sm text-gray-500 mt-1">Enrolled on {new Date(item.enrolled_at).toLocaleDateString()}</p>

@@ -9,6 +9,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [isLogin, setIsLogin] = useState(true)
+    const [isForgotPassword, setIsForgotPassword] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [fullName, setFullName] = useState('')
@@ -20,6 +21,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     useEffect(() => {
         if (!isOpen) return
         setError(null)
+        setIsForgotPassword(false)
         // Keep inputs if switching modes, maybe? No, let's keep it clean or just keep them.
         // Actually good UX to keep email/password if they just clicked the wrong tab.
     }, [isOpen, isLogin])
@@ -32,7 +34,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setError(null)
 
         try {
-            if (isLogin) {
+            if (isForgotPassword) {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: `${window.location.origin}/reset-password`,
+                })
+                if (error) throw error
+                setError('Password reset instructions sent! Check your email.')
+            } else if (isLogin) {
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
@@ -63,6 +71,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 }
             }
         } catch (err: any) {
+            console.error('Auth Error:', err)
             setError(err.message)
         } finally {
             setLoading(false)
@@ -112,79 +121,127 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     {/* Tabs */}
                     <div className="flex p-1 rounded-xl bg-slate-100 mb-8 relative">
                         <div
-                            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-white shadow-sm transition-all duration-300 ease-out ${isLogin ? 'left-1' : 'left-[calc(50%+4px)]'}`}
+                            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-white shadow-sm transition-all duration-300 ease-out ${isForgotPassword ? 'hidden' : isLogin ? 'left-1' : 'left-[calc(50%+4px)]'}`}
                         ></div>
                         <button
-                            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${isLogin ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
-                            onClick={() => setIsLogin(true)}
+                            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${isLogin && !isForgotPassword ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => { setIsLogin(true); setIsForgotPassword(false); }}
                         >
                             Sign In
                         </button>
                         <button
-                            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${!isLogin ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
-                            onClick={() => setIsLogin(false)}
+                            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${!isLogin && !isForgotPassword ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => { setIsLogin(false); setIsForgotPassword(false); }}
                         >
                             Sign Up
                         </button>
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {!isLogin && (
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
+                        {isForgotPassword ? (
+                            <div className="space-y-1.5 animate-in fade-in slide-in-from-right-4 duration-300">
+                                <div className="text-center mb-4">
+                                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 mb-3">
+                                        <i className="bi bi-key-fill text-xl text-indigo-600"></i>
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-slate-900">Forgot Password?</h3>
+                                    <p className="text-sm text-slate-500">
+                                        Enter your email address and we'll send you a link to reset your password.
+                                    </p>
+                                </div>
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                                 <div className="relative group">
                                     <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                        <i className="bi bi-person"></i>
+                                        <i className="bi bi-envelope"></i>
                                     </span>
                                     <input
-                                        type="text"
+                                        type="email"
                                         required
                                         className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
-                                        placeholder="John Doe"
-                                        value={fullName}
-                                        onChange={(e) => setFullName(e.target.value)}
+                                        placeholder="you@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                     />
                                 </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsForgotPassword(false)}
+                                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium block text-center mt-2"
+                                >
+                                    Back to Sign In
+                                </button>
                             </div>
+                        ) : (
+                            <>
+                                {!isLogin && (
+                                    <div className="space-y-1.5 animate-in fade-in slide-in-from-right-4 duration-300">
+                                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
+                                        <div className="relative group">
+                                            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                                <i className="bi bi-person"></i>
+                                            </span>
+                                            <input
+                                                type="text"
+                                                required
+                                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                                placeholder="John Doe"
+                                                value={fullName}
+                                                onChange={(e) => setFullName(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+                                    <div className="relative group">
+                                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                            <i className="bi bi-envelope"></i>
+                                        </span>
+                                        <input
+                                            type="email"
+                                            required
+                                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                            placeholder="you@example.com"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between items-center px-1">
+                                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Password</label>
+                                        {isLogin && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsForgotPassword(true)}
+                                                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                                            >
+                                                Forgot Password?
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="relative group">
+                                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                            <i className="bi bi-lock"></i>
+                                        </span>
+                                        <input
+                                            type="password"
+                                            required
+                                            className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                            placeholder="••••••••"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                            </>
                         )}
 
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
-                            <div className="relative group">
-                                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                    <i className="bi bi-envelope"></i>
-                                </span>
-                                <input
-                                    type="email"
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
-                                    placeholder="you@example.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Password</label>
-                            <div className="relative group">
-                                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                    <i className="bi bi-lock"></i>
-                                </span>
-                                <input
-                                    type="password"
-                                    required
-                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                            </div>
-                        </div>
-
                         {error && (
-                            <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${error.includes('Account created') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-                                <i className={`bi ${error.includes('Account created') ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'} mt-0.5`}></i>
+                            <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${error.includes('sent') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                                <i className={`bi ${error.includes('sent') ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'} mt-0.5`}></i>
                                 <span>{error}</span>
                             </div>
                         )}
@@ -200,7 +257,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     <span>Processing...</span>
                                 </>
                             ) : (
-                                <span>{isLogin ? 'Sign In to Dashboard' : 'Create Account'}</span>
+                                <span>{isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In to Dashboard' : 'Create Account'}</span>
                             )}
                         </button>
                     </form>

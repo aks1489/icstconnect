@@ -83,14 +83,14 @@ export default function OfflineClasses() {
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {classes.map((session) => (
                         <div key={session.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
-                            <div className={`p-4 ${session.course.color.split(' ')[1] || 'bg-gray-50'}`}>
+                            <div className={`p-4 ${(session.course.color || '').split(' ')[1] || 'bg-gray-50'}`}>
                                 <div className="flex items-center justify-between">
                                     <span className={`text-sm font-medium px-2 py-1 rounded-full bg-white/50`}>
                                         {session.course.title}
                                     </span>
                                     <span className={`text-xs font-semibold px-2 py-1 rounded-full ${session.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                            session.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                                                'bg-blue-100 text-blue-800'
+                                        session.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                            'bg-blue-100 text-blue-800'
                                         }`}>
                                         {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
                                     </span>
