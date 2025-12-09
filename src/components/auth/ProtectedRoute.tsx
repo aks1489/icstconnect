@@ -16,6 +16,9 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
 
     if (!user) {
         // Redirect to login but save the attempted location
+        if (requireAdmin) {
+            return <Navigate to="/admin/login" state={{ from: location }} replace />
+        }
         return <Navigate to="/login" state={{ from: location }} replace />
     }
 

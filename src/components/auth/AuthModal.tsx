@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate } from 'react-router-dom'
 
@@ -15,6 +15,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const navigate = useNavigate()
+
+    // Reset state when modal opens/closes or mode changes
+    useEffect(() => {
+        if (!isOpen) return
+        setError(null)
+        // Keep inputs if switching modes, maybe? No, let's keep it clean or just keep them.
+        // Actually good UX to keep email/password if they just clicked the wrong tab.
+    }, [isOpen, isLogin])
 
     if (!isOpen) return null
 
@@ -62,97 +70,148 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 relative animate-in fade-in zoom-in duration-200">
-                <button
-                    onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
-                >
-                    <i className="bi bi-x-lg text-xl"></i>
-                </button>
+        <div className="fixed inset-0 z-[1050] flex items-center justify-center">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300"
+                onClick={onClose}
+            ></div>
 
-                <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
-                    {isLogin ? 'Welcome Back' : 'Create Account'}
-                </h2>
+            {/* Modal Card */}
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-0 overflow-hidden animate-in fade-in zoom-in duration-300 mx-4">
 
-                <div className="flex mb-6 bg-gray-100 p-1 rounded-lg">
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-8 text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-full bg-white/10 opacity-30">
+                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl opacity-20"></div>
+                        <div className="absolute top-10 -right-10 w-40 h-40 bg-pink-400 rounded-full blur-3xl opacity-20"></div>
+                    </div>
+
                     <button
-                        className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${isLogin ? 'bg-white shadow text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-                        onClick={() => setIsLogin(true)}
+                        onClick={onClose}
+                        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-1 w-8 h-8 flex items-center justify-center backdrop-blur-md"
                     >
-                        Login
+                        <i className="bi bi-x-lg text-sm"></i>
                     </button>
-                    <button
-                        className={`flex-1 py-2 rounded-md text-sm font-medium transition-all ${!isLogin ? 'bg-white shadow text-indigo-600' : 'text-gray-500 hover:text-gray-700'}`}
-                        onClick={() => setIsLogin(false)}
-                    >
-                        Sign Up
-                    </button>
+
+                    <div className="relative z-10">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md mb-4 shadow-lg ring-1 ring-white/30">
+                            <i className={`bi ${isLogin ? 'bi-person-circle' : 'bi-person-plus-fill'} text-2xl text-white`}></i>
+                        </div>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">
+                            {isLogin ? 'Welcome Back' : 'Join ICST Connect'}
+                        </h2>
+                        <p className="text-indigo-100 text-sm mt-1 font-medium opacity-90">
+                            {isLogin ? 'Please sign in to continue' : 'Start your learning journey today'}
+                        </p>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {!isLogin && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input
-                                type="text"
-                                required
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                placeholder="John Doe"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                            />
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input
-                            type="email"
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                            placeholder="you@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                {/* Body Section */}
+                <div className="p-8 pt-6">
+                    {/* Tabs */}
+                    <div className="flex p-1 rounded-xl bg-slate-100 mb-8 relative">
+                        <div
+                            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-white shadow-sm transition-all duration-300 ease-out ${isLogin ? 'left-1' : 'left-[calc(50%+4px)]'}`}
+                        ></div>
+                        <button
+                            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${isLogin ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => setIsLogin(true)}
+                        >
+                            Sign In
+                        </button>
+                        <button
+                            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${!isLogin ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                            onClick={() => setIsLogin(false)}
+                        >
+                            Sign Up
+                        </button>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <input
-                            type="password"
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {!isLogin && (
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
+                                <div className="relative group">
+                                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                        <i className="bi bi-person"></i>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                        placeholder="John Doe"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+                        )}
 
-                    {error && (
-                        <div className={`text-sm text-center p-2 rounded ${error.includes('Account created') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
-                            {error}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+                            <div className="relative group">
+                                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                    <i className="bi bi-envelope"></i>
+                                </span>
+                                <input
+                                    type="email"
+                                    required
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                    placeholder="you@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
                         </div>
-                    )}
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
-                    </button>
-                </form>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Password</label>
+                            <div className="relative group">
+                                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                                    <i className="bi bi-lock"></i>
+                                </span>
+                                <input
+                                    type="password"
+                                    required
+                                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+                        </div>
 
-                <p className="mt-6 text-center text-sm text-gray-500">
-                    {isLogin ? "Don't have an account? " : "Already have an account? "}
-                    <button
-                        onClick={() => setIsLogin(!isLogin)}
-                        className="text-indigo-600 hover:text-indigo-500 font-medium"
-                    >
-                        {isLogin ? 'Sign up' : 'Log in'}
-                    </button>
-                </p>
+                        {error && (
+                            <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${error.includes('Account created') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                                <i className={`bi ${error.includes('Account created') ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'} mt-0.5`}></i>
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none mt-2 flex items-center justify-center gap-2"
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                    <span>Processing...</span>
+                                </>
+                            ) : (
+                                <span>{isLogin ? 'Sign In to Dashboard' : 'Create Account'}</span>
+                            )}
+                        </button>
+                    </form>
+                </div>
+
+                {/* Footer Section */}
+                <div className="px-8 pb-8 text-center">
+                    <p className="text-xs text-slate-400">
+                        By continuing, you agree to our Terms of Service and Privacy Policy.
+                    </p>
+                </div>
             </div>
         </div>
     )
