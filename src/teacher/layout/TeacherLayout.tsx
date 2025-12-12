@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { TEACHER_ACTIONS } from '../../config/navigation'
 
 export default function TeacherLayout() {
     const { signOut, user, profile } = useAuth()
@@ -28,12 +29,7 @@ export default function TeacherLayout() {
         navigate('/login')
     }
 
-    const navItems = [
-        { path: '/teacher/dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
-        { path: '/teacher/active-classes', label: 'Active Classes', icon: 'bi-easel' },
-        { path: '/teacher/exams', label: 'Exams', icon: 'bi-file-earmark-text' },
-        { path: '/teacher/calendar', label: 'Calendar', icon: 'bi-calendar-event' },
-    ]
+    const isActive = (path: string) => location.pathname === path
 
     return (
         <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
@@ -73,28 +69,25 @@ export default function TeacherLayout() {
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Menu
                         </div>
-                        {navItems.map((item) => {
-                            const isActive = location.pathname === item.path
-                            return (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`
-                                        flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                        ${isActive
-                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 translate-x-1'
-                                            : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:translate-x-1'
-                                        }
-                                    `}
-                                >
-                                    <i className={`bi ${item.icon} text-lg ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}></i>
-                                    <span className="font-medium">{item.label}</span>
-                                    {isActive && (
-                                        <i className="bi bi-chevron-right ml-auto text-xs opacity-50"></i>
-                                    )}
-                                </Link>
-                            )
-                        })}
+                        {TEACHER_ACTIONS.map((item) => (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`
+                                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                                    ${isActive(item.path)
+                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 translate-x-1'
+                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:translate-x-1'
+                                    }
+                                `}
+                            >
+                                <i className={`bi ${item.icon} text-lg ${isActive(item.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}></i>
+                                <span className="font-medium">{item.label}</span>
+                                {isActive(item.path) && (
+                                    <i className="bi bi-chevron-right ml-auto text-xs opacity-50"></i>
+                                )}
+                            </Link>
+                        ))}
                     </nav>
 
                     {/* User Profile / Logout */}
@@ -108,6 +101,13 @@ export default function TeacherLayout() {
                                 <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                             </div>
                         </div>
+                        <Link
+                            to="/quick-access"
+                            className="flex items-center gap-3 w-full p-3 mb-2 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-200 group"
+                        >
+                            <i className="bi bi-grid text-lg"></i>
+                            <span className="font-medium">Quick Access</span>
+                        </Link>
                         <button
                             onClick={handleSignOut}
                             className="flex items-center gap-3 w-full p-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 group"

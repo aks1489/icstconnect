@@ -17,6 +17,7 @@ import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import QuickAccess from './components/dashboard/QuickAccess'
 
 // Student Imports
 import StudentLayout from './student/layout/StudentLayout'
@@ -112,7 +113,14 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
 
-            {/* Student Routes - Independent Layout */}
+            {/* Quick Access - Protected but Shared */}
+            <Route path="/quick-access" element={
+              <ProtectedRoute>
+                <div className="animate-in fade-in duration-300">
+                  <QuickAccess />
+                </div>
+              </ProtectedRoute>
+            } />
             <Route path="/student" element={
               <ProtectedRoute>
                 <StudentLayout />
@@ -161,7 +169,7 @@ function App() {
           </Routes>
         </Suspense>
       </Router>
-    </AuthProvider>
+    </AuthProvider >
   )
 }
 

@@ -63,7 +63,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         if (otpType === 'recovery') {
             navigate('/reset-password')
         } else {
-            navigate('/student/dashboard')
+            navigate('/quick-access')
         }
         onClose()
     }
@@ -102,7 +102,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     throw new Error('Please check your email to confirm your account before logging in.')
                 }
 
-                navigate('/student/dashboard')
+                navigate('/quick-access')
                 onClose()
             } else {
                 const { data, error } = await supabase.auth.signUp({
@@ -117,7 +117,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 if (error) throw error
 
                 if (data.session) {
-                    navigate('/student/dashboard')
+                    navigate('/quick-access')
                     onClose()
                 } else {
                     // Switch to OTP mode instead of just showing message
