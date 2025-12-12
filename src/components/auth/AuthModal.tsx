@@ -18,6 +18,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [otpType, setOtpType] = useState<'signup' | 'recovery' | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [verificationSuccess, setVerificationSuccess] = useState(false)
     const navigate = useNavigate()
 
     // Reset state when modal opens/closes or mode changes
@@ -26,6 +27,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setError(null)
         setIsForgotPassword(false)
         setShowOtpInput(false)
+        setVerificationSuccess(false)
         setOtpCode('')
         setOtpType(null)
     }, [isOpen, isLogin])
@@ -46,14 +48,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
             if (error) throw error
 
-            if (otpType === 'recovery') {
-                // For recovery, user is now logged in. Redirect to reset password page to set new password.
-                navigate('/reset-password')
-            } else {
-                // For signup, user is now verified and logged in.
-                navigate('/student/dashboard')
-            }
-            onClose()
+            // Show success message instead of auto-redirecting
+            setVerificationSuccess(true)
 
         } catch (err: any) {
             console.error('OTP Error:', err)
@@ -61,6 +57,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleSuccessNavigation = () => {
+        if (otpType === 'recovery') {
+            navigate('/reset-password')
+        } else {
+            navigate('/student/dashboard')
+        }
+        onClose()
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -189,7 +194,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {showOtpInput ? (
+                        {verificationSuccess ? (
+                            <div className="space-y-6 text-center animate-in fade-in zoom-in duration-300 py-4">
+                                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-2 ring-8 ring-green-50">
+                                    <i className="bi bi-check-lg text-4xl text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Verified!</h3>
+                                    <p className="text-slate-500 max-w-[260px] mx-auto">
+                                        Your email has been successfully verified. You can now proceed to your dashboard.
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleSuccessNavigation}
+                                    className="w-full py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 transform hover:-translate-y-0.5 transition-all duration-200"
+                                >
+                                    Go to {otpType === 'recovery' ? 'Reset Password' : 'Dashboard'}
+                                </button>
+                            </div>
+                        ) : showOtpInput ? (
                             <div className="space-y-4 animate-in fade-in zoom-in duration-300">
                                 <div className="text-center mb-6">
                                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 mb-3 border border-indigo-100">
@@ -330,29 +354,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             </div>
                         )}
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none mt-2 flex items-center justify-center gap-2"
-                        >
-                            {loading ? (
-                                <>
-                                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                    <span>Processing...</span>
-                                </>
-                            ) : (
-                                <span>
-                                    {showOtpInput
-                                        ? 'Verify Code'
-                                        : isForgotPassword
-                                            ? 'Send Code'
-                                            : isLogin
-                                                ? 'Sign In to Dashboard'
-                                                : 'Create Account'
-                                    }
-                                </span>
-                            )}
-                        </button>
+                        {!verificationSuccess && (
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-600/30 hover:shadow-indigo-600/40 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none mt-2 flex items-center justify-center gap-2"
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                        <span>Processing...</span>
+                                    </>
+                                ) : (
+                                    <span>
+                                        {showOtpInput
+                                            ? 'Verify Code'
+                                            : isForgotPassword
+                                                ? 'Send Code'
+                                                : isLogin
+                                                    ? 'Sign In to Dashboard'
+                                                    : 'Create Account'
+                                        }
+                                    </span>
+                                )}
+                            </button>
+                        )}
                     </form>
                 </div>
 
