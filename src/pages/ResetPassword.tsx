@@ -15,9 +15,8 @@ export default function ResetPassword() {
         // Check if we have a valid session (which happens when clicking the reset link)
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (!session) {
-                // If no session, they might have lost the link context or it expired
-                // However, supabase.auth.onAuthStateChange in AuthContext handles session persistence usually
-                // But for reset password flow, the link effectively logs them in on click.
+                // If no session, redirect to home because they shouldn't be here without OTP or magic link
+                navigate('/')
             }
         })
     }, [])

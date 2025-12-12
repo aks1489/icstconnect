@@ -13,6 +13,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [fullName, setFullName] = useState('')
+    const [showOtpInput, setShowOtpInput] = useState(false)
+    const [otpCode, setOtpCode] = useState('')
+    const [otpType, setOtpType] = useState<'signup' | 'recovery' | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const navigate = useNavigate()
@@ -22,30 +25,78 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         if (!isOpen) return
         setError(null)
         setIsForgotPassword(false)
-        // Keep inputs if switching modes, maybe? No, let's keep it clean or just keep them.
-        // Actually good UX to keep email/password if they just clicked the wrong tab.
+        setShowOtpInput(false)
+        setOtpCode('')
+        setOtpType(null)
     }, [isOpen, isLogin])
 
     if (!isOpen) return null
 
+    const handleOtpVerification = async () => {
+        setLoading(true)
+        setError(null)
+        try {
+            if (!otpType) return
+
+            const { error } = await supabase.auth.verifyOtp({
+                email,
+                token: otpCode,
+                type: otpType
+            })
+
+            if (error) throw error
+
+            if (otpType === 'recovery') {
+                // For recovery, user is now logged in. Redirect to reset password page to set new password.
+                navigate('/reset-password')
+            } else {
+                // For signup, user is now verified and logged in.
+                navigate('/student/dashboard')
+            }
+            onClose()
+
+        } catch (err: any) {
+            console.error('OTP Error:', err)
+            setError(err.message || 'Invalid code. Please try again.')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (showOtpInput) {
+            await handleOtpVerification()
+            return
+        }
+
         setLoading(true)
         setError(null)
 
         try {
             if (isForgotPassword) {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: `${window.location.origin}/reset-password`,
-                })
+                const { error } = await supabase.auth.resetPasswordForEmail(email)
                 if (error) throw error
-                setError('Password reset instructions sent! Check your email.')
+
+                // Switch to OTP mode
+                setOtpType('recovery')
+                setShowOtpInput(true)
+                setError('Code sent! Please check your email and enter the code below.')
+
             } else if (isLogin) {
-                const { error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
                 })
                 if (error) throw error
+
+                // Explicitly check for email verification
+                if (data.user && !data.user.email_confirmed_at) {
+                    await supabase.auth.signOut()
+                    throw new Error('Please check your email to confirm your account before logging in.')
+                }
+
                 navigate('/student/dashboard')
                 onClose()
             } else {
@@ -53,7 +104,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     email,
                     password,
                     options: {
-                        emailRedirectTo: `${window.location.origin}/student/dashboard`,
                         data: {
                             full_name: fullName,
                         },
@@ -61,13 +111,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 })
                 if (error) throw error
 
-                // Check if session is established (auto-confirm enabled)
                 if (data.session) {
                     navigate('/student/dashboard')
                     onClose()
                 } else {
-                    // Email confirmation required
-                    setError('Account created! Please check your email to confirm your account before logging in.')
+                    // Switch to OTP mode instead of just showing message
+                    setOtpType('signup')
+                    setShowOtpInput(true)
+                    setError('Account created! Please enter the verification code sent to your email.')
                 }
             }
         } catch (err: any) {
@@ -138,7 +189,40 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
-                        {isForgotPassword ? (
+                        {showOtpInput ? (
+                            <div className="space-y-4 animate-in fade-in zoom-in duration-300">
+                                <div className="text-center mb-6">
+                                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 mb-3 border border-indigo-100">
+                                        <i className="bi bi-shield-lock-fill text-2xl text-indigo-600"></i>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-900">Enter Verification Code</h3>
+                                    <p className="text-sm text-slate-500 mt-1">
+                                        We sent a 6-digit code to <span className="font-semibold text-slate-700">{email}</span>
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-2 block">Verification Code</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        maxLength={6}
+                                        className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono font-bold"
+                                        placeholder="000000"
+                                        value={otpCode}
+                                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').substring(0, 6))}
+                                    />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShowOtpInput(false)}
+                                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium block text-center"
+                                >
+                                    Wrong email? Go back
+                                </button>
+                            </div>
+                        ) : isForgotPassword ? (
                             <div className="space-y-1.5 animate-in fade-in slide-in-from-right-4 duration-300">
                                 <div className="text-center mb-4">
                                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 mb-3">
@@ -146,7 +230,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     </div>
                                     <h3 className="text-lg font-semibold text-slate-900">Forgot Password?</h3>
                                     <p className="text-sm text-slate-500">
-                                        Enter your email address and we'll send you a link to reset your password.
+                                        Enter your email address to receive a verification code.
                                     </p>
                                 </div>
                                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
@@ -257,7 +341,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     <span>Processing...</span>
                                 </>
                             ) : (
-                                <span>{isForgotPassword ? 'Send Reset Link' : isLogin ? 'Sign In to Dashboard' : 'Create Account'}</span>
+                                <span>
+                                    {showOtpInput
+                                        ? 'Verify Code'
+                                        : isForgotPassword
+                                            ? 'Send Code'
+                                            : isLogin
+                                                ? 'Sign In to Dashboard'
+                                                : 'Create Account'
+                                    }
+                                </span>
                             )}
                         </button>
                     </form>
