@@ -170,9 +170,9 @@ export default function Teachers() {
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Teacher</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
+                                <th className="hidden md:table-cell text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                                <th className="hidden lg:table-cell text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                                <th className="hidden xl:table-cell text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
                                 <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -181,21 +181,24 @@ export default function Teachers() {
                                 <tr key={teacher.id} className="hover:bg-slate-50/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">
+                                            <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shrink-0">
                                                 {teacher.full_name?.charAt(0) || 'T'}
                                             </div>
-                                            <span className="font-semibold text-slate-700">{teacher.full_name}</span>
+                                            <div className="overflow-hidden">
+                                                <div className="font-semibold text-slate-700 truncate">{teacher.full_name}</div>
+                                                <div className="text-xs text-slate-500 md:hidden truncate">{teacher.email}</div>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm font-mono text-slate-600">
+                                    <td className="hidden md:table-cell px-6 py-4 text-sm font-mono text-slate-600">
                                         {teacher.teacher_id ? (
                                             <span className="bg-slate-100 px-2 py-1 rounded text-xs">{teacher.teacher_id}</span>
                                         ) : (
                                             <span className="text-slate-400 italic">--</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-500">{teacher.email}</td>
-                                    <td className="px-6 py-4 text-sm text-slate-500">{new Date(teacher.created_at).toLocaleDateString()}</td>
+                                    <td className="hidden lg:table-cell px-6 py-4 text-sm text-slate-500">{teacher.email}</td>
+                                    <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">{new Date(teacher.created_at).toLocaleDateString()}</td>
                                     <td className="px-6 py-4 text-right">
                                         <Link
                                             to={`/admin/teachers/${teacher.id}`}

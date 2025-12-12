@@ -37,6 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(session)
             setUser(session?.user ?? null)
             if (session?.user) {
+                // Immediately set loading to true to prevent premature redirects
+                setLoading(true)
                 fetchProfile(session.user.id)
             } else {
                 setProfile(null)
@@ -49,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProfile = async (userId: string) => {
         try {
+            setLoading(true)
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')

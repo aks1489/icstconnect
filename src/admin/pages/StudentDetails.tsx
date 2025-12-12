@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import ProfileForm from '../../components/common/ProfileForm'
-import { UserProfile } from '../../types'
+import type { UserProfile } from '../../types'
 
 interface Enrollment {
     course_id: number
