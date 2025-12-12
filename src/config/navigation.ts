@@ -97,8 +97,6 @@ export const ADMIN_ACTIONS: NavItem[] = [
         path: '/admin/courses',
         icon: 'bi-collection-fill',
         color: 'text-orange-600',
-        icon: 'bi-collection-fill',
-        color: 'text-orange-600',
         description: 'Create and edit course content'
     },
     {

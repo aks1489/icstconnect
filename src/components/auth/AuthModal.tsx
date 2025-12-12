@@ -96,6 +96,23 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 })
                 if (error) throw error
 
+                // --- RESTRICT ROLE LOGIN ---
+                // Fetch profile to check role
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single()
+
+                if (!profileError && profile) {
+                    if (profile.role === 'admin' || profile.role === 'teacher') {
+                        // Prevent login and sign out immediately
+                        await supabase.auth.signOut()
+                        throw new Error(`Restricted access. Please use the ${profile.role === 'admin' ? 'Admin' : 'Teacher'} login page.`)
+                    }
+                }
+                // ---------------------------
+
                 // Explicitly check for email verification
                 if (data.user && !data.user.email_confirmed_at) {
                     await supabase.auth.signOut()

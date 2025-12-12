@@ -1,11 +1,28 @@
+import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 
 export default function StudentLayout() {
-    const { profile, signOut } = useAuth()
+    const { profile, signOut, user } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
+
+    // Initialize based on screen width - default closed on mobile, open on desktop
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024)
+
+    // Handle screen resize to auto-open/close
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) {
+                setIsSidebarOpen(true)
+            } else {
+                setIsSidebarOpen(false)
+            }
+        }
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     const handleSignOut = async () => {
         await signOut()
@@ -17,93 +34,117 @@ export default function StudentLayout() {
     }
 
     return (
-        <div className="flex h-screen bg-slate-50">
+        <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <div className="hidden md:flex w-72 flex-col fixed inset-y-0 z-50">
-                <div className="flex-1 flex flex-col min-h-0 bg-white border-r border-slate-200">
-
-                    {/* Brand Header */}
-                    <div className="flex items-center h-20 flex-shrink-0 px-6 border-b border-slate-100">
+            <aside
+                className={`
+                    fixed lg:static inset-y-0 left-0 z-40
+                    bg-white border-r border-slate-200 transition-all duration-300 ease-in-out
+                    ${isSidebarOpen ? 'w-72 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden w-72'}
+                    flex flex-col shadow-xl lg:shadow-none
+                `}
+            >
+                <div className="w-72 flex flex-col h-full">
+                    {/* Logo Area */}
+                    <div className="h-20 flex items-center px-8 border-b border-slate-100 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-indigo-200">
-                                I
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-200 text-white">
+                                <span className="text-xl font-bold">I</span>
                             </div>
-                            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">
-                                ICST Connect
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* User Profile Summary */}
-                    <div className="px-6 py-6">
-                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                            <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border-2 border-white shadow-sm">
-                                {profile?.full_name?.charAt(0) || 'S'}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-bold text-slate-800 truncate">
-                                    {profile?.full_name || 'Student'}
-                                </p>
-                                <p className="text-xs text-slate-500 truncate">
-                                    Student Portal
-                                </p>
+                            <div>
+                                <h1 className="text-lg font-bold tracking-tight text-slate-800">Student Portal</h1>
+                                <p className="text-xs text-slate-500">ICST Connect</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar">
-                        <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-2">
+                    <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
+                        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-4">
                             Menu
-                        </p>
+                        </div>
                         {STUDENT_ACTIONS.map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`group flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-200 ${isActive(item.path)
+                                className={`
+                                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                                    ${isActive(item.path)
                                         ? 'bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100'
                                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                                    }`}
+                                    }
+                                `}
                             >
-                                <i className={`bi ${item.icon} mr-3 text-lg transition-colors ${isActive(item.path) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'
-                                    }`}></i>
-                                {item.label}
+                                <i className={`bi ${item.icon} text-lg ${isActive(item.path) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`}></i>
+                                <span className="font-medium">{item.label}</span>
+                                {isActive(item.path) && (
+                                    <i className="bi bi-chevron-right ml-auto text-xs opacity-50"></i>
+                                )}
                             </Link>
                         ))}
                     </nav>
 
-                    {/* Footer / Logout */}
-                    <div className="p-4 border-t border-slate-100">
+                    {/* User Profile / Logout */}
+                    <div className="p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
+                        <div className="flex items-center gap-3 mb-4 px-2">
+                            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700 border-2 border-white shadow-sm">
+                                {profile?.full_name?.charAt(0) || 'S'}
+                            </div>
+                            <div className="overflow-hidden">
+                                <p className="text-sm font-bold text-slate-800 truncate">{profile?.full_name || 'Student'}</p>
+                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                            </div>
+                        </div>
                         <Link
                             to="/quick-access"
-                            className="flex items-center px-4 py-3 text-sm font-medium text-slate-600 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors mb-2"
+                            className="flex items-center gap-3 w-full p-3 mb-2 rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all duration-200 group border border-transparent hover:border-slate-200 hover:shadow-sm"
                         >
-                            <i className="bi bi-grid mr-3 text-slate-400"></i>
-                            Quick Access
+                            <i className="bi bi-grid text-lg"></i>
+                            <span className="font-medium">Quick Access</span>
                         </Link>
                         <button
                             onClick={handleSignOut}
-                            className="w-full flex items-center px-4 py-3 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors"
+                            className="flex items-center gap-3 w-full p-3 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group border border-transparent"
                         >
-                            <i className="bi bi-box-arrow-right mr-3"></i>
-                            Sign Out
+                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-red-100 transition-colors">
+                                <i className="bi bi-box-arrow-right text-lg"></i>
+                            </div>
+                            <div className="text-left">
+                                <p className="text-sm font-medium">Sign Out</p>
+                                <p className="text-xs opacity-60">End session</p>
+                            </div>
                         </button>
                     </div>
                 </div>
-            </div>
+            </aside>
 
-            {/* Main Content Wrapper */}
-            <div className="flex flex-col flex-1 md:pl-72 transition-all duration-300">
-                {/* Mobile Header (TODO: Add specific mobile toggle if needed, using generic header for now) */}
-                <div className="md:hidden sticky top-0 z-20 flex items-center justify-between bg-white border-b px-4 py-3 shadow-sm">
-                    <span className="font-bold text-slate-800">ICST Connect</span>
-                    <button className="p-2 text-slate-500">
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col h-full overflow-hidden relative">
+                {/* Header for Mobile and Desktop Toggle */}
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-20">
+                    <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600"
+                    >
                         <i className="bi bi-list text-2xl"></i>
                     </button>
-                </div>
+                    <span className="font-semibold text-slate-700 lg:hidden">Student Portal</span>
+                    <div className="w-8 lg:hidden"></div> {/* Spacer for alignment */}
+                </header>
 
-                <main className="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8">
-                    <Outlet />
+                {/* Scrollable Page Content */}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 lg:p-8 scroll-smooth">
+                    <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <Outlet />
+                    </div>
                 </main>
             </div>
         </div>
