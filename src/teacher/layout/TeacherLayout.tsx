@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { TEACHER_ACTIONS } from '../../config/navigation'
+import logo from '../../assets/logo.jpg'
 
 export default function TeacherLayout() {
     const { signOut, user, profile } = useAuth()
@@ -54,9 +55,11 @@ export default function TeacherLayout() {
                     {/* Logo Area */}
                     <div className="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-950 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                                <span className="text-xl font-bold">T</span>
-                            </div>
+                            <img
+                                src={logo}
+                                alt="ICST Logo"
+                                className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-500/10"
+                            />
                             <div>
                                 <h1 className="text-lg font-bold tracking-tight">Teacher Portal</h1>
                                 <p className="text-xs text-slate-400">ICST Connect</p>

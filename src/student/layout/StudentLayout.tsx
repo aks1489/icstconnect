@@ -2,11 +2,14 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
+import logo from '../../assets/logo.jpg'
 
 export default function StudentLayout() {
     const { profile, signOut, user } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
+
+    // ... [Logic kept same] ...
 
     // Initialize based on screen width - default closed on mobile, open on desktop
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024)
@@ -56,9 +59,11 @@ export default function StudentLayout() {
                     {/* Logo Area */}
                     <div className="h-20 flex items-center px-8 border-b border-slate-100 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-200 text-white">
-                                <span className="text-xl font-bold">I</span>
-                            </div>
+                            <img
+                                src={logo}
+                                alt="ICST Logo"
+                                className="w-10 h-10 rounded-xl object-cover shadow-sm"
+                            />
                             <div>
                                 <h1 className="text-lg font-bold tracking-tight text-slate-800">Student Portal</h1>
                                 <p className="text-xs text-slate-500">ICST Connect</p>

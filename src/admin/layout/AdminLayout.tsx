@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { ADMIN_ACTIONS } from '../../config/navigation'
+import logo from '../../assets/logo.jpg'
 
 export default function AdminLayout() {
     const { signOut, profile } = useAuth()
@@ -56,9 +57,11 @@ export default function AdminLayout() {
                     {/* Logo Area */}
                     <div className="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-950 shrink-0">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                                <span className="text-xl font-bold">A</span>
-                            </div>
+                            <img
+                                src={logo}
+                                alt="ICST Logo"
+                                className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-indigo-500/10"
+                            />
                             <div>
                                 <h1 className="text-lg font-bold tracking-tight">Admin Portal</h1>
                                 <p className="text-xs text-slate-400">ICST Connect</p>
