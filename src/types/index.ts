@@ -12,5 +12,8 @@ export interface UserProfile {
     state?: string;
     dob?: string;
     avatar_url?: string;
+    phone?: string;
+    post_office?: string;
+    enrollment_center?: string;
     is_profile_complete?: boolean; // Computed or derived
 }

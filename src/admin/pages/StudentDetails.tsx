@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-
-interface StudentProfile {
-    id: string
-    full_name: string
-    email: string
-    created_at: string
-    role: string
-}
-
+import ProfileForm from '../../components/common/ProfileForm'
+import { UserProfile } from '../../types'
 
 interface Enrollment {
     course_id: number
@@ -30,11 +23,12 @@ interface Course {
 export default function StudentDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const [student, setStudent] = useState<StudentProfile | null>(null)
+    const [student, setStudent] = useState<UserProfile | null>(null)
     const [enrollments, setEnrollments] = useState<Enrollment[]>([])
     const [allCourses, setAllCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCourseId, setSelectedCourseId] = useState<string>('')
+    const [isEditOpen, setIsEditOpen] = useState(false)
 
     useEffect(() => {
         if (id) {
@@ -88,22 +82,10 @@ export default function StudentDetails() {
                 .order('course_name')
 
             if (coursesError) {
-                // Fallback to title if course_name doesn't exist (handling migration state)
+                // Fallback logic for migration
                 if (coursesError.message?.includes('column "course_name" does not exist')) {
-                    const { data: fallbackData, error: fallbackError } = await supabase
-                        .from('courses')
-                        .select('id, title')
-                        .order('title')
-
-                    if (fallbackError) {
-                        console.error('Error fetching courses fallback:', fallbackError)
-                        throw new Error(`Failed to load courses: ${fallbackError.message}`)
-                    }
-                    // Map title to course_name
+                    const { data: fallbackData } = await supabase.from('courses').select('id, title').order('title')
                     setAllCourses(fallbackData?.map((c: any) => ({ ...c, course_name: c.title })) || [])
-                } else {
-                    console.error('Error fetching courses:', coursesError)
-                    throw new Error(`Failed to load courses: ${coursesError.message}`)
                 }
             } else {
                 setAllCourses(coursesData || [])
@@ -130,13 +112,13 @@ export default function StudentDetails() {
                 })
 
             if (error) {
-                if (error.code === '23505') { // Unique violation
+                if (error.code === '23505') {
                     alert('Student is already enrolled in this course')
                 } else {
                     throw error
                 }
             } else {
-                fetchData() // Refresh
+                fetchData()
                 setSelectedCourseId('')
             }
         } catch (error) {
@@ -154,7 +136,6 @@ export default function StudentDetails() {
 
             if (error) throw error
 
-            // Optimistic update
             setEnrollments(prev => prev.map(e =>
                 e.course_id === courseId ? { ...e, progress: newProgress } : e
             ))
@@ -174,7 +155,7 @@ export default function StudentDetails() {
                 .match({ student_id: id, course_id: courseId })
 
             if (error) throw error
-            fetchData() // Refresh
+            fetchData()
         } catch (error) {
             console.error('Error unenrolling:', error)
             alert('Failed to unenroll student')
@@ -182,7 +163,7 @@ export default function StudentDetails() {
     }
 
     const handleMakeTeacher = async () => {
-        if (!window.confirm('Are you sure you want to promote this user to a Teacher? They will typically be removed from the student list.')) return
+        if (!window.confirm('Are you sure you want to promote this user to a Teacher?')) return
 
         try {
             const { error } = await supabase
@@ -193,43 +174,116 @@ export default function StudentDetails() {
             if (error) throw error
 
             alert('User promoted to Teacher successfully!')
-            navigate('/admin/students') // Go back to list as they might disappear from "Student" filtered lists
+            navigate('/admin/students')
         } catch (error) {
             console.error('Error promoting user:', error)
             alert('Failed to promote user')
         }
     }
 
+    const handleDeleteUser = async () => {
+        if (!window.confirm('Are you sure you want to delete this account? This action cannot be undone.')) return
+
+        try {
+            const { error } = await supabase.rpc('delete_user_by_id', { user_id: id })
+
+            if (error) throw error
+
+            alert('User deleted successfully.')
+            navigate('/admin/students')
+        } catch (error: any) {
+            console.error('Error deleting user:', error)
+            alert('Failed to delete user: ' + error.message)
+        }
+    }
+
+    const handleUpdateProfile = async (data: Partial<UserProfile>) => {
+        try {
+            // Remove email from updates as it shouldn't be changed here (or handled separately if needed)
+            const { email, ...updates } = data
+
+            const { error } = await supabase
+                .from('profiles')
+                .update(updates)
+                .eq('id', id)
+
+            if (error) throw error
+
+            setStudent(prev => prev ? ({ ...prev, ...updates } as UserProfile) : null)
+            setIsEditOpen(false)
+            alert('Profile updated successfully')
+        } catch (error: any) {
+            console.error('Error updating profile:', error)
+            throw error
+        }
+    }
+
     if (loading) return <div className="p-8 text-center">Loading details...</div>
     if (!student) return <div className="p-8 text-center">Student not found</div>
 
-    // Filter out courses already enrolled
     const availableCourses = allCourses.filter(c => !enrollments.some(e => e.course_id === c.id))
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto pb-12">
+            {/* Edit Modal */}
+            {isEditOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsEditOpen(false)}></div>
+                    <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                            <h2 className="text-xl font-bold text-slate-800">Edit Student Profile</h2>
+                            <button onClick={() => setIsEditOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">
+                                <i className="bi bi-x-lg text-xs"></i>
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <ProfileForm
+                                initialData={student}
+                                onSubmit={handleUpdateProfile}
+                                isEditing={true}
+                                onCancel={() => setIsEditOpen(false)}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="mb-8">
                 <Link to="/admin/students" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
                     <i className="bi bi-arrow-left"></i>
                     Back to Students
                 </Link>
-                <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold">
-                        {student.full_name?.charAt(0) || 'S'}
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold overflow-hidden">
+                            {student.avatar_url ? (
+                                <img src={student.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                student.full_name?.charAt(0) || 'S'
+                            )}
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-800">{student.full_name}</h1>
+                            <p className="text-slate-500">{student.email}</p>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${student.role === 'teacher' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                                {student.role || 'student'}
+                            </span>
+                        </div>
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-slate-800">{student.full_name}</h1>
-                        <p className="text-slate-500">{student.email}</p>
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${student.role === 'teacher' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
-                            {student.role || 'student'}
-                        </span>
-                    </div>
+                    <button
+                        onClick={() => setIsEditOpen(true)}
+                        className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold hover:bg-indigo-100 transition-colors flex items-center gap-2"
+                    >
+                        <i className="bi bi-pencil-square"></i>
+                        Edit Profile
+                    </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Content: Enrollments */}
                 <div className="lg:col-span-2 space-y-6">
+                    {/* Enrollments Card */}
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
                             <h2 className="font-bold text-slate-800">Enrolled Courses</h2>
@@ -284,6 +338,39 @@ export default function StudentDetails() {
                             )}
                         </div>
                     </div>
+
+                    {/* Personal Details Card */}
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6">
+                        <h2 className="font-bold text-slate-800 mb-4">Personal Details</h2>
+                        <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                            <div>
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">Father's Name</dt>
+                                <dd className="text-slate-800 font-medium">{student.father_name || '-'}</dd>
+                            </div>
+                            <div>
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">DOB</dt>
+                                <dd className="text-slate-800 font-medium">{student.dob || '-'}</dd>
+                            </div>
+                            <div>
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">Phone</dt>
+                                <dd className="text-slate-800 font-medium">{student.phone || '-'}</dd>
+                            </div>
+                            <div>
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">Pincode</dt>
+                                <dd className="text-slate-800 font-medium">{student.pincode || '-'}</dd>
+                            </div>
+                            <div className="md:col-span-2">
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">Address</dt>
+                                <dd className="text-slate-800 font-medium">{student.address || '-'}</dd>
+                            </div>
+                            {student.enrollment_center && (
+                                <div className="md:col-span-2">
+                                    <dt className="text-xs font-semibold text-slate-500 uppercase">Enrollment Center</dt>
+                                    <dd className="text-indigo-600 font-medium bg-indigo-50 inline-block px-2 py-0.5 rounded">{student.enrollment_center}</dd>
+                                </div>
+                            )}
+                        </dl>
+                    </div>
                 </div>
 
                 {/* Sidebar: Actions */}
@@ -319,18 +406,22 @@ export default function StudentDetails() {
                         <button className="w-full py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors mb-3">
                             Reset Password
                         </button>
-                        <button className="w-full py-2.5 border border-red-200 text-red-600 rounded-xl font-medium hover:bg-red-50 transition-colors">
-                            Deactivate Account
-                        </button>
 
                         {student.role !== 'teacher' && (
                             <button
                                 onClick={handleMakeTeacher}
-                                className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-medium hover:bg-emerald-100 transition-colors mt-3"
+                                className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-medium hover:bg-emerald-100 transition-colors mb-3"
                             >
                                 Promote to Teacher
                             </button>
                         )}
+
+                        <button
+                            onClick={handleDeleteUser}
+                            className="w-full py-2.5 border border-red-200 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors"
+                        >
+                            Delete Account
+                        </button>
                     </div>
                 </div>
             </div>

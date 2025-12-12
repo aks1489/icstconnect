@@ -90,6 +90,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 setError('Code sent! Please check your email and enter the code below.')
 
             } else if (isLogin) {
+                // ... login logic ...
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email,
                     password,
@@ -122,6 +123,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 navigate('/quick-access')
                 onClose()
             } else {
+                // ... signup logic ...
+                if (password.length < 8) {
+                    setError('Password must be at least 8 characters long.')
+                    setLoading(false)
+                    return
+                }
+
                 const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
@@ -135,7 +143,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                 if (data.session) {
                     // Check if profile is complete
-                    // We need to fetch it one-shot here because context might not be updated yet
                     const { data: profileCheck } = await supabase
                         .from('profiles')
                         .select('*')
@@ -157,9 +164,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     setError('Account created! Please enter the verification code sent to your email.')
                 }
             }
+
         } catch (err: any) {
             console.error('Auth Error:', err)
-            setError(err.message)
+            let msg = err.message
+            if (msg.includes('User already registered') || msg.includes('unique constraint')) {
+                msg = 'User account already exists with this email. Please Login with this email.'
+            }
+            setError(msg)
         } finally {
             setLoading(false)
         }
