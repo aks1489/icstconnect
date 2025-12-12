@@ -8,8 +8,10 @@ interface AuthContextType {
     profile: any | null
     loading: boolean
     signOut: () => Promise<void>
+    refreshProfile: () => Promise<void>
     isAdmin: boolean
     isTeacher: boolean
+    isProfileComplete: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -70,14 +72,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(null)
     }
 
+    const refreshProfile = async () => {
+        if (user) {
+            await fetchProfile(user.id)
+        }
+    }
+
     const value = {
         session,
         user,
         profile,
         loading,
         signOut,
+        refreshProfile,
         isAdmin: profile?.role === 'admin',
-        isTeacher: profile?.role === 'teacher'
+        isTeacher: profile?.role === 'teacher',
+        isProfileComplete: !!(profile && profile.full_name && profile.father_name && profile.address && profile.pincode && profile.dob)
     }
 
     return (

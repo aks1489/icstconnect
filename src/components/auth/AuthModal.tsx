@@ -134,7 +134,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 if (error) throw error
 
                 if (data.session) {
-                    navigate('/quick-access')
+                    // Check if profile is complete
+                    // We need to fetch it one-shot here because context might not be updated yet
+                    const { data: profileCheck } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', data.user?.id)
+                        .single()
+
+                    const isComplete = profileCheck && profileCheck.full_name && profileCheck.father_name && profileCheck.address && profileCheck.pincode && profileCheck.dob
+
+                    if (isComplete) {
+                        navigate('/quick-access')
+                    } else {
+                        navigate('/student/complete-profile')
+                    }
                     onClose()
                 } else {
                     // Switch to OTP mode instead of just showing message

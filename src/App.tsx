@@ -24,6 +24,7 @@ import StudentLayout from './student/layout/StudentLayout'
 import StudentDashboard from './student/pages/Dashboard'
 import OfflineClasses from './student/pages/OfflineClasses'
 import StudentCalendar from './student/pages/Calendar'
+import CompleteProfile from './student/pages/CompleteProfile'
 
 // Admin Imports
 import AdminLayout from './admin/layout/AdminLayout'
@@ -130,6 +131,7 @@ function App() {
               <Route path="dashboard" element={<StudentDashboard />} />
               <Route path="offline-classes" element={<OfflineClasses />} />
               <Route path="calendar" element={<StudentCalendar />} />
+              <Route path="complete-profile" element={<CompleteProfile />} />
             </Route>
 
             {/* Admin Routes - Independent Layout */}

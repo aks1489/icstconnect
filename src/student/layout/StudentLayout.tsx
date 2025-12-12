@@ -3,13 +3,25 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
+import EditProfileModal from '../components/EditProfileModal'
 
 export default function StudentLayout() {
-    const { profile, signOut, user } = useAuth()
+    const { profile, signOut, isProfileComplete } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
+    const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
 
-    // ... [Logic kept same] ...
+    // Guard: Redirect to complete profile if incomplete
+    useEffect(() => {
+        // Wait for profile to load (profile might be null initially while loading)
+        // But useAuth handles loading state, so if we are here, we might have data
+        // We actually need to be careful not to redirect prematurely.
+        // Assuming AuthContext 'loading' prop handles the initial wait.
+
+        if (profile && !isProfileComplete) {
+            navigate('/student/complete-profile')
+        }
+    }, [profile, isProfileComplete, navigate])
 
     // Initialize based on screen width - default closed on mobile, open on desktop
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024)
@@ -38,6 +50,11 @@ export default function StudentLayout() {
 
     return (
         <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
+            <EditProfileModal
+                isOpen={isEditProfileOpen}
+                onClose={() => setIsEditProfileOpen(false)}
+            />
+
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -100,12 +117,29 @@ export default function StudentLayout() {
                     {/* User Profile / Logout */}
                     <div className="p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
                         <div className="flex items-center gap-3 mb-4 px-2">
-                            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700 border-2 border-white shadow-sm">
-                                {profile?.full_name?.charAt(0) || 'S'}
-                            </div>
+                            <button
+                                onClick={() => setIsEditProfileOpen(true)}
+                                className="relative group/avatar"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700 border-2 border-white shadow-sm overflow-hidden">
+                                    {profile?.avatar_url ? (
+                                        <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        profile?.full_name?.charAt(0) || 'S'
+                                    )}
+                                </div>
+                                <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                    <i className="bi bi-pencil-fill text-xs"></i>
+                                </div>
+                            </button>
                             <div className="overflow-hidden">
                                 <p className="text-sm font-bold text-slate-800 truncate">{profile?.full_name || 'Student'}</p>
-                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                                <button
+                                    onClick={() => setIsEditProfileOpen(true)}
+                                    className="text-xs text-indigo-600 hover:text-indigo-700 font-medium truncate flex items-center gap-1"
+                                >
+                                    Edit Profile <i className="bi bi-pencil-square"></i>
+                                </button>
                             </div>
                         </div>
                         <Link
