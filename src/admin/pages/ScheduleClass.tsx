@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { addMonths, eachDayOfInterval, format, isSameDay, parse, set, getDay, addMinutes } from 'date-fns'
+import { addMonths, eachDayOfInterval, format, set, addMinutes } from 'date-fns'
 
 interface Course {
     id: number
@@ -13,7 +13,6 @@ interface Course {
 export default function ScheduleClass() {
     const navigate = useNavigate()
     const [courses, setCourses] = useState<Course[]>([])
-    const [loading, setLoading] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     // Form State
@@ -37,10 +36,8 @@ export default function ScheduleClass() {
     }, [selectedCourseId, startDate])
 
     const fetchCourses = async () => {
-        setLoading(true)
         const { data } = await supabase.from('courses').select('id, course_name, duration_months, color')
         if (data) setCourses(data)
-        setLoading(false)
     }
 
     const calculateEndDate = () => {

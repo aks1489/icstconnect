@@ -37,7 +37,6 @@ interface GlobalCalendarProps {
 export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTrigger = 0 }: GlobalCalendarProps) {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [events, setEvents] = useState<CalendarEvent[]>([])
-    const [loading, setLoading] = useState(false)
     const [selectedDate, setSelectedDate] = useState<Date | null>(null)
     const [view, setView] = useState<'month' | 'agenda'>('month')
 
@@ -47,7 +46,6 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
 
     // Fetch events for the current month range (padded by weeks)
     const fetchEvents = async () => {
-        setLoading(true)
         const monthStart = startOfMonth(currentDate)
         const monthEnd = endOfMonth(currentDate)
         const startDate = startOfWeek(monthStart).toISOString()
@@ -70,8 +68,6 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
             setEvents(data || [])
         } catch (error) {
             console.error('Error fetching events:', error)
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -152,7 +148,7 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
 
                     {/* Days Grid */}
                     <div className="flex-1 grid grid-cols-7 auto-rows-fr overflow-y-auto">
-                        {calendarDays.map((day, dayIdx) => {
+                        {calendarDays.map((day) => {
                             const dayEvents = getEventsForDay(day)
                             const isSelected = selectedDate ? isSameDay(day, selectedDate) : false
                             const isCurrentMonth = isSameMonth(day, currentDate)
