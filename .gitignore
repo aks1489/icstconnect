@@ -28,4 +28,4 @@ dist-ssr
 .env
 .env.local
 .env.*.local
-supabase_migration.sql
+.agent/workflows/configure_domain.md
