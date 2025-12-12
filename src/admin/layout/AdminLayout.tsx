@@ -5,7 +5,7 @@ import { ADMIN_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
 
 export default function AdminLayout() {
-    const { signOut, profile } = useAuth()
+    const { signOut } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
