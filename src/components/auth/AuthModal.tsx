@@ -197,7 +197,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     </div>
                                     <h3 className="text-xl font-bold text-slate-900">Enter Verification Code</h3>
                                     <p className="text-sm text-slate-500 mt-1">
-                                        We sent a 6-digit code to <span className="font-semibold text-slate-700">{email}</span>
+                                        We sent a verification code to <span className="font-semibold text-slate-700">{email}</span>
                                     </p>
                                 </div>
 
@@ -206,11 +206,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     <input
                                         type="text"
                                         required
-                                        maxLength={6}
+                                        maxLength={8}
                                         className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono font-bold"
                                         placeholder="000000"
                                         value={otpCode}
-                                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').substring(0, 6))}
+                                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').substring(0, 8))}
                                     />
                                 </div>
 
