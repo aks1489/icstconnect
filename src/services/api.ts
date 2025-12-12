@@ -1,15 +1,5 @@
 import { supabase } from '../lib/supabase'
 
-export interface Course {
-    id: number
-    title: string
-    duration: string
-    image: string
-    description: string
-    price: string
-    category?: string
-}
-
 export interface Notification {
     id: number
     title: string
@@ -32,15 +22,6 @@ export interface Test {
 }
 
 export const api = {
-    async getCourses() {
-        const { data, error } = await supabase
-            .from('courses')
-            .select('*')
-
-        if (error) throw error
-        return data as Course[]
-    },
-
     async getNotifications() {
         const { data, error } = await supabase
             .from('notifications')

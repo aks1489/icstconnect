@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import logo from '../../../assets/logo.jpg'
 
 interface NavigationProps {
     onLoginClick: () => void
+    user?: any
 }
 
-export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) => {
+export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user }) => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
@@ -24,7 +26,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
         { name: 'Notifications', href: '/notifications' },
         { name: 'Gallery', href: '/gallery' },
         { name: 'Online Test', href: '/online-test' },
-        { name: 'About Us', href: '/#about' },
+        { name: 'About Us', href: '/about' },
     ];
 
     return (
@@ -39,9 +41,11 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
                     <div className="flex items-center justify-between">
                         {/* Logo */}
                         <Link to="/" className="flex items-center gap-3 group no-underline">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-600 text-white flex items-center justify-center text-xl font-bold shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300">
-                                I
-                            </div>
+                            <img
+                                src={logo}
+                                alt="ICST Logo"
+                                className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300"
+                            />
                             <div className="flex flex-col">
                                 <span className="font-bold text-slate-800 text-lg leading-none tracking-tight">ICST</span>
                                 <span className="text-slate-500 text-[0.65rem] font-medium tracking-wider uppercase">Chowberia</span>
@@ -70,13 +74,23 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
 
                             <div className="h-6 w-px bg-slate-200 mx-2"></div>
 
-                            <button
-                                onClick={onLoginClick}
-                                className="px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap"
-                            >
-                                <i className="bi bi-person-circle"></i>
-                                <span>Login</span>
-                            </button>
+                            {user ? (
+                                <Link
+                                    to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
+                                    className="px-5 py-2 rounded-full bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline"
+                                >
+                                    <i className="bi bi-speedometer2"></i>
+                                    <span>Dashboard</span>
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={onLoginClick}
+                                    className="px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap"
+                                >
+                                    <i className="bi bi-person-circle"></i>
+                                    <span>Login</span>
+                                </button>
+                            )}
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -104,16 +118,27 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
                             </Link>
                         ))}
                         <div className="h-px bg-slate-100 my-2"></div>
-                        <button
-                            onClick={() => {
-                                onLoginClick();
-                                setIsMobileMenuOpen(false);
-                            }}
-                            className="w-full py-3 px-4 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
-                        >
-                            <i className="bi bi-person-circle"></i>
-                            <span>Login / Sign Up</span>
-                        </button>
+                        {user ? (
+                            <Link
+                                to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
+                                className="w-full py-3 px-4 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 no-underline"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                <i className="bi bi-speedometer2"></i>
+                                <span>Go to Dashboard</span>
+                            </Link>
+                        ) : (
+                            <button
+                                onClick={() => {
+                                    onLoginClick();
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className="w-full py-3 px-4 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                            >
+                                <i className="bi bi-person-circle"></i>
+                                <span>Login / Sign Up</span>
+                            </button>
+                        )}
                     </div>
                 </div>
             </nav>
@@ -121,36 +146,45 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick }) =>
     )
 }
 
-export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick }) => {
+export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user }) => {
     return (
         <div className="lg:hidden">
             <nav className="bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 w-full z-[1030] pb-[env(safe-area-inset-bottom)]">
                 <div className="w-full h-full">
                     <div className="flex justify-evenly items-center w-full h-full py-3">
-                        <a href="#" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        <Link to="/" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-house-door text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Home</span>
-                        </a>
-                        <a href="#courses" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        </Link>
+                        <Link to="/courses" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-book text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Courses</span>
-                        </a>
+                        </Link>
                         <div className="relative -top-5">
-                            <button
-                                onClick={onLoginClick}
-                                className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all"
-                            >
-                                <i className="bi bi-person text-xl"></i>
-                            </button>
+                            {user ? (
+                                <Link
+                                    to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
+                                    className="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    <i className="bi bi-speedometer2 text-xl"></i>
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={onLoginClick}
+                                    className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all"
+                                >
+                                    <i className="bi bi-person text-xl"></i>
+                                </button>
+                            )}
                         </div>
-                        <a href="#gallery" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        <Link to="/gallery" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-image text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">Gallery</span>
-                        </a>
-                        <a href="#about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
+                        </Link>
+                        <Link to="/about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
                             <i className="bi bi-info-circle text-xl group-hover:scale-110 transition-transform"></i>
                             <span className="text-[10px] font-medium">About</span>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </nav>

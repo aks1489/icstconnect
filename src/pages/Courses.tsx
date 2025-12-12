@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
-import CourseDetailsModal from '../components/ui/CourseDetailsModal'
+import { useState, useEffect, useMemo } from 'react'
+import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
-import { api, type Course } from '../services/api'
+import { courseService } from '../services/courseService'
+import type { Course } from '../types/course'
 
 type Duration = '3 Months' | '6 Months' | '12 Months' | '18 Months' | 'All'
 
-const AllCourses = () => {
+const CoursesPage = () => {
     const [activeFilter, setActiveFilter] = useState<Duration>('All')
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
     const [loading, setLoading] = useState(true)
@@ -14,11 +15,10 @@ const AllCourses = () => {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const data = await api.getCourses()
+                const data = await courseService.getCourses()
                 setCourses(data)
             } catch (error) {
                 console.error('Error fetching courses:', error)
-                // Fallback to empty or show error (optional)
             } finally {
                 setLoading(false)
             }
@@ -27,9 +27,11 @@ const AllCourses = () => {
         fetchCourses()
     }, [])
 
-    const filteredCourses = activeFilter === 'All'
-        ? courses
-        : courses.filter(course => course.duration === activeFilter)
+    const filteredCourses = useMemo(() => {
+        return activeFilter === 'All'
+            ? courses
+            : courses.filter(course => course.duration === activeFilter)
+    }, [activeFilter, courses])
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-slate-50">
@@ -82,15 +84,26 @@ const AllCourses = () => {
                                 </div>
                             </div>
                         ))
+                    ) : filteredCourses.length === 0 ? (
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-col items-center justify-center py-20 text-center">
+                            <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                                <i className="bi bi-hourglass-split text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-2">Coming Soon</h3>
+                            <p className="text-slate-500 max-w-md">
+                                We are currently working on adding courses for this duration. Please check back later or explore other options.
+                            </p>
+                        </div>
                     ) : (
                         filteredCourses.map((course) => (
-                            <div key={course.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 flex flex-col h-full">
-                                <div className="relative h-48 overflow-hidden">
-                                    <img
-                                        src={course.image}
-                                        alt={course.title}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
+                            <div
+                                key={course.id}
+                                onClick={() => setSelectedCourse(course)}
+                                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 flex flex-col h-full cursor-pointer"
+                            >
+                                <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
+                                    <div className="absolute inset-0 opacity-10 pattern-dots"></div>
+                                    <i className={`bi ${course.icon} text-6xl relative z-10 transform transition-transform duration-500 group-hover:scale-110`}></i>
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
                                         {course.duration}
                                     </div>
@@ -128,4 +141,4 @@ const AllCourses = () => {
     )
 }
 
-export default AllCourses
+export default CoursesPage
