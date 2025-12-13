@@ -1,4 +1,6 @@
 
+import { BadgeCheck, Users } from 'lucide-react'
+
 const AboutSection = () => {
     return (
         <section className="py-20 lg:py-28 bg-white relative overflow-hidden" id="about">
@@ -30,7 +32,7 @@ const AboutSection = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-blue-100 text-blue-600 rounded-xl shadow-sm">
-                                    <i className="bi bi-patch-check-fill text-xl"></i>
+                                    <BadgeCheck className="text-xl" size={24} />
                                 </div>
                                 <div>
                                     <h6 className="text-lg font-bold text-slate-900 mb-1">Certified Courses</h6>
@@ -39,7 +41,7 @@ const AboutSection = () => {
                             </div>
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-purple-100 text-purple-600 rounded-xl shadow-sm">
-                                    <i className="bi bi-people-fill text-xl"></i>
+                                    <Users className="text-xl" size={24} />
                                 </div>
                                 <div>
                                     <h6 className="text-lg font-bold text-slate-900 mb-1">Expert Mentors</h6>

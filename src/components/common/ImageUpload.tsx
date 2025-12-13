@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
+import { User, Camera } from 'lucide-react'
 
 interface ImageUploadProps {
     currentImageUrl?: string
@@ -133,7 +134,7 @@ export default function ImageUpload({ currentImageUrl, onUploadComplete, userId 
                         />
                     ) : (
                         <div className="w-full h-full flex items-center justify-center text-slate-400">
-                            <i className="bi bi-person-fill text-4xl"></i>
+                            <User className="w-12 h-12" />
                         </div>
                     )}
                 </div>
@@ -150,7 +151,7 @@ export default function ImageUpload({ currentImageUrl, onUploadComplete, userId 
                         onClick={() => fileInputRef.current?.click()}
                         className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-all cursor-pointer text-white"
                     >
-                        <i className="bi bi-camera-fill text-xl"></i>
+                        <Camera size={24} />
                     </button>
                 )}
             </div>

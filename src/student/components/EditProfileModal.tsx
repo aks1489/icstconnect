@@ -2,6 +2,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { UserProfile } from '../../types'
 import ProfileForm from '../../components/common/ProfileForm'
+import { X } from 'lucide-react'
 
 interface EditProfileModalProps {
     isOpen: boolean
@@ -55,7 +56,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                         onClick={onClose}
                         className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-300 transition-colors"
                     >
-                        <i className="bi bi-x-lg text-xs"></i>
+                        <X size={16} />
                     </button>
                 </div>
 

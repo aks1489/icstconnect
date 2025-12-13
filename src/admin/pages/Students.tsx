@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { UserPlus, Users, ArrowRight, Mail } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import CreateStudentModal from '../../components/admin/CreateStudentModal'
 
@@ -53,7 +54,7 @@ export default function ManageStudents() {
                     onClick={() => setIsCreateModalOpen(true)}
                     className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
                 >
-                    <i className="bi bi-person-plus"></i>
+                    <UserPlus size={20} />
                     <span>Add Student</span>
                 </button>
             </div>
@@ -83,7 +84,7 @@ export default function ManageStudents() {
                                 <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
                                     <div className="flex flex-col items-center justify-center">
                                         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3">
-                                            <i className="bi bi-people text-xl text-slate-400"></i>
+                                            <Users className="text-xl text-slate-400" size={24} />
                                         </div>
                                         <p>No students found</p>
                                     </div>
@@ -116,7 +117,7 @@ export default function ManageStudents() {
                                             className="text-indigo-600 hover:text-indigo-900 font-medium inline-flex items-center gap-1 hover:gap-2 transition-all"
                                         >
                                             View
-                                            <i className="bi bi-arrow-right"></i>
+                                            <ArrowRight size={16} />
                                         </Link>
                                     </td>
                                 </tr>
@@ -131,7 +132,7 @@ export default function ManageStudents() {
                 {students.length === 0 ? (
                     <div className="bg-white p-8 rounded-xl shadow-sm text-center border border-slate-200">
                         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <i className="bi bi-people text-xl text-slate-400"></i>
+                            <Users className="text-xl text-slate-400" size={24} />
                         </div>
                         <p className="text-slate-500">No students found</p>
                     </div>
@@ -152,7 +153,7 @@ export default function ManageStudents() {
 
                             <div className="mb-4">
                                 <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
-                                    <i className="bi bi-envelope text-slate-400"></i>
+                                    <Mail className="text-slate-400" size={16} />
                                     <span className="truncate">{student.email}</span>
                                 </div>
                             </div>

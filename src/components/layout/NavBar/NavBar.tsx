@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+    Home,
+    Book,
+    Image as ImageIcon,
+    Info,
+    LayoutDashboard,
+    User,
+    Menu,
+    X
+} from 'lucide-react'
 import logo from '../../../assets/logo.jpg'
 
 interface NavigationProps {
@@ -79,7 +90,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
                                     className="px-5 py-2 rounded-full bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline"
                                 >
-                                    <i className="bi bi-speedometer2"></i>
+                                    <LayoutDashboard size={18} />
                                     <span>Dashboard</span>
                                 </Link>
                             ) : (
@@ -87,7 +98,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                     onClick={onLoginClick}
                                     className="px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap"
                                 >
-                                    <i className="bi bi-person-circle"></i>
+                                    <User size={18} />
                                     <span>Login</span>
                                 </button>
                             )}
@@ -98,7 +109,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                             className="lg:hidden text-2xl text-slate-800 focus:outline-none"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
-                            <i className={`bi ${isMobileMenuOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+                            {isMobileMenuOpen ? <X /> : <Menu />}
                         </button>
                     </div>
                 </div>
@@ -124,7 +135,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 className="w-full py-3 px-4 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 no-underline"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                <i className="bi bi-speedometer2"></i>
+                                <LayoutDashboard size={20} />
                                 <span>Go to Dashboard</span>
                             </Link>
                         ) : (
@@ -135,7 +146,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 }}
                                 className="w-full py-3 px-4 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
                             >
-                                <i className="bi bi-person-circle"></i>
+                                <User size={20} />
                                 <span>Login / Sign Up</span>
                             </button>
                         )}
@@ -153,11 +164,15 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                 <div className="w-full h-full">
                     <div className="flex justify-evenly items-center w-full h-full py-3">
                         <Link to="/" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-house-door text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <Home size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">Home</span>
                         </Link>
                         <Link to="/courses" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-book text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <Book size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">Courses</span>
                         </Link>
                         <div className="relative -top-5">
@@ -166,23 +181,27 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
                                     className="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all"
                                 >
-                                    <i className="bi bi-speedometer2 text-xl"></i>
+                                    <LayoutDashboard size={24} />
                                 </Link>
                             ) : (
                                 <button
                                     onClick={onLoginClick}
                                     className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all"
                                 >
-                                    <i className="bi bi-person text-xl"></i>
+                                    <User size={24} />
                                 </button>
                             )}
                         </div>
                         <Link to="/gallery" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-image text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <ImageIcon size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">Gallery</span>
                         </Link>
                         <Link to="/about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-info-circle text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <Info size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">About</span>
                         </Link>
                     </div>

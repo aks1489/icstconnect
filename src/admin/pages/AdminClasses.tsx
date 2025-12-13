@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Plus, Search, Inbox, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { getIcon } from '../../utils/iconMapper'
 
 interface ClassBatch {
     id: number
@@ -145,7 +147,7 @@ export default function AdminClasses() {
                     to="/admin/courses"
                     className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                 >
-                    <i className="bi bi-plus-lg"></i>
+                    <Plus size={20} />
                     Create Batch (via Course)
                 </Link>
             </div>
@@ -153,7 +155,7 @@ export default function AdminClasses() {
             {/* Filters */}
             <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
-                    <i className="bi bi-search absolute left-3 top-3 text-slate-400"></i>
+                    <Search className="absolute left-3 top-3 text-slate-400" size={18} />
                     <input
                         type="text"
                         placeholder="Search batches..."
@@ -181,7 +183,7 @@ export default function AdminClasses() {
             ) : filteredClasses.length === 0 ? (
                 <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400">
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                        <i className="bi bi-inboxes text-2xl text-slate-300"></i>
+                        <Inbox className="text-2xl text-slate-300" size={32} />
                     </div>
                     <p>No classes found matching your filters.</p>
                 </div>
@@ -199,7 +201,10 @@ export default function AdminClasses() {
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${courseBg.replace('50', '100')}`}>
-                                                <i className={`bi ${cls.course.icon} ${courseColor}`}></i>
+                                                {(() => {
+                                                    const Icon = getIcon(cls.course.icon)
+                                                    return <Icon className={`${courseColor}`} size={20} />
+                                                })()}
                                             </div>
                                             <div>
                                                 <h3 className="font-bold text-slate-800">{cls.batch_name}</h3>
@@ -242,7 +247,7 @@ export default function AdminClasses() {
                                             disabled={cls.enrolled_count > 0}
                                             title="Delete Batch"
                                         >
-                                            <i className="bi bi-trash"></i>
+                                            <Trash2 size={18} />
                                         </button>
                                     </div>
                                 </div>

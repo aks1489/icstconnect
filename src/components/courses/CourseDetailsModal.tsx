@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import type { Course } from '../../types/course'
+import { X, Check, ArrowRight } from 'lucide-react'
+import { getIcon } from '../../utils/iconMapper'
 
 interface CourseDetailsModalProps {
     course: Course | null
@@ -41,13 +43,16 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                     onClick={onClose}
                     className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md text-slate-800 hover:bg-white transition-all z-50 shadow-sm"
                 >
-                    <i className="bi bi-x-lg text-lg"></i>
+                    <X size={24} />
                 </button>
 
                 {/* Hero Header */}
                 <div className={`relative h-48 flex-shrink-0 ${course.color} flex items-center justify-center overflow-hidden`}>
                     <div className="absolute inset-0 opacity-10 pattern-dots"></div>
-                    <i className={`bi ${course.icon} text-8xl text-current opacity-20 absolute -right-4 -bottom-4 transform rotate-12`}></i>
+                    {(() => {
+                        const Icon = getIcon(course.icon)
+                        return <Icon className="text-8xl text-current opacity-20 absolute -right-4 -bottom-4 transform rotate-12" size={96} />
+                    })()}
 
                     <div className="relative z-10 text-center p-8 w-full">
                         <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-slate-900 text-xs font-bold mb-3 shadow-sm border border-white/30">
@@ -83,7 +88,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                                 <ul className="grid grid-cols-1 gap-2">
                                     {course.syllabus && course.syllabus.map((topic, index) => (
                                         <li key={index} className="flex items-start gap-2 text-slate-700 font-medium">
-                                            <i className="bi bi-check-lg text-blue-600 mt-1"></i>
+                                            <Check className="text-blue-600 mt-1 shrink-0" size={16} />
                                             <span>{topic}</span>
                                         </li>
                                     ))}
@@ -130,7 +135,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                     </button>
                     <button className="px-8 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
                         <span>Enroll Now</span>
-                        <i className="bi bi-arrow-right"></i>
+                        <ArrowRight size={20} />
                     </button>
                 </div>
             </div>

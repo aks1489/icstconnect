@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Check, AlertCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 export default function ResetPassword() {
@@ -58,7 +59,7 @@ export default function ResetPassword() {
             <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full space-y-8 text-center">
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                        <i className="bi bi-check-lg text-green-600 text-xl"></i>
+                        <Check className="text-green-600" size={24} />
                     </div>
                     <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Password Updated!</h2>
                     <p className="mt-2 text-sm text-gray-600">
@@ -114,7 +115,7 @@ export default function ResetPassword() {
 
                     {error && (
                         <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
-                            <i className="bi bi-exclamation-circle-fill"></i>
+                            <AlertCircle size={16} />
                             {error}
                         </div>
                     )}

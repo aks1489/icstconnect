@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { X, Check, AlertTriangle } from 'lucide-react'
 
 interface ChangePasswordModalProps {
     isOpen: boolean
@@ -72,7 +73,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                         onClick={onClose}
                         className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-300 transition-colors"
                     >
-                        <i className="bi bi-x-lg text-xs"></i>
+                        <X size={16} />
                     </button>
                 </div>
 
@@ -80,7 +81,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
                     {success ? (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-green-600">
-                                <i className="bi bi-check-lg text-3xl"></i>
+                                <Check size={32} />
                             </div>
                             <h3 className="text-xl font-bold text-slate-800 mb-2">Password Updated!</h3>
                             <p className="text-slate-500">Your password has been changed successfully.</p>
@@ -113,7 +114,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
 
                             {error && (
                                 <div className="p-3 rounded-xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-2 text-sm">
-                                    <i className="bi bi-exclamation-triangle-fill"></i>
+                                    <AlertTriangle size={16} className="shrink-0" />
                                     {error}
                                 </div>
                             )}

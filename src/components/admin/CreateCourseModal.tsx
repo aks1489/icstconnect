@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { X, Code, Laptop, Database, Globe, Palette, Video, Bot, ShieldCheck } from 'lucide-react'
 
 interface CreateCourseModalProps {
     isOpen: boolean
@@ -13,7 +14,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
         course_name: '',
         short_code: '',
         description: '',
-        icon: 'bi-code-square',
+        icon: 'Code',
         color: 'text-indigo-600 bg-indigo-50',
         duration: '6 Months',
         category: 'Development'
@@ -29,8 +30,14 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
     ]
 
     const commonIcons = [
-        'bi-code-square', 'bi-laptop', 'bi-database', 'bi-globe',
-        'bi-palette', 'bi-camera-video', 'bi-robot', 'bi-shield-lock'
+        { id: 'Code', Icon: Code },
+        { id: 'Laptop', Icon: Laptop },
+        { id: 'Database', Icon: Database },
+        { id: 'Globe', Icon: Globe },
+        { id: 'Palette', Icon: Palette },
+        { id: 'Video', Icon: Video },
+        { id: 'Bot', Icon: Bot },
+        { id: 'ShieldCheck', Icon: ShieldCheck }
     ]
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +55,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 course_name: '',
                 short_code: '',
                 description: '',
-                icon: 'bi-code-square',
+                icon: 'Code',
                 color: 'text-indigo-600 bg-indigo-50',
                 duration: '6 Months',
                 category: 'Development'
@@ -72,7 +79,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
                     <h2 className="text-xl font-bold text-slate-800">Create New Course</h2>
                     <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                        <i className="bi bi-x-lg text-xs"></i>
+                        <X size={16} />
                     </button>
                 </div>
 
@@ -150,20 +157,20 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Icon</label>
                         <div className="grid grid-cols-4 gap-2">
-                            {commonIcons.map((icon) => (
+                            {commonIcons.map(({ id, Icon }) => (
                                 <button
-                                    key={icon}
+                                    key={id}
                                     type="button"
-                                    onClick={() => setFormData({ ...formData, icon })}
+                                    onClick={() => setFormData({ ...formData, icon: id })}
                                     className={`
                                                 h-10 rounded-lg border transition-all flex items-center justify-center
-                                                ${formData.icon === icon
+                                                ${formData.icon === id
                                             ? 'bg-slate-800 text-white border-slate-800'
                                             : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
                                         }
                                             `}
                                 >
-                                    <i className={`bi ${icon}`}></i>
+                                    <Icon size={20} />
                                 </button>
                             ))}
                         </div>

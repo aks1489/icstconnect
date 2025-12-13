@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Check } from 'lucide-react'
 
 interface Topic {
     id: number
@@ -170,7 +171,7 @@ export default function StudentProgressTracker() {
         <div className="max-w-4xl mx-auto pb-20">
             <div className="mb-6">
                 <Link to="/teacher/active-classes" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-2 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Active Classes
                 </Link>
                 <div className="flex items-center justify-between">
@@ -259,7 +260,7 @@ export default function StudentProgressTracker() {
                                                 : 'border-slate-300 text-transparent hover:border-emerald-500'
                                             }
                                         `}>
-                                            <i className="bi bi-check-lg text-sm"></i>
+                                            <Check size={14} />
                                         </div>
                                         <div className="flex-1">
                                             <p className={`font-medium transition-colors ${topic.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>

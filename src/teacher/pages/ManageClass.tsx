@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { ArrowLeft, Check, BookX } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { getIcon } from '../../utils/iconMapper'
 
 interface Topic {
     id: number
@@ -113,12 +115,15 @@ export default function ManageClass() {
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
                 <Link to="/teacher/active-classes" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Classes
                 </Link>
                 <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl text-white ${(course.color || '').split(' ')[1]?.replace('bg-', 'bg-') || 'bg-indigo-600'}`}>
-                        <i className={`bi ${course.icon}`}></i>
+                        {(() => {
+                            const Icon = getIcon(course.icon)
+                            return <Icon size={24} />
+                        })()}
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-slate-800">{course.course_name}</h1>
@@ -138,7 +143,7 @@ export default function ManageClass() {
                 <div className="divide-y divide-slate-100">
                     {topics.length === 0 ? (
                         <div className="p-8 text-center text-slate-400">
-                            <i className="bi bi-journal-x text-4xl mb-2 block opacity-50"></i>
+                            <BookX className="mx-auto text-4xl mb-2 opacity-50" size={40} />
                             <p>No topics found for this course.</p>
                         </div>
                     ) : (
@@ -155,7 +160,7 @@ export default function ManageClass() {
                                             }
                                         `}
                                     >
-                                        <i className="bi bi-check text-sm font-bold"></i>
+                                        <Check className="text-sm font-bold" size={14} />
                                     </button>
                                 </div>
                                 <div className="flex-1">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
+import { X, UserCircle, UserPlus, Check, ShieldCheck, Key, Mail, Lock, AlertCircle, CheckCircle, User } from 'lucide-react'
 
 interface AuthModalProps {
     isOpen: boolean
@@ -199,12 +200,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         onClick={onClose}
                         className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-1 w-8 h-8 flex items-center justify-center backdrop-blur-md"
                     >
-                        <i className="bi bi-x-lg text-sm"></i>
+                        <X size={18} />
                     </button>
 
                     <div className="relative z-10">
                         <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md mb-4 shadow-lg ring-1 ring-white/30">
-                            <i className={`bi ${isLogin ? 'bi-person-circle' : 'bi-person-plus-fill'} text-2xl text-white`}></i>
+                            {isLogin ? <UserCircle className="text-2xl text-white" size={28} /> : <UserPlus className="text-2xl text-white" size={28} />}
                         </div>
                         <h2 className="text-2xl font-bold text-white tracking-tight">
                             {isLogin ? 'Welcome Back' : 'Join ICST Connect'}
@@ -240,7 +241,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         {verificationSuccess ? (
                             <div className="space-y-6 text-center animate-in fade-in zoom-in duration-300 py-4">
                                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-2 ring-8 ring-green-50">
-                                    <i className="bi bi-check-lg text-4xl text-green-600"></i>
+                                    <Check className="text-4xl text-green-600" size={40} />
                                 </div>
                                 <div>
                                     <h3 className="text-2xl font-bold text-slate-900 mb-2">Verified!</h3>
@@ -260,7 +261,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             <div className="space-y-4 animate-in fade-in zoom-in duration-300">
                                 <div className="text-center mb-6">
                                     <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 mb-3 border border-indigo-100">
-                                        <i className="bi bi-shield-lock-fill text-2xl text-indigo-600"></i>
+                                        <ShieldCheck className="text-2xl text-indigo-600" size={28} />
                                     </div>
                                     <h3 className="text-xl font-bold text-slate-900">Enter Verification Code</h3>
                                     <p className="text-sm text-slate-500 mt-1">
@@ -293,7 +294,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             <div className="space-y-1.5 animate-in fade-in slide-in-from-right-4 duration-300">
                                 <div className="text-center mb-4">
                                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 mb-3">
-                                        <i className="bi bi-key-fill text-xl text-indigo-600"></i>
+                                        <Key className="text-xl text-indigo-600" size={24} />
                                     </div>
                                     <h3 className="text-lg font-semibold text-slate-900">Forgot Password?</h3>
                                     <p className="text-sm text-slate-500">
@@ -303,7 +304,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                                 <div className="relative group">
                                     <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                        <i className="bi bi-envelope"></i>
+                                        <Mail size={18} />
                                     </span>
                                     <input
                                         type="email"
@@ -329,7 +330,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
                                         <div className="relative group">
                                             <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                                <i className="bi bi-person"></i>
+                                                <User size={18} />
                                             </span>
                                             <input
                                                 type="text"
@@ -347,7 +348,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
                                     <div className="relative group">
                                         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                            <i className="bi bi-envelope"></i>
+                                            <Mail size={18} />
                                         </span>
                                         <input
                                             type="email"
@@ -375,7 +376,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                     </div>
                                     <div className="relative group">
                                         <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
-                                            <i className="bi bi-lock"></i>
+                                            <Lock size={18} />
                                         </span>
                                         <input
                                             type="password"
@@ -392,7 +393,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                         {error && (
                             <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${error.includes('sent') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-                                <i className={`bi ${error.includes('sent') ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill'} mt-0.5`}></i>
+                                {error.includes('sent') ? <CheckCircle className="mt-0.5" size={16} /> : <AlertCircle className="mt-0.5" size={16} />}
                                 <span>{error}</span>
                             </div>
                         )}

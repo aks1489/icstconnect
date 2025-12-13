@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Users } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
+import { getIcon } from '../../utils/iconMapper'
 
 export interface Student {
     id: string
@@ -83,7 +85,7 @@ export default function ActiveClasses() {
             {students.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
-                        <i className="bi bi-people text-2xl"></i>
+                        <Users className="text-2xl" size={32} />
                     </div>
                     <h3 className="text-lg font-medium text-slate-800 mb-2">No active classes</h3>
                     <p className="text-slate-500">As students enroll in courses, they will appear here.</p>
@@ -110,7 +112,10 @@ export default function ActiveClasses() {
                                 </div>
                                 <div className="absolute top-4 right-4">
                                     <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold shadow-sm text-slate-700 flex items-center gap-1">
-                                        <i className={`bi ${item.enrollment.course.icon}`}></i>
+                                        {(() => {
+                                            const Icon = getIcon(item.enrollment.course.icon)
+                                            return <Icon size={14} />
+                                        })()}
                                         {item.enrollment.course.course_name}
                                     </span>
                                 </div>

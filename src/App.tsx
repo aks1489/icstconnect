@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { Suspense, lazy, useState, useEffect } from 'react'
+import { AlertCircle, X } from 'lucide-react'
 import MainLayout from './components/layout/MainLayout'
 
 import PageSkeleton from './components/ui/PageSkeleton'
@@ -77,7 +78,7 @@ const ErrorToast = () => {
   return (
     <div className="fixed top-4 right-4 z-[1100] animate-in slide-in-from-right fade-in duration-300">
       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-lg flex items-start gap-3 max-w-md">
-        <i className="bi bi-exclamation-circle-fill mt-0.5 text-red-500"></i>
+        <AlertCircle className="mt-0.5 text-red-500 shrink-0" size={20} />
         <div>
           <h4 className="font-semibold text-sm">Authentication Error</h4>
           <p className="text-sm opacity-90">{error}</p>
@@ -86,7 +87,7 @@ const ErrorToast = () => {
           onClick={() => setError(null)}
           className="text-red-400 hover:text-red-600 transition-colors ml-auto"
         >
-          <i className="bi bi-x-lg"></i>
+          <X size={20} />
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Book, Plus, GripVertical, Pencil, Trash2, X, ArrowLeft } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import type { DropResult } from '@hello-pangea/dnd'
@@ -304,7 +305,7 @@ export default function CourseStructureEditor() {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-2 transition-colors">
-                        <i className="bi bi-arrow-left"></i>
+                        <ArrowLeft size={16} />
                         Back to Courses
                     </Link>
                     <h1 className="text-2xl font-bold text-slate-800">
@@ -319,7 +320,7 @@ export default function CourseStructureEditor() {
                     }}
                     className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                 >
-                    <i className="bi bi-plus-lg"></i>
+                    <Plus size={20} />
                     Add Module
                 </button>
             </div>
@@ -335,7 +336,7 @@ export default function CourseStructureEditor() {
                             {modules.length === 0 ? (
                                 <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
                                     <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
-                                        <i className="bi bi-diagram-3 text-2xl"></i>
+                                        <Book className="text-2xl" size={32} />
                                     </div>
                                     <h3 className="text-lg font-medium text-slate-800 mb-2">Structure is empty</h3>
                                     <p className="text-slate-500 mb-6 max-w-sm mx-auto">Start by creating your first module to organize topics.</p>
@@ -364,7 +365,7 @@ export default function CourseStructureEditor() {
                                                             {...provided.dragHandleProps}
                                                             className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 cursor-grab active:cursor-grabbing hover:text-indigo-600 hover:border-indigo-200 transition-colors"
                                                         >
-                                                            <i className="bi bi-grip-vertical"></i>
+                                                            <GripVertical size={18} />
                                                         </div>
                                                         <div>
                                                             <h3 className="font-semibold text-slate-800">{module.title}</h3>
@@ -374,17 +375,17 @@ export default function CourseStructureEditor() {
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={() => initiateEditModule(module)}
-                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-all"
+                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-all flex items-center justify-center"
                                                             title="Edit Module"
                                                         >
-                                                            <i className="bi bi-pencil"></i>
+                                                            <Pencil size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteModule(module.id)}
-                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-white transition-all"
+                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-white transition-all flex items-center justify-center"
                                                             title="Delete Module"
                                                         >
-                                                            <i className="bi bi-trash"></i>
+                                                            <Trash2 size={16} />
                                                         </button>
                                                     </div>
                                                 </div>
@@ -410,7 +411,7 @@ export default function CourseStructureEditor() {
                                                                                 >
                                                                                     <div className="flex items-center gap-3">
                                                                                         <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-medium cursor-grab active:cursor-grabbing ${snapshot.isDragging ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'}`}>
-                                                                                            {snapshot.isDragging ? <i className="bi bi-grip-vertical"></i> : (tIndex + 1)}
+                                                                                            {snapshot.isDragging ? <GripVertical size={14} /> : (tIndex + 1)}
                                                                                         </div>
                                                                                         <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-700">{topic.title}</span>
                                                                                     </div>
@@ -419,13 +420,13 @@ export default function CourseStructureEditor() {
                                                                                             onClick={() => initiateEditTopic(module.id, topic)}
                                                                                             className="p-1.5 rounded text-slate-400 hover:text-indigo-600"
                                                                                         >
-                                                                                            <i className="bi bi-pencil-square"></i>
+                                                                                            <Pencil size={14} />
                                                                                         </button>
                                                                                         <button
                                                                                             onClick={() => handleDeleteTopic(topic.id)}
                                                                                             className="p-1.5 rounded text-slate-400 hover:text-rose-600"
                                                                                         >
-                                                                                            <i className="bi bi-x-lg"></i>
+                                                                                            <X size={14} />
                                                                                         </button>
                                                                                     </div>
                                                                                 </div>
@@ -445,7 +446,7 @@ export default function CourseStructureEditor() {
                                                                     }}
                                                                     className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 py-1 px-2 rounded hover:bg-indigo-50 w-fit transition-colors"
                                                                 >
-                                                                    <i className="bi bi-plus"></i>
+                                                                    <Plus size={14} />
                                                                     Add Topic
                                                                 </button>
                                                             </div>

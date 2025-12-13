@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { UserSquare2, Mail, Lock, AlertCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 export default function TeacherLogin() {
@@ -56,7 +57,7 @@ export default function TeacherLogin() {
             <div className="max-w-md w-full space-y-8 bg-white/10 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-white/10 relative z-10 animate-in fade-in zoom-in duration-300">
                 <div>
                     <div className="mx-auto h-16 w-16 bg-white/10 rounded-full flex items-center justify-center mb-6 ring-4 ring-white/5">
-                        <i className="bi bi-person-video3 text-3xl text-white"></i>
+                        <UserSquare2 className="text-3xl text-white" size={32} />
                     </div>
                     <h2 className="text-center text-3xl font-bold text-white tracking-tight">
                         Teacher Portal
@@ -73,7 +74,7 @@ export default function TeacherLogin() {
                             </label>
                             <div className="relative">
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-white transition-colors">
-                                    <i className="bi bi-envelope"></i>
+                                    <Mail size={18} />
                                 </span>
                                 <input
                                     id="email-address"
@@ -94,7 +95,7 @@ export default function TeacherLogin() {
                             </label>
                             <div className="relative">
                                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-white transition-colors">
-                                    <i className="bi bi-lock"></i>
+                                    <Lock size={18} />
                                 </span>
                                 <input
                                     id="password"
@@ -113,7 +114,7 @@ export default function TeacherLogin() {
 
                     {error && (
                         <div className="flex items-center gap-2 text-red-300 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-                            <i className="bi bi-exclamation-circle-fill"></i>
+                            <AlertCircle size={16} />
                             {error}
                         </div>
                     )}

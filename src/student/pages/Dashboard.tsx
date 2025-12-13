@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { Book, Trophy, Star, BookPlus, ChevronRight } from 'lucide-react'
+import { getIcon } from '../../utils/iconMapper'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 
 interface EnrolledCourse {
@@ -88,7 +90,7 @@ export default function StudentDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <i className="bi bi-book-fill text-2xl text-blue-600"></i>
+                        <Book className="text-2xl text-blue-600" size={24} />
                     </div>
                     <div>
                         <h3 className="text-2xl font-bold text-slate-800">{courses.length}</h3>
@@ -97,7 +99,7 @@ export default function StudentDashboard() {
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <i className="bi bi-trophy-fill text-2xl text-emerald-600"></i>
+                        <Trophy className="text-2xl text-emerald-600" size={24} />
                     </div>
                     <div>
                         <h3 className="text-2xl font-bold text-slate-800">0</h3>
@@ -106,7 +108,7 @@ export default function StudentDashboard() {
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
-                        <i className="bi bi-star-fill text-2xl text-amber-600"></i>
+                        <Star className="text-2xl text-amber-600" size={24} />
                     </div>
                     <div>
                         <h3 className="text-2xl font-bold text-slate-800">0%</h3>
@@ -131,7 +133,7 @@ export default function StudentDashboard() {
                         {courses.length === 0 ? (
                             <div className="bg-white p-8 rounded-2xl border-2 border-dashed border-slate-200 text-center">
                                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4">
-                                    <i className="bi bi-journal-plus text-3xl text-slate-400"></i>
+                                    <BookPlus className="text-3xl text-slate-400" size={32} />
                                 </div>
                                 <h3 className="text-lg font-semibold text-slate-700">No courses yet</h3>
                                 <p className="text-slate-500 text-sm mb-4">Start your learning journey today!</p>
@@ -143,34 +145,37 @@ export default function StudentDashboard() {
                                 </button>
                             </div>
                         ) : (
-                            courses.map((item) => (
-                                <div key={item.course.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all group flex gap-5 items-center">
-                                    <div className={`w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center ${(item.course.color || '').split(' ')[0].replace('text-', 'bg-').replace('500', '100') || 'bg-blue-100'}`}>
-                                        <i className={`bi ${item.course.icon} text-3xl ${(item.course.color || '').split(' ')[0] || 'text-blue-600'}`}></i>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="text-lg font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
-                                                {item.course.course_name}
-                                            </h3>
-                                            {item.class && (
-                                                <span className="bg-violet-50 text-violet-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-violet-100">
-                                                    {item.class.batch_name}
-                                                </span>
-                                            )}
+                            courses.map((item) => {
+                                const IconComponent = getIcon(item.course.icon)
+                                return (
+                                    <div key={item.course.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all group flex gap-5 items-center">
+                                        <div className={`w-16 h-16 rounded-xl flex-shrink-0 flex items-center justify-center ${(item.course.color || '').split(' ')[0].replace('text-', 'bg-').replace('500', '100') || 'bg-blue-100'}`}>
+                                            <IconComponent className={`text-3xl ${(item.course.color || '').split(' ')[0] || 'text-blue-600'}`} size={32} />
                                         </div>
-                                        <p className="text-sm text-slate-500 line-clamp-1 mb-2">
-                                            {item.course.description}
-                                        </p>
-                                        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                                            <div className="bg-indigo-500 h-full rounded-full" style={{ width: '0%' }}></div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h3 className="text-lg font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                                                    {item.course.course_name}
+                                                </h3>
+                                                {item.class && (
+                                                    <span className="bg-violet-50 text-violet-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-violet-100">
+                                                        {item.class.batch_name}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-slate-500 line-clamp-1 mb-2">
+                                                {item.course.description}
+                                            </p>
+                                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                <div className="bg-indigo-500 h-full rounded-full" style={{ width: '0%' }}></div>
+                                            </div>
                                         </div>
+                                        <button className="flex-shrink-0 w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 text-slate-400 hover:text-indigo-600 transition-colors">
+                                            <ChevronRight size={20} />
+                                        </button>
                                     </div>
-                                    <button className="flex-shrink-0 w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:bg-slate-50 text-slate-400 hover:text-indigo-600 transition-colors">
-                                        <i className="bi bi-chevron-right"></i>
-                                    </button>
-                                </div>
-                            ))
+                                )
+                            })
                         )}
                     </div>
                 </div>
@@ -188,7 +193,7 @@ export default function StudentDashboard() {
                                     className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left"
                                 >
                                     <div className={`w-10 h-10 rounded-full ${action.color.replace('text-', 'bg-').replace('600', '100')} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                                        <i className={`bi ${action.icon} ${action.color}`}></i>
+                                        <action.icon className={`${action.color}`} size={20} />
                                     </div>
                                     <span className="font-semibold text-slate-600 group-hover:text-slate-900">{action.label}</span>
                                 </button>

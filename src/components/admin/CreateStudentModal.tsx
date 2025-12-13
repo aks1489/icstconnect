@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { X } from 'lucide-react'
 
 interface CreateStudentModalProps {
     isOpen: boolean
@@ -92,7 +93,7 @@ export default function CreateStudentModal({ isOpen, onClose, onSuccess }: Creat
                 <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
                     <h2 className="text-xl font-bold text-slate-800">Add New Student</h2>
                     <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                        <i className="bi bi-x-lg text-xs"></i>
+                        <X size={16} />
                     </button>
                 </div>
 

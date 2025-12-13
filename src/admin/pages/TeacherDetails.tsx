@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Check, X, Pencil, Mail, Calendar, CalendarX, UserMinus, Ban } from 'lucide-react'
 
 interface TeacherProfile {
     id: string
@@ -82,7 +83,7 @@ export default function TeacherDetails() {
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
                 <Link to="/admin/teachers" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Faculty
                 </Link>
             </div>
@@ -111,10 +112,10 @@ export default function TeacherDetails() {
                                             placeholder="Enter ID..."
                                         />
                                         <button onClick={handleUpdateId} className="text-emerald-600 hover:text-emerald-700">
-                                            <i className="bi bi-check-lg text-xl"></i>
+                                            <Check className="text-xl" size={20} />
                                         </button>
                                         <button onClick={() => setIsEditingId(false)} className="text-red-500 hover:text-red-700">
-                                            <i className="bi bi-x-lg text-xl"></i>
+                                            <X className="text-xl" size={20} />
                                         </button>
                                     </div>
                                 ) : (
@@ -125,7 +126,7 @@ export default function TeacherDetails() {
                                         <span className="text-sm font-mono font-bold text-slate-600">
                                             {teacher.teacher_id || 'No ID'}
                                         </span>
-                                        <i className="bi bi-pencil-fill text-xs text-slate-400 group-hover:text-slate-600"></i>
+                                        <Pencil className="text-xs text-slate-400 group-hover:text-slate-600" size={12} />
                                     </div>
                                 )}
                                 <span className="md:ml-auto px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold border border-emerald-200 whitespace-nowrap">
@@ -133,9 +134,9 @@ export default function TeacherDetails() {
                                 </span>
                             </div>
                             <div className="flex flex-col md:flex-row items-center gap-4 mt-2 text-slate-500 text-sm font-medium">
-                                <span className="flex items-center gap-2"><i className="bi bi-envelope"></i> {teacher.email}</span>
+                                <span className="flex items-center gap-2"><Mail size={16} /> {teacher.email}</span>
                                 <span className="hidden md:inline text-slate-300">|</span>
-                                <span className="flex items-center gap-2"><i className="bi bi-calendar"></i> Joined {new Date(teacher.created_at).toLocaleDateString()}</span>
+                                <span className="flex items-center gap-2"><Calendar size={16} /> Joined {new Date(teacher.created_at).toLocaleDateString()}</span>
                             </div>
                         </div>
                     </div>
@@ -145,7 +146,7 @@ export default function TeacherDetails() {
                             <div>
                                 <h3 className="text-lg font-bold text-slate-800 mb-4">Assigned Schedule</h3>
                                 <div className="p-8 border-2 border-dashed border-slate-200 rounded-2xl text-center text-slate-400">
-                                    <i className="bi bi-calendar-x text-3xl mb-2 block"></i>
+                                    <CalendarX className="text-3xl mb-2 block mx-auto" size={36} />
                                     No specific classes assigned via the new system yet.
                                 </div>
                             </div>
@@ -159,11 +160,11 @@ export default function TeacherDetails() {
                                         onClick={handleDemote}
                                         className="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:border-amber-500 hover:text-amber-600 rounded-xl font-medium transition-all shadow-sm flex items-center justify-center gap-2"
                                     >
-                                        <i className="bi bi-person-down"></i>
+                                        <UserMinus size={18} />
                                         Remove Teacher Role
                                     </button>
                                     <button className="w-full py-3 bg-white border border-slate-200 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-xl font-medium transition-all shadow-sm flex items-center justify-center gap-2">
-                                        <i className="bi bi-slash-circle"></i>
+                                        <Ban size={18} />
                                         Deactivate Account
                                     </button>
                                 </div>

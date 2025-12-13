@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { X, ArrowLeft, Pencil } from 'lucide-react'
+import { getIcon } from '../../utils/iconMapper'
 import ProfileForm from '../../components/common/ProfileForm'
 import type { UserProfile } from '../../types'
 
@@ -276,7 +278,7 @@ export default function StudentDetails() {
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
                             <h2 className="text-xl font-bold text-slate-800">Edit Student Profile</h2>
                             <button onClick={() => setIsEditOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">
-                                <i className="bi bi-x-lg text-xs"></i>
+                                <X className="text-xs" size={14} />
                             </button>
                         </div>
                         <div className="p-6">
@@ -293,7 +295,7 @@ export default function StudentDetails() {
 
             <div className="mb-8">
                 <Link to="/admin/students" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Students
                 </Link>
                 <div className="flex items-center justify-between">
@@ -317,7 +319,7 @@ export default function StudentDetails() {
                         onClick={() => setIsEditOpen(true)}
                         className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold hover:bg-indigo-100 transition-colors flex items-center gap-2"
                     >
-                        <i className="bi bi-pencil-square"></i>
+                        <Pencil size={18} />
                         Edit Profile
                     </button>
                 </div>
@@ -346,7 +348,10 @@ export default function StudentDetails() {
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${(enrollment.course.color || '').split(' ')[0].replace('text-', 'bg-').replace('600', '100') || 'bg-blue-100'}`}>
-                                                    <i className={`bi ${enrollment.course.icon} ${(enrollment.course.color || '').split(' ')[0] || 'text-blue-600'}`}></i>
+                                                    {(() => {
+                                                        const Icon = getIcon(enrollment.course.icon)
+                                                        return <Icon className={`${(enrollment.course.color || '').split(' ')[0] || 'text-blue-600'}`} size={20} />
+                                                    })()}
                                                 </div>
                                                 <div>
                                                     <h3 className="font-semibold text-slate-800">{enrollment.course.course_name}</h3>
@@ -358,7 +363,7 @@ export default function StudentDetails() {
                                                 className="text-red-400 hover:text-red-600 p-1"
                                                 title="Unenroll"
                                             >
-                                                <i className="bi bi-x-lg"></i>
+                                                <X size={20} />
                                             </button>
                                         </div>
 

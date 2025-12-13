@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react'
+import { Atom, Box, FileCode2, Wind, FileCode, Database, Server, Triangle } from 'lucide-react'
 import TechPopup from '../../ui/TechPopup'
 
 const TechTickerSection = () => {
@@ -9,7 +10,7 @@ const TechTickerSection = () => {
     const techs = [
         {
             name: 'React',
-            icon: 'bi-filetype-jsx',
+            icon: Atom,
             color: '#61DAFB',
             description: 'The most popular library for building modern, interactive user interfaces.',
             keyPoints: ['Component-Based', 'Virtual DOM', 'Huge Ecosystem'],
@@ -17,7 +18,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'Bootstrap',
-            icon: 'bi-bootstrap-fill',
+            icon: Box,
             color: '#7952B3',
             description: 'The world’s most popular framework for building responsive, mobile-first sites.',
             keyPoints: ['Responsive Grid', 'Pre-built Components', 'Easy to Use'],
@@ -25,7 +26,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'Node.js',
-            icon: 'bi-filetype-js',
+            icon: FileCode2,
             color: '#339933',
             description: 'Execute JavaScript on the server-side to build scalable network applications.',
             keyPoints: ['Event-Driven', 'Non-Blocking I/O', 'NPM Registry'],
@@ -33,7 +34,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'TailwindCSS',
-            icon: 'bi-wind',
+            icon: Wind,
             color: '#06B6D4',
             description: 'A utility-first CSS framework for rapidly building custom user interfaces.',
             keyPoints: ['Utility-First', 'Highly Customizable', 'Small Bundle Size'],
@@ -41,7 +42,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'TypeScript',
-            icon: 'bi-filetype-tsx',
+            icon: FileCode,
             color: '#3178C6',
             description: 'JavaScript with syntax for types. Adds safety and scalability to your code.',
             keyPoints: ['Static Typing', 'Better Tooling', 'Scalable'],
@@ -49,7 +50,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'MongoDB',
-            icon: 'bi-database-fill',
+            icon: Database,
             color: '#47A248',
             description: 'The most popular database for modern apps. Flexible, scalable, and powerful.',
             keyPoints: ['NoSQL', 'Document-Oriented', 'High Performance'],
@@ -57,7 +58,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'Express',
-            icon: 'bi-server',
+            icon: Server,
             color: '#000000',
             description: 'Fast, unopinionated, minimalist web framework for Node.js.',
             keyPoints: ['Minimalist', 'Flexible Routing', 'Middleware Support'],
@@ -65,7 +66,7 @@ const TechTickerSection = () => {
         },
         {
             name: 'Next.js',
-            icon: 'bi-triangle-fill',
+            icon: Triangle,
             color: '#000000',
             description: 'The React Framework for the Web. Used by some of the world\'s largest companies.',
             keyPoints: ['Server-Side Rendering', 'Static Site Gen', 'SEO Friendly'],
@@ -118,7 +119,7 @@ const TechTickerSection = () => {
                                 onMouseLeave={handleMouseLeave}
                                 onClick={(e) => handleClick(e, tech.name)}
                             >
-                                <i className={`bi ${tech.icon} text-3xl text-slate-300 group-hover:text-[color:var(--tech-color)] transition-colors duration-300`} style={{ '--tech-color': tech.color } as React.CSSProperties}></i>
+                                <tech.icon className={`text-3xl text-slate-300 group-hover:text-[color:var(--tech-color)] transition-colors duration-300`} style={{ '--tech-color': tech.color } as React.CSSProperties} size={32} />
                                 <span className="font-bold text-lg text-slate-400 group-hover:text-slate-800 transition-colors duration-300">{tech.name}</span>
                             </div>
                         ))}

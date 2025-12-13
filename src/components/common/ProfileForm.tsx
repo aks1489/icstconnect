@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 
 import type { UserProfile } from '../../types'
 import ImageUpload from './ImageUpload'
+import { Check, AlertTriangle } from 'lucide-react'
 
 interface ProfileFormProps {
     initialData: Partial<UserProfile>
@@ -288,7 +289,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                 className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-indigo-300 transition-all checked:border-indigo-600 checked:bg-indigo-600 focus:ring-2 focus:ring-indigo-200"
                             />
                             <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100">
-                                <i className="bi bi-check-lg text-sm"></i>
+                                <Check size={14} />
                             </div>
                         </div>
                         <div className="text-sm">
@@ -301,7 +302,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
 
             {error && (
                 <div className="p-4 rounded-xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3">
-                    <i className="bi bi-exclamation-triangle-fill"></i>
+                    <AlertTriangle size={20} className="shrink-0" />
                     <p className="text-sm font-medium">{error}</p>
                 </div>
             )}

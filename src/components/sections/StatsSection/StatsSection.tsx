@@ -1,10 +1,12 @@
 
+import { Users, TrendingUp, BookOpen, CalendarCheck } from 'lucide-react'
+
 const StatsSection = () => {
     const stats = [
-        { count: '5000+', label: 'Students Trained', icon: 'bi-people-fill' },
-        { count: '95%', label: 'Placement Rate', icon: 'bi-graph-up-arrow' },
-        { count: '25+', label: 'Courses Offered', icon: 'bi-book-fill' },
-        { count: '15+', label: 'Years Experience', icon: 'bi-calendar-check-fill' }
+        { count: '5000+', label: 'Students Trained', icon: Users },
+        { count: '95%', label: 'Placement Rate', icon: TrendingUp },
+        { count: '25+', label: 'Courses Offered', icon: BookOpen },
+        { count: '15+', label: 'Years Experience', icon: CalendarCheck }
     ]
 
     return (
@@ -21,7 +23,7 @@ const StatsSection = () => {
                         <div key={index} className="group">
                             <div className="p-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all duration-300 text-center group-hover:-translate-y-2">
                                 <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
-                                    <i className={`bi ${stat.icon} text-3xl text-white`}></i>
+                                    <stat.icon className="text-3xl text-white" size={32} />
                                 </div>
                                 <h2 className="text-4xl font-bold text-white mb-2">{stat.count}</h2>
                                 <p className="text-slate-400 font-medium tracking-wide uppercase text-sm">{stat.label}</p>

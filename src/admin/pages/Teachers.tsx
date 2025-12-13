@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Grid, List, UserPlus, Users, ChevronRight, Search } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import CreateTeacherModal from '../../components/admin/CreateTeacherModal'
 
@@ -66,13 +67,13 @@ export default function Teachers() {
                             onClick={() => setViewMode('grid')}
                             className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                         >
-                            <i className="bi bi-grid-fill"></i>
+                            <Grid size={20} />
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
                             className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                         >
-                            <i className="bi bi-list-ul"></i>
+                            <List size={20} />
                         </button>
                     </div>
 
@@ -80,7 +81,7 @@ export default function Teachers() {
                         onClick={() => setIsCreateModalOpen(true)}
                         className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-2"
                     >
-                        <i className="bi bi-person-plus-fill"></i>
+                        <UserPlus size={20} />
                         <span>Add Teacher</span>
                     </button>
                 </div>
@@ -88,7 +89,7 @@ export default function Teachers() {
 
             {/* Search Bar */}
             <div className="relative max-w-md">
-                <i className="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
                     type="text"
                     placeholder="Search by name, email, or ID..."
@@ -102,7 +103,7 @@ export default function Teachers() {
             {filteredTeachers.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center">
                     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i className="bi bi-people text-3xl text-indigo-300"></i>
+                        <Users className="text-3xl text-indigo-300" size={40} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800">No Teachers Found</h3>
                     <p className="text-slate-500 mt-1 max-w-xs mx-auto">
@@ -204,7 +205,7 @@ export default function Teachers() {
                                             to={`/admin/teachers/${teacher.id}`}
                                             className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                                         >
-                                            <i className="bi bi-chevron-right"></i>
+                                            <ChevronRight size={18} />
                                         </Link>
                                     </td>
                                 </tr>

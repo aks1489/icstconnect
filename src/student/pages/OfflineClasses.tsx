@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Calendar } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -97,7 +98,7 @@ export default function OfflineClasses() {
                                 </div>
                                 <h3 className="mt-2 text-lg font-semibold text-gray-900">{session.title}</h3>
                                 <div className="mt-1 flex items-center text-sm text-gray-600">
-                                    <i className="bi bi-calendar-event mr-2"></i>
+                                    <Calendar className="mr-2" size={16} />
                                     {new Date(session.date).toLocaleDateString()}
                                 </div>
                             </div>

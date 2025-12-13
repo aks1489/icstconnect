@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { ArrowLeft } from 'lucide-react'
+import { getIcon } from '../../utils/iconMapper'
 
 export default function CourseForm() {
     const { id } = useParams()
@@ -102,7 +104,7 @@ export default function CourseForm() {
         <div className="max-w-3xl mx-auto">
             <div className="mb-8">
                 <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Courses
                 </Link>
                 <h1 className="text-2xl font-bold text-slate-800">
@@ -181,22 +183,25 @@ export default function CourseForm() {
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-3">Icon</label>
                             <div className="grid grid-cols-6 gap-2">
-                                {commonIcons.map((icon) => (
-                                    <button
-                                        key={icon}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, icon })}
-                                        className={`
-                                            h-10 rounded-lg border transition-all flex items-center justify-center
-                                            ${formData.icon === icon
-                                                ? 'bg-slate-800 text-white border-slate-800'
-                                                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
-                                            }
-                                        `}
-                                    >
-                                        <i className={`bi ${icon}`}></i>
-                                    </button>
-                                ))}
+                                {commonIcons.map((icon) => {
+                                    const Icon = getIcon(icon)
+                                    return (
+                                        <button
+                                            key={icon}
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, icon })}
+                                            className={`
+                                                h-10 rounded-lg border transition-all flex items-center justify-center
+                                                ${formData.icon === icon
+                                                    ? 'bg-slate-800 text-white border-slate-800'
+                                                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                                                }
+                                            `}
+                                        >
+                                            <Icon size={18} />
+                                        </button>
+                                    )
+                                })}
                             </div>
                             <div className="mt-3">
                                 <label className="text-xs font-semibold text-slate-500 uppercase">Or Custom Icon Class</label>
@@ -217,7 +222,10 @@ export default function CourseForm() {
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm w-full max-w-sm mx-auto overflow-hidden">
                             <div className={`h-24 ${(formData.color || '').split(' ')[1] || 'bg-slate-100'} p-4 relative`}>
                                 <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center absolute -bottom-6 left-6">
-                                    <i className={`bi ${formData.icon} text-xl ${(formData.color || '').split(' ')[0] || 'text-slate-600'}`}></i>
+                                    {(() => {
+                                        const Icon = getIcon(formData.icon)
+                                        return <Icon className={`text-xl ${(formData.color || '').split(' ')[0] || 'text-slate-600'}`} size={24} />
+                                    })()}
                                 </div>
                             </div>
                             <div className="pt-8 p-6">

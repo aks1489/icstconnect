@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 
 interface ClassBatch {
@@ -142,7 +143,7 @@ export default function ClassManager() {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-2 transition-colors">
-                        <i className="bi bi-arrow-left"></i>
+                        <ArrowLeft size={16} />
                         Back to Courses
                     </Link>
                     <h1 className="text-2xl font-bold text-slate-800">
@@ -155,7 +156,7 @@ export default function ClassManager() {
                         onClick={() => setShowCreateModal(true)}
                         className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                     >
-                        <i className="bi bi-plus-lg"></i>
+                        <Plus size={20} />
                         Create New Batch
                     </button>
                 </div>
@@ -199,7 +200,7 @@ export default function ClassManager() {
                                     disabled={cls.enrolled_count > 0}
                                     title={cls.enrolled_count > 0 ? "Cannot delete non-empty batch" : "Delete Batch"}
                                 >
-                                    <i className="bi bi-trash"></i>
+                                    <Trash2 size={14} />
                                     Delete
                                 </button>
                             </div>
@@ -209,7 +210,7 @@ export default function ClassManager() {
 
                 {classes.length === 0 && (
                     <div className="col-span-full py-12 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                        <i className="bi bi-people text-3xl mb-3 block"></i>
+                        <Users className="text-3xl mb-3 block mx-auto" size={32} />
                         <p>No batches created yet.</p>
                         <button onClick={() => setShowCreateModal(true)} className="text-indigo-600 font-bold hover:underline mt-2">Create First Batch</button>
                     </div>

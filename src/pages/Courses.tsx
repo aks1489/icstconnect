@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Hourglass } from 'lucide-react'
+import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
 import { courseService } from '../services/courseService'
@@ -87,7 +89,7 @@ const CoursesPage = () => {
                     ) : filteredCourses.length === 0 ? (
                         <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-col items-center justify-center py-20 text-center">
                             <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                                <i className="bi bi-hourglass-split text-4xl text-blue-600"></i>
+                                <Hourglass className="text-blue-600 animate-pulse" size={40} />
                             </div>
                             <h3 className="text-2xl font-bold text-slate-900 mb-2">Coming Soon</h3>
                             <p className="text-slate-500 max-w-md">
@@ -103,7 +105,15 @@ const CoursesPage = () => {
                             >
                                 <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
                                     <div className="absolute inset-0 opacity-10 pattern-dots"></div>
-                                    <i className={`bi ${course.icon} text-6xl relative z-10 transform transition-transform duration-500 group-hover:scale-110`}></i>
+                                    {(() => {
+                                        const Icon = getIcon(course.icon)
+                                        return (
+                                            <Icon
+                                                size={64}
+                                                className="relative z-10 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                                            />
+                                        )
+                                    })()}
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
                                         {course.duration}
                                     </div>

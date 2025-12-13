@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Users, X } from 'lucide-react'
 
 interface Student {
     id: string
@@ -129,7 +130,7 @@ export default function AdminClassDetails() {
     return (
         <div className="max-w-5xl mx-auto pb-12">
             <Link to="/admin/classes" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-6 transition-colors">
-                <i className="bi bi-arrow-left"></i>
+                <ArrowLeft size={16} />
                 Back to All Classes
             </Link>
 
@@ -180,7 +181,7 @@ export default function AdminClassDetails() {
 
             {students.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
-                    <i className="bi bi-people text-4xl mb-3 block opacity-50"></i>
+                    <Users className="text-4xl mb-3 block opacity-50 mx-auto" size={48} />
                     <p>No students enrolled in this batch yet.</p>
                 </div>
             ) : (
@@ -230,7 +231,7 @@ export default function AdminClassDetails() {
                                             className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                                             title="Remove from Batch"
                                         >
-                                            <i className="bi bi-x-lg"></i>
+                                            <X size={18} />
                                         </button>
                                     </td>
                                 </tr>
