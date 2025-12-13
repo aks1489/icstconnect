@@ -18,6 +18,40 @@ const getCourseStyle = (title: string): { icon: string, color: string } => {
     return { icon: 'bi-code-square', color: 'text-blue-600 bg-blue-50' }
 }
 
+
+// Helper to generate tags based on content
+const generateTags = (title: string, desc: string): string[] => {
+    const tags = new Set<string>()
+    const text = `${title} ${desc}`.toLowerCase()
+
+    const keywords = [
+        { key: 'python', tag: 'Python' },
+        { key: 'java', tag: 'Java' },
+        { key: 'react', tag: 'React' },
+        { key: 'node', tag: 'Node.js' },
+        { key: 'sql', tag: 'SQL' },
+        { key: 'database', tag: 'Database' },
+        { key: 'html', tag: 'HTML' },
+        { key: 'css', tag: 'CSS' },
+        { key: 'web', tag: 'Web Dev' },
+        { key: 'c++', tag: 'C++' },
+        { key: 'office', tag: 'MS Office' },
+        { key: 'excel', tag: 'Excel' },
+        { key: 'tally', tag: 'Tally' },
+        { key: 'accounting', tag: 'Accounting' },
+        { key: 'hardware', tag: 'Hardware' },
+        { key: 'network', tag: 'Networking' },
+        { key: 'diploma', tag: 'Diploma' },
+        { key: 'design', tag: 'Design' }
+    ]
+
+    keywords.forEach(({ key, tag }) => {
+        if (text.includes(key)) tags.add(tag)
+    })
+
+    return Array.from(tags)
+}
+
 export const courseService = {
     async getCourses(): Promise<Course[]> {
         const { data, error } = await supabase
@@ -30,13 +64,19 @@ export const courseService = {
         // Map Supabase data to UI compatible format
         return (data || []).map((course: any) => {
             const style = getCourseStyle(course.course_name)
+            // Use existing tags or generate them if empty/null
+            const tags = (course.tags && course.tags.length > 0)
+                ? course.tags
+                : generateTags(course.course_name, course.description || '')
+
             return {
                 ...course,
                 title: course.course_name,
                 description: course.description || (course.syllabus && course.syllabus.length > 0 ? course.syllabus.join(', ') : 'No description available'),
                 icon: style.icon,
                 color: style.color,
-                price: course.fees?.total ? `₹${course.fees.total}` : 'Contact for Price'
+                price: course.fees?.total ? `₹${course.fees.total}` : 'Contact for Price',
+                tags: tags
             }
         }) as Course[]
     }

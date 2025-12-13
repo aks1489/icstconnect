@@ -17,7 +17,8 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
         icon: 'Code',
         color: 'text-indigo-600 bg-indigo-50',
         duration: '6 Months',
-        category: 'Development'
+        category: 'Development',
+        tags: [] as string[]
     })
 
     const colorThemes = [
@@ -58,7 +59,8 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 icon: 'Code',
                 color: 'text-indigo-600 bg-indigo-50',
                 duration: '6 Months',
-                category: 'Development'
+                category: 'Development',
+                tags: []
             })
             onSuccess()
             onClose()
@@ -154,6 +156,54 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                         </div>
                     </div>
 
+
+                    {/* Tag Input */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Tags <span className="text-slate-400 font-normal text-xs">(Enter to add)</span>
+                        </label>
+                        <div className="w-full px-4 py-3 rounded-xl border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all bg-white min-h-[50px] flex flex-wrap gap-2 items-center">
+                            {(formData.tags || []).map((tag, index) => (
+                                <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-sm font-medium">
+                                    {tag}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newTags = [...formData.tags]
+                                            newTags.splice(index, 1)
+                                            setFormData({ ...formData, tags: newTags })
+                                        }}
+                                        className="text-slate-400 hover:text-red-500"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </span>
+                            ))}
+                            <input
+                                type="text"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ',') {
+                                        e.preventDefault()
+                                        const val = e.currentTarget.value.trim()
+                                        if (val && !formData.tags.includes(val)) {
+                                            setFormData({
+                                                ...formData,
+                                                tags: [...formData.tags, val]
+                                            })
+                                            e.currentTarget.value = ''
+                                        }
+                                    } else if (e.key === 'Backspace' && !e.currentTarget.value && formData.tags.length > 0) {
+                                        const newTags = [...formData.tags]
+                                        newTags.pop()
+                                        setFormData({ ...formData, tags: newTags })
+                                    }
+                                }}
+                                className="flex-1 min-w-[80px] bg-transparent outline-none text-slate-700 placeholder-slate-400 text-sm"
+                                placeholder={formData.tags.length ? "" : "Add tags..."}
+                            />
+                        </div>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">Icon</label>
                         <div className="grid grid-cols-4 gap-2">
@@ -211,8 +261,8 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                             {loading ? 'Creating...' : 'Create Course'}
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
+                </form >
+            </div >
+        </div >
     )
 }
