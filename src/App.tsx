@@ -38,6 +38,9 @@ import ScheduleClass from './admin/pages/ScheduleClass'
 import AdminTeachers from './admin/pages/Teachers'
 import TeacherDetails from './admin/pages/TeacherDetails'
 import CourseStructureEditor from './admin/pages/CourseStructureEditor'
+import ClassManager from './admin/pages/ClassManager'
+import AdminClasses from './admin/pages/AdminClasses'
+import AdminClassDetails from './admin/pages/AdminClassDetails'
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -150,6 +153,9 @@ function App() {
               <Route path="courses/new" element={<CourseForm />} />
               <Route path="courses/:id/edit" element={<CourseForm />} />
               <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
+              <Route path="courses/:id/classes" element={<ClassManager />} />
+              <Route path="classes" element={<AdminClasses />} />
+              <Route path="classes/:id" element={<AdminClassDetails />} />
               <Route path="calendar" element={<AdminCalendar />} />
               <Route path="schedule" element={<ScheduleClass />} />
               <Route path="teachers" element={<AdminTeachers />} />

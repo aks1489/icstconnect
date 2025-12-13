@@ -28,6 +28,8 @@ export default function StudentDetails() {
     const [allCourses, setAllCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCourseId, setSelectedCourseId] = useState<string>('')
+    const [availableClasses, setAvailableClasses] = useState<any[]>([])
+    const [selectedClassId, setSelectedClassId] = useState<string>('')
     const [isEditOpen, setIsEditOpen] = useState(false)
 
     useEffect(() => {
@@ -35,6 +37,41 @@ export default function StudentDetails() {
             fetchData()
         }
     }, [id])
+
+    // Fetch classes when a course is selected
+    useEffect(() => {
+        if (selectedCourseId) {
+            fetchClassesForCourse(selectedCourseId)
+        } else {
+            setAvailableClasses([])
+            setSelectedClassId('')
+        }
+    }, [selectedCourseId])
+
+    const fetchClassesForCourse = async (courseId: string) => {
+        try {
+            const { data: classesData, error } = await supabase
+                .from('classes')
+                .select('*')
+                .eq('course_id', courseId)
+                .order('batch_number', { ascending: false })
+
+            if (error) throw error
+
+            // Get enrollment counts for each class to check capacity
+            const classesWithCounts = await Promise.all((classesData || []).map(async (cls) => {
+                const { count } = await supabase
+                    .from('enrollments')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('class_id', cls.id)
+                return { ...cls, enrolled_count: count || 0 }
+            }))
+
+            setAvailableClasses(classesWithCounts)
+        } catch (error) {
+            console.error('Error fetching classes:', error)
+        }
+    }
 
     const fetchData = async () => {
         try {
@@ -59,6 +96,7 @@ export default function StudentDetails() {
                     course_id,
                     progress,
                     enrolled_at,
+                    class_id,
                     course:courses (
                         course_name,
                         icon,
@@ -100,7 +138,10 @@ export default function StudentDetails() {
     }
 
     const handleAssignCourse = async () => {
-        if (!selectedCourseId || !id) return
+        if (!selectedCourseId || !id || !selectedClassId) {
+            alert('Please select both a course and a batch class.')
+            return
+        }
 
         try {
             const { error } = await supabase
@@ -108,6 +149,7 @@ export default function StudentDetails() {
                 .insert({
                     student_id: id,
                     course_id: parseInt(selectedCourseId),
+                    class_id: parseInt(selectedClassId),
                     progress: 0
                 })
 
@@ -120,6 +162,7 @@ export default function StudentDetails() {
             } else {
                 fetchData()
                 setSelectedCourseId('')
+                setSelectedClassId('')
             }
         } catch (error) {
             console.error('Error assigning course:', error)
@@ -391,9 +434,36 @@ export default function StudentDetails() {
                                     ))}
                                 </select>
                             </div>
+
+                            {selectedCourseId && (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Select Batch</label>
+                                    <select
+                                        value={selectedClassId}
+                                        onChange={(e) => setSelectedClassId(e.target.value)}
+                                        className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm"
+                                    >
+                                        <option value="">Choose a batch...</option>
+                                        {availableClasses.map(cls => {
+                                            const isFull = cls.enrolled_count >= cls.capacity
+                                            return (
+                                                <option key={cls.id} value={cls.id} disabled={isFull}>
+                                                    {cls.batch_name} {isFull ? '(FULL)' : `(${cls.enrolled_count}/${cls.capacity})`}
+                                                </option>
+                                            )
+                                        })}
+                                    </select>
+                                    {availableClasses.length === 0 && (
+                                        <p className="text-xs text-red-500 mt-1">
+                                            No available batches. <Link to={`/admin/courses/${selectedCourseId}/classes`} className="underline font-bold">Create one here.</Link>
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
                             <button
                                 onClick={handleAssignCourse}
-                                disabled={!selectedCourseId}
+                                disabled={!selectedCourseId || !selectedClassId}
                                 className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Assign Course

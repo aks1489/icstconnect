@@ -11,6 +11,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         course_name: '',
+        short_code: '',
         description: '',
         icon: 'bi-code-square',
         color: 'text-indigo-600 bg-indigo-50',
@@ -45,6 +46,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
 
             setFormData({
                 course_name: '',
+                short_code: '',
                 description: '',
                 icon: 'bi-code-square',
                 color: 'text-indigo-600 bg-indigo-50',
@@ -75,16 +77,30 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Course Title</label>
-                        <input
-                            type="text"
-                            required
-                            value={formData.course_name}
-                            onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
-                            placeholder="e.g. Advanced Web Development"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Course Title</label>
+                            <input
+                                type="text"
+                                required
+                                value={formData.course_name}
+                                onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                                placeholder="e.g. Advanced Web Development"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Short Code</label>
+                            <input
+                                type="text"
+                                required
+                                maxLength={6}
+                                value={formData.short_code}
+                                onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold uppercase tracking-wide"
+                                placeholder="e.g. AWD"
+                            />
+                        </div>
                     </div>
 
                     <div>

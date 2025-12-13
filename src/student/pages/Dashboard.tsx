@@ -13,6 +13,10 @@ interface EnrolledCourse {
         description: string
     }
     enrolled_at: string
+    class?: {
+        batch_name: string
+        batch_number: number
+    }
 }
 
 export default function StudentDashboard() {
@@ -39,6 +43,10 @@ export default function StudentDashboard() {
                         icon,
                         color,
                         description
+                    ),
+                    class:classes (
+                        batch_name,
+                        batch_number
                     )
                 `)
                 .eq('student_id', user!.id)
@@ -141,9 +149,16 @@ export default function StudentDashboard() {
                                         <i className={`bi ${item.course.icon} text-3xl ${(item.course.color || '').split(' ')[0] || 'text-blue-600'}`}></i>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-lg font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
-                                            {item.course.course_name}
-                                        </h3>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <h3 className="text-lg font-bold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">
+                                                {item.course.course_name}
+                                            </h3>
+                                            {item.class && (
+                                                <span className="bg-violet-50 text-violet-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-violet-100">
+                                                    {item.class.batch_name}
+                                                </span>
+                                            )}
+                                        </div>
                                         <p className="text-sm text-slate-500 line-clamp-1 mb-2">
                                             {item.course.description}
                                         </p>

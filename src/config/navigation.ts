@@ -100,6 +100,13 @@ export const ADMIN_ACTIONS: NavItem[] = [
         description: 'Create and edit course content'
     },
     {
+        label: 'Manage Classes',
+        path: '/admin/classes',
+        icon: 'bi-grid-3x3-gap-fill',
+        color: 'text-indigo-600',
+        description: 'View and manage all batches'
+    },
+    {
         label: 'Calendar',
         path: '/admin/calendar',
         icon: 'bi-calendar-week-fill',
