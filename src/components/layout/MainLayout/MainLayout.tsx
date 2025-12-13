@@ -23,19 +23,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
     // Listen for Password Recovery event
     React.useEffect(() => {
-        // Method 1: Listen for Supabase event (Cleaner, but sometimes timing-sensitive)
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-            console.log('Auth Event:', event) // Debug logging
             if (event === 'PASSWORD_RECOVERY') {
                 navigate('/reset-password')
             }
         })
 
-        // Method 2: Check URL hash directly (Fallback)
-        // Returns true if the URL indicates a recovery flow
+        // Check URL hash directly (Fallback)
         const isRecovery = window.location.hash.includes('type=recovery')
         if (isRecovery) {
-            console.log('Recovery hash detected, redirecting...')
             navigate('/reset-password')
         }
 

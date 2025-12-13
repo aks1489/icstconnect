@@ -66,7 +66,7 @@ const HeroSection = () => {
     const currentTech = technologies[currentTechIndex]
 
     return (
-        <section className="relative py-12 lg:py-24 bg-slate-50 overflow-hidden">
+        <section className="relative py-12 md:py-20 lg:py-24 bg-slate-50 overflow-hidden">
             {/* Background Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <motion.div
@@ -99,10 +99,10 @@ const HeroSection = () => {
                         >
                             🚀 Start your journey today
                         </motion.div>
-                        <h1 className="text-4xl lg:text-6xl font-extrabold mb-6 text-slate-900 leading-tight">
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-slate-900 leading-tight">
                             Master <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">Modern</span> Technologies
                         </h1>
-                        <p className="text-slate-500 mb-8 text-lg lg:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0">
+                        <p className="text-slate-500 mb-8 text-base md:text-lg lg:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0">
                             Join ICST - Chowberia to become an expert in industry-standard tools and frameworks.
                         </p>
 
