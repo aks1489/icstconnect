@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import CreateStudentModal from '../../components/admin/CreateStudentModal'
 
 interface StudentProfile {
     id: string
@@ -12,6 +13,7 @@ interface StudentProfile {
 export default function ManageStudents() {
     const [students, setStudents] = useState<StudentProfile[]>([])
     const [loading, setLoading] = useState(true)
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
     useEffect(() => {
         fetchStudents()
@@ -39,9 +41,18 @@ export default function ManageStudents() {
 
     return (
         <div>
+            <CreateStudentModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={fetchStudents}
+            />
+
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
                 <h2 className="text-2xl font-bold text-slate-800">Manage Students</h2>
-                <button className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20">
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
+                >
                     <i className="bi bi-person-plus"></i>
                     <span>Add Student</span>
                 </button>

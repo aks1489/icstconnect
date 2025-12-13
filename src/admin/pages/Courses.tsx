@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import CreateCourseModal from '../../components/admin/CreateCourseModal'
 
 interface Course {
     id: number
@@ -14,6 +15,7 @@ interface Course {
 export default function AdminCourses() {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
 
     useEffect(() => {
         fetchCourses()
@@ -57,18 +59,24 @@ export default function AdminCourses() {
 
     return (
         <div>
+            <CreateCourseModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={fetchCourses}
+            />
+
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Courses</h1>
                     <p className="text-slate-500">Manage your course catalog</p>
                 </div>
-                <Link
-                    to="/admin/courses/new"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2"
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200"
                 >
                     <i className="bi bi-plus-lg"></i>
                     Add Course
-                </Link>
+                </button>
             </div>
 
             {courses.length === 0 ? (
@@ -78,12 +86,12 @@ export default function AdminCourses() {
                     </div>
                     <h3 className="text-lg font-medium text-slate-800 mb-2">No courses yet</h3>
                     <p className="text-slate-500 mb-6">Create your first course to get started.</p>
-                    <Link
-                        to="/admin/courses/new"
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
                         className="text-indigo-600 font-medium hover:text-indigo-700"
                     >
                         Create Course &rarr;
-                    </Link>
+                    </button>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
