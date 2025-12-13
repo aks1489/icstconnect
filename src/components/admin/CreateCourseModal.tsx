@@ -14,7 +14,8 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
         description: '',
         icon: 'bi-code-square',
         color: 'text-indigo-600 bg-indigo-50',
-        duration_months: 6
+        duration: '6 Months',
+        category: 'Development'
     })
 
     const colorThemes = [
@@ -47,7 +48,8 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 description: '',
                 icon: 'bi-code-square',
                 color: 'text-indigo-600 bg-indigo-50',
-                duration_months: 6
+                duration: '6 Months',
+                category: 'Development'
             })
             onSuccess()
             onClose()
@@ -99,38 +101,55 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Duration (Months)</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
                             <select
-                                value={formData.duration_months}
-                                onChange={(e) => setFormData({ ...formData, duration_months: parseInt(e.target.value) })}
+                                required
+                                value={formData.category}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
                             >
-                                {[3, 6, 12, 18, 24].map(months => (
-                                    <option key={months} value={months}>{months} Months</option>
-                                ))}
+                                <option value="Development">Development</option>
+                                <option value="Design">Design</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Business">Business</option>
+                                <option value="IT & Software">IT & Software</option>
+                                <option value="Office Productivity">Office Productivity</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Icon</label>
-                            <div className="grid grid-cols-4 gap-2">
-                                {commonIcons.map((icon) => (
-                                    <button
-                                        key={icon}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, icon })}
-                                        className={`
-                                            h-10 rounded-lg border transition-all flex items-center justify-center
-                                            ${formData.icon === icon
-                                                ? 'bg-slate-800 text-white border-slate-800'
-                                                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
-                                            }
-                                        `}
-                                    >
-                                        <i className={`bi ${icon}`}></i>
-                                    </button>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Duration</label>
+                            <select
+                                value={formData.duration}
+                                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                            >
+                                {['3 Months', '6 Months', '12 Months', '18 Months', '24 Months'].map(d => (
+                                    <option key={d} value={d}>{d}</option>
                                 ))}
-                            </div>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Icon</label>
+                        <div className="grid grid-cols-4 gap-2">
+                            {commonIcons.map((icon) => (
+                                <button
+                                    key={icon}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, icon })}
+                                    className={`
+                                                h-10 rounded-lg border transition-all flex items-center justify-center
+                                                ${formData.icon === icon
+                                            ? 'bg-slate-800 text-white border-slate-800'
+                                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                                        }
+                                            `}
+                                >
+                                    <i className={`bi ${icon}`}></i>
+                                </button>
+                            ))}
                         </div>
                     </div>
 
@@ -143,10 +162,10 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                                     type="button"
                                     onClick={() => setFormData({ ...formData, color: theme.value })}
                                     className={`
-                                        w-12 h-12 flex-shrink-0 rounded-xl border-2 transition-all
-                                        ${theme.preview}
-                                        ${formData.color === theme.value ? 'border-slate-800 scale-110 shadow-md' : 'border-transparent hover:scale-105'}
-                                    `}
+                                            w-12 h-12 flex-shrink-0 rounded-xl border-2 transition-all
+                                            ${theme.preview}
+                                            ${formData.color === theme.value ? 'border-slate-800 scale-110 shadow-md' : 'border-transparent hover:scale-105'}
+                                        `}
                                     title={theme.label}
                                 />
                             ))}

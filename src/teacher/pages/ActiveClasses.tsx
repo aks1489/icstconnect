@@ -1,20 +1,25 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 
-interface Course {
-    id: number
-    course_name: string
-    description: string
-    icon: string
-    color: string
-    topics_count?: number
-    cleared_topics_count?: number
-    enrolled_students?: number
+export interface Student {
+    id: string
+    full_name: string
+    avatar_url: string
+    enrollments: {
+        course_id: number
+        progress: number
+        course: {
+            id: number
+            course_name: string
+            icon: string
+            color: string
+        }
+    }[]
 }
 
 export default function ActiveClasses() {
-    const [courses, setCourses] = useState<Course[]>([])
+    const [students, setStudents] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -23,26 +28,40 @@ export default function ActiveClasses() {
 
     const fetchActiveClasses = async () => {
         try {
-            // 1. Fetch Courses
-            const { data: coursesData, error: coursesError } = await supabase
-                .from('courses')
-                .select('*')
-                .order('course_name')
+            // Fetch students who have enrollments
+            const { data: enrollments, error } = await supabase
+                .from('enrollments')
+                .select(`
+                    progress,
+                    course:courses (
+                        id,
+                        course_name,
+                        icon,
+                        color
+                    ),
+                    student:profiles!enrollments_student_id_fkey (
+                        id,
+                        full_name,
+                        avatar_url
+                    )
+                `)
+                .order('enrolled_at', { ascending: false })
 
-            if (coursesError) throw coursesError
+            if (error) throw error
 
-            // Mock Data Integration (Real counts would need complex joins or valid subqueries)
-            // For now, we will simulate the "Teacher's Classes" aspect by showing all courses
-            // In a real app, we'd filter by an 'assignments' table key
+            const activeStudents = enrollments?.map((e: any) => ({
+                id: e.student.id,
+                full_name: e.student.full_name,
+                avatar_url: e.student.avatar_url,
+                enrollment: {
+                    course_id: e.course.id,
+                    progress: e.progress,
+                    course: e.course
+                }
+            })) || []
 
-            const processedCourses = coursesData.map(course => ({
-                ...course,
-                topics_count: 12, // Placeholder
-                cleared_topics_count: 5, // Placeholder
-                enrolled_students: 24 // Placeholder
-            }))
+            setStudents(activeStudents)
 
-            setCourses(processedCourses)
         } catch (error) {
             console.error('Error fetching classes:', error)
         } finally {
@@ -50,66 +69,74 @@ export default function ActiveClasses() {
         }
     }
 
-    if (loading) return <div className="p-8 text-center text-slate-500">Loading your classes...</div>
+    if (loading) return <div className="p-8 text-center bg-slate-50 rounded-xl">Loading active classes...</div>
 
     return (
-        <div>
+        <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-800">Active Classes</h1>
-                    <p className="text-slate-500 mt-1">Manage progress and topics for your assigned courses.</p>
+                    <p className="text-slate-500">Manage student progress and track performance</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {courses.map(course => (
-                    <div key={course.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group overflow-hidden">
-                        <div className={`h-24 ${(course.color || '').split(' ')[1] || 'bg-slate-100'} p-6 relative`}>
-                            <div className="absolute top-4 right-4">
-                                <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-bold text-slate-600 shadow-sm">
-                                    {course.enrolled_students} Students
-                                </span>
-                            </div>
-                            <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center absolute -bottom-6 left-6">
-                                <i className={`bi ${course.icon || 'bi-book'} text-xl ${(course.color || '').split(' ')[0] || 'text-slate-600'}`}></i>
-                            </div>
-                        </div>
-
-                        <div className="pt-10 px-6 pb-6">
-                            <h3 className="text-lg font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">
-                                {course.course_name}
-                            </h3>
-                            <p className="text-sm text-slate-500 line-clamp-2 mb-4 h-10">
-                                {course.description}
-                            </p>
-
-                            {/* Progress Bar */}
-                            <div className="mb-4">
-                                <div className="flex justify-between text-xs font-medium text-slate-500 mb-1">
-                                    <span>Course Progress</span>
-                                    <span>{Math.round((course.cleared_topics_count! / course.topics_count!) * 100)}%</span>
-                                </div>
-                                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-emerald-500 rounded-full"
-                                        style={{ width: `${(course.cleared_topics_count! / course.topics_count!) * 100}%` }}
-                                    ></div>
-                                </div>
-                                <div className="mt-1 text-xs text-slate-400">
-                                    {course.cleared_topics_count} of {course.topics_count} topics cleared
-                                </div>
-                            </div>
-
-                            <Link
-                                to={`/teacher/classes/${course.id}`}
-                                className="block w-full py-2.5 text-center text-sm font-semibold rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors border border-slate-100"
-                            >
-                                Manage Topics
-                            </Link>
-                        </div>
+            {students.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                        <i className="bi bi-people text-2xl"></i>
                     </div>
-                ))}
-            </div>
+                    <h3 className="text-lg font-medium text-slate-800 mb-2">No active classes</h3>
+                    <p className="text-slate-500">As students enroll in courses, they will appear here.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {students.map((item: any, index) => (
+                        <Link
+                            to={`/teacher/classes/${item.id}/${item.enrollment.course_id}`}
+                            key={`${item.id}-${item.enrollment.course_id}-${index}`}
+                            className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden group"
+                        >
+                            <div className={`h-24 ${(item.enrollment.course.color || '').split(' ')[1] || 'bg-slate-100'} relative p-6`}>
+                                <div className="absolute -bottom-6 left-6 flex items-end">
+                                    <div className="w-12 h-12 rounded-xl bg-white p-1 shadow-sm">
+                                        <div className="w-full h-full rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden">
+                                            {item.avatar_url ? (
+                                                <img src={item.avatar_url} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-indigo-600 font-bold text-sm">{item.full_name?.charAt(0)}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="absolute top-4 right-4">
+                                    <span className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold shadow-sm text-slate-700 flex items-center gap-1">
+                                        <i className={`bi ${item.enrollment.course.icon}`}></i>
+                                        {item.enrollment.course.course_name}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="pt-8 px-6 pb-6">
+                                <h3 className="font-bold text-slate-800 mb-1">{item.full_name}</h3>
+                                <p className="text-xs text-slate-500 mb-4">Click to manage progress</p>
+
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-xs font-semibold text-slate-600">
+                                        <span>Progress</span>
+                                        <span>{item.enrollment.progress || 0}%</span>
+                                    </div>
+                                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-green-500 rounded-full transition-all duration-500"
+                                            style={{ width: `${item.enrollment.progress || 0}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
         </div>
     )
 }

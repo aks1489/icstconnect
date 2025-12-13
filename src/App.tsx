@@ -37,6 +37,7 @@ import AdminCalendar from './admin/pages/Calendar'
 import ScheduleClass from './admin/pages/ScheduleClass'
 import AdminTeachers from './admin/pages/Teachers'
 import TeacherDetails from './admin/pages/TeacherDetails'
+import CourseStructureEditor from './admin/pages/CourseStructureEditor'
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -45,6 +46,7 @@ import TeacherCalendar from './teacher/pages/Calendar'
 import ActiveClasses from './teacher/pages/ActiveClasses'
 import ManageClass from './teacher/pages/ManageClass'
 import TeacherExams from './teacher/pages/Exams'
+import StudentProgressTracker from './teacher/pages/StudentProgressTracker'
 
 
 // Simple Toast Component for global errors
@@ -147,6 +149,7 @@ function App() {
               <Route path="courses" element={<AdminCourses />} />
               <Route path="courses/new" element={<CourseForm />} />
               <Route path="courses/:id/edit" element={<CourseForm />} />
+              <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
               <Route path="calendar" element={<AdminCalendar />} />
               <Route path="schedule" element={<ScheduleClass />} />
               <Route path="teachers" element={<AdminTeachers />} />
@@ -164,6 +167,7 @@ function App() {
               <Route path="calendar" element={<TeacherCalendar />} />
               <Route path="active-classes" element={<ActiveClasses />} />
               <Route path="classes/:courseId" element={<ManageClass />} />
+              <Route path="classes/:studentId/:courseId" element={<StudentProgressTracker />} />
               <Route path="exams" element={<TeacherExams />} />
               {/* Add more teacher routes here */}
             </Route>

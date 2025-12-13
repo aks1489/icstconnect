@@ -110,11 +110,18 @@ export default function AdminCourses() {
 
                                 <div className="flex items-center gap-3 mt-auto pt-4 border-t border-slate-100">
                                     <Link
+                                        to={`/admin/courses/${course.id}/structure`}
+                                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors text-sm font-medium"
+                                    >
+                                        <i className="bi bi-diagram-3"></i>
+                                        Structure
+                                    </Link>
+                                    <Link
                                         to={`/admin/courses/${course.id}/edit`}
-                                        className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-slate-50 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors text-sm font-medium"
+                                        className="p-2 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors"
+                                        title="Edit Details"
                                     >
                                         <i className="bi bi-pencil"></i>
-                                        Edit
                                     </Link>
                                     <button
                                         onClick={() => handleDelete(course.id)}
