@@ -1,6 +1,5 @@
 
-import { Link } from 'react-router-dom';
-import { Gamepad2, ArrowRight, Star, Trophy, Target } from 'lucide-react';
+import { Gamepad2, Star, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const LearningHubPreview = () => {

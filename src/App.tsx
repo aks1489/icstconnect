@@ -14,7 +14,7 @@ const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
-const LearningHub = lazy(() => import('./pages/LearningHub'))
+// const LearningHub = lazy(() => import('./pages/LearningHub'))
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
 import { AuthProvider } from './contexts/AuthContext'
@@ -107,7 +107,7 @@ function App() {
             <Route element={<MainLayout><Outlet /></MainLayout>}>
               <Route path="/" element={<Home />} />
               <Route path="/courses" element={<CoursesPage />} />
-// <Route path="/learning-hub" element={<LearningHub />} />
+
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/online-test" element={<OnlineTest />} />
