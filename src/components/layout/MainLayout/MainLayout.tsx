@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../../../lib/supabase'
 import { NavigationHeader, NavigationFooter } from '../NavBar'
 import AuthModal from '../../auth/AuthModal'
@@ -16,6 +16,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const [showAuthModal, setShowAuthModal] = useState(false)
     const { user, profile } = useAuth()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const handleLoginClick = () => {
         setShowAuthModal(true)
@@ -41,6 +42,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     // Combine user and profile for role access
     const authUser = user ? { ...user, role: profile?.role } : null
 
+    // Check if we are on admin or teacher login pages
+    const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
+
     return (
         <div className="app-shell">
             <header className="app-header">
@@ -51,11 +55,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 {children}
             </main>
 
-            <Footer />
-
-            <div className="lg:hidden">
-                <NavigationFooter onLoginClick={handleLoginClick} user={authUser} />
-            </div>
+            {!isRestrictedAuthPage && (
+                <>
+                    <Footer />
+                    <div className="lg:hidden">
+                        <NavigationFooter onLoginClick={handleLoginClick} user={authUser} />
+                    </div>
+                </>
+            )}
 
             <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
         </div>
