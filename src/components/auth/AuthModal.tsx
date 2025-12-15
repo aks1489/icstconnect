@@ -110,8 +110,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     if (profile.role === 'admin' || profile.role === 'teacher') {
                         // Prevent login and sign out immediately
                         await supabase.auth.signOut()
-                        throw new Error(`Restricted access. Please use the ${profile.role === 'admin' ? 'Admin' : 'Teacher'} login page.`)
+                        throw new Error(`Restricted access. Please login through the ${profile.role === 'admin' ? 'Admin' : 'Teacher'} Portal.`)
                     }
+
                 }
                 // ---------------------------
 

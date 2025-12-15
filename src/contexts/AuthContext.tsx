@@ -22,31 +22,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<any | null>(null)
     const [loading, setLoading] = useState(true)
 
+    const [isInitialLoad, setIsInitialLoad] = useState(true)
+
     useEffect(() => {
+        let mounted = true
+
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session)
-            setUser(session?.user ?? null)
-            if (session?.user) {
-                fetchProfile(session.user.id)
-            } else {
-                setLoading(false)
+            if (mounted) {
+                setSession(session)
+                setUser(session?.user ?? null)
+                if (session?.user) {
+                    fetchProfile(session.user.id).then(() => {
+                        if (mounted) setIsInitialLoad(false)
+                    })
+                } else {
+                    setLoading(false)
+                    setIsInitialLoad(false)
+                }
             }
         })
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session)
-            setUser(session?.user ?? null)
-            if (session?.user) {
-                // Immediately set loading to true to prevent premature redirects
-                setLoading(true)
-                fetchProfile(session.user.id)
-            } else {
-                setProfile(null)
-                setLoading(false)
+            if (mounted) {
+                setSession(session)
+                setUser(session?.user ?? null)
+                if (session?.user) {
+                    // Immediately set loading to true to prevent premature redirects
+                    setLoading(true)
+                    fetchProfile(session.user.id)
+                } else {
+                    setProfile(null)
+                    setLoading(false)
+                }
             }
         })
 
-        return () => subscription.unsubscribe()
+        return () => {
+            mounted = false
+            subscription.unsubscribe()
+        }
     }, [])
 
     const fetchProfile = async (userId: string) => {
@@ -95,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {!isInitialLoad && children}
         </AuthContext.Provider>
     )
 }

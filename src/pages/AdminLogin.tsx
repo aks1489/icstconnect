@@ -13,6 +13,20 @@ export default function AdminLogin() {
 
     const from = location.state?.from?.pathname || '/admin/dashboard'
 
+    // Check for error in URL params
+    try {
+        const params = new URLSearchParams(location.search)
+        const errorMsg = params.get('error')
+        if (errorMsg && !error) {
+            setError(errorMsg)
+            // Clean URL
+            window.history.replaceState(null, '', window.location.pathname)
+        }
+    } catch (e) {
+        // ignore
+    }
+
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
