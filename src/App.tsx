@@ -14,6 +14,7 @@ const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const Connect = lazy(() => import('./pages/Connect'))
 // const LearningHub = lazy(() => import('./pages/LearningHub'))
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
@@ -141,6 +142,9 @@ function App() {
               <Route path="calendar" element={<StudentCalendar />} />
               <Route path="complete-profile" element={<CompleteProfile />} />
             </Route>
+
+            {/* Standalone Connect Page */}
+            <Route path="/connect" element={<Connect />} />
 
             {/* Admin Routes - Independent Layout */}
             <Route path="/admin" element={
