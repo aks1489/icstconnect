@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Book, MoreVertical, Edit, Trash2, Users, Layers, AlertCircle } from 'lucide-react'
+import { Plus, Book, Trash2, Users, Layers } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import CreateCourseModal from '../../components/admin/CreateCourseModal'
 import { getIcon } from '../../utils/iconMapper'
