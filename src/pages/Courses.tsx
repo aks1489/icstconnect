@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useMemo } from 'react'
-import { Hourglass, Search, Hash, X } from 'lucide-react'
+import { Search, Hash, X } from 'lucide-react'
 import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
