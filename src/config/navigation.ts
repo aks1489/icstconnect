@@ -11,7 +11,8 @@ import {
     UserCog,
     Library,
     LayoutGrid,
-    CalendarDays
+    CalendarDays,
+    Tag
 } from 'lucide-react'
 
 export interface NavItem {
@@ -127,5 +128,12 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: CalendarDays,
         color: 'text-purple-600',
         description: 'Manage schedules and events'
+    },
+    {
+        label: 'Discount Claims',
+        path: '/admin/discount-claims',
+        icon: Tag,
+        color: 'text-pink-600',
+        description: 'View student discount inquiries'
     }
 ]

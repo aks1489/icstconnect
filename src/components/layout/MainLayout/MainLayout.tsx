@@ -51,13 +51,15 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 <NavigationHeader onLoginClick={handleLoginClick} user={authUser} />
             </header>
 
-            <main className="app-main pb-[60px] lg:pb-0">
+            <main className="app-main">
                 {children}
             </main>
 
             {!isRestrictedAuthPage && (
                 <>
-                    <Footer />
+                    <div className="pb-[60px] lg:pb-0 bg-slate-900">
+                        <Footer />
+                    </div>
                     <div className="lg:hidden">
                         <NavigationFooter onLoginClick={handleLoginClick} user={authUser} />
                     </div>
