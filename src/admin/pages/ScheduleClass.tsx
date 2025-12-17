@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { addMonths, eachDayOfInterval, format, set, addMinutes } from 'date-fns'
+import { ArrowLeft } from 'lucide-react'
 
 interface Course {
     id: number
@@ -141,7 +142,7 @@ export default function ScheduleClass() {
         <div className="max-w-2xl mx-auto">
             <div className="mb-8">
                 <button onClick={() => navigate('/admin/calendar')} className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Calendar
                 </button>
                 <h1 className="text-2xl font-bold text-slate-800">Schedule New Class</h1>

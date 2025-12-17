@@ -1,4 +1,6 @@
 
+import { ArrowRight } from 'lucide-react'
+
 const CoursesSection = () => {
     const courses = [
         {
@@ -73,7 +75,7 @@ const CoursesSection = () => {
                                         </span>
                                         <a href="#" className="text-blue-600 font-bold text-sm hover:text-blue-700 flex items-center gap-1 group/link no-underline">
                                             Details
-                                            <i className="bi bi-arrow-right transform group-hover/link:translate-x-1 transition-transform"></i>
+                                            <ArrowRight size={16} className="transform group-hover/link:translate-x-1 transition-transform" />
                                         </a>
                                     </div>
                                 </div>

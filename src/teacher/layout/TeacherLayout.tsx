@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { ChevronRight, List, Grid, LogOut } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { TEACHER_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
@@ -84,10 +85,10 @@ export default function TeacherLayout() {
                                     }
                                 `}
                             >
-                                <i className={`bi ${item.icon} text-lg ${isActive(item.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'}`}></i>
+                                <item.icon className={`text-lg ${isActive(item.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} size={20} />
                                 <span className="font-medium">{item.label}</span>
                                 {isActive(item.path) && (
-                                    <i className="bi bi-chevron-right ml-auto text-xs opacity-50"></i>
+                                    <ChevronRight className="ml-auto text-xs opacity-50" size={16} />
                                 )}
                             </Link>
                         ))}
@@ -108,7 +109,7 @@ export default function TeacherLayout() {
                             to="/quick-access"
                             className="flex items-center gap-3 w-full p-3 mb-2 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-200 group"
                         >
-                            <i className="bi bi-grid text-lg"></i>
+                            <Grid className="text-lg" size={20} />
                             <span className="font-medium">Quick Access</span>
                         </Link>
                         <button
@@ -116,7 +117,7 @@ export default function TeacherLayout() {
                             className="flex items-center gap-3 w-full p-3 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-200 group"
                         >
                             <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-                                <i className="bi bi-box-arrow-right text-lg"></i>
+                                <LogOut className="text-lg" size={20} />
                             </div>
                             <div className="text-left">
                                 <p className="text-sm font-medium">Sign Out</p>
@@ -135,7 +136,7 @@ export default function TeacherLayout() {
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600"
                     >
-                        <i className="bi bi-list text-2xl"></i>
+                        <List className="text-2xl" size={24} />
                     </button>
                     <span className="font-semibold text-slate-700 lg:hidden">Teacher Portal</span>
                     <div className="w-8 lg:hidden"></div> {/* Spacer for alignment */}

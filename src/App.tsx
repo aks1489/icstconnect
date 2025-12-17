@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { Suspense, lazy, useState, useEffect } from 'react'
+import { AlertCircle, X } from 'lucide-react'
 import MainLayout from './components/layout/MainLayout'
 
 import PageSkeleton from './components/ui/PageSkeleton'
@@ -13,6 +14,8 @@ const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const Connect = lazy(() => import('./pages/Connect'))
+// const LearningHub = lazy(() => import('./pages/LearningHub'))
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
 import { AuthProvider } from './contexts/AuthContext'
@@ -24,6 +27,7 @@ import StudentLayout from './student/layout/StudentLayout'
 import StudentDashboard from './student/pages/Dashboard'
 import OfflineClasses from './student/pages/OfflineClasses'
 import StudentCalendar from './student/pages/Calendar'
+import CompleteProfile from './student/pages/CompleteProfile'
 
 // Admin Imports
 import AdminLayout from './admin/layout/AdminLayout'
@@ -36,6 +40,10 @@ import AdminCalendar from './admin/pages/Calendar'
 import ScheduleClass from './admin/pages/ScheduleClass'
 import AdminTeachers from './admin/pages/Teachers'
 import TeacherDetails from './admin/pages/TeacherDetails'
+import CourseStructureEditor from './admin/pages/CourseStructureEditor'
+import ClassManager from './admin/pages/ClassManager'
+import AdminClasses from './admin/pages/AdminClasses'
+import AdminClassDetails from './admin/pages/AdminClassDetails'
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -44,6 +52,7 @@ import TeacherCalendar from './teacher/pages/Calendar'
 import ActiveClasses from './teacher/pages/ActiveClasses'
 import ManageClass from './teacher/pages/ManageClass'
 import TeacherExams from './teacher/pages/Exams'
+import StudentProgressTracker from './teacher/pages/StudentProgressTracker'
 
 
 // Simple Toast Component for global errors
@@ -71,7 +80,7 @@ const ErrorToast = () => {
   return (
     <div className="fixed top-4 right-4 z-[1100] animate-in slide-in-from-right fade-in duration-300">
       <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg shadow-lg flex items-start gap-3 max-w-md">
-        <i className="bi bi-exclamation-circle-fill mt-0.5 text-red-500"></i>
+        <AlertCircle className="mt-0.5 text-red-500 shrink-0" size={20} />
         <div>
           <h4 className="font-semibold text-sm">Authentication Error</h4>
           <p className="text-sm opacity-90">{error}</p>
@@ -80,7 +89,7 @@ const ErrorToast = () => {
           onClick={() => setError(null)}
           className="text-red-400 hover:text-red-600 transition-colors ml-auto"
         >
-          <i className="bi bi-x-lg"></i>
+          <X size={20} />
         </button>
       </div>
     </div>
@@ -99,6 +108,7 @@ function App() {
             <Route element={<MainLayout><Outlet /></MainLayout>}>
               <Route path="/" element={<Home />} />
               <Route path="/courses" element={<CoursesPage />} />
+
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/online-test" element={<OnlineTest />} />
@@ -130,7 +140,11 @@ function App() {
               <Route path="dashboard" element={<StudentDashboard />} />
               <Route path="offline-classes" element={<OfflineClasses />} />
               <Route path="calendar" element={<StudentCalendar />} />
+              <Route path="complete-profile" element={<CompleteProfile />} />
             </Route>
+
+            {/* Standalone Connect Page */}
+            <Route path="/connect" element={<Connect />} />
 
             {/* Admin Routes - Independent Layout */}
             <Route path="/admin" element={
@@ -145,6 +159,10 @@ function App() {
               <Route path="courses" element={<AdminCourses />} />
               <Route path="courses/new" element={<CourseForm />} />
               <Route path="courses/:id/edit" element={<CourseForm />} />
+              <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
+              <Route path="courses/:id/classes" element={<ClassManager />} />
+              <Route path="classes" element={<AdminClasses />} />
+              <Route path="classes/:id" element={<AdminClassDetails />} />
               <Route path="calendar" element={<AdminCalendar />} />
               <Route path="schedule" element={<ScheduleClass />} />
               <Route path="teachers" element={<AdminTeachers />} />
@@ -162,6 +180,7 @@ function App() {
               <Route path="calendar" element={<TeacherCalendar />} />
               <Route path="active-classes" element={<ActiveClasses />} />
               <Route path="classes/:courseId" element={<ManageClass />} />
+              <Route path="classes/:studentId/:courseId" element={<StudentProgressTracker />} />
               <Route path="exams" element={<TeacherExams />} />
               {/* Add more teacher routes here */}
             </Route>

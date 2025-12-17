@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+    Home,
+    Book,
+    Image as ImageIcon,
+    Info,
+    LayoutDashboard,
+    User,
+    Menu,
+    X
+} from 'lucide-react'
 import logo from '../../../assets/logo.jpg'
 
 interface NavigationProps {
@@ -11,6 +22,9 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
+
+    // Check if we are on admin or teacher login pages
+    const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -29,11 +43,22 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
         { name: 'About Us', href: '/about' },
     ];
 
+    // Determine if we should use light text (white) or dark text
+    // Light text not only when scrolled, but also when on dark-themed auth pages (even if not scrolled)
+    const useLightText = isScrolled || isRestrictedAuthPage;
+
+    const getLinkClasses = (isActive: boolean) => {
+        if (useLightText) {
+            return isActive ? 'text-white font-bold' : 'text-slate-300 hover:text-white';
+        }
+        return isActive ? 'text-slate-900 font-bold' : 'text-slate-600 hover:text-slate-900';
+    };
+
     return (
         <>
             <nav
                 className={`fixed top-0 left-0 right-0 z-[1040] transition-all duration-300 ${isScrolled
-                    ? 'bg-white/80 backdrop-blur-md shadow-sm py-3'
+                    ? 'bg-slate-900/90 backdrop-blur-md shadow-lg py-3'
                     : 'bg-transparent py-5'
                     }`}
             >
@@ -47,8 +72,8 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300"
                             />
                             <div className="flex flex-col">
-                                <span className="font-bold text-slate-800 text-lg leading-none tracking-tight">ICST</span>
-                                <span className="text-slate-500 text-[0.65rem] font-medium tracking-wider uppercase">Chowberia</span>
+                                <span className={`font-bold text-lg leading-none tracking-tight transition-colors duration-300 ${useLightText ? 'text-white' : 'text-slate-800'}`}>ICST</span>
+                                <span className={`text-[0.65rem] font-medium tracking-wider uppercase transition-colors duration-300 ${useLightText ? 'text-slate-400' : 'text-slate-500'}`}>Chowberia</span>
                             </div>
                         </Link>
 
@@ -59,46 +84,45 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                     <li key={link.name}>
                                         <Link
                                             to={link.href}
-                                            className={`text-sm font-medium transition-colors relative group py-2 no-underline whitespace-nowrap ${location.pathname === link.href
-                                                ? 'text-slate-900 font-bold'
-                                                : 'text-slate-600 hover:text-slate-900'
-                                                }`}
+                                            className={`text-sm font-medium transition-colors relative group py-2 no-underline whitespace-nowrap ${getLinkClasses(location.pathname === link.href)}`}
                                         >
                                             {link.name}
-                                            <span className={`absolute bottom-0 left-0 h-0.5 bg-slate-800 transition-all duration-300 group-hover:w-full ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
+                                            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full ${useLightText ? 'bg-white' : 'bg-slate-800'} ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
                                                 }`}></span>
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
 
-                            <div className="h-6 w-px bg-slate-200 mx-2"></div>
+                            <div className={`h-6 w-px mx-2 transition-colors duration-300 ${useLightText ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
 
                             {user ? (
                                 <Link
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
                                     className="px-5 py-2 rounded-full bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline"
                                 >
-                                    <i className="bi bi-speedometer2"></i>
+                                    <LayoutDashboard size={18} />
                                     <span>Dashboard</span>
                                 </Link>
                             ) : (
-                                <button
-                                    onClick={onLoginClick}
-                                    className="px-5 py-2 rounded-full bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 hover:shadow-lg hover:shadow-slate-900/20 transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap"
-                                >
-                                    <i className="bi bi-person-circle"></i>
-                                    <span>Login</span>
-                                </button>
+                                !isRestrictedAuthPage && (
+                                    <button
+                                        onClick={onLoginClick}
+                                        className={`px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap ${useLightText ? 'bg-white text-slate-900 hover:bg-slate-100 shadow-white/10' : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-slate-900/20'}`}
+                                    >
+                                        <User size={18} />
+                                        <span>Login</span>
+                                    </button>
+                                )
                             )}
                         </div>
 
                         {/* Mobile Menu Button */}
                         <button
-                            className="lg:hidden text-2xl text-slate-800 focus:outline-none"
+                            className={`lg:hidden text-2xl focus:outline-none transition-colors duration-300 ${useLightText ? 'text-white' : 'text-slate-800'}`}
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
-                            <i className={`bi ${isMobileMenuOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+                            {isMobileMenuOpen ? <X /> : <Menu />}
                         </button>
                     </div>
                 </div>
@@ -124,20 +148,22 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 className="w-full py-3 px-4 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 no-underline"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
-                                <i className="bi bi-speedometer2"></i>
+                                <LayoutDashboard size={20} />
                                 <span>Go to Dashboard</span>
                             </Link>
                         ) : (
-                            <button
-                                onClick={() => {
-                                    onLoginClick();
-                                    setIsMobileMenuOpen(false);
-                                }}
-                                className="w-full py-3 px-4 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <i className="bi bi-person-circle"></i>
-                                <span>Login / Sign Up</span>
-                            </button>
+                            !isRestrictedAuthPage && (
+                                <button
+                                    onClick={() => {
+                                        onLoginClick();
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="w-full py-3 px-4 rounded-lg bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <User size={20} />
+                                    <span>Login / Sign Up</span>
+                                </button>
+                            )
                         )}
                     </div>
                 </div>
@@ -147,17 +173,24 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
 }
 
 export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user }) => {
+    const location = useLocation();
+    const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
+
     return (
         <div className="lg:hidden">
             <nav className="bg-white/90 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 w-full z-[1030] pb-[env(safe-area-inset-bottom)]">
                 <div className="w-full h-full">
                     <div className="flex justify-evenly items-center w-full h-full py-3">
                         <Link to="/" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-house-door text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <Home size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">Home</span>
                         </Link>
                         <Link to="/courses" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-book text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <Book size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">Courses</span>
                         </Link>
                         <div className="relative -top-5">
@@ -166,23 +199,31 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
                                     className="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all"
                                 >
-                                    <i className="bi bi-speedometer2 text-xl"></i>
+                                    <LayoutDashboard size={24} />
                                 </Link>
                             ) : (
-                                <button
-                                    onClick={onLoginClick}
-                                    className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all"
-                                >
-                                    <i className="bi bi-person text-xl"></i>
-                                </button>
+                                !isRestrictedAuthPage ? (
+                                    <button
+                                        onClick={onLoginClick}
+                                        className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all"
+                                    >
+                                        <User size={24} />
+                                    </button>
+                                ) : (
+                                    null
+                                )
                             )}
                         </div>
                         <Link to="/gallery" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-image text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <ImageIcon size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">Gallery</span>
                         </Link>
                         <Link to="/about" className="no-underline text-slate-400 hover:text-slate-800 active:text-slate-800 flex flex-col items-center gap-1 transition-colors group">
-                            <i className="bi bi-info-circle text-xl group-hover:scale-110 transition-transform"></i>
+                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                <Info size={24} />
+                            </motion.div>
                             <span className="text-[10px] font-medium">About</span>
                         </Link>
                     </div>

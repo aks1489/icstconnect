@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Presentation, FileText, Users, Plus, CalendarPlus } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function TeacherDashboard() {
@@ -23,7 +24,7 @@ export default function TeacherDashboard() {
         {
             label: 'Active Classes',
             value: stats.activeClasses,
-            icon: 'bi-easel-fill',
+            icon: Presentation,
             color: 'from-emerald-500 to-emerald-600',
             bg: 'bg-emerald-50',
             textColor: 'text-emerald-600'
@@ -31,7 +32,7 @@ export default function TeacherDashboard() {
         {
             label: 'Upcoming Exams',
             value: stats.upcomingExams,
-            icon: 'bi-file-earmark-text-fill',
+            icon: FileText,
             color: 'from-amber-500 to-amber-600',
             bg: 'bg-amber-50',
             textColor: 'text-amber-600'
@@ -39,7 +40,7 @@ export default function TeacherDashboard() {
         {
             label: 'Total Students',
             value: stats.students,
-            icon: 'bi-people-fill',
+            icon: Users,
             color: 'from-blue-500 to-blue-600',
             bg: 'bg-blue-50',
             textColor: 'text-blue-600'
@@ -61,7 +62,7 @@ export default function TeacherDashboard() {
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
-                                <i className={`bi ${stat.icon} text-2xl ${stat.textColor}`}></i>
+                                <stat.icon className={`text-2xl ${stat.textColor}`} size={24} />
                             </div>
                         </div>
                         <div>
@@ -78,13 +79,13 @@ export default function TeacherDashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <button className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-colors group text-left">
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                            <i className="bi bi-plus-lg text-slate-600 group-hover:text-emerald-600"></i>
+                            <Plus className="text-slate-600 group-hover:text-emerald-600" size={24} />
                         </div>
                         <span className="font-semibold text-slate-700 group-hover:text-emerald-700">Update specific Course Progress</span>
                     </button>
                     <button className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-amber-500 hover:bg-amber-50 transition-colors group text-left">
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
-                            <i className="bi bi-calendar-plus text-slate-600 group-hover:text-amber-600"></i>
+                            <CalendarPlus className="text-slate-600 group-hover:text-amber-600" size={24} />
                         </div>
                         <span className="font-semibold text-slate-700 group-hover:text-amber-700">Schedule Extra Class</span>
                     </button>

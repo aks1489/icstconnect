@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { ArrowLeft } from 'lucide-react'
+import { getIcon } from '../../utils/iconMapper'
 
 export default function CourseForm() {
     const { id } = useParams()
@@ -14,7 +16,8 @@ export default function CourseForm() {
         description: '',
         icon: 'bi-code-square',
         color: 'text-indigo-600 bg-indigo-50',
-        duration_months: 6
+        duration_months: 6,
+        tags: [] as string[]
     })
 
     const colorThemes = [
@@ -55,7 +58,8 @@ export default function CourseForm() {
                     description: data.description || '',
                     icon: data.icon || 'bi-code-square',
                     color: data.color || 'text-indigo-600 bg-indigo-50',
-                    duration_months: data.duration_months || 6
+                    duration_months: data.duration_months || 6,
+                    tags: data.tags || []
                 })
             }
         } catch (error) {
@@ -102,7 +106,7 @@ export default function CourseForm() {
         <div className="max-w-3xl mx-auto">
             <div className="mb-8">
                 <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Courses
                 </Link>
                 <h1 className="text-2xl font-bold text-slate-800">
@@ -157,6 +161,55 @@ export default function CourseForm() {
 
                     <div className="h-px bg-slate-100"></div>
 
+                    {/* Tag Management */}
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Tags <span className="text-slate-400 font-normal">(Press Enter or Comma to add)</span>
+                        </label>
+                        <div className="w-full px-4 py-3 rounded-xl border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all bg-white min-h-[56px] flex flex-wrap gap-2 items-center">
+                            {(formData.tags || []).map((tag, index) => (
+                                <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium group">
+                                    {tag}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newTags = [...(formData.tags || [])]
+                                            newTags.splice(index, 1)
+                                            setFormData({ ...formData, tags: newTags })
+                                        }}
+                                        className="text-slate-400 hover:text-red-500 transition-colors"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                </span>
+                            ))}
+                            <input
+                                type="text"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ',') {
+                                        e.preventDefault()
+                                        const val = e.currentTarget.value.trim()
+                                        if (val && !formData.tags?.includes(val)) {
+                                            setFormData({
+                                                ...formData,
+                                                tags: [...(formData.tags || []), val]
+                                            })
+                                            e.currentTarget.value = ''
+                                        }
+                                    } else if (e.key === 'Backspace' && !e.currentTarget.value && formData.tags?.length > 0) {
+                                        const newTags = [...(formData.tags || [])]
+                                        newTags.pop()
+                                        setFormData({ ...formData, tags: newTags })
+                                    }
+                                }}
+                                className="flex-1 min-w-[120px] bg-transparent outline-none text-slate-700 placeholder-slate-400"
+                                placeholder={formData.tags?.length ? "" : "Add tags e.g. React, Coding, Design..."}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="h-px bg-slate-100"></div>
+
                     {/* Visuals */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
@@ -181,22 +234,25 @@ export default function CourseForm() {
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-3">Icon</label>
                             <div className="grid grid-cols-6 gap-2">
-                                {commonIcons.map((icon) => (
-                                    <button
-                                        key={icon}
-                                        type="button"
-                                        onClick={() => setFormData({ ...formData, icon })}
-                                        className={`
-                                            h-10 rounded-lg border transition-all flex items-center justify-center
-                                            ${formData.icon === icon
-                                                ? 'bg-slate-800 text-white border-slate-800'
-                                                : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
-                                            }
-                                        `}
-                                    >
-                                        <i className={`bi ${icon}`}></i>
-                                    </button>
-                                ))}
+                                {commonIcons.map((icon) => {
+                                    const Icon = getIcon(icon)
+                                    return (
+                                        <button
+                                            key={icon}
+                                            type="button"
+                                            onClick={() => setFormData({ ...formData, icon })}
+                                            className={`
+                                                h-10 rounded-lg border transition-all flex items-center justify-center
+                                                ${formData.icon === icon
+                                                    ? 'bg-slate-800 text-white border-slate-800'
+                                                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                                                }
+                                            `}
+                                        >
+                                            <Icon size={18} />
+                                        </button>
+                                    )
+                                })}
                             </div>
                             <div className="mt-3">
                                 <label className="text-xs font-semibold text-slate-500 uppercase">Or Custom Icon Class</label>
@@ -217,10 +273,18 @@ export default function CourseForm() {
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm w-full max-w-sm mx-auto overflow-hidden">
                             <div className={`h-24 ${(formData.color || '').split(' ')[1] || 'bg-slate-100'} p-4 relative`}>
                                 <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center absolute -bottom-6 left-6">
-                                    <i className={`bi ${formData.icon} text-xl ${(formData.color || '').split(' ')[0] || 'text-slate-600'}`}></i>
+                                    {(() => {
+                                        const Icon = getIcon(formData.icon)
+                                        return <Icon className={`text-xl ${(formData.color || '').split(' ')[0] || 'text-slate-600'}`} size={24} />
+                                    })()}
                                 </div>
                             </div>
                             <div className="pt-8 p-6">
+                                <div className="mb-2 flex flex-wrap gap-1">
+                                    {(formData.tags || []).slice(0, 3).map((tag, i) => (
+                                        <span key={i} className="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded font-medium">{tag}</span>
+                                    ))}
+                                </div>
                                 <h3 className="text-lg font-bold text-slate-800 mb-2">
                                     {formData.course_name || 'Course Title'}
                                 </h3>

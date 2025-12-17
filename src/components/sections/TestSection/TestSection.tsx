@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 
 const TestSection = () => {
     return (
@@ -18,7 +19,7 @@ const TestSection = () => {
                 </p>
                 <Link to="/online-test" className="bg-white text-blue-600 px-10 py-4 rounded-full text-lg font-bold shadow-2xl hover:scale-105 hover:shadow-white/20 transition-all duration-300 inline-flex items-center gap-3 mx-auto group">
                     Start Online Test
-                    <i className="bi bi-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+                    <ArrowRight className="transform group-hover:translate-x-1 transition-transform" />
                 </Link>
             </div>
         </section>

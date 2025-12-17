@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { X, AlertTriangle, Check } from 'lucide-react'
 
 interface CreateTeacherModalProps {
     isOpen: boolean
@@ -82,14 +83,14 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
                 <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <h3 className="text-lg font-bold text-slate-800">Add New Teacher</h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
-                        <i className="bi bi-x-lg"></i>
+                        <X size={20} />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2">
-                            <i className="bi bi-exclamation-triangle-fill"></i>
+                            <AlertTriangle size={16} className="shrink-0" />
                             {error}
                         </div>
                     )}
@@ -148,7 +149,7 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                             ) : (
                                 <>
-                                    <i className="bi bi-check-lg"></i>
+                                    <Check size={18} />
                                     Create Teacher
                                 </>
                             )}
