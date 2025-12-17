@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { Users, BookText, CalendarCheck, CloudDownload, UserPlus, Book } from 'lucide-react'
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
         {
             label: 'Total Students',
             value: stats.students,
-            icon: 'bi-people-fill',
+            icon: Users,
             color: 'from-blue-500 to-blue-600',
             bg: 'bg-blue-50',
             textColor: 'text-blue-600'
@@ -59,7 +60,7 @@ export default function AdminDashboard() {
         {
             label: 'Active Courses',
             value: stats.courses,
-            icon: 'bi-journal-richtext',
+            icon: BookText,
             color: 'from-emerald-500 to-emerald-600',
             bg: 'bg-emerald-50',
             textColor: 'text-emerald-600'
@@ -67,7 +68,7 @@ export default function AdminDashboard() {
         {
             label: 'Scheduled Classes',
             value: stats.classes,
-            icon: 'bi-calendar-check-fill',
+            icon: CalendarCheck,
             color: 'from-violet-500 to-violet-600',
             bg: 'bg-violet-50',
             textColor: 'text-violet-600'
@@ -82,7 +83,7 @@ export default function AdminDashboard() {
                     <p className="text-slate-500 mt-1">Welcome back to your control center.</p>
                 </div>
                 <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20">
-                    <i className="bi bi-cloud-download"></i>
+                    <CloudDownload size={18} />
                     <span>Generate Report</span>
                 </button>
             </div>
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
-                                <i className={`bi ${stat.icon} text-2xl ${stat.textColor}`}></i>
+                                <stat.icon className={`text-2xl ${stat.textColor}`} size={24} />
                             </div>
                             <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-full uppercase tracking-wider">
                                 Realtime
@@ -116,13 +117,13 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-2 gap-4">
                         <button className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200 group">
                             <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 group-hover:bg-indigo-200 transition-colors">
-                                <i className="bi bi-person-plus text-slate-600 group-hover:text-indigo-600"></i>
+                                <UserPlus className="text-slate-600 group-hover:text-indigo-600" size={24} />
                             </div>
                             <span className="text-sm font-semibold text-slate-600 group-hover:text-indigo-700">Add Student</span>
                         </button>
                         <button className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-200 group">
                             <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 group-hover:bg-emerald-200 transition-colors">
-                                <i className="bi bi-book text-slate-600 group-hover:text-emerald-600"></i>
+                                <Book className="text-slate-600 group-hover:text-emerald-600" size={24} />
                             </div>
                             <span className="text-sm font-semibold text-slate-600 group-hover:text-emerald-700">New Course</span>
                         </button>

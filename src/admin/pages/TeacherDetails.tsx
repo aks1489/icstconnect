@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { ArrowLeft, Check, X, Pencil, Mail, Calendar, CalendarX, UserMinus, Ban } from 'lucide-react'
 
 interface TeacherProfile {
     id: string
@@ -82,7 +83,7 @@ export default function TeacherDetails() {
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
                 <Link to="/admin/teachers" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
-                    <i className="bi bi-arrow-left"></i>
+                    <ArrowLeft size={16} />
                     Back to Faculty
                 </Link>
             </div>
@@ -92,52 +93,51 @@ export default function TeacherDetails() {
                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 </div>
                 <div className="px-8 pb-8">
-                    <div className="relative -mt-16 mb-6 flex flex-col md:flex-row items-end gap-6">
-                        <div className="w-32 h-32 rounded-3xl bg-white p-1.5 shadow-xl">
+                    <div className="relative -mt-16 mb-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+                        <div className="w-32 h-32 rounded-3xl bg-white p-1.5 shadow-lg shrink-0 z-10">
                             <div className="w-full h-full rounded-2xl bg-indigo-50 flex items-center justify-center text-4xl font-bold text-indigo-500">
                                 {teacher.full_name?.charAt(0)}
                             </div>
                         </div>
-                        <div className="flex-1 pb-2 text-center md:text-left">
+                        <div className="flex-1 text-center md:text-left min-w-0 w-full md:w-auto relative z-20 md:mt-20">
                             <div className="flex flex-col md:flex-row items-center gap-4">
-                                <h1 className="text-3xl font-bold text-slate-800">{teacher.full_name}</h1>
+                                <h1 className="text-3xl font-bold text-slate-800 truncate max-w-full py-1">{teacher.full_name}</h1>
                                 {isEditingId ? (
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="text"
                                             value={newTeacherId}
                                             onChange={(e) => setNewTeacherId(e.target.value)}
-                                            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm"
+                                            className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm w-32"
                                             placeholder="Enter ID..."
                                         />
                                         <button onClick={handleUpdateId} className="text-emerald-600 hover:text-emerald-700">
-                                            <i className="bi bi-check-lg text-xl"></i>
+                                            <Check className="text-xl" size={20} />
                                         </button>
                                         <button onClick={() => setIsEditingId(false)} className="text-red-500 hover:text-red-700">
-                                            <i className="bi bi-x-lg text-xl"></i>
+                                            <X className="text-xl" size={20} />
                                         </button>
                                     </div>
                                 ) : (
                                     <div
                                         onClick={() => setIsEditingId(true)}
-                                        className="group cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full transition-colors"
+                                        className="group cursor-pointer flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-full transition-colors shrink-0"
                                     >
                                         <span className="text-sm font-mono font-bold text-slate-600">
-                                            {teacher.teacher_id || 'No ID Set'}
+                                            {teacher.teacher_id || 'No ID'}
                                         </span>
-                                        <i className="bi bi-pencil-fill text-xs text-slate-400 group-hover:text-slate-600"></i>
+                                        <Pencil className="text-xs text-slate-400 group-hover:text-slate-600" size={12} />
                                     </div>
                                 )}
+                                <span className="md:ml-auto px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold border border-emerald-200 whitespace-nowrap">
+                                    Active Faculty
+                                </span>
                             </div>
-                            <div className="flex items-center justify-center md:justify-start gap-4 mt-2 text-slate-500">
-                                <span className="flex items-center gap-1.5"><i className="bi bi-envelope"></i> {teacher.email}</span>
-                                <span className="flex items-center gap-1.5"><i className="bi bi-calendar"></i> Joined {new Date(teacher.created_at).toLocaleDateString()}</span>
+                            <div className="flex flex-col md:flex-row items-center gap-4 mt-2 text-slate-500 text-sm font-medium">
+                                <span className="flex items-center gap-2"><Mail size={16} /> {teacher.email}</span>
+                                <span className="hidden md:inline text-slate-300">|</span>
+                                <span className="flex items-center gap-2"><Calendar size={16} /> Joined {new Date(teacher.created_at).toLocaleDateString()}</span>
                             </div>
-                        </div>
-                        <div className="pb-2">
-                            <span className="px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold border border-emerald-200">
-                                Active Faculty
-                            </span>
                         </div>
                     </div>
 
@@ -146,7 +146,7 @@ export default function TeacherDetails() {
                             <div>
                                 <h3 className="text-lg font-bold text-slate-800 mb-4">Assigned Schedule</h3>
                                 <div className="p-8 border-2 border-dashed border-slate-200 rounded-2xl text-center text-slate-400">
-                                    <i className="bi bi-calendar-x text-3xl mb-2 block"></i>
+                                    <CalendarX className="text-3xl mb-2 block mx-auto" size={36} />
                                     No specific classes assigned via the new system yet.
                                 </div>
                             </div>
@@ -160,11 +160,11 @@ export default function TeacherDetails() {
                                         onClick={handleDemote}
                                         className="w-full py-3 bg-white border border-slate-200 text-slate-600 hover:border-amber-500 hover:text-amber-600 rounded-xl font-medium transition-all shadow-sm flex items-center justify-center gap-2"
                                     >
-                                        <i className="bi bi-person-down"></i>
+                                        <UserMinus size={18} />
                                         Remove Teacher Role
                                     </button>
                                     <button className="w-full py-3 bg-white border border-slate-200 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-xl font-medium transition-all shadow-sm flex items-center justify-center gap-2">
-                                        <i className="bi bi-slash-circle"></i>
+                                        <Ban size={18} />
                                         Deactivate Account
                                     </button>
                                 </div>

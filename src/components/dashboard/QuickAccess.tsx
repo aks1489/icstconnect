@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { User, Home, LogOut } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS, TEACHER_ACTIONS, ADMIN_ACTIONS } from '../../config/navigation'
 import type { NavItem } from '../../config/navigation'
@@ -57,7 +58,7 @@ export default function QuickAccess() {
                             className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl border border-slate-100 transition-all duration-300 group text-left hover:-translate-y-1"
                         >
                             <div className={`w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                                <i className={`bi ${action.icon} text-2xl ${action.color}`}></i>
+                                <action.icon className={`text-2xl ${action.color}`} size={28} />
                             </div>
                             <h3 className="text-lg font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">
                                 {action.label}
@@ -74,7 +75,7 @@ export default function QuickAccess() {
                         className="bg-gradient-to-br from-indigo-500 to-violet-600 p-6 rounded-2xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 text-white transition-all duration-300 group text-left hover:-translate-y-1 md:col-span-2 lg:col-span-1"
                     >
                         <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                            <i className="bi bi-person-circle text-2xl text-white"></i>
+                            <User className="text-2xl text-white" size={28} />
                         </div>
                         <h3 className="text-lg font-bold text-white mb-1">
                             Edit Profile
@@ -92,14 +93,14 @@ export default function QuickAccess() {
                         onClick={() => navigate('/')}
                         className="text-slate-400 hover:text-slate-600 text-sm font-medium transition-colors flex items-center gap-2"
                     >
-                        <i className="bi bi-house"></i> Home
+                        <Home size={16} /> Home
                     </button>
                     <span className="text-slate-300">|</span>
                     <button
                         onClick={handleLogout}
                         className="text-slate-400 hover:text-red-500 text-sm font-medium transition-colors flex items-center gap-2"
                     >
-                        <i className="bi bi-box-arrow-right"></i> Sign Out
+                        <LogOut size={16} /> Sign Out
                     </button>
                 </div>
 

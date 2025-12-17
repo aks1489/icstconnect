@@ -15,6 +15,7 @@ export interface Course {
     icon: string
     color: string
     description: string
+    tags: string[]
     title: string // Computed for compatibility
     price: string // Computed for compatibility
 }

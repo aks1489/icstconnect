@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Skeleton from '../components/ui/Skeleton'
 import { api, type Test } from '../services/api'
+import { Clock, HelpCircle, ArrowRight } from 'lucide-react'
+import { getIcon } from '../utils/iconMapper'
 
 const OnlineTest = () => {
     const [loading, setLoading] = useState(true)
@@ -51,7 +53,10 @@ const OnlineTest = () => {
                         tests.map((test) => (
                             <div key={test.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 flex flex-col">
                                 <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 bg-${test.color}-50 text-${test.color}-600`}>
-                                    <i className={`bi ${test.icon} text-2xl`}></i>
+                                    {(() => {
+                                        const Icon = getIcon(test.icon)
+                                        return <Icon className="text-2xl" size={28} />
+                                    })()}
                                 </div>
 
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">{test.title}</h3>
@@ -61,10 +66,10 @@ const OnlineTest = () => {
 
                                 <div className="flex items-center gap-4 text-xs font-medium text-slate-400 mb-6">
                                     <span className="flex items-center gap-1">
-                                        <i className="bi bi-clock"></i> {test.duration}
+                                        <Clock size={14} /> {test.duration}
                                     </span>
                                     <span className="flex items-center gap-1">
-                                        <i className="bi bi-question-circle"></i> {test.questions} Qs
+                                        <HelpCircle size={14} /> {test.questions} Qs
                                     </span>
                                     <span className={`px-2 py-0.5 rounded-full bg-slate-100 text-slate-600`}>
                                         {test.difficulty}
@@ -75,7 +80,7 @@ const OnlineTest = () => {
                                     to={`/online-test/${test.id}`}
                                     className="w-full py-3 rounded-xl bg-slate-900 text-white font-semibold flex items-center justify-center gap-2 hover:bg-slate-800 transition-colors"
                                 >
-                                    Start Test <i className="bi bi-arrow-right"></i>
+                                    Start Test <ArrowRight size={16} />
                                 </Link>
                             </div>
                         ))

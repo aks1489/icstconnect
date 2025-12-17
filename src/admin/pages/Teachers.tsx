@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { Grid, List, UserPlus, Users, ChevronRight, Search } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import CreateTeacherModal from '../../components/admin/CreateTeacherModal'
 
@@ -66,13 +67,13 @@ export default function Teachers() {
                             onClick={() => setViewMode('grid')}
                             className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                         >
-                            <i className="bi bi-grid-fill"></i>
+                            <Grid size={20} />
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
                             className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
                         >
-                            <i className="bi bi-list-ul"></i>
+                            <List size={20} />
                         </button>
                     </div>
 
@@ -80,7 +81,7 @@ export default function Teachers() {
                         onClick={() => setIsCreateModalOpen(true)}
                         className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 flex items-center gap-2"
                     >
-                        <i className="bi bi-person-plus-fill"></i>
+                        <UserPlus size={20} />
                         <span>Add Teacher</span>
                     </button>
                 </div>
@@ -88,7 +89,7 @@ export default function Teachers() {
 
             {/* Search Bar */}
             <div className="relative max-w-md">
-                <i className="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
                     type="text"
                     placeholder="Search by name, email, or ID..."
@@ -102,7 +103,7 @@ export default function Teachers() {
             {filteredTeachers.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center">
                     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <i className="bi bi-people text-3xl text-indigo-300"></i>
+                        <Users className="text-3xl text-indigo-300" size={40} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800">No Teachers Found</h3>
                     <p className="text-slate-500 mt-1 max-w-xs mx-auto">
@@ -170,9 +171,9 @@ export default function Teachers() {
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Teacher</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
-                                <th className="text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
+                                <th className="hidden md:table-cell text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                                <th className="hidden lg:table-cell text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
+                                <th className="hidden xl:table-cell text-left px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined</th>
                                 <th className="text-right px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -181,27 +182,30 @@ export default function Teachers() {
                                 <tr key={teacher.id} className="hover:bg-slate-50/50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold">
+                                            <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shrink-0">
                                                 {teacher.full_name?.charAt(0) || 'T'}
                                             </div>
-                                            <span className="font-semibold text-slate-700">{teacher.full_name}</span>
+                                            <div className="overflow-hidden">
+                                                <div className="font-semibold text-slate-700 truncate">{teacher.full_name}</div>
+                                                <div className="text-xs text-slate-500 md:hidden truncate">{teacher.email}</div>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm font-mono text-slate-600">
+                                    <td className="hidden md:table-cell px-6 py-4 text-sm font-mono text-slate-600">
                                         {teacher.teacher_id ? (
                                             <span className="bg-slate-100 px-2 py-1 rounded text-xs">{teacher.teacher_id}</span>
                                         ) : (
                                             <span className="text-slate-400 italic">--</span>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-500">{teacher.email}</td>
-                                    <td className="px-6 py-4 text-sm text-slate-500">{new Date(teacher.created_at).toLocaleDateString()}</td>
+                                    <td className="hidden lg:table-cell px-6 py-4 text-sm text-slate-500">{teacher.email}</td>
+                                    <td className="hidden xl:table-cell px-6 py-4 text-sm text-slate-500">{new Date(teacher.created_at).toLocaleDateString()}</td>
                                     <td className="px-6 py-4 text-right">
                                         <Link
                                             to={`/admin/teachers/${teacher.id}`}
                                             className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
                                         >
-                                            <i className="bi bi-chevron-right"></i>
+                                            <ChevronRight size={18} />
                                         </Link>
                                     </td>
                                 </tr>

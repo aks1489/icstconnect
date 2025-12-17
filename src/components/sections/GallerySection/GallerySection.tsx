@@ -1,4 +1,6 @@
 
+import { Plus } from 'lucide-react'
+
 const GallerySection = () => {
     const images = [
         'https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
@@ -29,7 +31,7 @@ const GallerySection = () => {
                                 />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 backdrop-blur-[2px]">
                                     <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white transform scale-0 group-hover:scale-100 transition-transform duration-300 delay-100">
-                                        <i className="bi bi-plus-lg text-2xl"></i>
+                                        <Plus className="text-2xl" size={28} />
                                     </div>
                                 </div>
                             </div>

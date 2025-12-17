@@ -1,28 +1,30 @@
 
+import { UserCheck, Laptop, Briefcase, Clock } from 'lucide-react'
+
 const FeaturesSection = () => {
     const features = [
         {
             title: 'Expert Faculty',
             description: 'Learn from industry experts with years of real-world experience.',
-            icon: 'bi-person-badge-fill',
+            icon: UserCheck,
             color: 'bg-blue-50 text-blue-600'
         },
         {
             title: 'Hands-on Training',
             description: 'Practical learning with live projects and assignments.',
-            icon: 'bi-laptop-fill',
+            icon: Laptop,
             color: 'bg-purple-50 text-purple-600'
         },
         {
             title: 'Placement Assistance',
             description: 'Dedicated support to help you land your dream job.',
-            icon: 'bi-briefcase-fill',
+            icon: Briefcase,
             color: 'bg-green-50 text-green-600'
         },
         {
             title: 'Flexible Learning',
             description: 'Online and offline classes to suit your schedule.',
-            icon: 'bi-clock-fill',
+            icon: Clock,
             color: 'bg-orange-50 text-orange-600'
         }
     ]
@@ -42,7 +44,7 @@ const FeaturesSection = () => {
                             <div className="bg-white rounded-2xl p-8 text-center h-full border border-slate-100 hover:shadow-xl hover:border-transparent hover:-translate-y-2 transition-all duration-300">
                                 <div className="mb-6 inline-block">
                                     <div className={`w-20 h-20 flex items-center justify-center rounded-2xl ${feature.color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
-                                        <i className={`bi ${feature.icon} text-4xl`}></i>
+                                        <feature.icon className="text-4xl" size={40} />
                                     </div>
                                 </div>
                                 <h4 className="text-xl font-bold mb-3 text-slate-900">{feature.title}</h4>

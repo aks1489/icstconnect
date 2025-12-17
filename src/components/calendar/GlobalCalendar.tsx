@@ -13,6 +13,7 @@ import {
     isToday,
     parseISO
 } from 'date-fns'
+import { ChevronLeft, ChevronRight, PlusCircle, Clock, CalendarX } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 
 interface CalendarEvent {
@@ -117,7 +118,7 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
                         onClick={prevMonth}
                         className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-indigo-600 transition-colors"
                     >
-                        <i className="bi bi-chevron-left"></i>
+                        <ChevronLeft size={20} />
                     </button>
                     <button
                         onClick={resetToToday}
@@ -129,7 +130,7 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
                         onClick={nextMonth}
                         className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-indigo-600 transition-colors"
                     >
-                        <i className="bi bi-chevron-right"></i>
+                        <ChevronRight size={20} />
                     </button>
                 </div>
             </div>
@@ -178,7 +179,7 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
                                         </span>
                                         {isAdmin && (
                                             <button className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-indigo-600 transition-opacity">
-                                                <i className="bi bi-plus-circle-fill"></i>
+                                                <PlusCircle size={16} />
                                             </button>
                                         )}
                                     </div>
@@ -232,8 +233,8 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
                                         >
                                             <div>
                                                 <h4 className="font-semibold text-slate-800 text-sm">{event.title}</h4>
-                                                <p className="text-xs text-slate-500 mt-0.5">
-                                                    <i className="bi bi-clock mr-1"></i>
+                                                <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
+                                                    <Clock size={12} />
                                                     {format(parseISO(event.start_datetime), 'h:mm a')} - {format(parseISO(event.end_datetime), 'h:mm a')}
                                                 </p>
                                                 {event.description && (
@@ -259,7 +260,7 @@ export default function GlobalCalendar({ isAdmin = false, onDateClick, refreshTr
                     })}
                     {calendarDays.filter(day => isSameMonth(day, currentDate) && getEventsForDay(day).length > 0).length === 0 && (
                         <div className="text-center py-12 text-slate-400">
-                            <i className="bi bi-calendar-x text-4xl mb-3 block opacity-50"></i>
+                            <CalendarX className="mx-auto mb-3 opacity-50" size={32} />
                             <p>No events scheduled for this month.</p>
                         </div>
                     )}

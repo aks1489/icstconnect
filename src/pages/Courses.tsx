@@ -1,4 +1,7 @@
+
 import { useState, useEffect, useMemo } from 'react'
+import { Hourglass, Search, Hash, X } from 'lucide-react'
+import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
 import { courseService } from '../services/courseService'
@@ -11,6 +14,7 @@ const CoursesPage = () => {
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
     const [loading, setLoading] = useState(true)
     const [courses, setCourses] = useState<Course[]>([])
+    const [searchQuery, setSearchQuery] = useState('')
 
     useEffect(() => {
         const fetchCourses = async () => {
@@ -27,23 +31,79 @@ const CoursesPage = () => {
         fetchCourses()
     }, [])
 
+    // Real-time keyboard search activation
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Focus search on any key press if not already focused on an input
+            if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                const searchInput = document.getElementById('course-search')
+                if (searchInput) {
+                    searchInput.focus()
+                }
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [])
+
     const filteredCourses = useMemo(() => {
-        return activeFilter === 'All'
-            ? courses
-            : courses.filter(course => course.duration === activeFilter)
-    }, [activeFilter, courses])
+        const query = searchQuery.toLowerCase().trim()
+
+        return courses.filter(course => {
+            // Duration Filter
+            const matchesDuration = activeFilter === 'All' || course.duration === activeFilter
+
+            // Search Filter
+            if (!query) return matchesDuration
+
+            const matchesTitle = course.title.toLowerCase().includes(query)
+            const matchesDesc = course.description.toLowerCase().includes(query)
+            const matchesTags = course.tags?.some(tag => tag.toLowerCase().includes(query))
+
+            return matchesDuration && (matchesTitle || matchesDesc || matchesTags)
+        })
+    }, [activeFilter, courses, searchQuery])
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-slate-50">
             <div className="container mx-auto px-4 md:px-6">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <div className="text-center mb-8">
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 font-outfit">
                         Explore Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Courses</span>
                     </h1>
                     <p className="text-slate-600 max-w-2xl mx-auto text-lg">
                         Choose from a wide range of industry-relevant courses designed to boost your career.
                     </p>
+                </div>
+
+                {/* Search Bar */}
+                <div className="max-w-2xl mx-auto mb-10 relative">
+                    <div className="relative group">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                        </div>
+                        <input
+                            id="course-search"
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="block w-full pl-12 pr-12 py-4 bg-white border border-slate-200 rounded-2xl leading-5 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm hover:shadow-md text-lg"
+                            placeholder="Search courses, skills, or keywords..."
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        )}
+                    </div>
+                    <div className="mt-2 text-center text-xs text-slate-400">
+                        Press any key to start searching
+                    </div>
                 </div>
 
                 {/* Filter Tabs */}
@@ -87,12 +147,18 @@ const CoursesPage = () => {
                     ) : filteredCourses.length === 0 ? (
                         <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-col items-center justify-center py-20 text-center">
                             <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                                <i className="bi bi-hourglass-split text-4xl text-blue-600"></i>
+                                <Search className="text-blue-600" size={40} />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-2">Coming Soon</h3>
+                            <h3 className="text-2xl font-bold text-slate-900 mb-2">No courses found</h3>
                             <p className="text-slate-500 max-w-md">
-                                We are currently working on adding courses for this duration. Please check back later or explore other options.
+                                We couldn't find any courses matching "{searchQuery}" with the selected filter. Try correcting the spelling or use different keywords.
                             </p>
+                            <button
+                                onClick={() => { setSearchQuery(''); setActiveFilter('All'); }}
+                                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                            >
+                                Clear all filters
+                            </button>
                         </div>
                     ) : (
                         filteredCourses.map((course) => (
@@ -103,12 +169,27 @@ const CoursesPage = () => {
                             >
                                 <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
                                     <div className="absolute inset-0 opacity-10 pattern-dots"></div>
-                                    <i className={`bi ${course.icon} text-6xl relative z-10 transform transition-transform duration-500 group-hover:scale-110`}></i>
+                                    {(() => {
+                                        const Icon = getIcon(course.icon)
+                                        return (
+                                            <Icon
+                                                size={64}
+                                                className="relative z-10 transform transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                                            />
+                                        )
+                                    })()}
                                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
                                         {course.duration}
                                     </div>
                                 </div>
                                 <div className="p-6 flex flex-col flex-grow">
+                                    <div className="mb-3 flex flex-wrap gap-1.5">
+                                        {course.tags?.slice(0, 3).map((tag, idx) => (
+                                            <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-semibold uppercase tracking-wider">
+                                                <Hash size={10} /> {tag}
+                                            </span>
+                                        ))}
+                                    </div>
                                     <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
                                         {course.title}
                                     </h3>

@@ -1,15 +1,45 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
+import { ChevronRight, List, ChevronDown, Pencil, Key, Grid, LogOut } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
+import EditProfileModal from '../components/EditProfileModal'
+import ChangePasswordModal from '../../components/auth/ChangePasswordModal'
 
 export default function StudentLayout() {
-    const { profile, signOut, user } = useAuth()
+    const { profile, signOut, isProfileComplete } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
+    const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
 
-    // ... [Logic kept same] ...
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsUserMenuOpen(false)
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [])
+
+    // Guard: Redirect to complete profile if incomplete
+    useEffect(() => {
+        // Wait for profile to load (profile might be null initially while loading)
+        // But useAuth handles loading state, so if we are here, we might have data
+        // We actually need to be careful not to redirect prematurely.
+        // Assuming AuthContext 'loading' prop handles the initial wait.
+
+        if (profile && !isProfileComplete) {
+            navigate('/student/complete-profile')
+        }
+    }, [profile, isProfileComplete, navigate])
 
     // Initialize based on screen width - default closed on mobile, open on desktop
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024)
@@ -38,6 +68,15 @@ export default function StudentLayout() {
 
     return (
         <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
+            <EditProfileModal
+                isOpen={isEditProfileOpen}
+                onClose={() => setIsEditProfileOpen(false)}
+            />
+            <ChangePasswordModal
+                isOpen={isChangePasswordOpen}
+                onClose={() => setIsChangePasswordOpen(false)}
+            />
+
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -88,61 +127,98 @@ export default function StudentLayout() {
                                     }
                                 `}
                             >
-                                <i className={`bi ${item.icon} text-lg ${isActive(item.path) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`}></i>
+                                <item.icon className={`text-lg ${isActive(item.path) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`} size={20} />
                                 <span className="font-medium">{item.label}</span>
                                 {isActive(item.path) && (
-                                    <i className="bi bi-chevron-right ml-auto text-xs opacity-50"></i>
+                                    <ChevronRight className="ml-auto text-xs opacity-50" size={16} />
                                 )}
                             </Link>
                         ))}
                     </nav>
-
-                    {/* User Profile / Logout */}
-                    <div className="p-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
-                        <div className="flex items-center gap-3 mb-4 px-2">
-                            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700 border-2 border-white shadow-sm">
-                                {profile?.full_name?.charAt(0) || 'S'}
-                            </div>
-                            <div className="overflow-hidden">
-                                <p className="text-sm font-bold text-slate-800 truncate">{profile?.full_name || 'Student'}</p>
-                                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
-                            </div>
-                        </div>
-                        <Link
-                            to="/quick-access"
-                            className="flex items-center gap-3 w-full p-3 mb-2 rounded-xl text-slate-500 hover:bg-white hover:text-slate-900 transition-all duration-200 group border border-transparent hover:border-slate-200 hover:shadow-sm"
-                        >
-                            <i className="bi bi-grid text-lg"></i>
-                            <span className="font-medium">Quick Access</span>
-                        </Link>
-                        <button
-                            onClick={handleSignOut}
-                            className="flex items-center gap-3 w-full p-3 rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group border border-transparent"
-                        >
-                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                                <i className="bi bi-box-arrow-right text-lg"></i>
-                            </div>
-                            <div className="text-left">
-                                <p className="text-sm font-medium">Sign Out</p>
-                                <p className="text-xs opacity-60">End session</p>
-                            </div>
-                        </button>
-                    </div>
                 </div>
             </aside>
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Header for Mobile and Desktop Toggle */}
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-20">
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                    >
-                        <i className="bi bi-list text-2xl"></i>
-                    </button>
-                    <span className="font-semibold text-slate-700 lg:hidden">Student Portal</span>
-                    <div className="w-8 lg:hidden"></div> {/* Spacer for alignment */}
+                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 z-20">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600 lg:hidden"
+                        >
+                            <List className="text-2xl" size={24} />
+                        </button>
+                        <span className="font-semibold text-slate-700 lg:hidden">Student Portal</span>
+                    </div>
+
+                    {/* Top Right Profile Section */}
+                    <div className="flex items-center gap-4">
+                        <div className="relative" ref={dropdownRef}>
+                            <button
+                                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                                className="flex items-center gap-3 p-1 pl-3 pr-2 rounded-full border border-slate-200 hover:bg-slate-50 hover:shadow-sm transition-all group"
+                            >
+                                <div className="text-right hidden sm:block">
+                                    <p className="text-sm font-bold text-slate-700 leading-tight">{profile?.full_name}</p>
+                                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Student</p>
+                                </div>
+                                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700 border border-white shadow-sm overflow-hidden">
+                                    {profile?.avatar_url ? (
+                                        <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        profile?.full_name?.charAt(0) || 'S'
+                                    )}
+                                </div>
+                                <ChevronDown className={`text-slate-400 text-xs transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} size={16} />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {isUserMenuOpen && (
+                                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
+                                    <div className="p-4 bg-slate-50/50 border-b border-slate-100 sm:hidden">
+                                        <p className="font-bold text-slate-800">{profile?.full_name}</p>
+                                        <p className="text-xs text-slate-500">{profile?.email}</p>
+                                    </div>
+
+                                    <div className="p-2 space-y-1">
+                                        <button
+                                            onClick={() => { setIsEditProfileOpen(true); setIsUserMenuOpen(false); }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                        >
+                                            <Pencil className="text-lg" size={18} />
+                                            Edit Profile
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsChangePasswordOpen(true); setIsUserMenuOpen(false); }}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                        >
+                                            <Key className="text-lg" size={18} />
+                                            Change Password
+                                        </button>
+                                        <Link
+                                            to="/quick-access"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                        >
+                                            <Grid className="text-lg" size={18} />
+                                            Quick Access
+                                        </Link>
+                                    </div>
+
+                                    <div className="p-2 border-t border-slate-100">
+                                        <button
+                                            onClick={handleSignOut}
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                        >
+                                            <LogOut className="text-lg" size={18} />
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </header>
 
                 {/* Scrollable Page Content */}

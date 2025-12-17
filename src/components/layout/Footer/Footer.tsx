@@ -1,5 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import { Facebook, Twitter, Linkedin, Instagram, MapPin, Mail, Phone } from 'lucide-react'
 
 const Footer: React.FC = () => {
     return (
@@ -26,18 +28,18 @@ const Footer: React.FC = () => {
                             Empowering students with cutting-edge computer science education and technical skills for a brighter future.
                         </p>
                         <div className="flex gap-4 pt-2">
-                            <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
-                                <i className="bi bi-facebook"></i>
-                            </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
-                                <i className="bi bi-twitter-x"></i>
-                            </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
-                                <i className="bi bi-linkedin"></i>
-                            </a>
-                            <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
-                                <i className="bi bi-instagram"></i>
-                            </a>
+                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                                <Facebook size={18} />
+                            </motion.a>
+                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                                <Twitter size={18} />
+                            </motion.a>
+                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                                <Linkedin size={18} />
+                            </motion.a>
+                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                                <Instagram size={18} />
+                            </motion.a>
                         </div>
                     </div>
 
@@ -70,15 +72,15 @@ const Footer: React.FC = () => {
                         <h3 className="text-white font-bold mb-6">Contact Us</h3>
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
-                                <i className="bi bi-geo-alt mt-1 text-slate-400"></i>
+                                <MapPin size={18} className="mt-1 text-slate-400" />
                                 <span>Chowberia, West Bengal, India</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <i className="bi bi-envelope text-slate-400"></i>
+                                <Mail size={18} className="text-slate-400" />
                                 <a href="mailto:info@icst.com" className="hover:text-white transition-colors no-underline">info@icst.com</a>
                             </li>
                             <li className="flex items-center gap-3">
-                                <i className="bi bi-telephone text-slate-400"></i>
+                                <Phone size={18} className="text-slate-400" />
                                 <a href="tel:+911234567890" className="hover:text-white transition-colors no-underline">+91 123 456 7890</a>
                             </li>
                         </ul>

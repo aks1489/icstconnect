@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { Clock, ArrowLeft, ArrowRight } from 'lucide-react'
 
 // Mock Data for Tests
 const TEST_DATA = {
@@ -172,8 +173,8 @@ const TestPlayer = () => {
                         <p className="text-sm text-slate-500">Question {currentQuestionIndex + 1} of {totalQuestions}</p>
                     </div>
                     <div className="text-right">
-                        <div className="text-sm font-bold text-slate-900 bg-white px-3 py-1 rounded-lg shadow-sm border border-slate-100">
-                            <i className="bi bi-clock text-slate-400 mr-2"></i>
+                        <div className="text-sm font-bold text-slate-900 bg-white px-3 py-1 rounded-lg shadow-sm border border-slate-100 flex items-center gap-2">
+                            <Clock className="text-slate-400" size={16} />
                             14:59
                         </div>
                     </div>
@@ -227,7 +228,7 @@ const TestPlayer = () => {
                             : 'text-slate-600 hover:bg-slate-200'
                             }`}
                     >
-                        <i className="bi bi-arrow-left"></i> Previous
+                        <ArrowLeft size={20} /> Previous
                     </button>
 
                     {currentQuestionIndex === totalQuestions - 1 ? (
@@ -242,7 +243,7 @@ const TestPlayer = () => {
                             onClick={handleNext}
                             className="px-8 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
                         >
-                            Next <i className="bi bi-arrow-right"></i>
+                            Next <ArrowRight size={20} />
                         </button>
                     )}
                 </div>

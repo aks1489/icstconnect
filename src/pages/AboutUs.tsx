@@ -1,4 +1,4 @@
-
+import { Target, Laptop, Award, MapPin, Mail, Users } from 'lucide-react'
 
 const AboutUs = () => {
     return (
@@ -19,7 +19,7 @@ const AboutUs = () => {
                     <div className="order-2 md:order-1">
                         <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6">
-                                <i className="bi bi-bullseye text-2xl"></i>
+                                <Target size={24} />
                             </div>
                             <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Mission</h2>
                             <p className="text-slate-600 mb-6 leading-relaxed">
@@ -57,24 +57,24 @@ const AboutUs = () => {
                     <div className="grid md:grid-cols-3 gap-8">
                         {[
                             {
-                                icon: 'bi-laptop',
+                                Icon: Laptop,
                                 title: 'Modern Labs',
                                 description: 'State-of-the-art computer labs with the latest software and hardware.'
                             },
                             {
-                                icon: 'bi-person-badge',
+                                Icon: Users, // was bi-person-badge
                                 title: 'Expert Faculty',
                                 description: 'Learn from experienced instructors who are passionate about teaching.'
                             },
                             {
-                                icon: 'bi-award',
+                                Icon: Award,
                                 title: 'Certified Courses',
                                 description: 'Industry-recognized certifications to boost your career prospects.'
                             }
                         ].map((feature, index) => (
                             <div key={index} className="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-md transition-shadow">
                                 <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white mb-6">
-                                    <i className={`bi ${feature.icon} text-2xl`}></i>
+                                    <feature.Icon size={24} />
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
                                 <p className="text-slate-600">{feature.description}</p>
@@ -94,12 +94,12 @@ const AboutUs = () => {
                         </p>
                         <div className="flex flex-col md:flex-row gap-4 justify-center">
                             <div className="flex items-center justify-center gap-2 text-slate-300">
-                                <i className="bi bi-geo-alt-fill"></i>
+                                <MapPin size={18} />
                                 <span>Chowberia, West Bengal</span>
                             </div>
                             <div className="hidden md:block text-slate-600">•</div>
                             <div className="flex items-center justify-center gap-2 text-slate-300">
-                                <i className="bi bi-envelope-fill"></i>
+                                <Mail size={18} />
                                 <span>contact@icstchowberia.com</span>
                             </div>
                         </div>
