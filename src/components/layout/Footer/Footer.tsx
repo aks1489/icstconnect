@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Facebook, Twitter, Linkedin, Instagram, MapPin, Mail, Phone } from 'lucide-react'
+import { Facebook, Instagram, MapPin, Mail, Phone } from 'lucide-react'
 
 const Footer: React.FC = () => {
     return (
@@ -28,16 +28,10 @@ const Footer: React.FC = () => {
                             Empowering students with cutting-edge computer science education and technical skills for a brighter future.
                         </p>
                         <div className="flex gap-4 pt-2">
-                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
                                 <Facebook size={18} />
                             </motion.a>
-                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
-                                <Twitter size={18} />
-                            </motion.a>
-                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
-                                <Linkedin size={18} />
-                            </motion.a>
-                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
                                 <Instagram size={18} />
                             </motion.a>
                         </div>
@@ -68,22 +62,32 @@ const Footer: React.FC = () => {
                     </div>
 
                     {/* Contact Info */}
-                    <div>
-                        <h3 className="text-white font-bold mb-6">Contact Us</h3>
-                        <ul className="space-y-4 text-sm">
-                            <li className="flex items-start gap-3">
-                                <MapPin size={18} className="mt-1 text-slate-400" />
-                                <span>Chowberia, West Bengal, India</span>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <Mail size={18} className="text-slate-400" />
-                                <a href="mailto:info@icst.com" className="hover:text-white transition-colors no-underline">info@icst.com</a>
-                            </li>
-                            <li className="flex items-center gap-3">
-                                <Phone size={18} className="text-slate-400" />
-                                <a href="tel:+911234567890" className="hover:text-white transition-colors no-underline">+91 123 456 7890</a>
-                            </li>
-                        </ul>
+                    <div className="flex flex-col gap-6">
+                        <div>
+                            <h3 className="text-white font-bold mb-6">Contact Us</h3>
+                            <ul className="space-y-4 text-sm">
+                                <li className="flex items-start gap-3">
+                                    <MapPin size={18} className="mt-1 text-slate-400" />
+                                    <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors no-underline">Chowberia, West Bengal, India, 743290</a>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Mail size={18} className="text-slate-400" />
+                                    <a href="mailto:icstconnect@gmail.com" className="hover:text-white transition-colors no-underline">icstconnect@gmail.com</a>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Phone size={18} className="text-slate-400" />
+                                    <a href="tel:+918158031706" className="hover:text-white transition-colors no-underline">+91 8158031706</a>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <MapPin size={18} className="text-slate-400" />
+                                    <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors no-underline font-medium">Find us on Google Maps!</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Google Map */}
+
+
                     </div>
                 </div>
 

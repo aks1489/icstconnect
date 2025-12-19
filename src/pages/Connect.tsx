@@ -1,6 +1,7 @@
 import { ExternalLink } from 'lucide-react';
 import logo from '../assets/logo.jpg';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import DiscountForm from './Connect/DiscountForm';
 
 // REFINED: Usage of the correct multi-colored modern Google Maps logo (2020 version)
 const GoogleMapsLogo = ({ className }: { className?: string }) => (
@@ -65,6 +66,8 @@ const TicketIcon = ({ className }: { className?: string }) => (
 )
 
 const Connect = () => {
+    const [isDiscountFormOpen, setIsDiscountFormOpen] = useState(false);
+
     const links = useMemo(() => [
         {
             id: 'maps',
@@ -113,11 +116,6 @@ const Connect = () => {
         }
     ], []);
 
-    const handleClaimDiscount = () => {
-        // Will be linked later
-        console.log("Claim Discount clicked");
-    };
-
     return (
         <div className="min-h-screen w-full bg-[#0f172a] text-white flex flex-col items-center justify-center py-2 px-4 relative overflow-hidden font-sans">
 
@@ -150,7 +148,7 @@ const Connect = () => {
 
                 {/* Claim Discount Button */}
                 <button
-                    onClick={handleClaimDiscount}
+                    onClick={() => setIsDiscountFormOpen(true)}
                     className="w-full group relative overflow-hidden rounded-xl p-[1px] shadow-lg shadow-amber-500/10 active:scale-[0.98] transition-transform"
                 >
                     {/* Spinning Gradient Border - ENLARGED to cover corners */}
@@ -162,7 +160,7 @@ const Connect = () => {
                             <TicketIcon className="w-5 h-5" />
                         </div>
                         <span className="text-sm font-bold bg-gradient-to-r from-amber-200 to-yellow-500 bg-clip-text text-transparent uppercase tracking-wider">
-                            Claim 10% Discount
+                            Claim Discount Now
                         </span>
                     </div>
                 </button>
@@ -208,6 +206,9 @@ const Connect = () => {
                 </div>
 
             </div>
+
+            {/* Discount Form Modal */}
+            <DiscountForm isOpen={isDiscountFormOpen} onClose={() => setIsDiscountFormOpen(false)} />
         </div>
     );
 };

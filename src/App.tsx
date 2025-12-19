@@ -44,6 +44,7 @@ import CourseStructureEditor from './admin/pages/CourseStructureEditor'
 import ClassManager from './admin/pages/ClassManager'
 import AdminClasses from './admin/pages/AdminClasses'
 import AdminClassDetails from './admin/pages/AdminClassDetails'
+const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -167,6 +168,7 @@ function App() {
               <Route path="schedule" element={<ScheduleClass />} />
               <Route path="teachers" element={<AdminTeachers />} />
               <Route path="teachers/:id" element={<TeacherDetails />} />
+              <Route path="discount-claims" element={<DiscountClaims />} />
             </Route>
 
             {/* Teacher Routes - Independent Layout */}
