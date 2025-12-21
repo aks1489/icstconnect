@@ -108,7 +108,7 @@ function App() {
             {/* Public Routes with MainLayout */}
             <Route element={<MainLayout><Outlet /></MainLayout>}>
               <Route path="/" element={<Home />} />
-              <Route path="/courses" element={<CoursesPage />} />
+              <Route path="/courses/:courseId?" element={<CoursesPage />} />
 
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/gallery" element={<Gallery />} />
