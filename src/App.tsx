@@ -154,6 +154,8 @@ function App() {
               <Route path="dashboard" element={<StudentDashboard />} />
               <Route path="offline-classes" element={<OfflineClasses />} />
               <Route path="calendar" element={<StudentCalendar />} />
+              <Route path="tests" element={<OnlineTest isStudentPortal />} />
+              <Route path="tests/:testId" element={<TestPlayer />} />
               <Route path="complete-profile" element={<CompleteProfile />} />
             </Route>
 

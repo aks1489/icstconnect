@@ -48,7 +48,7 @@ export const STUDENT_ACTIONS: NavItem[] = [
     },
     {
         label: 'Online Tests',
-        path: '/online-test',
+        path: '/student/tests',
         icon: Laptop,
         color: 'text-blue-600',
         description: 'Take practice exams and view results'

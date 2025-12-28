@@ -84,6 +84,7 @@ export default function CreateTest() {
 
     const handleSave = async () => {
         if (!testData.title) return alert('Please enter a test title')
+        if (!testData.course_id) return alert('Please select a related course')
         if (questions.length === 0) return alert('Please add at least one question')
 
         // Validate Questions
@@ -249,7 +250,7 @@ export default function CreateTest() {
 
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                                <BookOpen size={16} /> Related Course
+                                <BookOpen size={16} /> Related Course <span className="text-red-500">*</span>
                             </label>
                             <select
                                 value={testData.course_id || ''}
@@ -264,7 +265,7 @@ export default function CreateTest() {
                                 }}
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 hover:border-indigo-300 outline-none transition-all bg-white"
                             >
-                                <option value="">Select a Course (Optional)</option>
+                                <option value="">Select a Course (Required)</option>
                                 {courses.map(course => (
                                     <option key={course.id} value={course.id}>{course.course_name}</option>
                                 ))}
