@@ -28,7 +28,7 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
             setLoading(true)
 
             // Prepare promises for parallel execution
-            const promises: Promise<any>[] = [
+            const promises: PromiseLike<any>[] = [
                 supabase
                     .from('tests')
                     .select('*')
