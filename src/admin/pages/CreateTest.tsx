@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { ArrowLeft, Save, Layout, Clock, Globe, Lock, BookOpen } from 'lucide-react'
 import QuestionEditor from '../../components/admin/QuestionEditor'
@@ -7,6 +7,9 @@ import type { Test, TestQuestion } from '../../types'
 
 export default function CreateTest() {
     const navigate = useNavigate()
+    const { id } = useParams() // Get ID for edit mode
+    const isEditMode = !!id
+
     const [loading, setLoading] = useState(false)
     const [courses, setCourses] = useState<any[]>([])
 
@@ -31,6 +34,54 @@ export default function CreateTest() {
         fetchCourses()
     }, [])
 
+    // Fetch Test Data if Edit Mode
+    useEffect(() => {
+        if (!isEditMode) return
+
+        const fetchTest = async () => {
+            setLoading(true)
+            try {
+                // 1. Fetch Test Details
+                const { data: test, error: tError } = await supabase
+                    .from('tests')
+                    .select('*')
+                    .eq('id', id)
+                    .single()
+
+                if (tError) throw tError
+                setTestData(test)
+
+                // 2. Fetch Questions (Ordered)
+                const { data: qs, error: qError } = await supabase
+                    .from('questions')
+                    .select('*, options(*)')
+                    .eq('test_id', id)
+                    .order('order_index', { ascending: true })
+
+                if (qError) throw qError
+
+                // 3. Format properly and sort options
+                if (qs) {
+                    const formattedQuestions: TestQuestion[] = qs.map(q => ({
+                        ...q,
+                        // Sort options by order_index
+                        options: q.options?.sort((a: any, b: any) => a.order_index - b.order_index) || []
+                    }))
+                    setQuestions(formattedQuestions)
+                }
+
+            } catch (error) {
+                console.error('Error fetching test:', error)
+                alert('Failed to load test details')
+                navigate('/admin/tests')
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchTest()
+    }, [id, isEditMode, navigate])
+
     const handleSave = async () => {
         if (!testData.title) return alert('Please enter a test title')
         if (questions.length === 0) return alert('Please add at least one question')
@@ -47,21 +98,55 @@ export default function CreateTest() {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) throw new Error('Not authenticated')
 
-            // 1. Create Test
-            const { data: test, error: testError } = await supabase
-                .from('tests')
-                .insert({
-                    ...testData,
-                    created_by: user.id
-                })
-                .select()
-                .single()
+            let testId = id
 
-            if (testError) throw testError
+            if (isEditMode) {
+                // UPDATE Existing Test
+                const { error: updateError } = await supabase
+                    .from('tests')
+                    .update({
+                        title: testData.title,
+                        description: testData.description,
+                        course_id: testData.course_id,
+                        course_name: testData.course_name,
+                        duration_minutes: testData.duration_minutes,
+                        difficulty: testData.difficulty,
+                        access_type: testData.access_type,
+                        is_active: testData.is_active
+                    })
+                    .eq('id', id)
 
-            // 2. Create Questions
+                if (updateError) throw updateError
+
+                // Delete existing questions (Cascade will delete options)
+                // This is the simplest way to handle full re-ordering/edits
+                const { error: deleteError } = await supabase
+                    .from('questions')
+                    .delete()
+                    .eq('test_id', id)
+
+                if (deleteError) throw deleteError
+
+            } else {
+                // CREATE New Test
+                const { data: test, error: insertError } = await supabase
+                    .from('tests')
+                    .insert({
+                        ...testData,
+                        created_by: user.id
+                    })
+                    .select()
+                    .single()
+
+                if (insertError) throw insertError
+                testId = test.id
+            }
+
+            // 2. Insert Questions (New or Re-insert for Edit)
+            if (!testId) throw new Error('Test ID missing')
+
             const questionsToInsert = questions.map((q, idx) => ({
-                test_id: test.id,
+                test_id: testId,
                 text: q.text,
                 type: q.type,
                 order_index: idx + 1,
@@ -75,14 +160,9 @@ export default function CreateTest() {
 
             if (qError) throw qError
 
-            // 3. Create Options (Mapping back to correct question IDs)
-            // This relies on the order being preserved or matching logic. 
-            // Ideally we insert one by one or batch carefully.
-            // For simplicity/robustness in this "single batch" context:
-
+            // 3. Insert Options
             const optionsToInsert = []
-            // We match inserted questions by order_index since we saved them relative to `questions` array
-            // Optimization: sort insertedQuestions by order_index to match `questions` array order
+            // Sort inserted questions to match the original array order logic
             const sortedInsertedQuestions = insertedQuestions.sort((a, b) => a.order_index - b.order_index)
 
             for (let i = 0; i < questions.length; i++) {
@@ -103,11 +183,11 @@ export default function CreateTest() {
 
             if (oError) throw oError
 
-            navigate('/admin/tests') // Or teacher/tests
+            navigate('/admin/tests')
 
         } catch (error: any) {
-            console.error('Error creating test:', error)
-            alert('Failed to create test: ' + error.message)
+            console.error('Error saving test:', error)
+            alert('Failed to save test: ' + error.message)
         } finally {
             setLoading(false)
         }
@@ -119,17 +199,19 @@ export default function CreateTest() {
             <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
+                        <button onClick={() => navigate('/admin/tests')} className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
                             <ArrowLeft size={20} />
                         </button>
-                        <h1 className="text-xl font-bold text-slate-800">Create New Test</h1>
+                        <h1 className="text-xl font-bold text-slate-800">
+                            {isEditMode ? 'Edit Test' : 'Create New Test'}
+                        </h1>
                     </div>
                     <button
                         onClick={handleSave}
                         disabled={loading}
                         className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2 disabled:opacity-70"
                     >
-                        {loading ? 'Saving...' : <><Save size={18} /> Publish Test</>}
+                        {loading ? 'Saving...' : <><Save size={18} /> {isEditMode ? 'Update' : 'Publish'} Test</>}
                     </button>
                 </div>
             </div>

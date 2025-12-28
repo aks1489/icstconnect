@@ -183,6 +183,7 @@ function App() {
               <Route path="teachers/:id" element={<TeacherDetails />} />
               <Route path="tests" element={<AdminTests />} />
               <Route path="tests/new" element={<CreateTest />} />
+              <Route path="tests/:id/edit" element={<CreateTest />} />
               <Route path="discount-claims" element={<DiscountClaims />} />
             </Route>
 
