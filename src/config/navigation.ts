@@ -130,6 +130,13 @@ export const ADMIN_ACTIONS: NavItem[] = [
         description: 'Manage schedules and events'
     },
     {
+        label: 'Tests',
+        path: '/admin/tests',
+        icon: FileText,
+        color: 'text-cyan-600',
+        description: 'Manage assessments'
+    },
+    {
         label: 'Discount Claims',
         path: '/admin/discount-claims',
         icon: Tag,

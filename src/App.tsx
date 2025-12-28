@@ -44,6 +44,8 @@ import CourseStructureEditor from './admin/pages/CourseStructureEditor'
 import ClassManager from './admin/pages/ClassManager'
 import AdminClasses from './admin/pages/AdminClasses'
 import AdminClassDetails from './admin/pages/AdminClassDetails'
+import CreateTest from './admin/pages/CreateTest'
+import AdminTests from './admin/pages/Tests'
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 
 // Teacher Imports
@@ -112,8 +114,19 @@ function App() {
 
               <Route path="/notifications" element={<Notifications />} />
               <Route path="/gallery" element={<Gallery />} />
-              <Route path="/online-test" element={<OnlineTest />} />
-              <Route path="/online-test/:testId" element={<TestPlayer />} />
+
+              <Route path="/online-test" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <OnlineTest />
+                </Suspense>
+              } />
+
+              <Route path="/online-test/:testId" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <TestPlayer />
+                </Suspense>
+              } />
+
               <Route path="/about" element={<AboutUs />} />
               <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="/admin/login" element={<AdminLogin />} />
@@ -168,6 +181,8 @@ function App() {
               <Route path="schedule" element={<ScheduleClass />} />
               <Route path="teachers" element={<AdminTeachers />} />
               <Route path="teachers/:id" element={<TeacherDetails />} />
+              <Route path="tests" element={<AdminTests />} />
+              <Route path="tests/new" element={<CreateTest />} />
               <Route path="discount-claims" element={<DiscountClaims />} />
             </Route>
 

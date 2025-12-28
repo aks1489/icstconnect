@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, List, ChevronDown, Pencil, Key, Grid, LogOut } from 'lucide-react'
+import { ChevronRight, List, ChevronDown, Pencil, Key, Grid, LogOut, AlertCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
@@ -14,6 +15,7 @@ export default function StudentLayout() {
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
     const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+    const [showProfileAlert, setShowProfileAlert] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     // Close dropdown when clicking outside
@@ -31,15 +33,18 @@ export default function StudentLayout() {
 
     // Guard: Redirect to complete profile if incomplete
     useEffect(() => {
-        // Wait for profile to load (profile might be null initially while loading)
-        // But useAuth handles loading state, so if we are here, we might have data
-        // We actually need to be careful not to redirect prematurely.
-        // Assuming AuthContext 'loading' prop handles the initial wait.
-
-        if (profile && !isProfileComplete) {
+        if (profile && !isProfileComplete && location.pathname !== '/student/complete-profile') {
             navigate('/student/complete-profile')
+            setShowProfileAlert(true)
+
+            const timer = setTimeout(() => setShowProfileAlert(false), 5000)
+            return () => clearTimeout(timer)
         }
-    }, [profile, isProfileComplete, navigate])
+    }, [profile, isProfileComplete, navigate, location.pathname])
+
+    const dismissAlert = () => {
+        if (showProfileAlert) setShowProfileAlert(false)
+    }
 
     // Initialize based on screen width - default closed on mobile, open on desktop
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 1024)
@@ -76,6 +81,46 @@ export default function StudentLayout() {
                 isOpen={isChangePasswordOpen}
                 onClose={() => setIsChangePasswordOpen(false)}
             />
+
+            {/* Incomplete Profile Alert */}
+            <AnimatePresence>
+                {showProfileAlert && (
+                    <div className="fixed top-6 left-0 right-0 z-[100] flex justify-center pointer-events-none">
+                        <motion.div
+                            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                            className="bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-xl shadow-orange-500/30 rounded-full px-6 py-3 flex items-center gap-3 pointer-events-auto"
+                        >
+                            <motion.div
+                                animate={{
+                                    rotate: [0, 15, -15, 0],
+                                    scale: [1, 1.1, 1]
+                                }}
+                                transition={{
+                                    repeat: Infinity,
+                                    duration: 2,
+                                    ease: "easeInOut"
+                                }}
+                                className="bg-white/20 p-1.5 rounded-full backdrop-blur-sm"
+                            >
+                                <AlertCircle size={20} strokeWidth={2.5} className="text-white" />
+                            </motion.div>
+                            <div>
+                                <h3 className="text-sm font-bold text-white leading-tight">Action Required</h3>
+                                <p className="text-xs text-white/90 font-medium">Please complete your profile to continue</p>
+                            </div>
+                            <button
+                                onClick={() => setShowProfileAlert(false)}
+                                className="ml-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
+                            </button>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
@@ -224,7 +269,7 @@ export default function StudentLayout() {
                 {/* Scrollable Page Content */}
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 lg:p-8 scroll-smooth">
                     <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <Outlet />
+                        <Outlet context={{ dismissAlert }} />
                     </div>
                 </main>
             </div>
