@@ -32,7 +32,14 @@ export default function StudentDetails() {
     const [selectedCourseId, setSelectedCourseId] = useState<string>('')
     const [availableClasses, setAvailableClasses] = useState<any[]>([])
     const [selectedClassId, setSelectedClassId] = useState<string>('')
+
     const [isEditOpen, setIsEditOpen] = useState(false)
+
+    // Batch Transfer State
+    const [isChangeBatchOpen, setIsChangeBatchOpen] = useState(false)
+    const [classToTransfer, setClassToTransfer] = useState<{ courseId: number, currentClassId: number } | null>(null)
+    const [transferAvailableClasses, setTransferAvailableClasses] = useState<any[]>([])
+    const [selectedTransferClassId, setSelectedTransferClassId] = useState('')
 
     useEffect(() => {
         if (id) {
@@ -136,6 +143,43 @@ export default function StudentDetails() {
             alert(error.message || 'Error loading student details')
         } finally {
             setLoading(false)
+        }
+    }
+
+
+    const openTransferModal = async (courseId: number, currentClassId: number) => {
+        setClassToTransfer({ courseId, currentClassId })
+        setIsChangeBatchOpen(true)
+        setSelectedTransferClassId('')
+
+        // Fetch other classes for this course
+        const { data } = await supabase
+            .from('classes')
+            .select('*')
+            .eq('course_id', courseId)
+            .neq('id', currentClassId) // Exclude current
+            .order('batch_number')
+
+        setTransferAvailableClasses(data || [])
+    }
+
+    const handleBatchTransfer = async () => {
+        if (!classToTransfer || !selectedTransferClassId) return
+
+        try {
+            const { error } = await supabase
+                .from('enrollments')
+                .update({ class_id: parseInt(selectedTransferClassId) })
+                .match({ student_id: id, course_id: classToTransfer.courseId })
+
+            if (error) throw error
+
+            alert('Batch switched successfully!')
+            setIsChangeBatchOpen(false)
+            fetchData()
+        } catch (error) {
+            console.error('Error switching batch:', error)
+            alert('Failed to switch batch')
         }
     }
 
@@ -298,6 +342,40 @@ export default function StudentDetails() {
                     <ArrowLeft size={16} />
                     Back to Students
                 </Link>
+
+                {/* Batch Transfer Modal */}
+                {isChangeBatchOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsChangeBatchOpen(false)}></div>
+                        <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
+                            <h3 className="font-bold text-lg mb-4 text-slate-800">Switch Class Batch</h3>
+                            <p className="text-sm text-slate-500 mb-4">Select a new batch for this course. Progress will be preserved.</p>
+
+                            <select
+                                className="w-full p-2 border border-slate-200 rounded-xl mb-4 bg-white"
+                                value={selectedTransferClassId}
+                                onChange={e => setSelectedTransferClassId(e.target.value)}
+                            >
+                                <option value="">-- Select New Batch --</option>
+                                {transferAvailableClasses.map(cls => (
+                                    <option key={cls.id} value={cls.id}>{cls.batch_name}</option>
+                                ))}
+                            </select>
+
+                            <div className="flex justify-end gap-2">
+                                <button onClick={() => setIsChangeBatchOpen(false)} className="px-4 py-2 text-slate-500 font-bold hover:bg-slate-50 rounded-lg">Cancel</button>
+                                <button
+                                    onClick={handleBatchTransfer}
+                                    disabled={!selectedTransferClassId}
+                                    className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                                >
+                                    Confirm Switch
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold overflow-hidden">
@@ -331,7 +409,7 @@ export default function StudentDetails() {
                     {/* Enrollments Card */}
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                         <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h2 className="font-bold text-slate-800">Enrolled Courses</h2>
+                            <h2 className="font-bold text-slate-800">Enrolled Classes</h2>
                             <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-semibold">
                                 {enrollments.length} Active
                             </span>
@@ -364,6 +442,20 @@ export default function StudentDetails() {
                                                 title="Unenroll"
                                             >
                                                 <X size={20} />
+                                            </button>
+                                        </div>
+
+                                        {/* Class Info & Logic */}
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <span className="text-xs font-bold text-slate-500 uppercase bg-slate-100 px-2 py-1 rounded">
+                                                Batch: {enrollment.class_id ? `ID #${enrollment.class_id}` : 'N/A'}
+                                                {/* Ideally we fetch batch name, but ID proves the link for now */}
+                                            </span>
+                                            <button
+                                                onClick={() => openTransferModal(enrollment.course_id, enrollment.class_id)}
+                                                className="text-xs text-indigo-600 font-bold hover:underline"
+                                            >
+                                                Switch Batch
                                             </button>
                                         </div>
 
@@ -424,7 +516,7 @@ export default function StudentDetails() {
                 {/* Sidebar: Actions */}
                 <div className="space-y-6">
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                        <h2 className="font-bold text-slate-800 mb-4">Assign Course</h2>
+                        <h2 className="font-bold text-slate-800 mb-4">Enroll in Class</h2>
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">Select Course</label>
@@ -471,7 +563,7 @@ export default function StudentDetails() {
                                 disabled={!selectedCourseId || !selectedClassId}
                                 className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                Assign Course
+                                Enroll in Class
                             </button>
                         </div>
                     </div>

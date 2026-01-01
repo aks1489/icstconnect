@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Plus, Search, Inbox, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
+import CreateClassModal from '../../components/admin/CreateClassModal'
 
 interface ClassBatch {
     id: number
@@ -32,7 +33,9 @@ export default function AdminClasses() {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCourse, setSelectedCourse] = useState<string>('all')
+
     const [searchQuery, setSearchQuery] = useState('')
+    const [isCreateOpen, setIsCreateOpen] = useState(false)
 
     useEffect(() => {
         fetchData()
@@ -142,15 +145,17 @@ export default function AdminClasses() {
                     <p className="text-slate-500 text-sm mt-1">View and manage student batches across all courses</p>
                 </div>
 
-                {/* Note: Creation is best done via Course context, so we might link there or add a global create modal later */}
-                <Link
-                    to="/admin/courses"
+                {/* Create Batch Action */}
+                <button
+                    onClick={() => setIsCreateOpen(true)}
                     className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
                 >
                     <Plus size={20} />
-                    Create Batch (via Course)
-                </Link>
+                    Create Batch
+                </button>
             </div>
+
+            <CreateClassModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSuccess={fetchData} />
 
             {/* Filters */}
             <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4">

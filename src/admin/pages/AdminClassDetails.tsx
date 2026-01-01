@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Users, X } from 'lucide-react'
+import { ArrowLeft, Users, X, Calendar, Clock, Plus, Trash2 } from 'lucide-react'
+
 
 interface Student {
     id: string
@@ -24,13 +25,29 @@ interface ClassDetails {
         course_name: string
         short_code: string | null
     }
+
+}
+
+interface ClassSchedule {
+    id: number
+    day_of_week: string
+    start_time: string
+    duration_minutes: number
 }
 
 export default function AdminClassDetails() {
     const { id } = useParams()
     const [classDetails, setClassDetails] = useState<ClassDetails | null>(null)
     const [students, setStudents] = useState<Student[]>([])
+    const [schedules, setSchedules] = useState<ClassSchedule[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Form State
+    const [newSchedule, setNewSchedule] = useState({
+        day_of_week: 'Monday',
+        start_time: '10:00',
+        duration_minutes: 60
+    })
 
     useEffect(() => {
         if (id) {
@@ -57,7 +74,16 @@ export default function AdminClassDetails() {
                 .single()
 
             if (classError) throw classError
+
             setClassDetails(classData)
+
+            // 1.5 Fetch Schedules for this specific Class (Batch)
+            const { data: scheduleData } = await supabase
+                .from('class_schedules')
+                .select('*')
+                .eq('class_id', id) // Use the class ID from params
+
+            setSchedules(scheduleData || [])
 
             // 2. Fetch Enrolled Students
             // We join enrollments -> profiles
@@ -121,6 +147,44 @@ export default function AdminClassDetails() {
         }
     }
 
+    const handleAddSchedule = async () => {
+        if (!classDetails) return
+        try {
+            const { data, error } = await supabase
+                .from('class_schedules')
+                .insert({
+                    course_id: classDetails.course.id, // Linked to Course
+                    class_id: id, // Link to this specific batch
+                    day_of_week: newSchedule.day_of_week,
+                    start_time: newSchedule.start_time,
+                    duration_minutes: newSchedule.duration_minutes
+                })
+                .select()
+
+            if (error) throw error
+            setSchedules([...schedules, data[0]])
+            // Reset form (optional)
+        } catch (error) {
+            console.error('Error adding schedule:', error)
+            alert('Failed to add schedule')
+        }
+    }
+
+    const handleDeleteSchedule = async (id: number) => {
+        if (!confirm('Delete this schedule?')) return
+        try {
+            const { error } = await supabase
+                .from('class_schedules')
+                .delete()
+                .eq('id', id)
+
+            if (error) throw error
+            setSchedules(prev => prev.filter(s => s.id !== id))
+        } catch (error) {
+            console.error('Error deleting schedule:', error)
+        }
+    }
+
     if (loading) return <div className="p-8 text-center text-slate-500">Loading details...</div>
     if (!classDetails) return <div className="p-8 text-center text-red-500">Class not found</div>
 
@@ -176,7 +240,96 @@ export default function AdminClassDetails() {
                 </div>
             </div>
 
-            {/* Students List */}
+            {/* Weekly Schedule Section */}
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <Calendar className="text-indigo-600" />
+                        Weekly Class Schedule
+                    </h2>
+                </div>
+
+                <div className="flex flex-col lg:flex-row gap-8">
+                    {/* List Existing Schedules */}
+                    <div className="flex-1 space-y-3">
+                        {schedules.length === 0 ? (
+                            <p className="text-slate-400 italic text-sm">No regular classes scheduled.</p>
+                        ) : (
+                            schedules.map(sched => (
+                                <div key={sched.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shrink-0">
+                                            {sched.day_of_week.substring(0, 3)}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-700">{sched.day_of_week}</p>
+                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                                <Clock size={12} />
+                                                <span>{sched.start_time.slice(0, 5)}</span>
+                                                <span>•</span>
+                                                <span>{sched.duration_minutes} mins</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteSchedule(sched.id)}
+                                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Add New Schedule Form */}
+                    <div className="w-full lg:w-80 bg-slate-50 p-5 rounded-xl border border-slate-100 h-fit">
+                        <h3 className="font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">Add New Class Time</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 mb-1">Day</label>
+                                <select
+                                    className="w-full px-3 py-2 rounded-lg border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                    value={newSchedule.day_of_week}
+                                    onChange={e => setNewSchedule({ ...newSchedule, day_of_week: e.target.value })}
+                                >
+                                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                                        <option key={d} value={d}>{d}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1">Start Time</label>
+                                    <input
+                                        type="time"
+                                        className="w-full px-3 py-2 rounded-lg border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        value={newSchedule.start_time}
+                                        onChange={e => setNewSchedule({ ...newSchedule, start_time: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1">Duration (min)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full px-3 py-2 rounded-lg border-slate-200 text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                        value={newSchedule.duration_minutes}
+                                        onChange={e => setNewSchedule({ ...newSchedule, duration_minutes: Number(e.target.value) })}
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                onClick={handleAddSchedule}
+                                className="w-full py-2.5 bg-indigo-600 text-white rounded-lg font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
+                            >
+                                <Plus size={16} /> Add Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Students List Link */}
             <h2 className="text-xl font-bold text-slate-800 mb-6">Enrolled Students</h2>
 
             {students.length === 0 ? (
