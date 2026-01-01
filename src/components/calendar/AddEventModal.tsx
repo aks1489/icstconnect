@@ -60,7 +60,7 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
                 start_datetime: `${date}T${startTime}:00`,
                 end_datetime: `${date}T${startTime}:00`, // Ideally calc end time
                 event_type: eventType,
-                created_by: 'admin' // In real app, use user id
+                // created_by removed as strictly not in schema
             }
 
             if (eventType === 'extra_class') {
