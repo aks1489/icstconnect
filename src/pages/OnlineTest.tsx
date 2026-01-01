@@ -99,39 +99,66 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-20">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-16"
-                >
-                    <span className="inline-block py-1 px-3 rounded-full bg-indigo-50 text-indigo-600 text-sm font-bold mb-4">
-                        Assessment Zone
-                    </span>
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
-                        Test Your Knowledge
-                    </h1>
-                    <p className="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
-                        Challenge yourself with our interactive quizzes. Track your progress, identify gaps, and master your subjects.
-                    </p>
+        <div className={`min-h-screen ${isStudentPortal ? 'bg-transparent' : 'bg-slate-50 pt-24 pb-20'}`}>
+            <div className={`container mx-auto px-4 ${isStudentPortal ? '' : 'max-w-6xl'}`}>
+                {isStudentPortal ? (
+                    // --- Student Portal Header ---
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-6">
+                        <div>
+                            <h1 className="text-2xl font-bold text-slate-900">Available Tests</h1>
+                            <p className="text-slate-500 text-sm mt-1">Select a test to start your assessment</p>
+                        </div>
 
-                    {/* Filter Tabs */}
-                    <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 w-fit mx-auto mt-8">
-                        {['all', 'public', 'my-courses'].map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => setFilter(f as any)}
-                                className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${filter === f
-                                    ? 'bg-slate-900 text-white shadow-md'
-                                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
-                                    } capitalize`}
-                            >
-                                {f.replace('-', ' ')}
-                            </button>
-                        ))}
+                        {/* Compact Filter Tabs */}
+                        <div className="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200 w-fit">
+                            {['all', 'public', 'my-courses'].map((f) => (
+                                <button
+                                    key={f}
+                                    onClick={() => setFilter(f as any)}
+                                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filter === f
+                                        ? 'bg-slate-900 text-white shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                        } capitalize`}
+                                >
+                                    {f.replace('-', ' ')}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </motion.div>
+                ) : (
+                    // --- Public Header ---
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-center mb-16"
+                    >
+                        <span className="inline-block py-1 px-3 rounded-full bg-indigo-50 text-indigo-600 text-sm font-bold mb-4">
+                            Assessment Zone
+                        </span>
+                        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">
+                            Test Your Knowledge
+                        </h1>
+                        <p className="text-slate-500 text-lg max-w-2xl mx-auto leading-relaxed">
+                            Challenge yourself with our interactive quizzes. Track your progress, identify gaps, and master your subjects.
+                        </p>
+
+                        {/* Filter Tabs */}
+                        <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 w-fit mx-auto mt-8">
+                            {['all', 'public', 'my-courses'].map((f) => (
+                                <button
+                                    key={f}
+                                    onClick={() => setFilter(f as any)}
+                                    className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${filter === f
+                                        ? 'bg-slate-900 text-white shadow-md'
+                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                                        } capitalize`}
+                                >
+                                    {f.replace('-', ' ')}
+                                </button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
 
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
