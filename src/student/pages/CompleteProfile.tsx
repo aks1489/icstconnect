@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { UserProfile } from '../../types'
@@ -8,6 +8,7 @@ import logo from '../../assets/logo.jpg'
 export default function CompleteProfile() {
     const { user, profile, refreshProfile } = useAuth()
     const navigate = useNavigate()
+    const { dismissAlert } = useOutletContext<any>() || {}
 
     const handleSubmit = async (data: Partial<UserProfile>) => {
         if (!user) return
@@ -74,6 +75,7 @@ export default function CompleteProfile() {
                             id: user.id
                         }}
                         onSubmit={handleSubmit}
+                        onInteraction={dismissAlert}
                     />
                 </div>
             </div>

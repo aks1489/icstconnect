@@ -36,106 +36,126 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
             ></div>
 
             {/* Modal Content */}
-            <div className={`relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 flex flex-col max-h-[90vh] ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
+            <div className={`relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl overflow-hidden transform transition-all duration-300 flex flex-col max-h-[90vh] ${isOpen ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'}`}>
 
-                {/* Close Button */}
+                {/* Close Button - Floated */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md text-slate-800 hover:bg-white transition-all z-50 shadow-sm"
+                    className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm text-slate-500 hover:text-slate-900 z-50 transition-all border border-slate-100"
                 >
-                    <X size={24} />
+                    <X size={20} />
                 </button>
 
-                {/* Hero Header */}
-                <div className={`relative h-48 flex-shrink-0 ${course.color} flex items-center justify-center overflow-hidden`}>
-                    <div className="absolute inset-0 opacity-10 pattern-dots"></div>
+                {/* Hero Header - Centered & Clean matching image */}
+                <div className="relative pt-12 pb-8 px-6 bg-cyan-50/50 flex flex-col items-center text-center border-b border-cyan-100/50">
+                    {/* Background Pattern */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-100 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-100 rounded-full blur-2xl opacity-50 translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+                    {/* Duration Badge */}
+                    <div className="relative z-10 mb-4">
+                        <span className="inline-block px-4 py-1.5 rounded-full bg-white text-slate-800 text-xs font-bold shadow-sm border border-slate-100 uppercase tracking-wide">
+                            {course.duration || '6 Months'}
+                        </span>
+                    </div>
+
+                    {/* Title */}
+                    <h2 className="relative z-10 text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight mb-2 max-w-[80%]">
+                        {course.title}
+                    </h2>
+
+                    {/* Subtitle / Code (Optional) */}
+                    {course.course_name.includes('(') && (
+                        <p className="relative z-10 text-slate-500 font-medium">
+                            {course.course_name.match(/\(([^)]+)\)/)?.[1] || ''}
+                        </p>
+                    )}
+
+                    {/* Faint Background Icon */}
                     {(() => {
                         const Icon = getIcon(course.icon)
-                        return <Icon className="text-8xl text-current opacity-20 absolute -right-4 -bottom-4 transform rotate-12" size={96} />
+                        return <Icon className="absolute right-0 bottom-0 text-cyan-200/40 transform translate-x-1/4 translate-y-1/4 rotate-12 pointer-events-none" size={140} />
                     })()}
-
-                    <div className="relative z-10 text-center p-8 w-full">
-                        <span className="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-slate-900 text-xs font-bold mb-3 shadow-sm border border-white/30">
-                            {course.duration}
-                        </span>
-                        <h2 className="text-3xl font-bold text-slate-900 leading-tight">{course.title}</h2>
-                    </div>
                 </div>
 
                 {/* Content - Scrollable */}
-                <div className="p-8 overflow-y-auto custom-scrollbar">
-                    <div className="flex items-center gap-6 mb-8 pb-8 border-b border-slate-100">
-                        <div>
-                            <p className="text-slate-500 text-xs uppercase tracking-wider font-bold mb-1">Price</p>
-                            <p className="text-2xl font-bold text-slate-900">{course.price}</p>
-                        </div>
-                        <div className="h-10 w-px bg-slate-200"></div>
-                        <div>
-                            <p className="text-slate-500 text-xs uppercase tracking-wider font-bold mb-1">Duration</p>
-                            <p className="text-lg font-semibold text-slate-900">{course.duration}</p>
-                        </div>
-                        <div className="h-10 w-px bg-slate-200"></div>
-                        <div>
-                            <p className="text-slate-500 text-xs uppercase tracking-wider font-bold mb-1">Level</p>
-                            <p className="text-lg font-semibold text-slate-900">Beginner to Pro</p>
+                <div className="flex-1 overflow-y-auto custom-scrollbar bg-white">
+                    {/* Key Stats Row */}
+                    <div className="px-6 py-6 border-b border-slate-50">
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Price</p>
+                                <p className="text-xl font-extrabold text-slate-900">{course.price}</p>
+                            </div>
+                            <div className="border-l border-slate-100 pl-4">
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Duration</p>
+                                <p className="text-lg font-bold text-slate-900 leading-tight">
+                                    {course.duration?.split(' ')[0]} <br />
+                                    <span className="text-xs font-medium text-slate-500">{course.duration?.split(' ').slice(1).join(' ')}</span>
+                                </p>
+                            </div>
+                            <div className="border-l border-slate-100 pl-4">
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Level</p>
+                                <p className="text-sm font-bold text-slate-900 leading-tight mt-1">Beginner to Pro</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="space-y-6">
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Course Syllabus</h3>
-                            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                                <ul className="grid grid-cols-1 gap-2">
-                                    {course.syllabus && course.syllabus.map((topic, index) => (
-                                        <li key={index} className="flex items-start gap-2 text-slate-700 font-medium">
-                                            <Check className="text-blue-600 mt-1 shrink-0" size={16} />
-                                            <span>{topic}</span>
+                    {/* Divider */}
+
+                    {/* Syllabus Section */}
+                    <div className="px-6 py-6">
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            Course Syllabus
+                        </h3>
+
+                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                            {course.syllabus && course.syllabus.length > 0 ? (
+                                <ul className="space-y-3">
+                                    {course.syllabus.map((topic, index) => (
+                                        <li key={index} className="flex items-start gap-3">
+                                            <div className="bg-blue-100 text-blue-600 rounded-full p-0.5 mt-0.5 shrink-0">
+                                                <Check size={12} strokeWidth={3} />
+                                            </div>
+                                            <span className="text-sm text-slate-700 font-medium leading-snug">{topic}</span>
                                         </li>
                                     ))}
                                 </ul>
-                            </div>
-                        </div>
-
-                        {course.fees && (
-                            <div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">Fee Structure</h3>
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
-                                        <p className="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Admission</p>
-                                        <p className="text-xl font-bold text-slate-900">{course.fees.admission ? `₹${course.fees.admission}` : 'N/A'}</p>
-                                    </div>
-                                    <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 text-center">
-                                        <p className="text-xs text-purple-600 font-bold uppercase tracking-wider mb-1">Monthly</p>
-                                        <p className="text-xl font-bold text-slate-900">{course.fees.monthly ? `₹${course.fees.monthly}` : 'N/A'}</p>
-                                    </div>
-                                    <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center">
-                                        <p className="text-xs text-emerald-600 font-bold uppercase tracking-wider mb-1">Total</p>
-                                        <p className="text-xl font-bold text-slate-900">{course.fees.total ? `₹${course.fees.total}` : 'N/A'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">Certification</h3>
-                            <p className="text-slate-600">
-                                Upon successful completion of this course, you will receive a verified certificate from ICST Chowberia, which is recognized by leading companies.
-                            </p>
+                            ) : (
+                                <p className="text-sm text-slate-500 italic">Detailed syllabus available upon enrollment.</p>
+                            )}
                         </div>
                     </div>
+
+                    {/* Fees Section (if matches) */}
+                    {course.fees && (
+                        <div className="px-6 pb-6">
+                            <h3 className="text-lg font-bold text-slate-900 mb-4">Fee Breakdown</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Admission</p>
+                                    <p className="text-lg font-bold text-slate-900">{course.fees.admission ? `₹${course.fees.admission}` : '-'}</p>
+                                </div>
+                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Monthly</p>
+                                    <p className="text-lg font-bold text-slate-900">{course.fees.monthly ? `₹${course.fees.monthly}` : '-'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer Action */}
-                <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-4 flex-shrink-0">
+                <div className="p-6 border-t border-slate-100 bg-white flex items-center justify-between gap-4 flex-shrink-0 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     <button
                         onClick={onClose}
-                        className="px-6 py-3 rounded-xl font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
+                        className="text-sm font-semibold text-slate-500 hover:text-slate-800 px-4 py-2 transition-colors"
                     >
                         Close
                     </button>
-                    <button className="px-8 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
-                        <span>Enroll Now</span>
-                        <ArrowRight size={20} />
+                    <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                        Enroll Now
+                        <ArrowRight size={18} />
                     </button>
                 </div>
             </div>

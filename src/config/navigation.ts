@@ -48,7 +48,7 @@ export const STUDENT_ACTIONS: NavItem[] = [
     },
     {
         label: 'Online Tests',
-        path: '/online-test',
+        path: '/student/tests',
         icon: Laptop,
         color: 'text-blue-600',
         description: 'Take practice exams and view results'
@@ -128,6 +128,13 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: CalendarDays,
         color: 'text-purple-600',
         description: 'Manage schedules and events'
+    },
+    {
+        label: 'Tests',
+        path: '/admin/tests',
+        icon: FileText,
+        color: 'text-cyan-600',
+        description: 'Manage assessments'
     },
     {
         label: 'Discount Claims',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -19,20 +19,11 @@ interface NavigationProps {
 }
 
 export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user }) => {
-    const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
 
     // Check if we are on admin or teacher login pages
     const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     const navLinks = [
         { name: 'Home', href: '/' },
@@ -43,24 +34,17 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
         { name: 'About Us', href: '/about' },
     ];
 
-    // Determine if we should use light text (white) or dark text
-    // Light text not only when scrolled, but also when on dark-themed auth pages (even if not scrolled)
-    const useLightText = isScrolled || isRestrictedAuthPage;
+
 
     const getLinkClasses = (isActive: boolean) => {
-        if (useLightText) {
-            return isActive ? 'text-white font-bold' : 'text-slate-300 hover:text-white';
-        }
+        // Always dark text
         return isActive ? 'text-slate-900 font-bold' : 'text-slate-600 hover:text-slate-900';
     };
 
     return (
         <>
             <nav
-                className={`fixed top-0 left-0 right-0 z-[1040] transition-all duration-300 ${isScrolled
-                    ? 'bg-slate-900/90 backdrop-blur-md shadow-lg py-3'
-                    : 'bg-transparent py-5'
-                    }`}
+                className="fixed top-0 left-0 right-0 z-[1040] bg-white/90 backdrop-blur-md shadow-sm py-3 transition-all duration-300"
             >
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-center justify-between">
@@ -72,8 +56,8 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300"
                             />
                             <div className="flex flex-col">
-                                <span className={`font-bold text-lg leading-none tracking-tight transition-colors duration-300 ${useLightText ? 'text-white' : 'text-slate-800'}`}>ICST</span>
-                                <span className={`text-[0.65rem] font-medium tracking-wider uppercase transition-colors duration-300 ${useLightText ? 'text-slate-400' : 'text-slate-500'}`}>Chowberia</span>
+                                <span className="font-bold text-lg leading-none tracking-tight transition-colors duration-300 text-slate-900">ICST</span>
+                                <span className="text-[0.65rem] font-medium tracking-wider uppercase transition-colors duration-300 text-slate-500">Chowberia</span>
                             </div>
                         </Link>
 
@@ -87,14 +71,14 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                             className={`text-sm font-medium transition-colors relative group py-2 no-underline whitespace-nowrap ${getLinkClasses(location.pathname === link.href)}`}
                                         >
                                             {link.name}
-                                            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full ${useLightText ? 'bg-white' : 'bg-slate-800'} ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
+                                            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full bg-slate-900 ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
                                                 }`}></span>
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
 
-                            <div className={`h-6 w-px mx-2 transition-colors duration-300 ${useLightText ? 'bg-slate-700' : 'bg-slate-200'}`}></div>
+                            <div className="h-6 w-px mx-2 transition-colors duration-300 bg-slate-200"></div>
 
                             {user ? (
                                 <Link
@@ -108,7 +92,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 !isRestrictedAuthPage && (
                                     <button
                                         onClick={onLoginClick}
-                                        className={`px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap ${useLightText ? 'bg-white text-slate-900 hover:bg-slate-100 shadow-white/10' : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-slate-900/20'}`}
+                                        className="px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap bg-slate-900 text-white hover:bg-slate-800 hover:shadow-slate-900/20"
                                     >
                                         <User size={18} />
                                         <span>Login</span>
@@ -119,7 +103,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
 
                         {/* Mobile Menu Button */}
                         <button
-                            className={`lg:hidden text-2xl focus:outline-none transition-colors duration-300 ${useLightText ? 'text-white' : 'text-slate-800'}`}
+                            className="lg:hidden text-2xl focus:outline-none transition-colors duration-300 text-slate-800"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
                             {isMobileMenuOpen ? <X /> : <Menu />}
@@ -137,6 +121,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 className={`block py-3 px-4 rounded-lg hover:bg-slate-50 font-medium transition-colors no-underline ${location.pathname === link.href ? 'text-slate-900 bg-slate-50' : 'text-slate-600'
                                     }`}
                                 onClick={() => setIsMobileMenuOpen(false)}
+
                             >
                                 {link.name}
                             </Link>

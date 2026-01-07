@@ -1,6 +1,6 @@
-
 import { useState, useEffect, useMemo } from 'react'
 import { Search, Hash, X } from 'lucide-react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
@@ -10,12 +10,15 @@ import type { Course } from '../types/course'
 type Duration = '3 Months' | '6 Months' | '12 Months' | '18 Months' | 'All'
 
 const CoursesPage = () => {
+    const { courseId } = useParams()
+    const navigate = useNavigate()
     const [activeFilter, setActiveFilter] = useState<Duration>('All')
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
     const [loading, setLoading] = useState(true)
     const [courses, setCourses] = useState<Course[]>([])
     const [searchQuery, setSearchQuery] = useState('')
 
+    // Fetch Courses
     useEffect(() => {
         const fetchCourses = async () => {
             try {
@@ -31,11 +34,25 @@ const CoursesPage = () => {
         fetchCourses()
     }, [])
 
+    // Deep Linking Effect: Sync URL param with Modal State
+    useEffect(() => {
+        if (!courses.length) return
+
+        if (courseId) {
+            const course = courses.find(c => c.id.toString() === courseId)
+            if (course) {
+                setSelectedCourse(course)
+            }
+        } else {
+            setSelectedCourse(null)
+        }
+    }, [courseId, courses])
+
     // Real-time keyboard search activation
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             // Focus search on any key press if not already focused on an input
-            if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+            if (e.key && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
                 const searchInput = document.getElementById('course-search')
                 if (searchInput) {
                     searchInput.focus()
@@ -64,6 +81,14 @@ const CoursesPage = () => {
             return matchesDuration && (matchesTitle || matchesDesc || matchesTags)
         })
     }, [activeFilter, courses, searchQuery])
+
+    const handleCourseClick = (course: Course) => {
+        navigate(`/courses/${course.id}`)
+    }
+
+    const handleCloseModal = () => {
+        navigate('/courses')
+    }
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-slate-50">
@@ -164,7 +189,7 @@ const CoursesPage = () => {
                         filteredCourses.map((course) => (
                             <div
                                 key={course.id}
-                                onClick={() => setSelectedCourse(course)}
+                                onClick={() => handleCourseClick(course)}
                                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 flex flex-col h-full cursor-pointer"
                             >
                                 <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
@@ -199,7 +224,10 @@ const CoursesPage = () => {
                                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
                                         <span className="text-slate-900 font-bold">{course.price}</span>
                                         <button
-                                            onClick={() => setSelectedCourse(course)}
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                handleCourseClick(course)
+                                            }}
                                             className="text-blue-600 font-semibold text-sm hover:underline"
                                         >
                                             View Details
@@ -216,7 +244,7 @@ const CoursesPage = () => {
             <CourseDetailsModal
                 course={selectedCourse}
                 isOpen={!!selectedCourse}
-                onClose={() => setSelectedCourse(null)}
+                onClose={handleCloseModal}
             />
         </div>
     )

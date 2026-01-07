@@ -9,9 +9,10 @@ interface ProfileFormProps {
     onSubmit: (data: Partial<UserProfile>) => Promise<void>
     isEditing?: boolean
     onCancel?: () => void
+    onInteraction?: () => void
 }
 
-export default function ProfileForm({ initialData, onSubmit, isEditing = false, onCancel }: ProfileFormProps) {
+export default function ProfileForm({ initialData, onSubmit, isEditing = false, onCancel, onInteraction }: ProfileFormProps) {
     const [formData, setFormData] = useState<Partial<UserProfile>>({
         full_name: '',
         father_name: '',
@@ -30,6 +31,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
     const [loading, setLoading] = useState(false)
     const [pincodeLoading, setPincodeLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
     const [postOffices, setPostOffices] = useState<any[]>([])
 
     // Sync initial data
@@ -57,12 +59,12 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                             ...prev,
                             district: firstOffice.District,
                             state: firstOffice.State,
-                            // If only one post office, select it automatically
-                            post_office: offices.length === 1 ? offices[0].Name : prev.post_office
+                            // Verify if current post office is valid for new pin, otherwise reset or auto-select
+                            post_office: offices.length === 1 ? offices[0].Name : (offices.find((o: any) => o.Name === prev.post_office) ? prev.post_office : '')
                         }))
                     } else {
                         setPostOffices([])
-                        // Don't clear district/state immediately to avoid annoying flickering if user is typing
+                        setFormData(prev => ({ ...prev, district: '', state: '', post_office: '' }))
                     }
                 } catch (err) {
                     console.error('Pincode lookup failed:', err)
@@ -71,6 +73,10 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                 }
             } else {
                 setPostOffices([])
+                // Reset dependent fields if pin is invalid
+                if (formData.district || formData.state || formData.post_office) {
+                    setFormData(prev => ({ ...prev, district: '', state: '', post_office: '' }))
+                }
             }
         }
 
@@ -80,15 +86,57 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target
+        onInteraction?.()
         setFormData(prev => ({ ...prev, [name]: value }))
+        // Clear error when user types
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev }
+                delete newErrors[name]
+                return newErrors
+            })
+        }
     }
 
     const handleImageUpload = (url: string) => {
+        onInteraction?.()
         setFormData(prev => ({ ...prev, avatar_url: url }))
+    }
+
+    const validateForm = () => {
+        const errors: Record<string, string> = {}
+
+        if (!formData.full_name?.trim()) errors.full_name = "Name is required"
+        if (!formData.father_name?.trim()) errors.father_name = "Father's name is required"
+        if (!formData.dob) errors.dob = "Date of birth is required"
+
+        if (!formData.phone) {
+            errors.phone = "Phone number is required"
+        } else if (formData.phone.length !== 10) {
+            errors.phone = "Phone number must be 10 digits"
+        }
+
+        if (!formData.pincode) {
+            errors.pincode = "Pincode is required"
+        } else if (formData.pincode.length !== 6) {
+            errors.pincode = "Pincode must be 6 digits"
+        }
+
+        if (!formData.post_office) errors.post_office = "Please select a post office"
+        if (!formData.address?.trim()) errors.address = "Address is required"
+
+        setFieldErrors(errors)
+        return Object.keys(errors).length === 0
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (!validateForm()) {
+            // Scroll to first error?
+            return
+        }
+
         setLoading(true)
         setError(null)
 
@@ -103,7 +151,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
             {/* Avatar Section */}
             <div className="flex justify-center mb-6">
                 <ImageUpload
@@ -116,61 +164,69 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Full Name</label>
+                    <label className="text-sm font-semibold text-slate-700">Full Name <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         name="full_name"
-                        required
                         value={formData.full_name}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.full_name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
                         placeholder="Student Name"
                     />
+                    {fieldErrors.full_name && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.full_name}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Father's Name</label>
+                    <label className="text-sm font-semibold text-slate-700">Father's Name <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         name="father_name"
-                        required
                         value={formData.father_name || ''}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.father_name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
                         placeholder="Father's Name"
                     />
+                    {fieldErrors.father_name && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.father_name}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Date of Birth</label>
+                    <label className="text-sm font-semibold text-slate-700">Date of Birth <span className="text-red-500">*</span></label>
                     <input
                         type="date"
                         name="dob"
-                        required
                         value={formData.dob || ''}
                         onChange={handleChange}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.dob ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
                     />
+                    {fieldErrors.dob && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.dob}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Phone Number</label>
+                    <label className="text-sm font-semibold text-slate-700">Phone Number <span className="text-red-500">*</span></label>
                     <div className="relative">
                         <span className="absolute left-4 top-2.5 text-slate-400 font-medium">+91</span>
                         <input
                             type="tel"
                             name="phone"
-                            required
                             maxLength={10}
                             value={formData.phone || ''}
                             onChange={(e) => {
                                 const val = e.target.value.replace(/\D/g, '')
+                                onInteraction?.()
                                 setFormData(prev => ({ ...prev, phone: val }))
+                                if (fieldErrors.phone) {
+                                    setFieldErrors(prev => {
+                                        const newErrors = { ...prev }
+                                        delete newErrors.phone
+                                        return newErrors
+                                    })
+                                }
                             }}
-                            className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                            className={`w-full pl-12 pr-4 py-2.5 rounded-xl border ${fieldErrors.phone ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
                             placeholder="9876543210"
                         />
                     </div>
+                    {fieldErrors.phone && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.phone}</p>}
                 </div>
             </div>
 
@@ -182,20 +238,28 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Pincode with Loader */}
                         <div className="space-y-2 relative">
-                            <label className="text-sm font-semibold text-slate-700">Pincode</label>
+                            <label className="text-sm font-semibold text-slate-700">Pincode <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="pincode"
-                                required
                                 maxLength={6}
                                 value={formData.pincode || ''}
                                 onChange={(e) => {
                                     const val = e.target.value.replace(/\D/g, '')
+                                    onInteraction?.()
                                     setFormData(prev => ({ ...prev, pincode: val }))
+                                    if (fieldErrors.pincode) {
+                                        setFieldErrors(prev => {
+                                            const newErrors = { ...prev }
+                                            delete newErrors.pincode
+                                            return newErrors
+                                        })
+                                    }
                                 }}
-                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.pincode ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
                                 placeholder="110001"
                             />
+                            {fieldErrors.pincode && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.pincode}</p>}
                             {pincodeLoading && (
                                 <div className="absolute right-3 top-[34px]">
                                     <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
@@ -205,14 +269,13 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
 
                         {/* Post Office Dropdown */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700">Post Office</label>
+                            <label className="text-sm font-semibold text-slate-700">Post Office <span className="text-red-500">*</span></label>
                             <select
                                 name="post_office"
-                                required
                                 value={formData.post_office || ''}
                                 onChange={handleChange}
                                 disabled={pincodeLoading || postOffices.length === 0}
-                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400"
+                                className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.post_office ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400`}
                             >
                                 <option value="">Select Post Office</option>
                                 {postOffices.map((po, idx) => (
@@ -221,6 +284,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                     </option>
                                 ))}
                             </select>
+                            {fieldErrors.post_office && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.post_office}</p>}
                         </div>
                     </div>
 
@@ -259,16 +323,16 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700">Full Address</label>
+                        <label className="text-sm font-semibold text-slate-700">Full Address <span className="text-red-500">*</span></label>
                         <textarea
                             name="address"
-                            required
                             rows={3}
                             value={formData.address || ''}
                             onChange={handleChange}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
+                            className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.address ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all resize-none`}
                             placeholder="House No, Street, Locality"
                         />
+                        {fieldErrors.address && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.address}</p>}
                     </div>
                 </div>
             </div>
@@ -282,10 +346,13 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                 type="checkbox"
                                 name="enrollment_center"
                                 checked={formData.enrollment_center === 'ICST Chowberia'}
-                                onChange={(e) => setFormData(prev => ({
-                                    ...prev,
-                                    enrollment_center: e.target.checked ? 'ICST Chowberia' : ''
-                                }))}
+                                onChange={(e) => {
+                                    onInteraction?.()
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        enrollment_center: e.target.checked ? 'ICST Chowberia' : ''
+                                    }))
+                                }}
                                 className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-indigo-300 transition-all checked:border-indigo-600 checked:bg-indigo-600 focus:ring-2 focus:ring-indigo-200"
                             />
                             <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100">

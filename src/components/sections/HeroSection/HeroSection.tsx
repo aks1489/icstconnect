@@ -7,10 +7,9 @@ import {
     FileCode2,
     Wind,
     ArrowRight,
-    PlayCircle,
-    ChevronLeft,
-    ChevronRight
+    PlayCircle
 } from 'lucide-react'
+import InteractiveRobot from '../../common/InteractiveRobot'
 
 const HeroSection = () => {
     const technologies = [
@@ -20,26 +19,9 @@ const HeroSection = () => {
         { name: 'TailwindCSS', color: '#06B6D4', icon: Wind }
     ]
 
-    const slides = [
-        {
-            image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            title: "Learn Coding",
-            desc: "Master the latest technologies."
-        },
-        {
-            image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            title: "Build Projects",
-            desc: "Hands-on experience with real projects."
-        },
-        {
-            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-            title: "Career Growth",
-            desc: "Get placed in top IT companies."
-        }
-    ]
+
 
     const [currentTechIndex, setCurrentTechIndex] = useState(0)
-    const [currentSlide, setCurrentSlide] = useState(0)
 
     useEffect(() => {
         const techInterval = setInterval(() => {
@@ -48,25 +30,12 @@ const HeroSection = () => {
         return () => clearInterval(techInterval)
     }, [])
 
-    useEffect(() => {
-        const slideInterval = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % slides.length)
-        }, 5000)
-        return () => clearInterval(slideInterval)
-    }, [])
 
-    const nextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }
-
-    const prevSlide = () => {
-        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
-    }
 
     const currentTech = technologies[currentTechIndex]
 
     return (
-        <section className="relative py-12 md:py-20 lg:py-24 bg-slate-50 overflow-hidden">
+        <section className="relative pt-28 pb-12 md:pt-32 md:pb-24 lg:pt-36 bg-slate-50 overflow-hidden">
             {/* Background Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <motion.div
@@ -139,61 +108,14 @@ const HeroSection = () => {
                         </div>
                     </motion.div>
 
-                    {/* Right Side: Carousel */}
+                    {/* Right Side: Interactive Robot */}
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8 }}
-                        className="w-full lg:w-1/2 order-1 lg:order-2"
+                        className="w-full lg:w-1/2 order-1 lg:order-2 flex justify-center"
                     >
-                        <div className="relative shadow-2xl shadow-slate-200 rounded-3xl overflow-hidden aspect-[4/3] lg:aspect-square group border-4 border-white">
-                            <AnimatePresence initial={false}>
-                                <motion.div
-                                    key={currentSlide}
-                                    initial={{ opacity: 0, scale: 1.1 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.7 }}
-                                    className="absolute inset-0"
-                                >
-                                    <img src={slides[currentSlide].image} className="w-full h-full object-cover" alt={slides[currentSlide].title} />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                                        <motion.h5
-                                            initial={{ y: 20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: 0.3 }}
-                                            className="text-3xl font-bold mb-2"
-                                        >
-                                            {slides[currentSlide].title}
-                                        </motion.h5>
-                                        <motion.p
-                                            initial={{ y: 20, opacity: 0 }}
-                                            animate={{ y: 0, opacity: 1 }}
-                                            transition={{ delay: 0.4 }}
-                                            className="text-white/80 text-lg"
-                                        >
-                                            {slides[currentSlide].desc}
-                                        </motion.p>
-                                    </div>
-                                </motion.div>
-                            </AnimatePresence>
-
-                            <div className="absolute bottom-8 right-8 flex gap-2 z-10">
-                                <button
-                                    onClick={prevSlide}
-                                    className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-all"
-                                >
-                                    <ChevronLeft />
-                                </button>
-                                <button
-                                    onClick={nextSlide}
-                                    className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-white/20 transition-all"
-                                >
-                                    <ChevronRight />
-                                </button>
-                            </div>
-                        </div>
+                        <InteractiveRobot />
                     </motion.div>
                 </div>
             </div>
