@@ -21,7 +21,7 @@ export default function AdminCalendar() {
                 </button>
             </div>
 
-            <GlobalCalendar isAdmin={true} />
+            <GlobalCalendar />
         </div>
     )
 }

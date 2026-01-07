@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
 interface TestLayoutProps {
@@ -6,7 +6,7 @@ interface TestLayoutProps {
     title?: string;
 }
 
-export default function TestLayout({ children, title = "Online Assessment" }: TestLayoutProps) {
+export default function TestLayout({ children }: TestLayoutProps) {
     return (
         <div className="min-h-screen bg-slate-50 relative overflow-hidden font-inter selection:bg-indigo-100 selection:text-indigo-900">
             {/* Animated Background Elements */}
