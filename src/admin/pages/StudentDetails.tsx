@@ -15,6 +15,7 @@ interface Enrollment {
         icon: string
         color: string
     }
+    class_id?: number | null
 }
 
 interface Course {
@@ -451,12 +452,14 @@ export default function StudentDetails() {
                                                 Batch: {enrollment.class_id ? `ID #${enrollment.class_id}` : 'N/A'}
                                                 {/* Ideally we fetch batch name, but ID proves the link for now */}
                                             </span>
-                                            <button
-                                                onClick={() => openTransferModal(enrollment.course_id, enrollment.class_id)}
-                                                className="text-xs text-indigo-600 font-bold hover:underline"
-                                            >
-                                                Switch Batch
-                                            </button>
+                                            {enrollment.class_id && (
+                                                <button
+                                                    onClick={() => openTransferModal(enrollment.course_id, enrollment.class_id!)}
+                                                    className="text-xs text-indigo-600 font-bold hover:underline"
+                                                >
+                                                    Switch Batch
+                                                </button>
+                                            )}
                                         </div>
 
                                         <div>
