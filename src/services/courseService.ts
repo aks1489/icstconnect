@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import type { Course } from '../types/course'
+import type { Course, Module } from '../types/course'
 
 // Icon mapping helper
 const getCourseStyle = (title: string): { icon: string, color: string } => {
@@ -79,5 +79,44 @@ export const courseService = {
                 tags: tags
             }
         }) as Course[]
+    },
+
+    async getCourseStructure(courseId: number): Promise<Module[]> {
+        // 1. Fetch Modules
+        const { data: modulesData, error: modulesError } = await supabase
+            .from('course_modules')
+            .select('*')
+            .eq('course_id', courseId)
+            .order('sort_order', { ascending: true })
+
+        if (modulesError) throw modulesError
+
+        if (!modulesData || modulesData.length === 0) {
+            return []
+        }
+
+        // 2. Fetch Topics for these modules
+        const moduleIds = modulesData.map((m: any) => m.id)
+        const { data: topicsData, error: topicsError } = await supabase
+            .from('course_topics')
+            .select('*')
+            .in('module_id', moduleIds)
+            .order('sort_order', { ascending: true })
+
+        if (topicsError) throw topicsError
+
+        // 3. Merge Topics into Modules
+        return modulesData.map((m: any) => ({
+            id: m.id,
+            title: m.title,
+            description: m.description,
+            sort_order: m.sort_order,
+            topics: topicsData?.filter((t: any) => t.module_id === m.id).map((t: any) => ({
+                id: t.id,
+                title: t.title,
+                description: t.description,
+                sort_order: t.sort_order
+            })) || []
+        }))
     }
 }
