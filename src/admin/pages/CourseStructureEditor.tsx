@@ -33,7 +33,9 @@ export default function CourseStructureEditor() {
 
     const [activeModuleId, setActiveModuleId] = useState<number | null>(null)
     const [editingTopic, setEditingTopic] = useState<Topic | null>(null)
+
     const [isTopicModalOpen, setIsTopicModalOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     // Form States (Implicitly handled via uncontrolled inputs in original, keeping consistent)
 
@@ -43,9 +45,9 @@ export default function CourseStructureEditor() {
         }
     }, [id])
 
-    const fetchStructure = async () => {
+    const fetchStructure = async (isBackground = false) => {
         try {
-            setLoading(true)
+            if (!isBackground) setLoading(true)
             // Fetch Course Details
             const { data: course } = await supabase
                 .from('courses')
@@ -102,6 +104,7 @@ export default function CourseStructureEditor() {
         const description = formData.get('description') as string
 
         try {
+            setIsSaving(true)
             if (editingModule) {
                 await supabase
                     .from('course_modules')
@@ -147,10 +150,12 @@ export default function CourseStructureEditor() {
             }
             setShowModuleModal(false)
             setEditingModule(null)
-            fetchStructure()
+            fetchStructure(true)
         } catch (error) {
             console.error('Error saving module:', error)
             alert('Failed to save module')
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -171,7 +176,7 @@ export default function CourseStructureEditor() {
         if (!confirm('Delete this module? All topics will be deleted.')) return
         try {
             await supabase.from('course_modules').delete().eq('id', moduleId)
-            fetchStructure()
+            fetchStructure(true)
         } catch (error) {
             console.error('Error deleting module:', error)
         }
@@ -188,6 +193,7 @@ export default function CourseStructureEditor() {
         const description = formData.get('description') as string
 
         try {
+            setIsSaving(true)
             const currentModule = modules.find(m => m.id === activeModuleId)
             const currentTopicsCount = currentModule?.topics.length || 0
 
@@ -208,10 +214,12 @@ export default function CourseStructureEditor() {
             }
             setIsTopicModalOpen(false)
             setEditingTopic(null)
-            fetchStructure()
+            fetchStructure(true)
         } catch (error) {
             console.error('Error saving topic:', error)
             alert('Failed to save topic')
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -219,7 +227,7 @@ export default function CourseStructureEditor() {
         if (!confirm('Delete this topic?')) return
         try {
             await supabase.from('course_topics').delete().eq('id', topicId)
-            fetchStructure()
+            fetchStructure(true)
         } catch (error) {
             console.error('Error deleting topic:', error)
         }
@@ -255,7 +263,7 @@ export default function CourseStructureEditor() {
             } catch (error) {
                 console.error('Error reordering modules:', error)
                 alert('Failed to save module order.')
-                fetchStructure()
+                fetchStructure(true)
             }
         } else if (type === 'topic') {
             const newModules = [...modules]
@@ -324,7 +332,7 @@ export default function CourseStructureEditor() {
             } catch (error) {
                 console.error('Error reordering topics:', error)
                 alert('Failed to save topic order.')
-                fetchStructure()
+                fetchStructure(true)
             }
         }
     }
@@ -355,17 +363,6 @@ export default function CourseStructureEditor() {
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">Drag and drop modules and topics to reorder</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setEditingModule(null)
-                        setPendingTopics([''])
-                        setShowModuleModal(true)
-                    }}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
-                >
-                    <Plus size={20} />
-                    Add Module
-                </button>
             </div>
 
             <DragDropContext onDragEnd={handleDragEnd}>
@@ -511,17 +508,17 @@ export default function CourseStructureEditor() {
             {/* Module Modal */}
             {showModuleModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowModuleModal(false)}></div>
-                    <div className="relative w-full max-w-md bg-white max-h-[90vh] flex flex-col rounded-2xl shadow-xl overflow-hidden pt-6 pb-2 px-6">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !isSaving && setShowModuleModal(false)}></div>
+                    <div className="relative w-full max-w-md bg-white max-h-[90vh] flex flex-col rounded-2xl shadow-xl overflow-hidden pt-6 pb-2 px-6 animate-in zoom-in-95 duration-200">
                         <h2 className="text-xl font-bold text-slate-800 mb-4 shrink-0">{editingModule ? 'Edit Module' : 'New Module'}</h2>
                         <form onSubmit={handleSaveModule} className="space-y-4 flex flex-col min-h-0 overflow-y-auto pr-2 pb-4">
                             <div className="shrink-0">
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Module Title</label>
-                                <input name="title" required defaultValue={editingModule?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500" placeholder="e.g. Introduction to React" />
+                                <input name="title" disabled={isSaving} required defaultValue={editingModule?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="e.g. Introduction to React" />
                             </div>
                             <div className="shrink-0">
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
-                                <textarea name="description" rows={2} defaultValue={editingModule?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500" placeholder="Brief overview..." />
+                                <textarea name="description" disabled={isSaving} rows={2} defaultValue={editingModule?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="Brief overview..." />
                             </div>
 
                             {/* Topics Section - Only visible when creating a NEW module */}
@@ -533,10 +530,11 @@ export default function CourseStructureEditor() {
                                             <input
                                                 key={index}
                                                 value={topic}
+                                                disabled={isSaving}
                                                 onChange={(e) => handleTopicInputChange(index, e.target.value)}
                                                 onClick={() => handleTopicInputFocus(index)}
                                                 onFocus={() => handleTopicInputFocus(index)}
-                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 text-sm"
+                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 text-sm disabled:opacity-50 disabled:bg-slate-50"
                                                 placeholder={`Topic ${index + 1}`}
                                             />
                                         ))}
@@ -546,8 +544,17 @@ export default function CourseStructureEditor() {
                             )}
 
                             <div className="flex justify-end gap-3 pt-4 shrink-0 mt-auto">
-                                <button type="button" onClick={() => setShowModuleModal(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Module</button>
+                                <button type="button" disabled={isSaving} onClick={() => setShowModuleModal(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg disabled:opacity-50">Cancel</button>
+                                <button type="submit" disabled={isSaving} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                    {isSaving ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        'Save Module'
+                                    )}
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -557,26 +564,47 @@ export default function CourseStructureEditor() {
             {/* Topic Modal */}
             {isTopicModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsTopicModalOpen(false)}></div>
-                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !isSaving && setIsTopicModalOpen(false)}></div>
+                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
                         <h2 className="text-xl font-bold text-slate-800 mb-4">{editingTopic ? 'Edit Topic' : 'New Topic'}</h2>
                         <form onSubmit={handleSaveTopic} className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Topic Title</label>
-                                <input name="title" required defaultValue={editingTopic?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500" placeholder="e.g. Components & Props" />
+                                <input name="title" disabled={isSaving} required defaultValue={editingTopic?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="e.g. Components & Props" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
-                                <textarea name="description" rows={3} defaultValue={editingTopic?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500" placeholder="What will be covered?" />
+                                <textarea name="description" disabled={isSaving} rows={3} defaultValue={editingTopic?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="What will be covered?" />
                             </div>
                             <div className="flex justify-end gap-3 pt-4">
-                                <button type="button" onClick={() => setIsTopicModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Topic</button>
+                                <button type="button" disabled={isSaving} onClick={() => setIsTopicModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg disabled:opacity-50">Cancel</button>
+                                <button type="submit" disabled={isSaving} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                                    {isSaving ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        'Save Topic'
+                                    )}
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
             )}
+            {/* Floating Add Module Button */}
+            <button
+                onClick={() => {
+                    setEditingModule(null)
+                    setPendingTopics([''])
+                    setShowModuleModal(true)
+                }}
+                className="fixed bottom-8 right-8 w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 animate-in fade-in slide-in-from-bottom-4 z-[40]"
+                title="Add New Module"
+            >
+                <Plus size={28} />
+            </button>
         </div>
     )
 }

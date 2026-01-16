@@ -83,9 +83,9 @@ export default function StudentDetails() {
         }
     }
 
-    const fetchData = async () => {
+    const fetchData = async (isBackground = false) => {
         try {
-            setLoading(true)
+            if (!isBackground) setLoading(true)
             // 1. Fetch Student Profile
             const { data: studentData, error: studentError } = await supabase
                 .from('profiles')
@@ -177,7 +177,7 @@ export default function StudentDetails() {
 
             alert('Batch switched successfully!')
             setIsChangeBatchOpen(false)
-            fetchData()
+            fetchData(true)
         } catch (error) {
             console.error('Error switching batch:', error)
             alert('Failed to switch batch')
@@ -207,7 +207,7 @@ export default function StudentDetails() {
                     throw error
                 }
             } else {
-                fetchData()
+                fetchData(true)
                 setSelectedCourseId('')
                 setSelectedClassId('')
             }
@@ -245,7 +245,7 @@ export default function StudentDetails() {
                 .match({ student_id: id, course_id: courseId })
 
             if (error) throw error
-            fetchData()
+            fetchData(true)
         } catch (error) {
             console.error('Error unenrolling:', error)
             alert('Failed to unenroll student')
