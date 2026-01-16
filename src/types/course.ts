@@ -19,3 +19,18 @@ export interface Course {
     title: string // Computed for compatibility
     price: string // Computed for compatibility
 }
+
+export interface Topic {
+    id: number
+    title: string
+    description: string
+    sort_order: number
+}
+
+export interface Module {
+    id: number
+    title: string
+    description: string
+    sort_order: number
+    topics: Topic[]
+}

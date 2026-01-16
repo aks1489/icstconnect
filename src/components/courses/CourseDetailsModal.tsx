@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import type { Course } from '../../types/course'
+import type { Course, Module } from '../../types/course'
+import { courseService } from '../../services/courseService'
 import { X, Check, ArrowRight } from 'lucide-react'
 import { getIcon } from '../../utils/iconMapper'
 
@@ -11,17 +12,31 @@ interface CourseDetailsModalProps {
 
 const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen, onClose }) => {
     const [isVisible, setIsVisible] = useState(false)
+    const [modules, setModules] = useState<Module[]>([])
+    const [loadingStructure, setLoadingStructure] = useState(false)
 
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true)
             document.body.style.overflow = 'hidden'
+
+            // Fetch structure if course exists
+            if (course?.id) {
+                setLoadingStructure(true)
+                courseService.getCourseStructure(course.id)
+                    .then(setModules)
+                    .catch(e => {
+                        console.error('Error loading course structure', e)
+                        setModules([])
+                    })
+                    .finally(() => setLoadingStructure(false))
+            }
         } else {
             const timer = setTimeout(() => setIsVisible(false), 300)
             document.body.style.overflow = 'unset'
             return () => clearTimeout(timer)
         }
-    }, [isOpen])
+    }, [isOpen, course?.id])
 
     if (!isVisible && !isOpen) return null
 
@@ -109,22 +124,52 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                             Course Syllabus
                         </h3>
 
-                        <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
-                            {course.syllabus && course.syllabus.length > 0 ? (
-                                <ul className="space-y-3">
-                                    {course.syllabus.map((topic, index) => (
-                                        <li key={index} className="flex items-start gap-3">
-                                            <div className="bg-blue-100 text-blue-600 rounded-full p-0.5 mt-0.5 shrink-0">
-                                                <Check size={12} strokeWidth={3} />
-                                            </div>
-                                            <span className="text-sm text-slate-700 font-medium leading-snug">{topic}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <p className="text-sm text-slate-500 italic">Detailed syllabus available upon enrollment.</p>
-                            )}
-                        </div>
+                        {loadingStructure ? (
+                            <div className="space-y-3 animate-pulse">
+                                <div className="h-4 bg-slate-100 rounded w-3/4"></div>
+                                <div className="h-4 bg-slate-100 rounded w-1/2"></div>
+                                <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                            </div>
+                        ) : modules.length > 0 ? (
+                            <div className="space-y-4">
+                                {modules.map((module) => (
+                                    <div key={module.id} className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                                        <h4 className="font-bold text-slate-800 mb-3 text-base">{module.title}</h4>
+                                        {module.topics && module.topics.length > 0 ? (
+                                            <ul className="space-y-2">
+                                                {module.topics.map((topic) => (
+                                                    <li key={topic.id} className="flex items-start gap-3">
+                                                        <div className="bg-blue-100 text-blue-600 rounded-full p-0.5 mt-0.5 shrink-0">
+                                                            <Check size={12} strokeWidth={3} />
+                                                        </div>
+                                                        <span className="text-sm text-slate-700 font-medium leading-snug">{topic.title}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-xs text-slate-400 italic">No topics listed.</p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100/50">
+                                {course.syllabus && course.syllabus.length > 0 ? (
+                                    <ul className="space-y-3">
+                                        {course.syllabus.map((topic, index) => (
+                                            <li key={index} className="flex items-start gap-3">
+                                                <div className="bg-blue-100 text-blue-600 rounded-full p-0.5 mt-0.5 shrink-0">
+                                                    <Check size={12} strokeWidth={3} />
+                                                </div>
+                                                <span className="text-sm text-slate-700 font-medium leading-snug">{topic}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-slate-500 italic">Detailed syllabus available upon enrollment.</p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Fees Section (if matches) */}

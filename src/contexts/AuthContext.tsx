@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
@@ -22,38 +22,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<any | null>(null)
     const [loading, setLoading] = useState(true)
 
-    const [isInitialLoad, setIsInitialLoad] = useState(true)
+    // Using a ref to track the last seen access token to prevent redundant updates
+    const accessTokenRef = useRef<string | null>(null)
 
     useEffect(() => {
         let mounted = true
 
+        // Initial Session Check
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (mounted) {
-                setSession(session)
-                setUser(session?.user ?? null)
-                if (session?.user) {
-                    fetchProfile(session.user.id).then(() => {
-                        if (mounted) setIsInitialLoad(false)
+                if (session) {
+                    accessTokenRef.current = session.access_token
+                    setSession(session)
+                    setUser(session.user)
+                    // Initial load: keep loading true until profile is fetched
+                    fetchProfile(session.user.id).finally(() => {
+                        if (mounted) setLoading(false)
                     })
                 } else {
                     setLoading(false)
-                    setIsInitialLoad(false)
                 }
             }
         })
 
+        // Auth State Listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (mounted) {
-                setSession(session)
-                setUser(session?.user ?? null)
-                if (session?.user) {
-                    // Immediately set loading to true to prevent premature redirects
-                    setLoading(true)
-                    fetchProfile(session.user.id)
-                } else {
-                    setProfile(null)
-                    setLoading(false)
-                }
+            if (!mounted) return
+
+            const newAccessToken = session?.access_token ?? null
+
+            // If the token hasn't changed, ignore the update (prevents tab-switch re-renders)
+            if (newAccessToken === accessTokenRef.current) {
+                return
+            }
+
+            accessTokenRef.current = newAccessToken
+            setSession(session)
+            setUser(session?.user ?? null)
+
+            if (session?.user) {
+                // Background update: Do NOT set loading to true to avoid UI flash
+                // Just update the profile silently
+                fetchProfile(session.user.id)
+            } else {
+                // User signed out
+                setProfile(null)
+                setLoading(false)
             }
         })
 
@@ -65,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const fetchProfile = async (userId: string) => {
         try {
-            setLoading(true)
+            // Removed setLoading(true) to prevent full page loaders on background refreshes
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
@@ -79,12 +93,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         } catch (error) {
             console.error('Error:', error)
-        } finally {
-            setLoading(false)
         }
     }
 
     const signOut = async () => {
+        accessTokenRef.current = null // Reset token tracking
         await supabase.auth.signOut()
         setProfile(null)
     }
@@ -95,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     }
 
-    const value = {
+    const value = useMemo(() => ({
         session,
         user,
         profile,
@@ -105,11 +118,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin: profile?.role === 'admin',
         isTeacher: profile?.role === 'teacher',
         isProfileComplete: !!(profile && profile.full_name && profile.father_name && profile.address && profile.pincode && profile.dob)
-    }
+    }), [session, user, profile, loading])
 
     return (
         <AuthContext.Provider value={value}>
-            {!isInitialLoad && children}
+            {!loading && children}
         </AuthContext.Provider>
     )
 }
