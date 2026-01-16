@@ -29,6 +29,7 @@ export default function CourseStructureEditor() {
     // Edit States
     const [editingModule, setEditingModule] = useState<Module | null>(null)
     const [showModuleModal, setShowModuleModal] = useState(false)
+    const [pendingTopics, setPendingTopics] = useState<string[]>([''])
 
     const [activeModuleId, setActiveModuleId] = useState<number | null>(null)
     const [editingTopic, setEditingTopic] = useState<Topic | null>(null)
@@ -107,7 +108,8 @@ export default function CourseStructureEditor() {
                     .update({ title, description })
                     .eq('id', editingModule.id)
             } else {
-                await supabase
+                // 1. Insert Module
+                const { data: newModuleData, error: moduleError } = await supabase
                     .from('course_modules')
                     .insert({
                         course_id: id,
@@ -115,6 +117,33 @@ export default function CourseStructureEditor() {
                         description,
                         sort_order: modules.length
                     })
+                    .select()
+                    .single()
+
+                if (moduleError) throw moduleError
+
+                // 2. Insert Topics if any
+                const validTopics = pendingTopics
+                    .map(t => t.trim())
+                    .filter(t => t.length > 0)
+
+                if (validTopics.length > 0 && newModuleData) {
+                    const topicsToInsert = validTopics.map((topicTitle, index) => ({
+                        module_id: newModuleData.id,
+                        title: topicTitle,
+                        description: '', // Default empty description for quick add
+                        sort_order: index
+                    }))
+
+                    const { error: topicsError } = await supabase
+                        .from('course_topics')
+                        .insert(topicsToInsert)
+
+                    if (topicsError) {
+                        console.error('Error adding topics:', topicsError)
+                        alert('Module created but failed to save some topics.')
+                    }
+                }
             }
             setShowModuleModal(false)
             setEditingModule(null)
@@ -122,6 +151,19 @@ export default function CourseStructureEditor() {
         } catch (error) {
             console.error('Error saving module:', error)
             alert('Failed to save module')
+        }
+    }
+
+    const handleTopicInputChange = (index: number, value: string) => {
+        const newTopics = [...pendingTopics]
+        newTopics[index] = value
+        setPendingTopics(newTopics)
+    }
+
+    const handleTopicInputFocus = (index: number) => {
+        // If focusing the last input, add a new one
+        if (index === pendingTopics.length - 1) {
+            setPendingTopics([...pendingTopics, ''])
         }
     }
 
@@ -316,6 +358,7 @@ export default function CourseStructureEditor() {
                 <button
                     onClick={() => {
                         setEditingModule(null)
+                        setPendingTopics([''])
                         setShowModuleModal(true)
                     }}
                     className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
@@ -343,6 +386,7 @@ export default function CourseStructureEditor() {
                                     <button
                                         onClick={() => {
                                             setEditingModule(null)
+                                            setPendingTopics([''])
                                             setShowModuleModal(true)
                                         }}
                                         className="text-indigo-600 font-bold hover:text-indigo-700"
@@ -468,18 +512,40 @@ export default function CourseStructureEditor() {
             {showModuleModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowModuleModal(false)}></div>
-                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6">
-                        <h2 className="text-xl font-bold text-slate-800 mb-4">{editingModule ? 'Edit Module' : 'New Module'}</h2>
-                        <form onSubmit={handleSaveModule} className="space-y-4">
-                            <div>
+                    <div className="relative w-full max-w-md bg-white max-h-[90vh] flex flex-col rounded-2xl shadow-xl overflow-hidden pt-6 pb-2 px-6">
+                        <h2 className="text-xl font-bold text-slate-800 mb-4 shrink-0">{editingModule ? 'Edit Module' : 'New Module'}</h2>
+                        <form onSubmit={handleSaveModule} className="space-y-4 flex flex-col min-h-0 overflow-y-auto pr-2 pb-4">
+                            <div className="shrink-0">
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Module Title</label>
                                 <input name="title" required defaultValue={editingModule?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500" placeholder="e.g. Introduction to React" />
                             </div>
-                            <div>
+                            <div className="shrink-0">
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
                                 <textarea name="description" rows={2} defaultValue={editingModule?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500" placeholder="Brief overview..." />
                             </div>
-                            <div className="flex justify-end gap-3 pt-4">
+
+                            {/* Topics Section - Only visible when creating a NEW module */}
+                            {!editingModule && (
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-slate-700">Topics</label>
+                                    <div className="space-y-2">
+                                        {pendingTopics.map((topic, index) => (
+                                            <input
+                                                key={index}
+                                                value={topic}
+                                                onChange={(e) => handleTopicInputChange(index, e.target.value)}
+                                                onClick={() => handleTopicInputFocus(index)}
+                                                onFocus={() => handleTopicInputFocus(index)}
+                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 text-sm"
+                                                placeholder={`Topic ${index + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-slate-400">Click the last field to add a new topic.</p>
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-3 pt-4 shrink-0 mt-auto">
                                 <button type="button" onClick={() => setShowModuleModal(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg">Cancel</button>
                                 <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Module</button>
                             </div>
