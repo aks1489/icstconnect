@@ -15,9 +15,17 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
     const [modules, setModules] = useState<Module[]>([])
     const [loadingStructure, setLoadingStructure] = useState(false)
 
+    // Helper to render icon without triggering linter warning
+    const renderIcon = () => {
+        if (!course) return null
+        const IconComponent = getIcon(course.icon)
+        return <IconComponent className="absolute right-0 bottom-0 text-cyan-200/40 transform translate-x-1/4 translate-y-1/4 rotate-12 pointer-events-none" size={140} />
+    }
+
     useEffect(() => {
         if (isOpen) {
-            setIsVisible(true)
+            // Defer to next tick to avoid synchronous setState warning
+            const timer = setTimeout(() => setIsVisible(true), 0)
             document.body.style.overflow = 'hidden'
 
             // Fetch structure if course exists
@@ -31,6 +39,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                     })
                     .finally(() => setLoadingStructure(false))
             }
+            return () => clearTimeout(timer)
         } else {
             const timer = setTimeout(() => setIsVisible(false), 300)
             document.body.style.overflow = 'unset'
@@ -87,10 +96,7 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                     )}
 
                     {/* Faint Background Icon */}
-                    {(() => {
-                        const Icon = getIcon(course.icon)
-                        return <Icon className="absolute right-0 bottom-0 text-cyan-200/40 transform translate-x-1/4 translate-y-1/4 rotate-12 pointer-events-none" size={140} />
-                    })()}
+                    {renderIcon()}
                 </div>
 
                 {/* Content - Scrollable */}

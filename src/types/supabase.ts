@@ -9,16 +9,16 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
-            [key: string]: any
+            [key: string]: unknown
         }
         Views: {
-            [key: string]: any
+            [key: string]: unknown
         }
         Functions: {
-            [key: string]: any
+            [key: string]: unknown
         }
         Enums: {
-            [key: string]: any
+            [key: string]: unknown
         }
     }
 }

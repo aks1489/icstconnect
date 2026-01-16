@@ -14,7 +14,7 @@ import { useAuth } from '../../../contexts/AuthContext'
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     const [showAuthModal, setShowAuthModal] = useState(false)
-    const { user, profile } = useAuth()
+    const { profile } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -39,16 +39,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         return () => subscription.unsubscribe()
     }, [navigate])
 
-    // Combine user and profile for role access
-    const authUser = React.useMemo(() => (user ? { ...user, role: profile?.role } : null), [user, profile])
-
     // Check if we are on admin or teacher login pages
     const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
 
     return (
         <div className="app-shell">
             <header className="app-header">
-                <NavigationHeader onLoginClick={handleLoginClick} user={authUser} />
+                <NavigationHeader onLoginClick={handleLoginClick} user={profile} />
             </header>
 
             <main className="app-main">
@@ -61,7 +58,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                         <Footer />
                     </div>
                     <div className="lg:hidden">
-                        <NavigationFooter onLoginClick={handleLoginClick} user={authUser} />
+                        <NavigationFooter onLoginClick={handleLoginClick} user={profile} />
                     </div>
                 </>
             )}

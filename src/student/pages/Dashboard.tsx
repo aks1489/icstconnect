@@ -28,40 +28,40 @@ export default function StudentDashboard() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        const fetchEnrolledCourses = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('enrollments')
+                    .select(`
+                        enrolled_at,
+                        course:courses (
+                            id,
+                            course_name,
+                            icon,
+                            color,
+                            description
+                        ),
+                        class:classes (
+                            batch_name,
+                            batch_number
+                        )
+                    `)
+                    .eq('student_id', user!.id)
+
+                if (error) throw error
+
+                setCourses(data as unknown as EnrolledCourse[])
+            } catch (error) {
+                console.error('Error fetching courses:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         if (user) {
             fetchEnrolledCourses()
         }
     }, [user])
-
-    const fetchEnrolledCourses = async () => {
-        try {
-            const { data, error } = await supabase
-                .from('enrollments')
-                .select(`
-                    enrolled_at,
-                    course:courses (
-                        id,
-                        course_name,
-                        icon,
-                        color,
-                        description
-                    ),
-                    class:classes (
-                        batch_name,
-                        batch_number
-                    )
-                `)
-                .eq('student_id', user!.id)
-
-            if (error) throw error
-
-            setCourses(data as unknown as EnrolledCourse[])
-        } catch (error) {
-            console.error('Error fetching courses:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     if (loading) {
         return (

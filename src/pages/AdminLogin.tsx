@@ -22,7 +22,7 @@ export default function AdminLogin() {
             // Clean URL
             window.history.replaceState(null, '', window.location.pathname)
         }
-    } catch (e) {
+    } catch {
         // ignore
     }
 
@@ -52,8 +52,12 @@ export default function AdminLogin() {
             }
 
             navigate(from, { replace: true })
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('An unexpected error occurred')
+            }
             await supabase.auth.signOut()
         } finally {
             setLoading(false)

@@ -8,7 +8,7 @@ import logo from '../../assets/logo.jpg'
 export default function CompleteProfile() {
     const { user, profile, refreshProfile } = useAuth()
     const navigate = useNavigate()
-    const { dismissAlert } = useOutletContext<any>() || {}
+    const { dismissAlert } = useOutletContext<{ dismissAlert: () => void }>()
 
     const handleSubmit = async (data: Partial<UserProfile>) => {
         if (!user) return

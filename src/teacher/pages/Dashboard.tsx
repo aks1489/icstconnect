@@ -1,24 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Presentation, FileText, Users, Plus, CalendarPlus } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function TeacherDashboard() {
     const { profile } = useAuth()
-    const [stats, setStats] = useState({
-        activeClasses: 0,
-        upcomingExams: 0,
-        students: 0
+    const [stats] = useState({
+        activeClasses: 5,
+        upcomingExams: 2,
+        students: 120
     })
-
-    // Mock stats for now, replace with Supabase fetch later
-    useEffect(() => {
-        // TODO: Fetch real stats from database
-        setStats({
-            activeClasses: 5,
-            upcomingExams: 2,
-            students: 120
-        })
-    }, [])
 
     const statCards = [
         {

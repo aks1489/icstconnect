@@ -5,10 +5,11 @@ import {
     Globe, Calculator, Router, AppWindow, Award, Code,
     Bell, Info, CheckCircle, AlertTriangle, Megaphone, Zap
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-export const getIcon = (iconName: string) => {
+export const getIcon = (iconName: string): LucideIcon => {
     // Icon mapping for specific tech/course icons
-    const iconMap: Record<string, any> = {
+    const iconMap: Record<string, LucideIcon> = {
         // Tech Icons
         'bi-filetype-jsx': Atom,
         'bi-bootstrap-fill': Box,

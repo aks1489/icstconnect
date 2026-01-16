@@ -1,5 +1,31 @@
 import { supabase } from '../lib/supabase'
-import type { Course, Module } from '../types/course'
+import type { Course, Module, CourseFees } from '../types/course'
+
+interface DBCourse {
+    id: number
+    course_name: string
+    description: string | null
+    tags: string[] | null
+    syllabus: string[] | null
+    fees: CourseFees | null
+    [key: string]: unknown
+}
+
+interface DBModule {
+    id: number
+    title: string
+    description: string
+    sort_order: number
+    course_id: number
+}
+
+interface DBTopic {
+    id: number
+    title: string
+    description: string
+    sort_order: number
+    module_id: number
+}
 
 // Icon mapping helper
 const getCourseStyle = (title: string): { icon: string, color: string } => {
@@ -62,7 +88,7 @@ export const courseService = {
         if (error) throw error
 
         // Map Supabase data to UI compatible format
-        return (data || []).map((course: any) => {
+        return (data || []).map((course: DBCourse) => {
             const style = getCourseStyle(course.course_name)
             // Use existing tags or generate them if empty/null
             const tags = (course.tags && course.tags.length > 0)
@@ -77,8 +103,8 @@ export const courseService = {
                 color: style.color,
                 price: course.fees?.total ? `₹${course.fees.total}` : 'Contact for Price',
                 tags: tags
-            }
-        }) as Course[]
+            } as Course
+        })
     },
 
     async getCourseStructure(courseId: number): Promise<Module[]> {
@@ -88,6 +114,7 @@ export const courseService = {
             .select('*')
             .eq('course_id', courseId)
             .order('sort_order', { ascending: true })
+            .returns<DBModule[]>()
 
         if (modulesError) throw modulesError
 
@@ -96,22 +123,23 @@ export const courseService = {
         }
 
         // 2. Fetch Topics for these modules
-        const moduleIds = modulesData.map((m: any) => m.id)
+        const moduleIds = modulesData.map((m) => m.id)
         const { data: topicsData, error: topicsError } = await supabase
             .from('course_topics')
             .select('*')
             .in('module_id', moduleIds)
             .order('sort_order', { ascending: true })
+            .returns<DBTopic[]>()
 
         if (topicsError) throw topicsError
 
         // 3. Merge Topics into Modules
-        return modulesData.map((m: any) => ({
+        return modulesData.map((m) => ({
             id: m.id,
             title: m.title,
             description: m.description,
             sort_order: m.sort_order,
-            topics: topicsData?.filter((t: any) => t.module_id === m.id).map((t: any) => ({
+            topics: topicsData?.filter((t) => t.module_id === m.id).map((t) => ({
                 id: t.id,
                 title: t.title,
                 description: t.description,

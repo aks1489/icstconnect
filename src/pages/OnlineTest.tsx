@@ -20,63 +20,63 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
     const basePath = isStudentPortal ? '/student/tests' : '/online-test'
 
     useEffect(() => {
-        fetchTests()
-    }, [user]) // Re-run if user changes (e.g. login/logout)
+        const fetchTests = async () => {
+            try {
+                setLoading(true)
 
-    const fetchTests = async () => {
-        try {
-            setLoading(true)
-
-            // Prepare promises for parallel execution
-            const promises: PromiseLike<any>[] = [
-                supabase
-                    .from('tests')
-                    .select('*')
-                    .eq('is_active', true)
-                    .order('created_at', { ascending: false })
-            ]
-
-            // If user logged in, fetch enrollments in parallel
-            if (user) {
-                promises.push(
+                // Prepare promises for parallel execution
+                const promises: PromiseLike<any>[] = [
                     supabase
-                        .from('enrollments')
-                        .select('course_id')
-                        .eq('student_id', user.id)
-                )
+                        .from('tests')
+                        .select('*')
+                        .eq('is_active', true)
+                        .order('created_at', { ascending: false })
+                ]
+
+                // If user logged in, fetch enrollments in parallel
+                if (user) {
+                    promises.push(
+                        supabase
+                            .from('enrollments')
+                            .select('course_id')
+                            .eq('student_id', user.id)
+                    )
+                }
+
+                // Execute all requests
+                const results = await Promise.all(promises)
+
+                // Extract Tests
+                const { data: allTests, error: testError } = results[0]
+                if (testError) throw testError
+
+                let visibleTests: Test[] = allTests || []
+
+                // Extract Enrollments & Filter if user exists
+                if (user && results[1]) {
+                    const { data: enrollments } = results[1]
+                    const enrolledCourseIds = new Set(enrollments?.map((e: { course_id: number }) => String(e.course_id)) || [])
+
+                    visibleTests = visibleTests.filter((test: Test) => {
+                        if (test.access_type === 'public') return true
+                        return test.course_id && enrolledCourseIds.has(String(test.course_id))
+                    })
+                } else {
+                    // Guest: Show only Public
+                    visibleTests = visibleTests.filter((t: Test) => t.access_type === 'public')
+                }
+
+                setTests(visibleTests)
+
+            } catch (error) {
+                console.error('Error fetching tests:', error)
+            } finally {
+                setLoading(false)
             }
-
-            // Execute all requests
-            const results = await Promise.all(promises)
-
-            // Extract Tests
-            const { data: allTests, error: testError } = results[0]
-            if (testError) throw testError
-
-            let visibleTests = allTests || []
-
-            // Extract Enrollments & Filter if user exists
-            if (user && results[1]) {
-                const { data: enrollments } = results[1]
-                const enrolledCourseIds = new Set(enrollments?.map((e: any) => String(e.course_id)) || [])
-
-                visibleTests = visibleTests.filter((test: Test) => {
-                    if (test.access_type === 'public') return true
-                    return test.course_id && enrolledCourseIds.has(String(test.course_id))
-                })
-            } else {
-                // Guest: Show only Public
-                visibleTests = visibleTests.filter((t: Test) => t.access_type === 'public')
-            }
-
-            setTests(visibleTests)
-
-        } catch (error) {
-            console.error('Error fetching tests:', error)
-        } finally {
-            setLoading(false)
         }
-    }
+
+        fetchTests()
+    }, [user])
 
     const filteredTests = tests.filter(test => {
         if (filter === 'all') return true
@@ -114,7 +114,7 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                             {['all', 'public', 'my-courses'].map((f) => (
                                 <button
                                     key={f}
-                                    onClick={() => setFilter(f as any)}
+                                    onClick={() => setFilter(f as 'all' | 'public' | 'my-courses')}
                                     className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filter === f
                                         ? 'bg-slate-900 text-white shadow-sm'
                                         : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
@@ -147,7 +147,7 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                             {['all', 'public', 'my-courses'].map((f) => (
                                 <button
                                     key={f}
-                                    onClick={() => setFilter(f as any)}
+                                    onClick={() => setFilter(f as 'all' | 'public' | 'my-courses')}
                                     className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${filter === f
                                         ? 'bg-slate-900 text-white shadow-md'
                                         : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'

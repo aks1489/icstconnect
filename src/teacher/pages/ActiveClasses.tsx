@@ -8,7 +8,7 @@ export interface Student {
     id: string
     full_name: string
     avatar_url: string
-    enrollments: {
+    enrollment: {
         course_id: number
         progress: number
         course: {
@@ -17,19 +17,37 @@ export interface Student {
             icon: string
             color: string
         }
-    }[]
+    }
+}
+
+interface EnrollmentData {
+    id: string
+    full_name: string
+    email: string
+    avatar_url: string
+}
+
+interface CourseData {
+    id: number
+    course_name: string
+}
+
+interface ClassData {
+    id: number
+    batch_name: string
+    capacity: number
 }
 
 export default function ActiveClasses() {
-    const [students, setStudents] = useState<any[]>([])
+    const [students, setStudents] = useState<Student[]>([])
     const [loading, setLoading] = useState(true)
 
     // Enrollment Modal State
     const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false)
     const [enrollLoading, setEnrollLoading] = useState(false)
-    const [availableStudents, setAvailableStudents] = useState<any[]>([])
-    const [courses, setCourses] = useState<any[]>([])
-    const [classes, setClasses] = useState<any[]>([])
+    const [availableStudents, setAvailableStudents] = useState<EnrollmentData[]>([])
+    const [courses, setCourses] = useState<CourseData[]>([])
+    const [classes, setClasses] = useState<ClassData[]>([])
 
     // Form Selection State
     const [selectedStudentId, setSelectedStudentId] = useState('')
@@ -290,7 +308,7 @@ export default function ActiveClasses() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {students.map((item: any, index) => (
+                    {students.map((item, index) => (
                         <Link
                             to={`/teacher/classes/${item.id}/${item.enrollment.course_id}`}
                             key={`${item.id}-${item.enrollment.course_id}-${index}`}

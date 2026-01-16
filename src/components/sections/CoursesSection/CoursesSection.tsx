@@ -77,7 +77,8 @@ const CoursesSection = () => {
     }
 
     // Marquee Logic: Duplicate list for loop
-    const marqueeCourses = [...courses, ...courses, ...courses, ...courses];
+    // Optimization: Reduced duplication from 4x to 2x (Sufficient for seamless loop if content width > viewport width)
+    const marqueeCourses = [...courses, ...courses];
 
     return (
         <section className="py-24 bg-slate-50 relative overflow-hidden" id="courses">

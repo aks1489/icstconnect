@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { ArrowLeft, Check } from 'lucide-react'
+import type { UserProfile } from '../../types'
 
 interface Topic {
     id: number
@@ -9,6 +10,7 @@ interface Topic {
     description: string
     sort_order: number
     completed?: boolean
+    module_id: number
 }
 
 interface Module {
@@ -18,76 +20,110 @@ interface Module {
     topics: Topic[]
 }
 
+interface Course {
+    id: number
+    course_name: string
+}
+
 export default function StudentProgressTracker() {
     const { studentId, courseId } = useParams()
     const [modules, setModules] = useState<Module[]>([])
-    const [studentData, setStudentData] = useState<any>(null)
-    const [courseData, setCourseData] = useState<any>(null)
+    const [studentData, setStudentData] = useState<UserProfile | null>(null)
+    const [courseData, setCourseData] = useState<Course | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+
+                // 1. Fetch Student & Course Info
+                const { data: student } = await supabase.from('profiles').select('*').eq('id', studentId).single()
+                const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single()
+                setStudentData(student)
+                setCourseData(course)
+
+                // 2. Fetch Modules
+                const { data: modulesData } = await supabase
+                    .from('course_modules')
+                    .select('*')
+                    .eq('course_id', courseId)
+                    .order('sort_order', { ascending: true })
+
+                let allTopics: Topic[] = []
+
+                if (modulesData && modulesData.length > 0) {
+                    const moduleIds = modulesData.map((m: { id: number }) => m.id)
+                    const { data: topicsData } = await supabase
+                        .from('course_topics')
+                        .select('*')
+                        .in('module_id', moduleIds)
+                        .order('sort_order', { ascending: true })
+
+                    allTopics = topicsData || []
+                }
+
+                // 3. Fetch Student Progress
+                const { data: progressData } = await supabase
+                    .from('student_topic_progress')
+                    .select('topic_id, status')
+                    .eq('student_id', studentId)
+                    .eq('status', 'completed')
+
+                const completedTopicIds = new Set(progressData?.map((p: { topic_id: number }) => p.topic_id))
+
+                // Merge Data
+                const mergedModules = modulesData?.map((m: Module) => ({
+                    ...m,
+                    topics: allTopics
+                        .filter(t => t.module_id === m.id)
+                        .map(t => ({
+                            ...t,
+                            completed: completedTopicIds.has(t.id)
+                        }))
+                })) || []
+
+                setModules(mergedModules)
+
+            } catch (error) {
+                console.error('Error loading data:', error)
+                alert('Failed to load progress data')
+            } finally {
+                setLoading(false)
+            }
+        }
+
         if (studentId && courseId) {
             fetchData()
         }
     }, [studentId, courseId])
 
-    const fetchData = async () => {
+    const updateEnrollmentProgress = async (currentModules: Module[]) => {
         try {
-            setLoading(true)
+            // Simpler: Use the modules state we already have for total count
+            const localTotalTopics = currentModules.reduce((acc, m) => acc + m.topics.length, 0)
 
-            // 1. Fetch Student & Course Info
-            const { data: student } = await supabase.from('profiles').select('*').eq('id', studentId).single()
-            const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single()
-            setStudentData(student)
-            setCourseData(course)
+            if (localTotalTopics > 0) {
+                // Fetch actual completed count from DB to be sure
+                const { data: pData } = await supabase
+                    .from('student_topic_progress')
+                    .select('topic_id')
+                    .eq('student_id', studentId)
+                    .eq('status', 'completed')
 
-            // 2. Fetch Modules
-            const { data: modulesData } = await supabase
-                .from('course_modules')
-                .select('*')
-                .eq('course_id', courseId)
-                .order('sort_order', { ascending: true })
+                // Filter to ensure we only count topics from this course
+                const topicIdsInCourse = new Set(currentModules.flatMap(m => m.topics.map(t => t.id)))
+                const courseCompletedCount = pData?.filter((p: { topic_id: number }) => topicIdsInCourse.has(p.topic_id)).length || 0
 
-            let allTopics: any[] = []
+                const newProgress = Math.round((courseCompletedCount / localTotalTopics) * 100)
 
-            if (modulesData && modulesData.length > 0) {
-                const moduleIds = modulesData.map(m => m.id)
-                const { data: topicsData } = await supabase
-                    .from('course_topics')
-                    .select('*')
-                    .in('module_id', moduleIds)
-                    .order('sort_order', { ascending: true })
-
-                allTopics = topicsData || []
+                await supabase
+                    .from('enrollments')
+                    .update({ progress: newProgress })
+                    .match({ student_id: studentId, course_id: courseId })
             }
-
-            // 3. Fetch Student Progress
-            const { data: progressData } = await supabase
-                .from('student_topic_progress')
-                .select('topic_id, status')
-                .eq('student_id', studentId)
-                .eq('status', 'completed')
-
-            const completedTopicIds = new Set(progressData?.map(p => p.topic_id))
-
-            // Merge Data
-            const mergedModules = modulesData?.map((m: any) => ({
-                ...m,
-                topics: allTopics
-                    .filter(t => t.module_id === m.id)
-                    .map((t: any) => ({
-                        ...t,
-                        completed: completedTopicIds.has(t.id)
-                    }))
-            })) || []
-
-            setModules(mergedModules)
-
-        } catch (error) {
-            console.error('Error loading data:', error)
-            alert('Failed to load progress data')
-        } finally {
-            setLoading(false)
+        } catch (err) {
+            console.error('Error syncing progress:', err)
         }
     }
 
@@ -113,51 +149,21 @@ export default function StudentProgressTracker() {
             }
 
             // Update local state
-            setModules(prev => prev.map(m => ({
-                ...m,
-                topics: m.topics.map(t =>
-                    t.id === topicId ? { ...t, completed: !currentStatus } : t
-                )
-            })))
-
-            // Recalculate and update overall progress in enrollments
-            updateEnrollmentProgress()
+            setModules(prev => {
+                const nextModules = prev.map(m => ({
+                    ...m,
+                    topics: m.topics.map(t =>
+                        t.id === topicId ? { ...t, completed: !currentStatus } : t
+                    )
+                }))
+                // Trigger enrollment update with NEW state
+                updateEnrollmentProgress(nextModules)
+                return nextModules
+            })
 
         } catch (error) {
             console.error('Error updating status:', error)
             alert('Failed to update status')
-        }
-    }
-
-    const updateEnrollmentProgress = async () => {
-        try {
-            // Count total topics for this course (server-side would be better but doing client-side for now)
-
-
-            // Simpler: Use the modules state we already have for total count
-            const localTotalTopics = modules.reduce((acc, m) => acc + m.topics.length, 0)
-
-            if (localTotalTopics > 0) {
-                // Fetch actual completed count from DB to be sure
-                const { data: pData } = await supabase
-                    .from('student_topic_progress')
-                    .select('topic_id')
-                    .eq('student_id', studentId)
-                    .eq('status', 'completed')
-
-                // Filter to ensure we only count topics from this course
-                const topicIdsInCourse = new Set(modules.flatMap(m => m.topics.map(t => t.id)))
-                const courseCompletedCount = pData?.filter(p => topicIdsInCourse.has(p.topic_id)).length || 0
-
-                const newProgress = Math.round((courseCompletedCount / localTotalTopics) * 100)
-
-                await supabase
-                    .from('enrollments')
-                    .update({ progress: newProgress })
-                    .match({ student_id: studentId, course_id: courseId })
-            }
-        } catch (err) {
-            console.error('Error syncing progress:', err)
         }
     }
 

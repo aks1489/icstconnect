@@ -14,11 +14,12 @@ import {
     CalendarDays,
     Tag
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 export interface NavItem {
     label: string
     path: string
-    icon: any
+    icon: LucideIcon
     color: string
     description?: string
     external?: boolean

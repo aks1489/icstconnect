@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Clock, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
@@ -27,22 +27,6 @@ const TestPlayer = () => {
     // Timer State
     const [timeLeft, setTimeLeft] = useState(0)
 
-    useEffect(() => {
-        if (test && !isSubmitted && timeLeft > 0) {
-            const timer = setInterval(() => {
-                setTimeLeft((prev) => {
-                    if (prev <= 1) {
-                        clearInterval(timer)
-                        handleSubmit()
-                        return 0
-                    }
-                    return prev - 1
-                })
-            }, 1000)
-            return () => clearInterval(timer)
-        }
-    }, [test, isSubmitted, timeLeft])
-
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60)
         const secs = seconds % 60
@@ -50,86 +34,117 @@ const TestPlayer = () => {
     }
 
     useEffect(() => {
-        fetchTestDetails()
-    }, [testId])
+        const fetchTestDetails = async () => {
+            if (!testId) return
 
-    const fetchTestDetails = async () => {
-        if (!testId) return
+            try {
+                setLoading(true)
+                const { data: { user } } = await supabase.auth.getUser()
 
-        try {
-            setLoading(true)
-            const { data: { user } } = await supabase.auth.getUser()
-
-            // 1. Fetch Test Metadata
-            const { data: testData, error: tError } = await supabase
-                .from('tests')
-                .select('*')
-                .eq('id', testId)
-                .single()
-
-            if (tError || !testData) throw new Error('Test not found')
-
-            // 2. Access Control Check
-            if (testData.access_type === 'private') {
-                if (!user) {
-                    alert('You must be logged in to access this private test.')
-                    return navigate('/login')
-                }
-
-                // Check Enrollment
-                const { data: enrollment } = await supabase
-                    .from('enrollments')
-                    .select('id')
-                    .eq('student_id', user.id)
-                    .eq('course_id', testData.course_id)
+                // 1. Fetch Test Metadata
+                const { data: testData, error: tError } = await supabase
+                    .from('tests')
+                    .select('*')
+                    .eq('id', testId)
                     .single()
 
-                if (!enrollment) {
-                    alert('You are not enrolled in the course for this test.')
-                    return navigate(backPath)
+                if (tError || !testData) throw new Error('Test not found')
+
+                // 2. Access Control Check
+                if (testData.access_type === 'private') {
+                    if (!user) {
+                        alert('You must be logged in to access this private test.')
+                        return navigate('/login')
+                    }
+
+                    // Check Enrollment
+                    const { data: enrollment } = await supabase
+                        .from('enrollments')
+                        .select('id')
+                        .eq('student_id', user.id)
+                        .eq('course_id', testData.course_id)
+                        .single()
+
+                    if (!enrollment) {
+                        alert('You are not enrolled in the course for this test.')
+                        return navigate(backPath)
+                    }
                 }
-            }
 
-            setTest(testData)
-            setTimeLeft(testData.duration_minutes * 60)
+                setTest(testData)
+                setTimeLeft(testData.duration_minutes * 60)
 
-            // 3. Fetch Questions & Options
-            const { data: qs, error: qError } = await supabase
-                .from('questions')
-                .select(`
-                    id,
-                    text,
-                    type,
-                    order_index,
-                    marks,
-                    options (
+                // 3. Fetch Questions & Options
+                const { data: qs, error: qError } = await supabase
+                    .from('questions')
+                    .select(`
                         id,
                         text,
-                        is_correct,
-                        order_index
-                    )
-                `)
-                .eq('test_id', testId)
-                .order('order_index', { ascending: true })
+                        type,
+                        order_index,
+                        marks,
+                        options (
+                            id,
+                            text,
+                            is_correct,
+                            order_index
+                        )
+                    `)
+                    .eq('test_id', testId)
+                    .order('order_index', { ascending: true })
 
-            if (qError) throw qError
+                if (qError) throw qError
 
-            // Format specific data if needed (e.g. sorting options)
-            const formattedQuestions = qs?.map(q => ({
-                ...q,
-                test_id: testId as string, // Ensure test_id is present
-                options: q.options?.sort((a: any, b: any) => a.order_index - b.order_index) || []
-            })) as TestQuestion[] || []
+                // Format specific data if needed (e.g. sorting options)
+                const formattedQuestions = qs?.map(q => ({
+                    ...q,
+                    test_id: testId as string, // Ensure test_id is present
+                    options: q.options?.sort((a: any, b: any) => a.order_index - b.order_index) || []
+                })) as TestQuestion[] || []
 
-            setQuestions(formattedQuestions)
+                setQuestions(formattedQuestions)
 
-        } catch (error) {
-            console.error('Error loading test:', error)
-            navigate(backPath)
-        } finally {
-            setLoading(false)
+            } catch (error) {
+                console.error('Error loading test:', error)
+                navigate(backPath)
+            } finally {
+                setLoading(false)
+            }
         }
-    }
+
+        fetchTestDetails()
+    }, [testId, navigate, backPath])
+
+    const handleSubmit = useCallback(() => {
+        let calculatedScore = 0
+        questions.forEach(q => {
+            const selectedIdx = selectedAnswers[q.id]
+            if (selectedIdx !== undefined && q.options[selectedIdx]?.is_correct) {
+                calculatedScore += (q.marks || 1) // Default to 1 if no marks or simple count
+            }
+        })
+        setScore(calculatedScore)
+        setIsSubmitted(true)
+        // Ideally save result to DB here
+    }, [questions, selectedAnswers])
+
+    // Timer Effect: Runs interval
+    useEffect(() => {
+        if (test && !isSubmitted && timeLeft > 0) {
+            const timer = setInterval(() => {
+                setTimeLeft((prev) => Math.max(0, prev - 1))
+            }, 1000)
+            return () => clearInterval(timer)
+        }
+    }, [test, isSubmitted]) // Removed timeLeft to prevent re-intervaling
+
+    // Timeout Check Effect
+    useEffect(() => {
+        if (timeLeft === 0 && test && !isSubmitted) {
+            handleSubmit()
+        }
+    }, [timeLeft, test, isSubmitted, handleSubmit])
+
 
     const currentQuestion = questions[currentQuestionIndex]
     const totalQuestions = questions.length
@@ -155,19 +170,6 @@ const TestPlayer = () => {
         }
     }
 
-    const handleSubmit = () => {
-        let calculatedScore = 0
-        questions.forEach(q => {
-            const selectedIdx = selectedAnswers[q.id]
-            if (selectedIdx !== undefined && q.options[selectedIdx]?.is_correct) {
-                calculatedScore += (q.marks || 1) // Default to 1 if no marks or simple count
-            }
-        })
-        setScore(calculatedScore)
-        setIsSubmitted(true)
-        // Ideally save result to DB here
-    }
-
     if (loading) {
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -180,18 +182,7 @@ const TestPlayer = () => {
 
     // --- RESULTS VIEW ---
     if (isSubmitted) {
-        const totalMarks = questions.reduce((sum, q) => sum + (q.marks || 1), 0) // Assuming 1 mark default for simple % calc if necessary
-        // Or simpler: just count correct answers if ignoring marks for now? The mock used 'score' as count.
-        // Let's use simple count of correct answers matching the mock logic which tracked correct count.
-        // BUT logic above adds `q.marks`. Let's assume 1 mark per question for now to match UI "Score X / TotalQuestions"
-        // Update: calculatedScore above adds marks. Let's normalize to count just for the UI logic if requested, 
-        // OR just stick to marks. The UI shows "Score: X / TotalQuestions". 
-        // If marks can be > 1, this UI is slightly misleading. 
-        // I will assume simple 1 mark per question for now to keep it consistent with "Score / Total".
-
-        // Re-calcing specifically for "Count" display if needed. 
-        // Actually, let's treat `score` as total marks obtained.
-
+        const totalMarks = questions.reduce((sum, q) => sum + (q.marks || 1), 0)
         const percentage = Math.round((score / totalMarks) * 100)
         let message = ''
         let color = ''

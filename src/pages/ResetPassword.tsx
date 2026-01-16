@@ -20,7 +20,7 @@ export default function ResetPassword() {
                 navigate('/')
             }
         })
-    }, [])
+    }, [navigate])
 
     const handleReset = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -47,8 +47,12 @@ export default function ResetPassword() {
             setTimeout(() => {
                 navigate('/')
             }, 3000)
-        } catch (err: any) {
-            setError(err.message)
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('An unexpected error occurred')
+            }
         } finally {
             setLoading(false)
         }

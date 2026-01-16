@@ -22,51 +22,51 @@ export default function OfflineClasses() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        const fetchClasses = async () => {
+            try {
+                // 1. Get enrolled course IDs
+                const { data: enrollments, error: enrollmentError } = await supabase
+                    .from('enrollments')
+                    .select('course_id')
+                    .eq('student_id', user!.id)
+
+                if (enrollmentError) throw enrollmentError
+
+                const courseIds = enrollments.map(e => e.course_id)
+
+                if (courseIds.length === 0) {
+                    setLoading(false)
+                    return
+                }
+
+                // 2. Get classes for those courses
+                const { data: classesData, error: classesError } = await supabase
+                    .from('classes')
+                    .select(`
+                        *,
+                        course:courses (
+                            title,
+                            icon,
+                            color
+                        )
+                    `)
+                    .in('course_id', courseIds)
+                    .order('date', { ascending: false })
+
+                if (classesError) throw classesError
+
+                setClasses(classesData)
+            } catch (error) {
+                console.error('Error fetching classes:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         if (user) {
             fetchClasses()
         }
     }, [user])
-
-    const fetchClasses = async () => {
-        try {
-            // 1. Get enrolled course IDs
-            const { data: enrollments, error: enrollmentError } = await supabase
-                .from('enrollments')
-                .select('course_id')
-                .eq('student_id', user!.id)
-
-            if (enrollmentError) throw enrollmentError
-
-            const courseIds = enrollments.map(e => e.course_id)
-
-            if (courseIds.length === 0) {
-                setLoading(false)
-                return
-            }
-
-            // 2. Get classes for those courses
-            const { data: classesData, error: classesError } = await supabase
-                .from('classes')
-                .select(`
-                    *,
-                    course:courses (
-                        title,
-                        icon,
-                        color
-                    )
-                `)
-                .in('course_id', courseIds)
-                .order('date', { ascending: false })
-
-            if (classesError) throw classesError
-
-            setClasses(classesData)
-        } catch (error) {
-            console.error('Error fetching classes:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     if (loading) {
         return <div>Loading classes...</div>

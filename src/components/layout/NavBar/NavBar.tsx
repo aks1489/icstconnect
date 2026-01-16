@@ -12,10 +12,11 @@ import {
     X
 } from 'lucide-react'
 import logo from '../../../assets/logo.jpg'
+import type { UserProfile } from '../../../types'
 
 interface NavigationProps {
     onLoginClick: () => void
-    user?: any
+    user?: UserProfile | null
 }
 
 export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user }) => {

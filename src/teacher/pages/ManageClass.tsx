@@ -26,56 +26,56 @@ export default function ManageClass() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        const fetchCourseDetails = async () => {
+            try {
+                // 1. Fetch Course Info
+                const { data: courseData, error: courseError } = await supabase
+                    .from('courses')
+                    .select('id, course_name, color, icon')
+                    .eq('id', courseId)
+                    .single()
+
+                if (courseError) throw courseError
+                setCourse(courseData)
+
+                // 2. Fetch Topics
+                const { data: topicsData, error: topicsError } = await supabase
+                    .from('topics')
+                    .select('*')
+                    .eq('course_id', courseId)
+                    .order('order_index')
+
+                if (topicsError) throw topicsError
+
+                // 3. Fetch Cleared Status (This would check the offline_course_progress table)
+                const { data: progressData, error: progressError } = await supabase
+                    .from('offline_course_progress')
+                    .select('topic_id, is_completed')
+                    .eq('course_id', courseId)
+
+                if (progressError && progressError.code !== 'PGRST116') {
+                    console.error('Error fetching progress', progressError) // Suppress single not found
+                }
+
+                const completedTopicIds = new Set(progressData?.filter(p => p.is_completed).map(p => p.topic_id) || [])
+
+                const mergedTopics = topicsData.map(topic => ({
+                    ...topic,
+                    is_cleared: completedTopicIds.has(topic.id)
+                }))
+
+                setTopics(mergedTopics)
+            } catch (error) {
+                console.error('Error loading class details:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
         if (courseId) {
             fetchCourseDetails()
         }
     }, [courseId])
-
-    const fetchCourseDetails = async () => {
-        try {
-            // 1. Fetch Course Info
-            const { data: courseData, error: courseError } = await supabase
-                .from('courses')
-                .select('id, course_name, color, icon')
-                .eq('id', courseId)
-                .single()
-
-            if (courseError) throw courseError
-            setCourse(courseData)
-
-            // 2. Fetch Topics
-            const { data: topicsData, error: topicsError } = await supabase
-                .from('topics')
-                .select('*')
-                .eq('course_id', courseId)
-                .order('order_index')
-
-            if (topicsError) throw topicsError
-
-            // 3. Fetch Cleared Status (This would check the offline_course_progress table)
-            const { data: progressData, error: progressError } = await supabase
-                .from('offline_course_progress')
-                .select('topic_id, is_completed')
-                .eq('course_id', courseId)
-
-            if (progressError && progressError.code !== 'PGRST116') {
-                console.error('Error fetching progress', progressError) // Suppress single not found
-            }
-
-            const completedTopicIds = new Set(progressData?.filter(p => p.is_completed).map(p => p.topic_id) || [])
-
-            const mergedTopics = topicsData.map(topic => ({
-                ...topic,
-                is_cleared: completedTopicIds.has(topic.id)
-            }))
-
-            setTopics(mergedTopics)
-        } catch (error) {
-            console.error('Error loading class details:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const toggleTopicCompletion = async (topicId: number, currentStatus: boolean) => {
         try {

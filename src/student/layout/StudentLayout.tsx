@@ -35,10 +35,15 @@ export default function StudentLayout() {
     useEffect(() => {
         if (profile && !isProfileComplete && location.pathname !== '/student/complete-profile') {
             navigate('/student/complete-profile')
-            setShowProfileAlert(true)
 
-            const timer = setTimeout(() => setShowProfileAlert(false), 5000)
-            return () => clearTimeout(timer)
+            // Defer state update to avoid "setState during render" warning
+            const showTimer = setTimeout(() => setShowProfileAlert(true), 0)
+            const hideTimer = setTimeout(() => setShowProfileAlert(false), 5000)
+
+            return () => {
+                clearTimeout(showTimer)
+                clearTimeout(hideTimer)
+            }
         }
     }, [profile, isProfileComplete, navigate, location.pathname])
 

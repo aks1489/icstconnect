@@ -28,7 +28,7 @@ const HeroSection = () => {
             setCurrentTechIndex((prev) => (prev + 1) % technologies.length)
         }, 2000)
         return () => clearInterval(techInterval)
-    }, [])
+    }, [technologies.length])
 
 
 
@@ -124,5 +124,3 @@ const HeroSection = () => {
 }
 
 export default HeroSection
-
-
