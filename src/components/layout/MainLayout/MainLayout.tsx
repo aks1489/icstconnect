@@ -40,7 +40,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }, [navigate])
 
     // Combine user and profile for role access
-    const authUser = user ? { ...user, role: profile?.role } : null
+    const authUser = React.useMemo(() => (user ? { ...user, role: profile?.role } : null), [user, profile])
 
     // Check if we are on admin or teacher login pages
     const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
