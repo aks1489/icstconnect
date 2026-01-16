@@ -22,48 +22,56 @@ interface EnrolledCourse {
 }
 
 export default function StudentDashboard() {
-    const { user, profile } = useAuth()
+    const { user, profile, refreshProfile } = useAuth()
     const navigate = useNavigate()
     const [courses, setCourses] = useState<EnrolledCourse[]>([])
-    const [loading, setLoading] = useState(true)
+    const [dashboardLoading, setDashboardLoading] = useState(true)
 
     useEffect(() => {
         if (user) {
-            fetchEnrolledCourses()
+            fetchDashboardData()
         }
     }, [user])
 
-    const fetchEnrolledCourses = async () => {
+    const fetchDashboardData = async () => {
+        if (!user) return
+        setDashboardLoading(true)
         try {
-            const { data, error } = await supabase
-                .from('enrollments')
-                .select(`
-                    enrolled_at,
-                    course:courses (
-                        id,
-                        course_name,
-                        icon,
-                        color,
-                        description
-                    ),
-                    class:classes (
-                        batch_name,
-                        batch_number
+            // Concurrently fetch courses and refresh the profile
+            const [coursesResponse] = await Promise.all([
+                supabase
+                    .from('enrollments')
+                    .select(
+                        `
+                        enrolled_at,
+                        course:courses (
+                            id,
+                            course_name,
+                            icon,
+                            color,
+                            description
+                        ),
+                        class:classes (
+                            batch_name,
+                            batch_number
+                        )
+                    `
                     )
-                `)
-                .eq('student_id', user!.id)
+                    .eq('student_id', user.id),
+                refreshProfile(), // Refresh profile from AuthContext
+            ])
 
-            if (error) throw error
+            if (coursesResponse.error) throw coursesResponse.error
 
-            setCourses(data as unknown as EnrolledCourse[])
+            setCourses(coursesResponse.data as unknown as EnrolledCourse[])
         } catch (error) {
-            console.error('Error fetching courses:', error)
+            console.error('Error fetching dashboard data:', error)
         } finally {
-            setLoading(false)
+            setDashboardLoading(false)
         }
     }
 
-    if (loading) {
+    if (dashboardLoading || !profile) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
