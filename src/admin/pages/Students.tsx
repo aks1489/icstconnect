@@ -9,6 +9,7 @@ interface StudentProfile {
     full_name: string
     email: string
     created_at: string
+    avatar_url?: string | null
 }
 
 export default function ManageStudents() {
@@ -96,9 +97,17 @@ export default function ManageStudents() {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="flex-shrink-0 h-10 w-10">
-                                                <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
-                                                    {student.full_name?.charAt(0) || 'S'}
-                                                </div>
+                                                {student.avatar_url ? (
+                                                    <img
+                                                        className="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-200"
+                                                        src={student.avatar_url}
+                                                        alt=""
+                                                    />
+                                                ) : (
+                                                    <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                                                        {student.full_name?.charAt(0).toUpperCase() || 'S'}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="ml-4">
                                                 <div className="text-sm font-semibold text-slate-900">{student.full_name || 'Unknown'}</div>
@@ -141,9 +150,17 @@ export default function ManageStudents() {
                         <div key={student.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
-                                        {student.full_name?.charAt(0) || 'S'}
-                                    </div>
+                                    {student.avatar_url ? (
+                                        <img
+                                            src={student.avatar_url}
+                                            alt=""
+                                            className="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-200"
+                                        />
+                                    ) : (
+                                        <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                                            {student.full_name?.charAt(0).toUpperCase() || 'S'}
+                                        </div>
+                                    )}
                                     <div>
                                         <h3 className="font-semibold text-slate-900">{student.full_name || 'Unknown'}</h3>
                                         <p className="text-xs text-slate-500">{new Date(student.created_at).toLocaleDateString()}</p>
