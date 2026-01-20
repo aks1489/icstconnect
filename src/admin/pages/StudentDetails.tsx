@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { X, ArrowLeft, Pencil } from 'lucide-react'
+import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import { getIcon } from '../../utils/iconMapper'
 import ProfileForm from '../../components/common/ProfileForm'
 import type { UserProfile } from '../../types'
@@ -41,6 +41,32 @@ export default function StudentDetails() {
     const [classToTransfer, setClassToTransfer] = useState<{ courseId: number, currentClassId: number } | null>(null)
     const [transferAvailableClasses, setTransferAvailableClasses] = useState<any[]>([])
     const [selectedTransferClassId, setSelectedTransferClassId] = useState('')
+
+    // Course Search State
+    const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false)
+    const [courseSearchTerm, setCourseSearchTerm] = useState('')
+    const [highlightedIndex, setHighlightedIndex] = useState(0)
+    const dropdownRef = useRef<HTMLDivElement>(null)
+    const dropdownListRef = (element: HTMLDivElement | null) => {
+        if (element && highlightedIndex >= 0) {
+            const children = element.children;
+            if (children[highlightedIndex]) {
+                children[highlightedIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
+    };
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsCourseDropdownOpen(false)
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside)
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside)
+        }
+    }, [dropdownRef])
 
     useEffect(() => {
         if (id) {
@@ -292,12 +318,24 @@ export default function StudentDetails() {
             // Remove email from updates as it shouldn't be changed here (or handled separately if needed)
             const { email, ...updates } = data
 
-            const { error } = await supabase
+            console.log('Updating profile with payload:', updates)
+
+            const { data: updatedData, error } = await supabase
                 .from('profiles')
                 .update(updates)
                 .eq('id', id)
+                .select()
 
-            if (error) throw error
+            if (error) {
+                console.error('Supabase update error:', error)
+                throw error
+            }
+
+            console.log('Update success, returned:', updatedData)
+
+            if (!updatedData || updatedData.length === 0) {
+                throw new Error('No changes saved. You might not have permission to update this profile.')
+            }
 
             setStudent(prev => prev ? ({ ...prev, ...updates } as UserProfile) : null)
             setIsEditOpen(false)
@@ -523,16 +561,84 @@ export default function StudentDetails() {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">Select Course</label>
-                                <select
-                                    value={selectedCourseId}
-                                    onChange={(e) => setSelectedCourseId(e.target.value)}
-                                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm"
-                                >
-                                    <option value="">Choose a course...</option>
-                                    {availableCourses.map(course => (
-                                        <option key={course.id} value={course.id}>{course.course_name}</option>
-                                    ))}
-                                </select>
+                                <div className="relative" ref={dropdownRef}>
+                                    <div
+                                        onClick={() => setIsCourseDropdownOpen(!isCourseDropdownOpen)}
+                                        className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-indigo-500 bg-white flex items-center justify-between cursor-pointer"
+                                    >
+                                        <span className={!selectedCourseId ? "text-slate-500" : "text-slate-900"}>
+                                            {selectedCourseId
+                                                ? allCourses.find(c => c.id === Number(selectedCourseId))?.course_name
+                                                : "Choose a course..."}
+                                        </span>
+                                        {isCourseDropdownOpen ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+                                    </div>
+
+                                    {isCourseDropdownOpen && (
+                                        <div className="absolute z-20 mt-2 w-full bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
+                                            <div className="p-2 border-b border-slate-100">
+                                                <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
+                                                    <Search size={14} className="text-slate-400" />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search course..."
+                                                        className="bg-transparent border-none outline-none text-sm w-full"
+                                                        value={courseSearchTerm}
+                                                        onChange={(e) => {
+                                                            setCourseSearchTerm(e.target.value)
+                                                            setHighlightedIndex(0) // Reset highlight on search
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            const filtered = availableCourses.filter(c => c.course_name.toLowerCase().includes(courseSearchTerm.toLowerCase()));
+                                                            if (e.key === 'ArrowDown') {
+                                                                e.preventDefault();
+                                                                setHighlightedIndex(prev => Math.min(prev + 1, filtered.length - 1));
+                                                            } else if (e.key === 'ArrowUp') {
+                                                                e.preventDefault();
+                                                                setHighlightedIndex(prev => Math.max(prev - 1, 0));
+                                                            } else if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                if (filtered[highlightedIndex]) {
+                                                                    setSelectedCourseId(filtered[highlightedIndex].id.toString());
+                                                                    setIsCourseDropdownOpen(false);
+                                                                    setCourseSearchTerm('');
+                                                                }
+                                                            } else if (e.key === 'Escape') {
+                                                                setIsCourseDropdownOpen(false);
+                                                            }
+                                                        }}
+                                                        autoFocus
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div ref={dropdownListRef} className="max-h-60 overflow-y-auto scroll-smooth">
+                                                {availableCourses
+                                                    .filter(c => c.course_name.toLowerCase().includes(courseSearchTerm.toLowerCase()))
+                                                    .length === 0 ? (
+                                                    <div className="p-4 text-center text-sm text-slate-400">No courses found</div>
+                                                ) : (
+                                                    availableCourses
+                                                        .filter(c => c.course_name.toLowerCase().includes(courseSearchTerm.toLowerCase()))
+                                                        .map((course, index) => (
+                                                            <div
+                                                                key={course.id}
+                                                                onClick={() => {
+                                                                    setSelectedCourseId(course.id.toString())
+                                                                    setIsCourseDropdownOpen(false)
+                                                                    setCourseSearchTerm('')
+                                                                }}
+                                                                className={`px-4 py-2 cursor-pointer text-sm transition-colors ${index === highlightedIndex ? 'bg-indigo-50 text-indigo-700 font-medium' : 'hover:bg-slate-50 text-slate-700'
+                                                                    }`}
+                                                            >
+                                                                {course.course_name}
+                                                            </div>
+                                                        ))
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
                             {selectedCourseId && (
