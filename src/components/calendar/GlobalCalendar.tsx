@@ -178,6 +178,51 @@ export default function GlobalCalendar() {
     const prevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1))
     const resetToday = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))
 
+    const handleDeleteEvent = async () => {
+        if (!selectedEvent || !isAdmin) return
+
+        const isRecurring = selectedEvent.id.startsWith('sched-')
+        const isOneOff = selectedEvent.id.startsWith('evt-')
+
+        let confirmMessage = "Are you sure you want to delete this event?"
+        if (isRecurring) {
+            confirmMessage = "WARNING: This is a recurring class schedule. Deleting this will remove this class slot for ALL future weeks. Are you sure?"
+        }
+
+        if (!window.confirm(confirmMessage)) return
+
+        setLoading(true)
+        try {
+            if (isOneOff) {
+                const id = selectedEvent.id.replace('evt-', '')
+                const { error } = await supabase
+                    .from('calendar_events')
+                    .delete()
+                    .eq('id', id)
+
+                if (error) throw error
+            } else if (isRecurring) {
+                const id = selectedEvent.id.split('-')[1] // sched-123-date -> 123
+                const { error } = await supabase
+                    .from('class_schedules')
+                    .delete()
+                    .eq('id', id)
+
+                if (error) throw error
+            }
+
+            // Close modal and refresh
+            setSelectedEvent(null)
+            fetchCalendarData()
+
+        } catch (err) {
+            console.error("Error deleting event:", err)
+            alert("Failed to delete event. Please try again.")
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const weekDays = eachDayOfInterval({
         start: currentWeekStart,
         end: endOfWeek(currentWeekStart, { weekStartsOn: 1 })
@@ -230,6 +275,7 @@ export default function GlobalCalendar() {
                 isOpen={!!selectedEvent}
                 event={selectedEvent}
                 onClose={() => setSelectedEvent(null)}
+                onDelete={isAdmin ? handleDeleteEvent : undefined}
             />
 
             {/* Week Grid */}

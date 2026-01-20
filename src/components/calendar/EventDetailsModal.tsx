@@ -17,9 +17,10 @@ interface EventDetailsModalProps {
     isOpen: boolean
     onClose: () => void
     event: CalendarEvent | null
+    onDelete?: () => void
 }
 
-export default function EventDetailsModal({ isOpen, onClose, event }: EventDetailsModalProps) {
+export default function EventDetailsModal({ isOpen, onClose, event, onDelete }: EventDetailsModalProps) {
     if (!isOpen || !event) return null
 
     // Helper to format duration
@@ -122,7 +123,16 @@ export default function EventDetailsModal({ isOpen, onClose, event }: EventDetai
                     </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
+                    {onDelete && (
+                        <button
+                            onClick={onDelete}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 font-bold rounded-xl text-sm hover:bg-red-100 transition-colors border border-red-100"
+                        >
+                            <span className="w-4 h-4 rounded-full border-2 border-current flex items-center justify-center text-[10px] font-bold">!</span>
+                            Delete
+                        </button>
+                    )}
                     <button
                         onClick={onClose}
                         className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl text-sm hover:bg-indigo-600 transition-colors shadow-sm"
