@@ -4,6 +4,8 @@ import { supabase } from '../../lib/supabase'
 import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp } from 'lucide-react'
 import { getIcon } from '../../utils/iconMapper'
 import ProfileForm from '../../components/common/ProfileForm'
+import FeeStructureModal from '../components/FeeStructureModal'
+import { feesService } from '../../services/feesService'
 import type { UserProfile } from '../../types'
 
 interface Enrollment {
@@ -41,6 +43,10 @@ export default function StudentDetails() {
     const [classToTransfer, setClassToTransfer] = useState<{ courseId: number, currentClassId: number } | null>(null)
     const [transferAvailableClasses, setTransferAvailableClasses] = useState<any[]>([])
     const [selectedTransferClassId, setSelectedTransferClassId] = useState('')
+
+    // Fee Modal State
+    const [isFeeModalOpen, setIsFeeModalOpen] = useState(false)
+    const [pendingEnrollment, setPendingEnrollment] = useState<{ courseId: number, classId: number } | null>(null)
 
     // Course Search State
     const [isCourseDropdownOpen, setIsCourseDropdownOpen] = useState(false)
@@ -210,19 +216,55 @@ export default function StudentDetails() {
         }
     }
 
-    const handleAssignCourse = async () => {
-        if (!selectedCourseId || !id || !selectedClassId) {
+
+    const onEnrollClick = () => {
+        if (!selectedCourseId || !selectedClassId) {
             alert('Please select both a course and a batch class.')
             return
         }
+        setPendingEnrollment({
+            courseId: parseInt(selectedCourseId),
+            classId: parseInt(selectedClassId)
+        })
+        setIsFeeModalOpen(true)
+    }
+
+    const handleConfirmEnrollment = async (feeData: any) => {
+        if (!pendingEnrollment || !id) return
+
+        // 1. Enroll Student
+        const enrollSuccess = await handleAssignCourse(pendingEnrollment.courseId, pendingEnrollment.classId)
+        if (!enrollSuccess) return
+
+        // 2. Assign Fee Structure
+        try {
+            await feesService.assignFeeStructure({
+                student_id: id,
+                course_id: pendingEnrollment.courseId,
+                ...feeData
+            })
+
+            fetchData(true)
+            setSelectedCourseId('')
+            setSelectedClassId('')
+            setPendingEnrollment(null)
+            alert('Student enrolled and fee structure assigned successfully!')
+        } catch (error) {
+            console.error('Error assigning fees:', error)
+            alert('Enrollment successful but failed to assign fees. Please check logs.')
+        }
+    }
+
+    const handleAssignCourse = async (courseId: number, classId: number) => {
+        if (!id) return false
 
         try {
             const { error } = await supabase
                 .from('enrollments')
                 .insert({
                     student_id: id,
-                    course_id: parseInt(selectedCourseId),
-                    class_id: parseInt(selectedClassId),
+                    course_id: courseId,
+                    class_id: classId,
                     progress: 0
                 })
 
@@ -232,14 +274,12 @@ export default function StudentDetails() {
                 } else {
                     throw error
                 }
-            } else {
-                fetchData(true)
-                setSelectedCourseId('')
-                setSelectedClassId('')
+                return false
             }
+            return true
         } catch (error) {
             console.error('Error assigning course:', error)
-            alert('Failed to assign course')
+            return false
         }
     }
 
@@ -375,6 +415,17 @@ export default function StudentDetails() {
                     </div>
                 </div>
             )}
+
+            {/* Fee Structure Modal */}
+            <FeeStructureModal
+                isOpen={isFeeModalOpen}
+                onClose={() => setIsFeeModalOpen(false)}
+                onConfirm={handleConfirmEnrollment}
+                studentName={student?.full_name || 'Student'}
+                courseName={allCourses.find(c => c.id === pendingEnrollment?.courseId)?.course_name || ''}
+                // In future: fetch default course fee here
+                defaultBaseFee={0}
+            />
 
             <div className="mb-8">
                 <Link to="/admin/students" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
@@ -668,11 +719,11 @@ export default function StudentDetails() {
                             )}
 
                             <button
-                                onClick={handleAssignCourse}
+                                onClick={onEnrollClick}
                                 disabled={!selectedCourseId || !selectedClassId}
                                 className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                Enroll in Class
+                                Enroll & Set Fees
                             </button>
                         </div>
                     </div>

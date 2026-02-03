@@ -28,6 +28,7 @@ import StudentDashboard from './student/pages/Dashboard'
 import OfflineClasses from './student/pages/OfflineClasses'
 import StudentCalendar from './student/pages/Calendar'
 import CompleteProfile from './student/pages/CompleteProfile'
+import StudentFeesPage from './student/pages/StudentFees'
 
 // Admin Imports
 import AdminLayout from './admin/layout/AdminLayout'
@@ -47,6 +48,7 @@ import AdminClassDetails from './admin/pages/AdminClassDetails'
 import CreateTest from './admin/pages/CreateTest'
 import AdminTests from './admin/pages/Tests'
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
+const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -156,6 +158,7 @@ function App() {
               <Route path="calendar" element={<StudentCalendar />} />
               <Route path="tests" element={<OnlineTest isStudentPortal />} />
               <Route path="tests/:testId" element={<TestPlayer />} />
+              <Route path="fees" element={<StudentFeesPage />} />
               <Route path="complete-profile" element={<CompleteProfile />} />
             </Route>
 
@@ -186,6 +189,7 @@ function App() {
               <Route path="tests" element={<AdminTests />} />
               <Route path="tests/new" element={<CreateTest />} />
               <Route path="tests/:id/edit" element={<CreateTest />} />
+              <Route path="finance" element={<AdminFinance />} />
               <Route path="discount-claims" element={<DiscountClaims />} />
             </Route>
 
