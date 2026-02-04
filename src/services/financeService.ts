@@ -83,5 +83,29 @@ export const financeService = {
 
         if (error) throw error;
         return true;
+    },
+
+    async getStudentPayments(studentId: string) {
+        // Fetch all transactions linked to this student (Admission, EMI, etc.)
+        const { data, error } = await supabase
+            .from('institution_transactions')
+            .select('*')
+            .eq('student_id', studentId)
+            .order('transaction_date', { ascending: false });
+
+        if (error) throw error;
+        return data as Transaction[];
+    },
+
+    async getAllStudentPayments() {
+        // Fetch specific payment types for the grid view
+        const { data, error } = await supabase
+            .from('institution_transactions')
+            .select('*, student:profiles(full_name, id)')
+            .in('category', ['Admission', 'EMI', 'Course Fee'])
+            .order('transaction_date', { ascending: false });
+
+        if (error) throw error;
+        return data;
     }
 };

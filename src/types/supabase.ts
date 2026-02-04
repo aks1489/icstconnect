@@ -106,6 +106,8 @@ export interface Database {
                     description: string | null
                     payment_mode: 'cash' | 'online' | 'bank_transfer' | 'cheque' | 'other'
                     related_payment_id: string | null
+                    student_id: string | null
+                    remarks: string | null
                     created_at: string
                 }
                 Insert: {
@@ -118,6 +120,8 @@ export interface Database {
                     description?: string | null
                     payment_mode?: 'cash' | 'online' | 'bank_transfer' | 'cheque' | 'other'
                     related_payment_id?: string | null
+                    student_id?: string | null
+                    remarks?: string | null
                     created_at?: string
                 }
                 Update: {

@@ -1,7 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Calendar } from 'lucide-react';
 import type { Database } from '../../types/supabase';
+import { supabase } from '../../lib/supabase';
+import StudentViewPaymentGrid from '../components/StudentViewPaymentGrid';
 
 type StudentFee = Database['public']['Tables']['student_fees']['Row'];
 type FeePayment = Database['public']['Tables']['fee_payments']['Row'];
@@ -30,7 +33,8 @@ export default function StudentFees() {
             // I'll modify the service later? No, let's just use supabase client here for MVP speed.
 
             // Actually, I should use the service. I'll stick to a simple query here.
-            const { supabase } = await import('../../lib/supabase');
+            // Using top-level supabase client
+
 
             const { data: fees } = await supabase
                 .from('student_fees')
@@ -86,7 +90,11 @@ export default function StudentFees() {
                                     </div>
                                 </div>
 
-                                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Monthly Payment Grid */}
+                                <StudentViewPaymentGrid />
+
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    {/* Fee Structure Card */}
                                     <div>
                                         <p className="text-sm text-slate-500 mb-1">Total Fee</p>
                                         <p className="font-semibold text-slate-700">₹{fee.final_total_fee.toLocaleString()}</p>
@@ -114,7 +122,7 @@ export default function StudentFees() {
                                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-indigo-500 rounded-full transition-all duration-500"
-                                            style={{ width: `${progress}%` }}
+                                            style={{ width: `${progress}% ` }}
                                         />
                                     </div>
                                     <p className="text-xs text-right mt-1 text-slate-400">{progress.toFixed(0)}% paid</p>

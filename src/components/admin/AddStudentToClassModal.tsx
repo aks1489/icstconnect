@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Search, UserPlus, CheckCircle } from 'lucide-react'
+import { X, Search, UserPlus, CheckCircle, ArrowLeft } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../contexts/ToastContext'
 
@@ -30,24 +30,57 @@ export default function AddStudentToClassModal({
     existingStudentIds
 }: AddStudentToClassModalProps) {
     const { showToast } = useToast()
+
+    // Selecting Student State
     const [searchQuery, setSearchQuery] = useState('')
     const [allStudents, setAllStudents] = useState<Student[]>([])
     const [filteredStudents, setFilteredStudents] = useState<Student[]>([])
     const [loading, setLoading] = useState(false)
-    const [addingIds, setAddingIds] = useState<string[]>([])
+
+    // Fee Details State
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+    const [feeDetails, setFeeDetails] = useState({
+        base_fee: 0,
+        admission_fee: 0,
+        discount: 0,
+        payment_plan: 'monthly' as 'monthly' | 'one_time',
+        monthly_installment: 0,
+        monthly_due_day: 5
+    })
+    const [submitting, setSubmitting] = useState(false)
 
     // Load all students on mount (or when modal opens)
     useEffect(() => {
         if (isOpen) {
-            setAddingIds([]) // Reset local adding state on reopen
+            // Reset state on open
+            setSelectedStudent(null)
+            setFeeDetails({
+                base_fee: 0,
+                admission_fee: 0,
+                discount: 0,
+                payment_plan: 'monthly',
+                monthly_installment: 0,
+                monthly_due_day: 5
+            })
             fetchAllStudents()
         }
     }, [isOpen])
 
-    // Filter students locally when search query changes
+    // Filter students locally
     useEffect(() => {
-        filterStudents()
-    }, [searchQuery, allStudents, existingStudentIds])
+        let result = allStudents
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase()
+            result = result.filter(s =>
+                s.full_name?.toLowerCase().includes(query) ||
+                s.email?.toLowerCase().includes(query)
+            )
+        }
+        setFilteredStudents(result)
+    }, [searchQuery, allStudents])
+
+    // Calculate final fee whenever inputs change
+    const totalFee = (Number(feeDetails.base_fee) + Number(feeDetails.admission_fee)) - Number(feeDetails.discount)
 
     const fetchAllStudents = async () => {
         try {
@@ -57,10 +90,9 @@ export default function AddStudentToClassModal({
                 .select('id, full_name, email, avatar_url')
                 .eq('role', 'student')
                 .order('full_name')
-                .limit(100) // Fetches top 100 students initially
+                .limit(100)
 
             if (error) throw error
-
             setAllStudents(data || [])
         } catch (error) {
             console.error('Error fetching students:', error)
@@ -70,46 +102,61 @@ export default function AddStudentToClassModal({
         }
     }
 
-    const filterStudents = () => {
-        let result = allStudents
-
-        // 1. Filter by search query
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase()
-            result = result.filter(s =>
-                s.full_name?.toLowerCase().includes(query) ||
-                s.email?.toLowerCase().includes(query)
-            )
-        }
-
-        // 2. We DO NOT filter out enrolled students anymore, we just mark them
-        // result = result.filter(s => !existingStudentIds.includes(s.id))
-
-        setFilteredStudents(result)
+    const handleSelectStudent = (student: Student) => {
+        setSelectedStudent(student)
+        // Set default installment roughly if monthly
+        // We can't know defaults yet, so just leave 0
     }
 
-    const handleAddStudent = async (student: Student) => {
-        try {
-            setAddingIds(prev => [...prev, student.id])
+    const handleConfirmEnrollment = async () => {
+        if (!selectedStudent) return
+        setSubmitting(true)
 
-            const { error } = await supabase
+        try {
+            // 1. Create Enrollment
+            const { error: enrollError } = await supabase
                 .from('enrollments')
                 .insert({
-                    student_id: student.id,
+                    student_id: selectedStudent.id,
                     class_id: classId,
                     course_id: courseId,
                     progress: 0
                 })
 
-            if (error) throw error
+            if (enrollError) throw enrollError
 
-            showToast(`${student.full_name} added to class`, 'success')
-            onSuccess() // Trigger refresh in parent
+            // 2. Create Student Fee Record
+            const { error: feeError } = await supabase
+                .from('student_fees')
+                .insert({
+                    student_id: selectedStudent.id,
+                    course_id: courseId,
+                    base_fee: feeDetails.base_fee,
+                    admission_fee: feeDetails.admission_fee,
+                    discount_on_base: feeDetails.discount,
+                    discount_on_admission: 0,
+                    // final_total_fee is generated by DB
+                    payment_plan: feeDetails.payment_plan,
+                    monthly_installment_amount: feeDetails.payment_plan === 'monthly' ? feeDetails.monthly_installment : null,
+                    monthly_due_day: feeDetails.monthly_due_day,
+                    status: 'pending' // Default status
+                })
+
+            if (feeError) {
+                console.error('Fee creation failed but enrollment succeeded:', feeError)
+                showToast('Enrolled, but failed to set fees. Please set manually.', 'warning')
+            } else {
+                showToast(`${selectedStudent.full_name} enrolled successfully!`, 'success')
+            }
+
+            onSuccess() // Trigger refresh parent
+            onClose()
 
         } catch (error) {
-            console.error('Error adding student:', error)
-            showToast('Failed to add student to class', 'error')
-            setAddingIds(prev => prev.filter(id => id !== student.id))
+            console.error('Error enrolling student:', error)
+            showToast('Failed to enroll student', 'error')
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -117,98 +164,190 @@ export default function AddStudentToClassModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-                onClick={onClose}
-            ></div>
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
 
-            <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+
+                {/* Header */}
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <h3 className="font-bold text-slate-800">Add Student to Class</h3>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-slate-200 rounded-full transition-colors"
-                    >
+                    <div className="flex items-center gap-2">
+                        {selectedStudent && (
+                            <button
+                                onClick={() => setSelectedStudent(null)}
+                                className="mr-2 p-1 hover:bg-slate-200 rounded-full transition-colors"
+                            >
+                                <ArrowLeft size={18} className="text-slate-500" />
+                            </button>
+                        )}
+                        <h3 className="font-bold text-slate-800">
+                            {selectedStudent ? 'Setup Fee Structure' : 'Add Student to Class'}
+                        </h3>
+                    </div>
+                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
                         <X size={20} className="text-slate-500" />
                     </button>
                 </div>
 
-                <div className="p-4">
-                    <div className="relative mb-4">
-                        <Search className="absolute left-3 top-3 text-slate-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Search by student name..."
-                            autoFocus
-                            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="overflow-y-auto max-h-[400px] min-h-[200px]">
-                        {loading && allStudents.length === 0 ? (
-                            <div className="text-center py-8 text-slate-400 text-sm">Loading students...</div>
-                        ) : filteredStudents.length === 0 ? (
-                            <div className="text-center py-8 text-slate-400 text-sm">
-                                {searchQuery ? 'No matching students found' : 'All available students listed'}
+                {/* Content */}
+                <div className="p-0 overflow-y-auto">
+                    {!selectedStudent ? (
+                        // VIEW 1: SELECT STUDENT
+                        <div className="p-4">
+                            <div className="relative mb-4">
+                                <Search className="absolute left-3 top-3 text-slate-400" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search by student name..."
+                                    autoFocus
+                                    className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
                             </div>
-                        ) : (
-                            <div className="space-y-2">
-                                {filteredStudents.map(student => {
-                                    const isAlreadyEnrolled = existingStudentIds.includes(student.id)
-                                    const isJustAdded = addingIds.includes(student.id)
-                                    const isAdded = isAlreadyEnrolled || isJustAdded
 
-                                    return (
-                                        <div
-                                            key={student.id}
-                                            className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-all group"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm overflow-hidden flex-shrink-0">
-                                                    {student.avatar_url ? (
-                                                        <img src={student.avatar_url} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        student.full_name?.charAt(0)
-                                                    )}
+                            <div className="overflow-y-auto max-h-[400px] min-h-[200px]">
+                                {loading && allStudents.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-400 text-sm">Loading students...</div>
+                                ) : filteredStudents.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-400 text-sm">No matching students found</div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {filteredStudents.map(student => {
+                                            const isAlreadyEnrolled = existingStudentIds.includes(student.id)
+                                            return (
+                                                <div key={student.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-all group">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm overflow-hidden flex-shrink-0">
+                                                            {student.avatar_url ? (
+                                                                <img src={student.avatar_url} alt="" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                student.full_name?.charAt(0)
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-slate-700 text-sm">{student.full_name}</p>
+                                                            <p className="text-xs text-slate-500">{student.email}</p>
+                                                            {isAlreadyEnrolled && (
+                                                                <p className="text-[10px] uppercase font-bold text-emerald-600 mt-1">Already Enrolled</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleSelectStudent(student)}
+                                                        disabled={isAlreadyEnrolled}
+                                                        className={`p-2 rounded-lg transition-colors ${isAlreadyEnrolled
+                                                            ? 'bg-slate-100 text-slate-400 cursor-default'
+                                                            : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white'
+                                                            }`}
+                                                    >
+                                                        {isAlreadyEnrolled ? <CheckCircle size={18} /> : <UserPlus size={18} />}
+                                                    </button>
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-slate-700 text-sm">{student.full_name}</p>
-                                                    <p className="text-xs text-slate-500">{student.email}</p>
-                                                    {isAdded && (
-                                                        <p className="text-[10px] uppercase font-bold text-emerald-600 mt-1">
-                                                            Enrolled in {batchName}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <button
-                                                onClick={() => handleAddStudent(student)}
-                                                disabled={isAdded}
-                                                className={`p-2 rounded-lg transition-colors ${isAdded
-                                                        ? 'bg-slate-100 text-slate-400 cursor-default'
-                                                        : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white'
-                                                    }`}
-                                            >
-                                                {isAdded ? <CheckCircle size={18} /> : <UserPlus size={18} />}
-                                            </button>
-                                        </div>
-                                    )
-                                })}
+                                            )
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                </div>
+                        </div>
+                    ) : (
+                        // VIEW 2: FEE FORM
+                        <div className="p-6 space-y-6">
+                            <div className="bg-indigo-50 p-4 rounded-xl flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                                    {selectedStudent.full_name.charAt(0)}
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-indigo-900">{selectedStudent.full_name}</h4>
+                                    <p className="text-xs text-indigo-600">Enrolling in {batchName}</p>
+                                </div>
+                            </div>
 
-                <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
-                    <button
-                        onClick={onClose}
-                        className="text-slate-500 font-bold text-sm hover:text-slate-800"
-                    >
-                        Done
-                    </button>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1">Base Fee (₹)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        value={feeDetails.base_fee}
+                                        onChange={e => setFeeDetails({ ...feeDetails, base_fee: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1">Admission Fee (₹)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        value={feeDetails.admission_fee}
+                                        onChange={e => setFeeDetails({ ...feeDetails, admission_fee: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1">Discount (₹)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        value={feeDetails.discount}
+                                        onChange={e => setFeeDetails({ ...feeDetails, discount: Number(e.target.value) })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 mb-1">Payment Plan</label>
+                                    <select
+                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                        value={feeDetails.payment_plan}
+                                        onChange={e => setFeeDetails({ ...feeDetails, payment_plan: e.target.value as any })}
+                                    >
+                                        <option value="monthly">Monthly</option>
+                                        <option value="one_time">One Time</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {feeDetails.payment_plan === 'monthly' && (
+                                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                    <div className="col-span-1">
+                                        <label className="block text-xs font-bold text-slate-500 mb-1">Monthly Installment (₹)</label>
+                                        <input
+                                            type="number"
+                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            value={feeDetails.monthly_installment}
+                                            onChange={e => setFeeDetails({ ...feeDetails, monthly_installment: Number(e.target.value) })}
+                                        />
+                                    </div>
+                                    <div className="col-span-1">
+                                        <label className="block text-xs font-bold text-slate-500 mb-1">Due Day (of month)</label>
+                                        <input
+                                            type="number"
+                                            min="1" max="31"
+                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            value={feeDetails.monthly_due_day}
+                                            onChange={e => setFeeDetails({ ...feeDetails, monthly_due_day: Number(e.target.value) })}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex items-center justify-between p-4 bg-slate-900 text-white rounded-xl shadow-lg">
+                                <div>
+                                    <p className="text-xs text-slate-400 uppercase font-bold">Total Final Fee</p>
+                                    <p className="text-2xl font-bold">₹{totalFee.toLocaleString()}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-slate-400">
+                                        {feeDetails.payment_plan === 'monthly' ? 'Monthly Plan' : 'One-time Payment'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={handleConfirmEnrollment}
+                                disabled={submitting}
+                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {submitting ? 'Enrolling...' : 'Confirm Enrollment & Fees'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
