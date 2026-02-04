@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Upload, DollarSign, TrendingUp, TrendingDown, Activity, FileText } from 'lucide-react';
+import { Download, Plus, DollarSign, TrendingUp, TrendingDown, Activity, FileText, Trash2 } from 'lucide-react';
 import { financeService } from '../../services/financeService';
-import { parseBalanceSheetCSV } from '../../utils/csvParser';
+import AddTransactionModal from '../components/AddTransactionModal';
 import type { Database } from '../../types/supabase';
+import { useToast } from '../../contexts/ToastContext';
 
 type Transaction = Database['public']['Tables']['institution_transactions']['Row'];
 
 export default function FinancialDashboard() {
+    const { showToast } = useToast();
     const [stats, setStats] = useState({
         totalIncome: 0,
         totalExpense: 0,
@@ -14,7 +16,7 @@ export default function FinancialDashboard() {
         totalLiabilities: 0
     });
     const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [isImporting, setIsImporting] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -30,41 +32,53 @@ export default function FinancialDashboard() {
             setTransactions(txData);
         } catch (error) {
             console.error('Error fetching financial data:', error);
+            showToast('Failed to load financial data', 'error');
         }
     };
 
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
+    const handleExportCSV = () => {
+        if (transactions.length === 0) {
+            showToast('No transactions to export', 'info');
+            return;
+        }
 
-        setIsImporting(true);
-        const reader = new FileReader();
+        const headers = ['Date', 'Type', 'Category', 'Sub Category', 'Amount', 'Payment Mode', 'Description'];
+        const csvContent = [
+            headers.join(','),
+            ...transactions.map(tx => [
+                new Date(tx.transaction_date).toLocaleDateString(),
+                tx.type,
+                `"${tx.category}"`,
+                `"${tx.sub_category || ''}"`,
+                tx.amount,
+                tx.payment_mode,
+                `"${tx.description || ''}"`
+            ].join(','))
+        ].join('\n');
 
-        reader.onload = async (e) => {
-            const content = e.target?.result as string;
-            if (content) {
-                try {
-                    const parsedData = parseBalanceSheetCSV(content);
-                    if (parsedData.length === 0) {
-                        alert('No valid transactions found in CSV.');
-                        return;
-                    }
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `financial_transactions_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('CSV Exported Successfully', 'success');
+    };
 
-                    if (confirm(`Found ${parsedData.length} transactions. Import now?`)) {
-                        await financeService.importTransactions(parsedData);
-                        alert('Import successful!');
-                        fetchData();
-                    }
-                } catch (error) {
-                    console.error('Import failed:', error);
-                    alert('Import failed. Check console for details.');
-                } finally {
-                    setIsImporting(false);
-                }
-            }
-        };
+    const handleDeleteTransaction = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this transaction?')) return;
 
-        reader.readAsText(file);
+        try {
+            await financeService.deleteTransaction(id);
+            showToast('Transaction deleted successfully', 'success');
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting transaction:', error);
+            showToast('Failed to delete transaction', 'error');
+        }
     };
 
     return (
@@ -75,11 +89,20 @@ export default function FinancialDashboard() {
                     <p className="text-slate-500">Manage institution finances and balance sheet</p>
                 </div>
                 <div className="flex gap-3">
-                    <label className={`flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 cursor-pointer transition-colors ${isImporting ? 'opacity-50 pointer-events-none' : ''}`}>
-                        <Upload size={18} />
-                        <span>{isImporting ? 'Importing...' : 'Import CSV'}</span>
-                        <input type="file" accept=".csv" onChange={handleFileUpload} className="hidden" disabled={isImporting} />
-                    </label>
+                    <button
+                        onClick={handleExportCSV}
+                        className="flex items-center gap-2 px-4 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                        <Download size={18} />
+                        <span>Export CSV</span>
+                    </button>
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                        <Plus size={18} />
+                        <span>Add Transaction</span>
+                    </button>
                 </div>
             </div>
 
@@ -133,18 +156,19 @@ export default function FinancialDashboard() {
                                 <th className="px-4 py-3">Sub Category</th>
                                 <th className="px-4 py-3">Amount</th>
                                 <th className="px-4 py-3">Mode</th>
+                                <th className="px-4 py-3 w-10"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {transactions.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
-                                        No transactions found. Import a CSV to get started.
+                                    <td colSpan={7} className="px-4 py-8 text-center text-slate-400">
+                                        No transactions found. Add a transaction to get started.
                                     </td>
                                 </tr>
                             ) : (
                                 transactions.map((tx) => (
-                                    <tr key={tx.id} className="hover:bg-slate-50 transition-colors">
+                                    <tr key={tx.id} className="hover:bg-slate-50 transition-colors group">
                                         <td className="px-4 py-3 text-slate-600">
                                             {new Date(tx.transaction_date).toLocaleDateString()}
                                         </td>
@@ -163,6 +187,15 @@ export default function FinancialDashboard() {
                                             ₹{tx.amount.toLocaleString()}
                                         </td>
                                         <td className="px-4 py-3 text-slate-500 capitalize">{tx.payment_mode?.replace('_', ' ')}</td>
+                                        <td className="px-4 py-3 text-right">
+                                            <button
+                                                onClick={() => handleDeleteTransaction(tx.id)}
+                                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                                                title="Delete transaction"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             )}
@@ -170,6 +203,12 @@ export default function FinancialDashboard() {
                     </table>
                 </div>
             </div>
+
+            <AddTransactionModal
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onSuccess={fetchData}
+            />
         </div>
     );
 }

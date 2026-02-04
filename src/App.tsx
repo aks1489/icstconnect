@@ -101,117 +101,123 @@ const ErrorToast = () => {
   )
 }
 
+import { ToastProvider } from './contexts/ToastContext'
+import ToastContainer from './components/ui/ToastContainer'
+
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <ErrorToast />
+      <ToastProvider>
+        <Router>
+          <ErrorToast />
+          <ToastContainer />
 
-        <Suspense fallback={<PageSkeleton />}>
-          <Routes>
-            {/* Public Routes with MainLayout */}
-            <Route element={<MainLayout><Outlet /></MainLayout>}>
-              <Route path="/" element={<Home />} />
-              <Route path="/courses/:courseId?" element={<CoursesPage />} />
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes>
+              {/* Public Routes with MainLayout */}
+              <Route element={<MainLayout><Outlet /></MainLayout>}>
+                <Route path="/" element={<Home />} />
+                <Route path="/courses/:courseId?" element={<CoursesPage />} />
 
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/gallery" element={<Gallery />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/gallery" element={<Gallery />} />
 
-              <Route path="/online-test" element={
-                <Suspense fallback={<PageSkeleton />}>
-                  <OnlineTest />
-                </Suspense>
+                <Route path="/online-test" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <OnlineTest />
+                  </Suspense>
+                } />
+
+                <Route path="/online-test/:testId" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <TestPlayer />
+                  </Suspense>
+                } />
+
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/login" element={<Navigate to="/" replace />} />
+                <Route path="/admin/login" element={<AdminLogin />} />
+                <Route path="/teacher/login" element={<TeacherLogin />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+
+                {/* Catch all to Home - Only inside MainLayout */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Route>
+
+              {/* Quick Access - Protected but Shared */}
+              <Route path="/quick-access" element={
+                <ProtectedRoute>
+                  <div className="animate-in fade-in duration-300">
+                    <QuickAccess />
+                  </div>
+                </ProtectedRoute>
               } />
+              <Route path="/student" element={
+                <ProtectedRoute>
+                  <StudentLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<StudentDashboard />} />
+                <Route path="offline-classes" element={<OfflineClasses />} />
+                <Route path="calendar" element={<StudentCalendar />} />
+                <Route path="tests" element={<OnlineTest isStudentPortal />} />
+                <Route path="tests/:testId" element={<TestPlayer />} />
+                <Route path="fees" element={<StudentFeesPage />} />
+                <Route path="complete-profile" element={<CompleteProfile />} />
+              </Route>
 
-              <Route path="/online-test/:testId" element={
-                <Suspense fallback={<PageSkeleton />}>
-                  <TestPlayer />
-                </Suspense>
-              } />
+              {/* Standalone Connect Page */}
+              <Route path="/connect" element={<Connect />} />
 
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/login" element={<Navigate to="/" replace />} />
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/teacher/login" element={<TeacherLogin />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
+              {/* Admin Routes - Independent Layout */}
+              <Route path="/admin" element={
+                <ProtectedRoute requireAdmin>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="students" element={<ManageStudents />} />
+                <Route path="students/:id" element={<StudentDetails />} />
+                <Route path="courses" element={<AdminCourses />} />
+                <Route path="courses/new" element={<CourseForm />} />
+                <Route path="courses/:id/edit" element={<CourseForm />} />
+                <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
+                <Route path="courses/:id/classes" element={<ClassManager />} />
+                <Route path="classes" element={<AdminClasses />} />
+                <Route path="classes/:id" element={<AdminClassDetails />} />
+                <Route path="calendar" element={<AdminCalendar />} />
+                <Route path="schedule" element={<ScheduleClass />} />
+                <Route path="teachers" element={<AdminTeachers />} />
+                <Route path="teachers/:id" element={<TeacherDetails />} />
+                <Route path="tests" element={<AdminTests />} />
+                <Route path="tests/new" element={<CreateTest />} />
+                <Route path="tests/:id/edit" element={<CreateTest />} />
+                <Route path="finance" element={<AdminFinance />} />
+                <Route path="discount-claims" element={<DiscountClaims />} />
+              </Route>
 
-              {/* Catch all to Home - Only inside MainLayout */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
+              {/* Teacher Routes - Independent Layout */}
+              <Route path="/teacher" element={
+                <ProtectedRoute requireTeacher>
+                  <TeacherLayout />
+                </ProtectedRoute>
+              }>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<TeacherDashboard />} />
+                <Route path="calendar" element={<TeacherCalendar />} />
+                <Route path="active-classes" element={<ActiveClasses />} />
+                <Route path="classes/:courseId" element={<ManageClass />} />
+                <Route path="classes/:studentId/:courseId" element={<StudentProgressTracker />} />
+                <Route path="exams" element={<TeacherExams />} />
+                {/* Add more teacher routes here */}
+              </Route>
 
-            {/* Quick Access - Protected but Shared */}
-            <Route path="/quick-access" element={
-              <ProtectedRoute>
-                <div className="animate-in fade-in duration-300">
-                  <QuickAccess />
-                </div>
-              </ProtectedRoute>
-            } />
-            <Route path="/student" element={
-              <ProtectedRoute>
-                <StudentLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="offline-classes" element={<OfflineClasses />} />
-              <Route path="calendar" element={<StudentCalendar />} />
-              <Route path="tests" element={<OnlineTest isStudentPortal />} />
-              <Route path="tests/:testId" element={<TestPlayer />} />
-              <Route path="fees" element={<StudentFeesPage />} />
-              <Route path="complete-profile" element={<CompleteProfile />} />
-            </Route>
-
-            {/* Standalone Connect Page */}
-            <Route path="/connect" element={<Connect />} />
-
-            {/* Admin Routes - Independent Layout */}
-            <Route path="/admin" element={
-              <ProtectedRoute requireAdmin>
-                <AdminLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="students" element={<ManageStudents />} />
-              <Route path="students/:id" element={<StudentDetails />} />
-              <Route path="courses" element={<AdminCourses />} />
-              <Route path="courses/new" element={<CourseForm />} />
-              <Route path="courses/:id/edit" element={<CourseForm />} />
-              <Route path="courses/:id/structure" element={<CourseStructureEditor />} />
-              <Route path="courses/:id/classes" element={<ClassManager />} />
-              <Route path="classes" element={<AdminClasses />} />
-              <Route path="classes/:id" element={<AdminClassDetails />} />
-              <Route path="calendar" element={<AdminCalendar />} />
-              <Route path="schedule" element={<ScheduleClass />} />
-              <Route path="teachers" element={<AdminTeachers />} />
-              <Route path="teachers/:id" element={<TeacherDetails />} />
-              <Route path="tests" element={<AdminTests />} />
-              <Route path="tests/new" element={<CreateTest />} />
-              <Route path="tests/:id/edit" element={<CreateTest />} />
-              <Route path="finance" element={<AdminFinance />} />
-              <Route path="discount-claims" element={<DiscountClaims />} />
-            </Route>
-
-            {/* Teacher Routes - Independent Layout */}
-            <Route path="/teacher" element={
-              <ProtectedRoute requireTeacher>
-                <TeacherLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<TeacherDashboard />} />
-              <Route path="calendar" element={<TeacherCalendar />} />
-              <Route path="active-classes" element={<ActiveClasses />} />
-              <Route path="classes/:courseId" element={<ManageClass />} />
-              <Route path="classes/:studentId/:courseId" element={<StudentProgressTracker />} />
-              <Route path="exams" element={<TeacherExams />} />
-              {/* Add more teacher routes here */}
-            </Route>
-
-          </Routes>
-        </Suspense>
-      </Router>
+            </Routes>
+          </Suspense>
+        </Router>
+      </ToastProvider>
     </AuthProvider >
   )
 }

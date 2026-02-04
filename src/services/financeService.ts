@@ -73,5 +73,15 @@ export const financeService = {
         });
 
         return stats;
+    },
+
+    async deleteTransaction(id: string) {
+        const { error } = await supabase
+            .from('institution_transactions')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return true;
     }
 };
