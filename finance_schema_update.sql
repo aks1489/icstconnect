@@ -15,3 +15,7 @@ DROP CONSTRAINT IF EXISTS student_fees_student_id_fkey;
 ALTER TABLE student_fees
 ADD CONSTRAINT student_fees_student_id_fkey 
 FOREIGN KEY (student_id) REFERENCES profiles(id);
+
+-- Add columns for Dynamic Fee Calculation (Requested for Student specific tables)
+ALTER TABLE courses ADD COLUMN IF NOT EXISTS duration_months INTEGER DEFAULT 12;
+ALTER TABLE classes ADD COLUMN IF NOT EXISTS start_date DATE DEFAULT CURRENT_DATE;
