@@ -153,7 +153,7 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/student" element={
-                <ProtectedRoute>
+                <ProtectedRoute requireStudent>
                   <StudentLayout />
                 </ProtectedRoute>
               }>
