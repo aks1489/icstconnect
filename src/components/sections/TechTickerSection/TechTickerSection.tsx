@@ -1,11 +1,19 @@
-
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Atom, Box, FileCode2, Wind, FileCode, Database, Server, Triangle } from 'lucide-react'
 import TechPopup from '../../ui/TechPopup'
 
 const TechTickerSection = () => {
     const [hoveredTech, setHoveredTech] = useState<string | null>(null)
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+    const timeoutRef = useRef<number | null>(null)
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current)
+            }
+        }
+    }, [])
 
     const techs = [
         {
@@ -80,7 +88,15 @@ const TechTickerSection = () => {
     }
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        setMousePos({ x: e.clientX, y: e.clientY })
+        if (timeoutRef.current) return;
+
+        const x = e.clientX;
+        const y = e.clientY;
+
+        timeoutRef.current = setTimeout(() => {
+            setMousePos({ x, y })
+            timeoutRef.current = null;
+        }, 40) // throttle to ~25fps to save render cycles
     }
 
     const handleMouseLeave = () => {
