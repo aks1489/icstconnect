@@ -15,6 +15,7 @@ const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const Connect = lazy(() => import('./pages/Connect'))
+const TypingPractice = lazy(() => import('./pages/TypingPractice'))
 // const LearningHub = lazy(() => import('./pages/LearningHub'))
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
@@ -143,6 +144,13 @@ function App() {
                 {/* Catch all to Home - Only inside MainLayout */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
+
+              {/* Standalone Typing Practice Page */}
+              <Route path="/typing-practice" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <TypingPractice />
+                </Suspense>
+              } />
 
               {/* Quick Access - Protected but Shared */}
               <Route path="/quick-access" element={
