@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Users, X, Calendar, Clock, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Users, X, Calendar, Clock, Plus, Trash2, UserPlus } from 'lucide-react'
+import AddStudentToClassModal from '../../components/admin/AddStudentToClassModal'
+import { useToast } from '../../contexts/ToastContext'
 
 
 interface Student {
@@ -37,6 +39,7 @@ interface ClassSchedule {
 
 export default function AdminClassDetails() {
     const { id } = useParams()
+    const { showToast } = useToast()
     const [classDetails, setClassDetails] = useState<ClassDetails | null>(null)
     const [students, setStudents] = useState<Student[]>([])
     const [schedules, setSchedules] = useState<ClassSchedule[]>([])
@@ -49,15 +52,17 @@ export default function AdminClassDetails() {
         duration_minutes: 60
     })
 
+    const [isAddStudentOpen, setIsAddStudentOpen] = useState(false)
+
     useEffect(() => {
         if (id) {
             fetchData()
         }
     }, [id])
 
-    const fetchData = async () => {
+    const fetchData = async (isRefresh = false) => {
         try {
-            setLoading(true)
+            if (!isRefresh) setLoading(true)
 
             // 1. Fetch Class Details
             const { data: classData, error: classError } = await supabase
@@ -119,15 +124,13 @@ export default function AdminClassDetails() {
 
         } catch (error) {
             console.error('Error fetching details:', error)
-            alert('Failed to load class details')
+            showToast('Failed to load class details', 'error')
         } finally {
             setLoading(false)
         }
     }
 
     const handleRemoveStudent = async (enrollmentId: number) => {
-        if (!confirm('Are you sure you want to remove this student from the class? This will delete their enrollment record.')) return
-
         try {
             const { error } = await supabase
                 .from('enrollments')
@@ -138,12 +141,14 @@ export default function AdminClassDetails() {
 
             // Optimistic update
             setStudents(prev => prev.filter(s => s.enrollment_id !== enrollmentId))
+            showToast('Student removed from class', 'success')
+
             // Optionally refetch to be safe
-            // fetchData()
+            // fetchData(true)
 
         } catch (error) {
             console.error('Error removing student:', error)
-            alert('Failed to remove student')
+            showToast('Failed to remove student', 'error')
         }
     }
 
@@ -163,10 +168,11 @@ export default function AdminClassDetails() {
 
             if (error) throw error
             setSchedules([...schedules, data[0]])
+            showToast('Class schedule added', 'success')
             // Reset form (optional)
         } catch (error) {
             console.error('Error adding schedule:', error)
-            alert('Failed to add schedule')
+            showToast('Failed to add schedule', 'error')
         }
     }
 
@@ -180,8 +186,10 @@ export default function AdminClassDetails() {
 
             if (error) throw error
             setSchedules(prev => prev.filter(s => s.id !== id))
+            showToast('Schedule deleted', 'success')
         } catch (error) {
             console.error('Error deleting schedule:', error)
+            showToast('Failed to delete schedule', 'error')
         }
     }
 
@@ -197,6 +205,18 @@ export default function AdminClassDetails() {
                 <ArrowLeft size={16} />
                 Back to All Classes
             </Link>
+
+            {classDetails && (
+                <AddStudentToClassModal
+                    isOpen={isAddStudentOpen}
+                    onClose={() => setIsAddStudentOpen(false)}
+                    onSuccess={() => fetchData(true)}
+                    classId={Number(id)}
+                    courseId={classDetails.course.id}
+                    batchName={classDetails.batch_name}
+                    existingStudentIds={students.map(s => s.id)}
+                />
+            )}
 
             {/* Header Card */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 mb-8">
@@ -330,7 +350,16 @@ export default function AdminClassDetails() {
             </div>
 
             {/* Students List Link */}
-            <h2 className="text-xl font-bold text-slate-800 mb-6">Enrolled Students</h2>
+            <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-slate-800">Enrolled Students</h2>
+                <button
+                    onClick={() => setIsAddStudentOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 font-medium text-sm"
+                >
+                    <UserPlus size={18} />
+                    Add Student
+                </button>
+            </div>
 
             {students.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">

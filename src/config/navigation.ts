@@ -52,6 +52,13 @@ export const STUDENT_ACTIONS: NavItem[] = [
         icon: Laptop,
         color: 'text-blue-600',
         description: 'Take practice exams and view results'
+    },
+    {
+        label: 'My Fees',
+        path: '/student/fees',
+        icon: Building2,
+        color: 'text-emerald-600',
+        description: 'View fee status and payments'
     }
 ]
 
@@ -135,6 +142,13 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: FileText,
         color: 'text-cyan-600',
         description: 'Manage assessments'
+    },
+    {
+        label: 'Financials',
+        path: '/admin/finance',
+        icon: Building2,
+        color: 'text-emerald-600',
+        description: 'Balance sheet and transactions'
     },
     {
         label: 'Discount Claims',

@@ -26,7 +26,10 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                     pincode: data.pincode,
                     district: data.district,
                     state: data.state,
-                    avatar_url: data.avatar_url
+                    avatar_url: data.avatar_url,
+                    phone: data.phone,
+                    post_office: data.post_office,
+                    enrollment_center: data.enrollment_center
                 })
                 .eq('id', user.id)
 

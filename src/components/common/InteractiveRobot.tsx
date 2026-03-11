@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useAnimation, AnimatePresence, useInView } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence, useInView, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 // Using Devicon CDN for high-quality original logos
 // Static data defined outside component to prevent recreation
@@ -28,7 +28,8 @@ const InteractiveRobot = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const isInView = useInView(containerRef, { amount: 0.1, once: false }); // Only active when visible
 
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
     const [spawnedIcons, setSpawnedIcons] = useState<any[]>([]);
     const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
     const [isInteracting, setIsInteracting] = useState(false);
@@ -48,7 +49,8 @@ const InteractiveRobot = () => {
             animationFrameId = requestAnimationFrame(() => {
                 const x = (e.clientX / window.innerWidth) * 2 - 1;
                 const y = (e.clientY / window.innerHeight) * 2 - 1;
-                setMousePosition({ x, y });
+                mouseX.set(x);
+                mouseY.set(y);
             });
         };
 
@@ -141,14 +143,13 @@ const InteractiveRobot = () => {
                 });
             }
         }
-    }, [mousePosition, isInteracting, rightArmControls, hoveredIcon, spawnedIcons, isInView]);
+    }, [isInteracting, rightArmControls, hoveredIcon, spawnedIcons, isInView]);
 
-    const pupilMovement = {
-        x: mousePosition.x * 8,
-        y: mousePosition.y * 8
-    };
+    const pupilX = useTransform(mouseX, x => x * 8);
+    const pupilY = useTransform(mouseY, y => y * 8);
 
-    const headRotation = mousePosition.x * 5;
+    const smoothMouseX = useSpring(mouseX, { damping: 25, stiffness: 200, mass: 0.5 });
+    const headRotation = useTransform(smoothMouseX, x => x * 5);
 
     return (
         <div
@@ -249,11 +250,11 @@ const InteractiveRobot = () => {
                             {/* Eyes */}
                             <div className="flex justify-between items-center h-full px-4 pt-2">
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-inner relative overflow-hidden ring-4 ring-black/5">
-                                    <motion.div animate={pupilMovement} className="w-5 h-5 bg-slate-900 rounded-full" />
+                                    <motion.div style={{ x: pupilX, y: pupilY }} className="w-5 h-5 bg-slate-900 rounded-full" />
                                     <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-50"></div>
                                 </div>
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-inner relative overflow-hidden ring-4 ring-black/5">
-                                    <motion.div animate={pupilMovement} className="w-5 h-5 bg-slate-900 rounded-full" />
+                                    <motion.div style={{ x: pupilX, y: pupilY }} className="w-5 h-5 bg-slate-900 rounded-full" />
                                     <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-50"></div>
                                 </div>
                             </div>

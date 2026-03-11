@@ -25,6 +25,9 @@ export default function CompleteProfile() {
                     district: data.district,
                     state: data.state,
                     avatar_url: data.avatar_url,
+                    phone: data.phone,
+                    post_office: data.post_office,
+                    enrollment_center: data.enrollment_center,
                     // Helper logic could be added here to mark "is_complete" if you add a boolean flag col
                 })
                 .eq('id', user.id)

@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const newAccessToken = session?.access_token ?? null
 
             // If the token hasn't changed, ignore the update (prevents tab-switch re-renders)
-            if (newAccessToken === accessTokenRef.current) {
+            if (newAccessToken === accessTokenRef.current && _event !== 'SIGNED_OUT') {
                 return
             }
 
@@ -97,9 +97,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const signOut = async () => {
-        accessTokenRef.current = null // Reset token tracking
         await supabase.auth.signOut()
+        setSession(null)
+        setUser(null)
         setProfile(null)
+        accessTokenRef.current = null
     }
 
     const refreshProfile = async () => {
