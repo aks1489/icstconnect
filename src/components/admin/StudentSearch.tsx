@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Check } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface Student {
