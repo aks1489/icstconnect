@@ -4,26 +4,36 @@ import { ArrowLeft, Lock, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.jpg';
 
+const EXPIRY_MS = 3 * 60 * 1000; // 3 minutes
+
 export default function TypingPractice() {
-  // We'll store unlocked levels an array of numbers (the durations)
-  // 10s is always unlocked.
   const [unlockedLevels, setUnlockedLevels] = useState<number[]>(() => {
     const saved = localStorage.getItem('icst_typing_unlocked');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.levels && parsed.timestamp) {
+           const now = new Date().getTime();
+           if (now - parsed.timestamp < EXPIRY_MS) {
+              return parsed.levels;
+           }
+        }
       } catch {
         return [10];
       }
     }
     return [10];
   });
-
+  
   const [currentLevel, setCurrentLevel] = useState<number>(10);
 
-  // Save to localstorage when it changes
+  // Save to localstorage with timestamp when it changes
   useEffect(() => {
-    localStorage.setItem('icst_typing_unlocked', JSON.stringify(unlockedLevels));
+    const data = {
+       levels: unlockedLevels,
+       timestamp: new Date().getTime()
+    };
+    localStorage.setItem('icst_typing_unlocked', JSON.stringify(data));
   }, [unlockedLevels]);
 
   const handleTestComplete = (passed: boolean) => {
