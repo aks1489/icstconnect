@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { Course, Module } from '../../types/course'
 import { courseService } from '../../services/courseService'
 import { X, Check, ArrowRight } from 'lucide-react'
@@ -11,6 +12,7 @@ interface CourseDetailsModalProps {
 }
 
 const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen, onClose }) => {
+    const navigate = useNavigate()
     const [isVisible, setIsVisible] = useState(false)
     const [modules, setModules] = useState<Module[]>([])
     const [loadingStructure, setLoadingStructure] = useState(false)
@@ -198,7 +200,10 @@ const CourseDetailsModal: React.FC<CourseDetailsModalProps> = ({ course, isOpen,
                     >
                         Close
                     </button>
-                    <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <button 
+                        onClick={() => navigate(`/enroll/${course.id}`)}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
                         Enroll Now
                         <ArrowRight size={18} />
                     </button>

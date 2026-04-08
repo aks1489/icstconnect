@@ -12,6 +12,7 @@ const Notifications = lazy(() => import('./pages/Notifications'))
 const Gallery = lazy(() => import('./pages/Gallery'))
 const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
+const EnrollmentForm = lazy(() => import('./pages/EnrollmentForm'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const Connect = lazy(() => import('./pages/Connect'))
@@ -50,6 +51,7 @@ import CreateTest from './admin/pages/CreateTest'
 import AdminTests from './admin/pages/Tests'
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
+const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -119,6 +121,11 @@ function App() {
               <Route element={<MainLayout><Outlet /></MainLayout>}>
                 <Route path="/" element={<Home />} />
                 <Route path="/courses/:courseId?" element={<CoursesPage />} />
+                <Route path="/enroll/:courseId" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <EnrollmentForm />
+                  </Suspense>
+                } />
 
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/gallery" element={<Gallery />} />
@@ -204,6 +211,7 @@ function App() {
                 <Route path="tests/:id/edit" element={<CreateTest />} />
                 <Route path="finance" element={<AdminFinance />} />
                 <Route path="discount-claims" element={<DiscountClaims />} />
+                <Route path="enrollments" element={<EnrollmentApplications />} />
               </Route>
 
               {/* Teacher Routes - Independent Layout */}
