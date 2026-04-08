@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:all": "concurrently \"npm run dev\" \"npm run email\"",
+    "email": "node email-server.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -13,8 +15,11 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@netlify/functions": "^5.1.1",
     "@supabase/supabase-js": "^2.86.2",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
     "date-fns": "^4.1.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.561.0",
     "nodemailer": "^8.0.5",

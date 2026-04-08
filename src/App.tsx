@@ -15,6 +15,7 @@ const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const EnrollmentForm = lazy(() => import('./pages/EnrollmentForm'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const ForcePasswordChange = lazy(() => import('./pages/ForcePasswordChange'))
 const Connect = lazy(() => import('./pages/Connect'))
 const TypingPractice = lazy(() => import('./pages/TypingPractice'))
 // const LearningHub = lazy(() => import('./pages/LearningHub'))
@@ -140,6 +141,13 @@ function App() {
                   <Suspense fallback={<PageSkeleton />}>
                     <TestPlayer />
                   </Suspense>
+                } />
+
+                {/* Security Flow */}
+                <Route path="/force-password-change" element={
+                  <ProtectedRoute>
+                    <ForcePasswordChange />
+                  </ProtectedRoute>
                 } />
 
                 <Route path="/about" element={<AboutUs />} />

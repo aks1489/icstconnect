@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import type { FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { 
     CheckCircle2, ArrowRight, BookOpen, MapPin, Phone, MessageSquare, 
-    Info, CreditCard, ChevronDown, CheckCircle 
+    Info, CreditCard, ChevronDown, CheckCircle, X 
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
@@ -24,6 +24,24 @@ export default function EnrollmentForm() {
     const [submitting, setSubmitting] = useState(false)
     const [course, setCourse] = useState<Course | null>(null)
     const [successData, setSuccessData] = useState<any>(null)
+    
+    // Confirmation Modal
+    const [showConfirmModal, setShowConfirmModal] = useState(false)
+    const [declarationAccepted, setDeclarationAccepted] = useState(false)
+    const [highlightDeclaration, setHighlightDeclaration] = useState(false)
+    
+    // Track if profile data has been seeded to prevent overwrites
+    const profileInitialized = useRef(false)
+    const declarationRef = useRef<HTMLLabelElement>(null)
+
+    useEffect(() => {
+        if (showConfirmModal) {
+            document.body.style.overflow = 'hidden'
+        } else {
+            document.body.style.overflow = 'unset'
+        }
+        return () => { document.body.style.overflow = 'unset' }
+    }, [showConfirmModal])
 
     // Form Data
     const [formData, setFormData] = useState({
@@ -59,7 +77,8 @@ export default function EnrollmentForm() {
                 }
 
                 // Pre-fill from auth profile if available
-                if (profile) {
+                if (profile && !profileInitialized.current) {
+                    profileInitialized.current = true
                     setFormData(prev => ({
                         ...prev,
                         full_name: profile.full_name || '',
@@ -142,9 +161,35 @@ export default function EnrollmentForm() {
             return
         }
 
-        // Show confirmation popup (Native browser prompt for safety, can be replaced with custom Modal later)
-        const confirmed = window.confirm("Are you sure you want to submit this enrollment application?")
-        if (!confirmed) return
+        // Open custom confirmation modal instead of window.confirm
+        setShowConfirmModal(true)
+    }
+
+    const calculateFees = () => {
+        if (!course || !course.fees || !course.fees.total) return null
+        
+        const baseTotal = course.fees.total
+        let discount = 0
+        
+        if (formData.payment_plan === 'one_time') {
+            discount = baseTotal * 0.10 // 10% discount
+        }
+
+        return {
+            baseTotal,
+            discount,
+            finalTotal: baseTotal - discount
+        }
+    }
+
+    const handleConfirmSubmit = async () => {
+        if (!declarationAccepted) {
+            showToast("Please accept the declaration to proceed.", "warning")
+            setHighlightDeclaration(true)
+            declarationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            setTimeout(() => setHighlightDeclaration(false), 2000)
+            return
+        }
 
         setSubmitting(true)
         try {
@@ -160,12 +205,41 @@ export default function EnrollmentForm() {
                 district: formData.district,
                 post_office: formData.post_office,
                 address: formData.address,
-                course_id: course.id,
+                course_id: course!.id,
                 payment_plan: formData.payment_plan as any,
                 opt_spoken_english: formData.opt_spoken_english
             })
 
+            // Fire off background email directly to our new Express relay API
+            if (formData.email) {
+                fetch('http://localhost:5000/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: formData.email,
+                        subject: `Enrollment Application Submitted - ${course?.title}`,
+                        html: `
+                            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                                <h2>Application Received!</h2>
+                                <p>Dear ${formData.full_name},</p>
+                                <p>Your application for <strong>${course?.title}</strong> is safely submitted.</p>
+                                <hr />
+                                <h3>Reference ID: <span style="color: #4f46e5; font-family: monospace;">${app.reference_id}</span></h3>
+                                <br />
+                                <h4>ICST Chowberia Contact Info</h4>
+                                <p>Phone: +91 8158031706</p>
+                                <p>Address: Vill- Chowberia, P.O- Chowberia, P.S- Bongaon, Dist- North 24 Parganas, Pin- 743273</p>
+                            </div>
+                        `
+                    })
+                }).catch(err => console.error("Email API failed:", err)) // Silent fail for UX
+            }
+
             setSuccessData(app)
+            setShowConfirmModal(false)
+            if (formData.email) {
+                showToast("An email with reference details has been sent to you!", "success")
+            }
             window.scrollTo(0, 0)
         } catch (error: any) {
             showToast(error.message || "Failed to submit application", "error")
@@ -245,9 +319,135 @@ export default function EnrollmentForm() {
     }
 
     const progress = calculateProgress()
+    const feeInfo = calculateFees()
 
     return (
         <div className="min-h-screen bg-slate-50 pt-20 pb-20 relative">
+            
+            {/* Full-Screen Confirmation Modal */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 z-[9999] bg-slate-50 flex flex-col animate-in fade-in duration-200">
+                    
+                    {/* Header */}
+                    <div className="shrink-0 px-6 md:px-12 py-5 border-b border-indigo-700 flex items-center justify-between bg-indigo-600 text-white shadow-sm z-10 w-full">
+                        <h2 className="text-xl font-bold flex items-center gap-2">
+                            <BookOpen size={24} /> Review & Confirm Enrollment
+                        </h2>
+                        <button onClick={() => setShowConfirmModal(false)} className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-colors font-semibold flex items-center gap-2">
+                            <X size={18} />
+                            <span className="hidden md:inline">Cancel</span>
+                        </button>
+                    </div>
+                    
+                    {/* Scrollable Body */}
+                    <div className="flex-1 overflow-y-auto w-full flex justify-center p-4 md:p-8">
+                        <div className="w-full max-w-4xl space-y-6">
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="col-span-1 sm:col-span-2 border-b border-slate-100 pb-3 mb-1"><h3 className="font-bold text-slate-800">Student Info</h3></div>
+                                <div><p className="text-xs text-slate-500">Name</p><p className="font-bold text-slate-900">{formData.full_name}</p></div>
+                                <div><p className="text-xs text-slate-500">Phone</p><p className="font-bold text-slate-900">{formData.phone}</p></div>
+                                <div><p className="text-xs text-slate-500">Email</p><p className="font-medium text-slate-900">{formData.email || 'N/A'}</p></div>
+                                <div><p className="text-xs text-slate-500">Gender</p><p className="font-medium text-slate-900">{formData.gender}</p></div>
+                                <div className="col-span-1 sm:col-span-2"><p className="text-xs text-slate-500">Address</p><p className="font-medium text-slate-900">{formData.address}, P.O: {formData.post_office}, {formData.district}, {formData.state} - {formData.pincode}</p></div>
+                            </div>
+
+                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="col-span-1 sm:col-span-2 border-b border-slate-100 pb-3 mb-1"><h3 className="font-bold text-slate-800">Course & Perks</h3></div>
+                                <div className="col-span-1 sm:col-span-2 flex items-center gap-3">
+                                    <div className={`w-10 h-10 ${course?.color} rounded-lg flex items-center justify-center`}><BookOpen size={20}/></div>
+                                    <div><p className="font-bold text-slate-900">{course?.title}</p><p className="text-xs text-slate-500">{course?.duration}</p></div>
+                                </div>
+                                <div className="col-span-1 sm:col-span-2 mt-2">
+                                    {formData.opt_spoken_english && <span className="inline-flex items-center gap-1 text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full mr-2 mb-2"><CheckCircle2 size={12}/> Free Spoken English</span>}
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full"><CheckCircle2 size={12}/> Free Practice Classes</span>
+                                </div>
+                            </div>
+
+                            <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-10"><CreditCard size={100} /></div>
+                                <h3 className="font-bold text-indigo-900 mb-4 relative z-10">Payment Plan Overview</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 sm:gap-y-3 relative z-10">
+                                    <div><p className="text-sm text-indigo-600/80">Selected Plan</p><p className="font-black text-indigo-900 capitalize text-lg tracking-wide">{formData.payment_plan.replace('_', ' ')}</p></div>
+                                    
+                                    {feeInfo ? (
+                                        <div className="text-right">
+                                            {feeInfo.discount > 0 && formData.payment_plan === 'one_time' ? (
+                                                <>
+                                                    <p className="text-xs text-green-600 font-bold uppercase tracking-wider mb-1 animate-pulse">🎉 10% Instant Discount Applied!</p>
+                                                    <p className="text-sm text-slate-500 line-through">Original: ₹{feeInfo.baseTotal.toLocaleString()}</p>
+                                                    <p className="font-black text-indigo-900 text-3xl">Total: ₹{feeInfo.finalTotal.toLocaleString()}</p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p className="text-sm justify-end text-indigo-600/80 mb-1 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                                                        Total Course Fee
+                                                    </p>
+                                                    <p className="font-black text-indigo-900 text-3xl mb-2">₹{feeInfo.baseTotal.toLocaleString()}</p>
+                                                    {formData.payment_plan !== 'one_time' && (
+                                                        <div className="inline-flex text-left items-start gap-2 bg-amber-50 rounded-xl p-3 border border-amber-100 max-w-[250px]">
+                                                            <div className="mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div></div>
+                                                            <p className="text-xs text-amber-900 leading-tight">Switch to <strong>One Time</strong> payment plan to instantly unlock a 10% discount (-₹{(feeInfo.baseTotal * 0.10).toLocaleString()})!</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="text-right flex items-center sm:justify-end">
+                                            <p className="text-sm font-bold text-indigo-800 bg-white px-3 py-1.5 rounded-full shadow-sm">{course?.price}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Declaration Box in Scrollable Content */}
+                            <label 
+                                ref={declarationRef}
+                                className={`flex items-start gap-4 p-5 md:p-6 bg-white border-2 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all duration-300 transform ${highlightDeclaration ? 'border-red-500 bg-red-50/50 scale-[1.02] shadow-xl ring-4 ring-red-500/20' : 'border-slate-200'}`}
+                            >
+                                <div className="mt-0.5">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={declarationAccepted}
+                                        onChange={(e) => setDeclarationAccepted(e.target.checked)}
+                                        className="w-6 h-6 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                                    />
+                                </div>
+                                <p className="text-base font-medium text-slate-800 leading-snug">
+                                    I hereby declare that all the details provided above are true and correct to the best of my knowledge. I accept the institution's terms for enrollment.
+                                </p>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Footer / Action Bar */}
+                    <div className="shrink-0 bg-white border-t border-slate-200 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] flex justify-center p-4 md:p-6 w-full z-10">
+                        <div className="w-full max-w-4xl">
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <button 
+                                    onClick={() => setShowConfirmModal(false)}
+                                    disabled={submitting}
+                                    className="px-8 py-4 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                                >
+                                    Go Back & Edit
+                                </button>
+                                <button 
+                                    onClick={handleConfirmSubmit}
+                                    disabled={submitting}
+                                    className="flex-1 py-4 rounded-xl font-bold text-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center justify-center gap-3 shadow-xl shadow-indigo-600/20 hover:-translate-y-0.5"
+                                >
+                                    {submitting ? (
+                                        <><div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Submitting securely...</>
+                                    ) : (
+                                        <><CheckCircle2 size={24} /> Confirm & Submit Application</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Sticky Progress Bar */}
             <div className="fixed top-16 left-0 right-0 z-40 bg-white border-b border-slate-200 shadow-sm py-3 px-4 md:px-8 flex items-center justify-between">
                 <span className="font-bold text-sm text-slate-600">Application Progress</span>

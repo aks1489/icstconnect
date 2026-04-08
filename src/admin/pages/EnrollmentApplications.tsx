@@ -4,6 +4,7 @@ import { useToast } from '../../contexts/ToastContext'
 import { enrollmentService } from '../../services/enrollmentService'
 import type { EnrollmentApplication } from '../../types'
 import ApplicationApprovalModal from '../components/ApplicationApprovalModal'
+import ApplicationDetailsModal from '../components/ApplicationDetailsModal'
 
 export default function EnrollmentApplications() {
     const { showToast } = useToast()
@@ -14,6 +15,7 @@ export default function EnrollmentApplications() {
     // Modal State
     const [selectedApp, setSelectedApp] = useState<EnrollmentApplication | null>(null)
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false)
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
 
     const fetchApplications = async () => {
         try {
@@ -33,16 +35,23 @@ export default function EnrollmentApplications() {
     }, [])
 
     const handleApproveClick = (app: EnrollmentApplication) => {
+        setIsDetailsModalOpen(false) // Close details if open
         setSelectedApp(app)
         setIsApproveModalOpen(true)
     }
 
+    const handleInfoClick = (app: EnrollmentApplication) => {
+        setSelectedApp(app)
+        setIsDetailsModalOpen(true)
+    }
+
     const handleRejectClick = async (app: EnrollmentApplication) => {
+        setIsDetailsModalOpen(false) // Close details if open
         const confirm = window.confirm(`Are you sure you want to reject application ${app.reference_id}?`)
         if (!confirm) return
 
         try {
-            await enrollmentService.rejectApplication(app.id)
+            await enrollmentService.rejectApplication(app.id, app)
             showToast("Application rejected", "success")
             fetchApplications()
         } catch (error: any) {
@@ -159,6 +168,13 @@ export default function EnrollmentApplications() {
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button 
+                                                    onClick={() => handleInfoClick(app)}
+                                                    className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition-colors shadow-sm"
+                                                    title="View Full Details"
+                                                >
+                                                    <FileText size={18} />
+                                                </button>
+                                                <button 
                                                     onClick={() => handleApproveClick(app)}
                                                     className="w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-600 hover:text-white flex items-center justify-center transition-colors shadow-sm"
                                                     title="Approve"
@@ -183,15 +199,28 @@ export default function EnrollmentApplications() {
             </div>
 
             {selectedApp && (
-                <ApplicationApprovalModal 
-                    isOpen={isApproveModalOpen}
-                    onClose={() => {
-                        setIsApproveModalOpen(false)
-                        setSelectedApp(null)
-                    }}
-                    application={selectedApp}
-                    onSuccess={onApproveSuccess}
-                />
+                <>
+                    <ApplicationDetailsModal 
+                        isOpen={isDetailsModalOpen}
+                        onClose={() => {
+                            setIsDetailsModalOpen(false)
+                            setSelectedApp(null)
+                        }}
+                        application={selectedApp}
+                        onApprove={handleApproveClick}
+                        onReject={handleRejectClick}
+                    />
+
+                    <ApplicationApprovalModal 
+                        isOpen={isApproveModalOpen}
+                        onClose={() => {
+                            setIsApproveModalOpen(false)
+                            setSelectedApp(null)
+                        }}
+                        application={selectedApp}
+                        onSuccess={onApproveSuccess}
+                    />
+                </>
             )}
         </div>
     )

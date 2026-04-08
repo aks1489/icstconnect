@@ -16,6 +16,7 @@ export interface UserProfile {
     post_office?: string;
     enrollment_center?: string;
     is_profile_complete?: boolean; // Computed or derived
+    temp_password?: string | null;
 }
 
 // --- Test System Types ---
