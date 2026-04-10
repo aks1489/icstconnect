@@ -1,4 +1,4 @@
-import { X, User, MapPin, Calendar, BookOpen, CheckCircle2, CreditCard, ChevronDown } from 'lucide-react'
+import { X, User, MapPin, BookOpen, CheckCircle2, CreditCard } from 'lucide-react'
 import type { EnrollmentApplication } from '../../types'
 
 interface Props {
