@@ -7,18 +7,18 @@ export default function BentoFlowLayout({ images }: { images: any[] }) {
     // Assign sizes cyclically to create a bento box look
     const getBentoClass = (index: number) => {
         const pattern = [
-            'col-span-12 md:col-span-8 row-span-2 aspect-[16/9] md:aspect-[2/1]', // Hero wide
-            'col-span-6 md:col-span-4 row-span-1 aspect-square', // Small square
-            'col-span-6 md:col-span-4 row-span-1 aspect-square', // Small square
-            'col-span-12 md:col-span-4 row-span-2 aspect-[3/4]', // Tall
-            'col-span-12 md:col-span-8 row-span-2 aspect-video' // Wide
+            'col-span-12 md:col-span-8 row-span-2', // Hero wide
+            'col-span-6 md:col-span-4 row-span-1', // Small component
+            'col-span-6 md:col-span-4 row-span-1', // Small component
+            'col-span-12 md:col-span-4 row-span-2', // Tall
+            'col-span-12 md:col-span-8 row-span-2' // Wide
         ];
         return pattern[index % pattern.length];
     };
 
     return (
         <div className="w-full max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-12 auto-rows-min gap-4 md:gap-6">
+            <div className="grid grid-cols-12 auto-rows-[180px] md:auto-rows-[250px] lg:auto-rows-[300px] gap-4 md:gap-6 grid-flow-dense">
                 {images.map((img, index) => (
                     <motion.div
                         key={img.id}
@@ -26,7 +26,7 @@ export default function BentoFlowLayout({ images }: { images: any[] }) {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true, margin: "50px" }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
-                        className={`relative rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group ${getBentoClass(index)}`}
+                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group ${getBentoClass(index)}`}
                     >
                         <InteractiveImageMarker 
                             src={getOptimizedImageUrl(img.cloudinary_url, 1000)} 

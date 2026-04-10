@@ -8,12 +8,12 @@ export default function CollageLayout({ images }: { images: any[] }) {
         // Pseudo-random but deterministic
         const num = (id.charCodeAt(0) + index) % 5;
         switch (num) {
-            case 0: return 'aspect-[3/4] row-span-2';
-            case 1: return 'aspect-video col-span-2';
-            case 2: return 'aspect-square';
-            case 3: return 'aspect-[4/3]';
-            case 4: return 'aspect-[9/16] row-span-2';
-            default: return 'aspect-square';
+            case 0: return 'row-span-2';
+            case 1: return 'col-span-2 md:col-span-2';
+            case 2: return 'col-span-1';
+            case 3: return 'col-span-2 row-span-2';
+            case 4: return 'row-span-2';
+            default: return 'col-span-1';
         }
     };
 
@@ -32,7 +32,7 @@ export default function CollageLayout({ images }: { images: any[] }) {
                             type: "spring", 
                             stiffness: 100 
                         }}
-                        className={`relative rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group ${getAspectClass(img.id, index)}`}
+                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group ${getAspectClass(img.id, index)}`}
                     >
                         <InteractiveImageMarker 
                             src={getOptimizedImageUrl(img.cloudinary_url, 800)} 
