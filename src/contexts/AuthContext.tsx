@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshProfile,
         isAdmin: profile?.role === 'admin',
         isTeacher: profile?.role === 'teacher',
-        isProfileComplete: !!(profile && profile.full_name && profile.father_name && profile.address && profile.pincode && profile.dob)
+        isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob)
     }), [session, user, profile, loading])
 
     return (

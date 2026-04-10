@@ -15,7 +15,7 @@ interface ProfileFormProps {
 export default function ProfileForm({ initialData, onSubmit, isEditing = false, onCancel, onInteraction }: ProfileFormProps) {
     const [formData, setFormData] = useState<Partial<UserProfile>>({
         full_name: '',
-        father_name: '',
+        guardian_name: '',
         dob: '',
         address: '',
         pincode: '',
@@ -107,7 +107,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
         const errors: Record<string, string> = {}
 
         if (!formData.full_name?.trim()) errors.full_name = "Name is required"
-        if (!formData.father_name?.trim()) errors.father_name = "Father's name is required"
+        if (!formData.guardian_name?.trim()) errors.guardian_name = "Guardian's name is required"
         if (!formData.dob) errors.dob = "Date of birth is required"
 
         if (!formData.phone) {
@@ -177,16 +177,16 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Father's Name <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-slate-700">Guardian's Name <span className="text-red-500">*</span></label>
                     <input
                         type="text"
-                        name="father_name"
-                        value={formData.father_name || ''}
+                        name="guardian_name"
+                        value={formData.guardian_name || ''}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.father_name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
-                        placeholder="Father's Name"
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.guardian_name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
+                        placeholder="Guardian's Name"
                     />
-                    {fieldErrors.father_name && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.father_name}</p>}
+                    {fieldErrors.guardian_name && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.guardian_name}</p>}
                 </div>
 
                 <div className="space-y-2">

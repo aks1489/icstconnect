@@ -5,7 +5,7 @@ export interface UserProfile {
     role: 'student' | 'teacher' | 'admin';
     created_at: string;
     // Extended Profile Fields
-    father_name?: string;
+    guardian_name?: string;
     address?: string;
     pincode?: string;
     district?: string;
@@ -73,6 +73,7 @@ export interface EnrollmentApplication {
     reference_id: string;
     student_id?: string;
     full_name: string;
+    guardian_name: string;
     phone: string;
     email?: string;
     gender: string;

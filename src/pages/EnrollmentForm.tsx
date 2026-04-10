@@ -46,6 +46,7 @@ export default function EnrollmentForm() {
     // Form Data
     const [formData, setFormData] = useState({
         full_name: '',
+        guardian_name: '',
         phone: '',
         email: '',
         gender: '',
@@ -142,7 +143,7 @@ export default function EnrollmentForm() {
     }
 
     const calculateProgress = () => {
-        const requiredFields = ['full_name', 'phone', 'gender', 'address', 'pincode', 'state', 'district', 'post_office']
+        const requiredFields = ['full_name', 'guardian_name', 'phone', 'gender', 'address', 'pincode', 'state', 'district', 'post_office', 'dob', 'email']
         const filled = requiredFields.filter(field => !!formData[field as keyof typeof formData]).length
         return Math.floor((filled / requiredFields.length) * 100)
     }
@@ -196,6 +197,7 @@ export default function EnrollmentForm() {
             const app = await enrollmentService.submitApplication({
                 student_id: profile?.id,
                 full_name: formData.full_name,
+                guardian_name: formData.guardian_name,
                 phone: formData.phone,
                 email: formData.email, // Can be blank
                 gender: formData.gender,
@@ -345,6 +347,7 @@ export default function EnrollmentForm() {
                             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="col-span-1 sm:col-span-2 border-b border-slate-100 pb-3 mb-1"><h3 className="font-bold text-slate-800">Student Info</h3></div>
                                 <div><p className="text-xs text-slate-500">Name</p><p className="font-bold text-slate-900">{formData.full_name}</p></div>
+                                <div><p className="text-xs text-slate-500">Guardian</p><p className="font-bold text-slate-900">{formData.guardian_name}</p></div>
                                 <div><p className="text-xs text-slate-500">Phone</p><p className="font-bold text-slate-900">{formData.phone}</p></div>
                                 <div><p className="text-xs text-slate-500">Email</p><p className="font-medium text-slate-900">{formData.email || 'N/A'}</p></div>
                                 <div><p className="text-xs text-slate-500">Gender</p><p className="font-medium text-slate-900">{formData.gender}</p></div>
@@ -509,6 +512,18 @@ export default function EnrollmentForm() {
                                         placeholder="E.g. John Doe"
                                     />
                                 </div>
+                                <div className="space-y-1 sm:col-span-2">
+                                    <label className="text-sm font-bold text-slate-700">Guardian's Name *</label>
+                                    <input 
+                                        required
+                                        type="text" 
+                                        name="guardian_name"
+                                        value={formData.guardian_name}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                        placeholder="Guardian's Full Name"
+                                    />
+                                </div>
                                 <div className="space-y-1">
                                     <label className="text-sm font-bold text-slate-700">Phone Number *</label>
                                     <input 
@@ -522,8 +537,9 @@ export default function EnrollmentForm() {
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">Email Address (Optional)</label>
+                                    <label className="text-sm font-bold text-slate-700">Email Address *</label>
                                     <input 
+                                        required
                                         type="email" 
                                         name="email"
                                         value={formData.email}
@@ -548,8 +564,9 @@ export default function EnrollmentForm() {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">Date of Birth</label>
+                                    <label className="text-sm font-bold text-slate-700">Date of Birth *</label>
                                     <input 
+                                        required
                                         type="date" 
                                         name="dob"
                                         value={formData.dob}

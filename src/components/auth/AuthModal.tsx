@@ -16,6 +16,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [fullName, setFullName] = useState('')
     const [showOtpInput, setShowOtpInput] = useState(false)
     const [otpCode, setOtpCode] = useState('')
+    const [localOtpTracker, setLocalOtpTracker] = useState<string | null>(null)
     const [otpType, setOtpType] = useState<'signup' | 'recovery' | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -41,16 +42,49 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         try {
             if (!otpType) return
 
-            const { error } = await supabase.auth.verifyOtp({
-                email,
-                token: otpCode,
-                type: otpType
-            })
+            if (otpType === 'signup') {
+                if (otpCode !== localOtpTracker) {
+                    throw new Error('Invalid code. Please try again.')
+                }
 
-            if (error) throw error
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: { data: { full_name: fullName } },
+                })
+                if (error) throw error
 
-            // Show success message instead of auto-redirecting
-            setVerificationSuccess(true)
+                if (data.session) {
+                    const { data: profileCheck } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', data.user?.id)
+                        .single()
+
+                    const isComplete = profileCheck && profileCheck.full_name && profileCheck.address && profileCheck.pincode && profileCheck.dob
+
+                    if (isComplete) {
+                        navigate('/quick-access')
+                    } else {
+                        navigate('/student/complete-profile')
+                    }
+                    onClose()
+                } else {
+                    setVerificationSuccess(true)
+                }
+
+            } else {
+                const { error } = await supabase.auth.verifyOtp({
+                    email,
+                    token: otpCode,
+                    type: otpType
+                })
+
+                if (error) throw error
+
+                // Show success message instead of auto-redirecting
+                setVerificationSuccess(true)
+            }
 
         } catch (err: any) {
             console.error('OTP Error:', err)
@@ -159,39 +193,31 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     return
                 }
 
-                const { data, error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                        },
-                    },
-                })
-                if (error) throw error
+                // Custom OTP Generation instead of instant sign up
+                const newOtp = Math.floor(1000 + Math.random() * 9000).toString() // Generate 4 digit code
+                setLocalOtpTracker(newOtp)
 
-                if (data.session) {
-                    // Check if profile is complete
-                    const { data: profileCheck } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', data.user?.id)
-                        .single()
+                fetch('http://localhost:5000/api/send-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: email,
+                        subject: 'Verify your ICST Connect Account',
+                        html: `
+                            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                                <h2>Account Verification</h2>
+                                <p>Hi ${fullName},</p>
+                                <p>Your 4-digit verification code to join ICST Connect is:</p>
+                                <h1 style="font-size: 32px; letter-spacing: 5px; color: #4f46e5; background: #f8fafc; padding: 10px 20px; border-radius: 8px; display: inline-block;">${newOtp}</h1>
+                                <p>Enter this code in the portal to securely create your account.</p>
+                            </div>
+                        `
+                    })
+                }).catch(err => console.error("OTP Email failed:", err))
 
-                    const isComplete = profileCheck && profileCheck.full_name && profileCheck.father_name && profileCheck.address && profileCheck.pincode && profileCheck.dob
-
-                    if (isComplete) {
-                        navigate('/quick-access')
-                    } else {
-                        navigate('/student/complete-profile')
-                    }
-                    onClose()
-                } else {
-                    // Switch to OTP mode instead of just showing message
-                    setOtpType('signup')
-                    setShowOtpInput(true)
-                    setError('Account created! Please enter the verification code sent to your email.')
-                }
+                setOtpType('signup')
+                setShowOtpInput(true)
+                setError('Verification code sent! Please check your email inbox.')
             }
 
         } catch (err: any) {
@@ -239,6 +265,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 otpCode={otpCode}
                                 setOtpCode={setOtpCode}
                                 onCancel={() => setShowOtpInput(false)}
+                                otpType={otpType}
                             />
                         ) : isForgotPassword ? (
                             <ForgotPasswordInputs
@@ -369,7 +396,7 @@ const SuccessView = ({ otpType, onNavigate }: { otpType: string | null, onNaviga
     </div>
 )
 
-const OtpInput = ({ email, otpCode, setOtpCode, onCancel }: { email: string, otpCode: string, setOtpCode: (c: string) => void, onCancel: () => void }) => (
+const OtpInput = ({ email, otpCode, setOtpCode, onCancel, otpType }: { email: string, otpCode: string, setOtpCode: (c: string) => void, onCancel: () => void, otpType: string | null }) => (
     <div className="space-y-4 animate-in fade-in zoom-in duration-300">
         <div className="text-center mb-6">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 mb-3 border border-indigo-100">
@@ -386,11 +413,11 @@ const OtpInput = ({ email, otpCode, setOtpCode, onCancel }: { email: string, otp
             <input
                 type="text"
                 required
-                maxLength={8}
+                maxLength={otpType === 'signup' ? 4 : 6}
                 className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono font-bold"
-                placeholder="000000"
+                placeholder={otpType === 'signup' ? "0000" : "000000"}
                 value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').substring(0, 8))}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').substring(0, otpType === 'signup' ? 4 : 6))}
             />
         </div>
 

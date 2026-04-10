@@ -18,7 +18,7 @@ export default function CompleteProfile() {
                 .from('profiles')
                 .update({
                     full_name: data.full_name,
-                    father_name: data.father_name,
+                    guardian_name: data.guardian_name,
                     dob: data.dob,
                     address: data.address,
                     pincode: data.pincode,
@@ -73,8 +73,9 @@ export default function CompleteProfile() {
                 <div className="p-8">
                     <ProfileForm
                         initialData={{
+                            ...(profile || {}),
                             full_name: profile?.full_name || '',
-                            email: user.email || '',
+                            email: user.email || profile?.email || '',
                             id: user.id
                         }}
                         onSubmit={handleSubmit}

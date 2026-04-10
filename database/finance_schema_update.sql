@@ -3,7 +3,7 @@
 -- Add remarks for additional details
 
 ALTER TABLE institution_transactions 
-ADD COLUMN IF NOT EXISTS student_id UUID REFERENCES profiles(id),
+ADD COLUMN IF NOT EXISTS student_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
 ADD COLUMN IF NOT EXISTS remarks TEXT;
 
 -- Index for faster lookups by student
@@ -14,7 +14,7 @@ DROP CONSTRAINT IF EXISTS student_fees_student_id_fkey;
 
 ALTER TABLE student_fees
 ADD CONSTRAINT student_fees_student_id_fkey 
-FOREIGN KEY (student_id) REFERENCES profiles(id);
+FOREIGN KEY (student_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
 -- Add columns for Dynamic Fee Calculation (Requested for Student specific tables)
 ALTER TABLE courses ADD COLUMN IF NOT EXISTS duration_months INTEGER DEFAULT 12;

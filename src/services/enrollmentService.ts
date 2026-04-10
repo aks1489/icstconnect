@@ -110,9 +110,10 @@ export const enrollmentService = {
 
             const { error: _profileError } = await supabase
                 .from('profiles')
-                .insert([{
+                .upsert([{
                     id: studentId,
                     full_name: applicationDetails.full_name,
+                    guardian_name: applicationDetails.guardian_name,
                     phone: applicationDetails.phone,
                     email: applicationDetails.email,
                     role: 'student',

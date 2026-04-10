@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp, KeyRound } from 'lucide-react'
+import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp, KeyRound, Users } from 'lucide-react'
 import { getIcon } from '../../utils/iconMapper'
 import ProfileForm from '../../components/common/ProfileForm'
 import FeeStructureModal from '../components/FeeStructureModal'
@@ -583,8 +583,8 @@ export default function StudentDetails() {
                         <h2 className="font-bold text-slate-800 mb-4">Personal Details</h2>
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                             <div>
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">Father's Name</dt>
-                                <dd className="text-slate-800 font-medium">{student.father_name || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">Guardian's Name</dt>
+                                <dd className="text-slate-800 font-medium">{student.guardian_name || '-'}</dd>
                             </div>
                             <div>
                                 <dt className="text-xs font-semibold text-slate-500 uppercase">DOB</dt>
