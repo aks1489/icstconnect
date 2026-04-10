@@ -82,6 +82,40 @@ export const enrollmentService = {
         let studentId = applicationDetails.student_id
         let tempPassword = ''
 
+        // If no student ID is attached to the application, check if a profile already exists
+        if (!studentId) {
+            // Check by email first
+            if (applicationDetails.email) {
+                const { data: emailProfile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('email', applicationDetails.email)
+                    .maybeSingle()
+                if (emailProfile) studentId = emailProfile.id
+            }
+
+            // Check by phone
+            if (!studentId && applicationDetails.phone) {
+                const { data: phoneProfile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('phone', applicationDetails.phone)
+                    .maybeSingle()
+                if (phoneProfile) studentId = phoneProfile.id
+            }
+
+            // Check by generated email
+            if (!studentId && !applicationDetails.email) {
+                const generatedEmail = `student_${applicationDetails.phone}@icstchowberia.com`
+                const { data: generatedEmailProfile } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('email', generatedEmail)
+                    .maybeSingle()
+                if (generatedEmailProfile) studentId = generatedEmailProfile.id
+            }
+        }
+
         if (!studentId) {
             // STRICT Profile Generation via Auth Backend
             const userEmail = applicationDetails.email || `student_${applicationDetails.phone}@icstchowberia.com`

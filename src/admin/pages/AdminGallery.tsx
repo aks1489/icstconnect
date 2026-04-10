@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { uploadToCloudinary, getOptimizedImageUrl } from '../../lib/cloudinary'
-import { Plus, Image as ImageIcon, Trash2, FolderPlus, Tag, CheckCircle2, Edit2, X, Save } from 'lucide-react'
+import { Plus, Image as ImageIcon, Trash2, FolderPlus, CheckCircle2, Edit2, X, Save } from 'lucide-react'
 import ImageTagger, { type ImageTag } from '../../components/admin/ImageTagger'
 
 interface Category {
