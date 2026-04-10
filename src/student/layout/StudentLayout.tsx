@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, List, ChevronDown, Pencil, Key, Grid, LogOut, AlertCircle } from 'lucide-react'
+import { ChevronRight, List, ChevronDown, Pencil, Key, Grid, LogOut, AlertCircle, Home, Book, Image as ImageIcon, MonitorPlay, Keyboard } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
@@ -179,6 +179,35 @@ export default function StudentLayout() {
                                 )}
                             </Link>
                         ))}
+
+                        <div className="mt-8 mb-4">
+                            <div className="h-px bg-slate-100 mx-4 mb-6"></div>
+                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-4">
+                                Main Website
+                            </div>
+                            <div className="space-y-1">
+                                <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                    <Home className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                    <span className="font-medium">Home Page</span>
+                                </Link>
+                                <Link to="/courses" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                    <Book className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                    <span className="font-medium">All Courses</span>
+                                </Link>
+                                <Link to="/online-test" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                    <MonitorPlay className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                    <span className="font-medium">Online Tests</span>
+                                </Link>
+                                <Link to="/typing-practice" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                    <Keyboard className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                    <span className="font-medium">Typing Portal</span>
+                                </Link>
+                                <Link to="/gallery" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+                                    <ImageIcon className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                    <span className="font-medium">Gallery</span>
+                                </Link>
+                            </div>
+                        </div>
                     </nav>
                 </div>
             </aside>
@@ -196,6 +225,7 @@ export default function StudentLayout() {
                         </button>
                         <span className="font-semibold text-slate-700 lg:hidden">Student Portal</span>
                     </div>
+
 
                     {/* Top Right Profile Section */}
                     <div className="flex items-center gap-4">
