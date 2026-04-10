@@ -61,20 +61,20 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
     };
 
     return (
-        <div className="relative min-h-[60vh] py-10 px-4 max-w-6xl mx-auto overflow-hidden">
+        <div className="relative min-h-[60vh] pt-12 pb-20 px-4 max-w-6xl mx-auto overflow-hidden">
             
             {/* View Mode Toggle */}
-            <div className="flex justify-center mb-16 relative z-20">
+            <div className="flex justify-center mb-20 relative z-20">
                 <div className="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-slate-100 flex items-center gap-1">
                     <button 
                         onClick={() => { setViewMode('events'); setSelectedEvent(null); }}
-                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'events' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'events' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}
                     >
                         Event Stacks
                     </button>
                     <button 
                         onClick={() => { setViewMode('story'); setSelectedEvent(null); }}
-                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'story' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'story' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}
                     >
                         Story Timeline
                     </button>
@@ -171,9 +171,9 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                         initial={{ opacity: 0, y: 30 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 20 }}
-                                        className="w-full bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-6 md:p-10 border border-white"
+                                        className="w-full bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white max-h-[75vh] overflow-y-auto custom-scrollbar relative"
                                     >
-                                        <div className="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4 border-b border-slate-200 pb-6">
+                                        <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md px-6 md:px-10 pt-6 md:pt-10 pb-4 border-b border-slate-200 flex flex-col md:flex-row justify-between md:items-center gap-4">
                                             <div>
                                                 <h4 className="text-3xl font-bold text-slate-800 mb-2">{event.name}</h4>
                                                 <p className="text-sm text-slate-500">{event.others.length + 1} photos • Click any thumbnail to view full details</p>
@@ -192,7 +192,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                             </button>
                                         </div>
                                         
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[160px] grid-flow-dense mt-2">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[160px] grid-flow-dense mt-4 px-6 md:px-10 pb-10">
                                             {[event.cover, ...event.others].map((img, idx) => (
                                                 <div 
                                                     key={img.id} 
@@ -293,16 +293,16 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
             {/* Lightbox Overlay for Expanded Image Details */}
             {expandedImage && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm" onClick={() => setExpandedImage(null)}></div>
-                    <div className="relative w-full max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+                    <div className="absolute inset-0 bg-slate-200/60 backdrop-blur-md" onClick={() => setExpandedImage(null)}></div>
+                    <div className="relative w-full max-w-6xl bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-slate-100">
                         <button 
                             onClick={() => setExpandedImage(null)} 
-                            className="absolute top-4 right-4 z-50 p-2 bg-black/40 backdrop-blur-md border border-white/20 text-white rounded-full hover:bg-black/60 transition-colors"
+                            className="absolute top-4 right-4 z-50 p-2 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-800 rounded-full hover:bg-slate-100 transition-colors shadow-sm"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                         
-                        <div className="w-full md:w-3/5 h-[40vh] sm:h-[50vh] md:h-auto bg-slate-950 flex items-center justify-center relative p-2 md:p-8">
+                        <div className="w-full md:w-3/5 h-[40vh] sm:h-[50vh] md:h-auto bg-slate-50 flex items-center justify-center relative p-2 md:p-8">
                             <InteractiveImageMarker 
                                 src={getOptimizedImageUrl(expandedImage.cloudinary_url, 1200)} 
                                 alt={expandedImage.title || ''} 

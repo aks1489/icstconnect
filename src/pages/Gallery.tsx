@@ -73,7 +73,7 @@ export default function Gallery() {
         <div className="min-h-screen bg-slate-50 overflow-hidden">
             
             {/* Dynamic Hero Section */}
-            <div className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900 border-b border-slate-200">
+            <div className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
                 
                 {/* Parallax Background */}
                 <motion.div 
