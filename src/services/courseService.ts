@@ -81,6 +81,36 @@ export const courseService = {
         }) as Course[]
     },
 
+    async getCourseById(id: number | string): Promise<Course | null> {
+        const { data, error } = await supabase
+            .from('courses')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+        if (error) {
+            if (error.code === 'PGRST116') return null // Not found
+            throw error
+        }
+
+        if (!data) return null
+
+        const style = getCourseStyle(data.course_name)
+        const tags = (data.tags && data.tags.length > 0)
+            ? data.tags
+            : generateTags(data.course_name, data.description || '')
+
+        return {
+            ...data,
+            title: data.course_name,
+            description: data.description || (data.syllabus && data.syllabus.length > 0 ? data.syllabus.join(', ') : 'No description available'),
+            icon: style.icon,
+            color: style.color,
+            price: data.fees?.total ? `₹${data.fees.total}` : 'Contact for Price',
+            tags: tags
+        } as Course
+    },
+
     async getCourseStructure(courseId: number): Promise<Module[]> {
         // 1. Fetch Modules
         const { data: modulesData, error: modulesError } = await supabase

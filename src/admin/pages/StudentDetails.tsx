@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp, KeyRound } from 'lucide-react'
 import { getIcon } from '../../utils/iconMapper'
 import ProfileForm from '../../components/common/ProfileForm'
 import FeeStructureModal from '../components/FeeStructureModal'
@@ -481,6 +481,13 @@ export default function StudentDetails() {
                             <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${student.role === 'teacher' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
                                 {student.role || 'student'}
                             </span>
+                            {/* Temporary Password Badge */}
+                            {student.temp_password && (
+                                <div className="mt-2 inline-flex flex-col gap-1 items-start bg-amber-50 border border-amber-200 pl-3 pr-4 py-1.5 rounded-lg shadow-sm">
+                                    <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest flex items-center gap-1.5"><KeyRound size={10} /> Temporary Password Active</span>
+                                    <span className="text-sm font-mono font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-amber-100 select-all tracking-wider">{student.temp_password}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <button
@@ -576,8 +583,8 @@ export default function StudentDetails() {
                         <h2 className="font-bold text-slate-800 mb-4">Personal Details</h2>
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                             <div>
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">Father's Name</dt>
-                                <dd className="text-slate-800 font-medium">{student.father_name || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 uppercase">Guardian's Name</dt>
+                                <dd className="text-slate-800 font-medium">{student.guardian_name || '-'}</dd>
                             </div>
                             <div>
                                 <dt className="text-xs font-semibold text-slate-500 uppercase">DOB</dt>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { UserPlus, Users, ArrowRight, Mail } from 'lucide-react'
+import { UserPlus, Users, ArrowRight, Mail, KeyRound } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import CreateStudentModal from '../../components/admin/CreateStudentModal'
 
@@ -10,6 +10,7 @@ interface StudentProfile {
     email: string
     created_at: string
     avatar_url?: string | null
+    temp_password?: string | null
 }
 
 export default function ManageStudents() {
@@ -115,7 +116,14 @@ export default function ManageStudents() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-slate-600">{student.email}</div>
+                                        <div className="text-sm text-slate-600">
+                                            {student.email}
+                                            {student.temp_password && (
+                                                <div className="mt-1.5 flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm max-w-fit tracking-wide">
+                                                    <KeyRound size={12} /> {student.temp_password}
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-slate-500">{new Date(student.created_at).toLocaleDateString()}</div>
@@ -168,11 +176,17 @@ export default function ManageStudents() {
                                 </div>
                             </div>
 
-                            <div className="mb-4">
-                                <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
-                                    <Mail className="text-slate-400" size={16} />
-                                    <span className="truncate">{student.email}</span>
-                                </div>
+                            <div className="mb-4 flex flex-col gap-2">
+                                    <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
+                                        <Mail className="text-slate-400" size={16} />
+                                        <span className="truncate">{student.email}</span>
+                                    </div>
+                                    {student.temp_password && (
+                                        <div className="flex items-center gap-2 text-sm text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-100 font-bold">
+                                            <KeyRound size={16} className="text-amber-500" />
+                                            <span className="tracking-wider">{student.temp_password}</span>
+                                        </div>
+                                    )}
                             </div>
 
                             <Link

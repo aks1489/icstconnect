@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, requireAdmin = false, requireTeacher = false, requireStudent = false }: ProtectedRouteProps) {
-    const { user, isAdmin, isTeacher, loading } = useAuth()
+    const { user, profile, isAdmin, isTeacher, loading } = useAuth()
     const location = useLocation()
 
     if (loading) {
@@ -25,6 +25,10 @@ export default function ProtectedRoute({ children, requireAdmin = false, require
             return <Navigate to="/teacher/login" state={{ from: location }} replace />
         }
         return <Navigate to="/login" state={{ from: location }} replace />
+    }
+
+    if (profile?.requires_password_change && location.pathname !== '/force-password-change') {
+        return <Navigate to="/force-password-change" replace />
     }
 
     if (requireAdmin && !isAdmin) {

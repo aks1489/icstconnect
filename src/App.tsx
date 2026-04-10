@@ -12,9 +12,12 @@ const Notifications = lazy(() => import('./pages/Notifications'))
 const Gallery = lazy(() => import('./pages/Gallery'))
 const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
+const EnrollmentForm = lazy(() => import('./pages/EnrollmentForm'))
 const AboutUs = lazy(() => import('./pages/AboutUs'))
 const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const ForcePasswordChange = lazy(() => import('./pages/ForcePasswordChange'))
 const Connect = lazy(() => import('./pages/Connect'))
+const TypingPractice = lazy(() => import('./pages/TypingPractice'))
 // const LearningHub = lazy(() => import('./pages/LearningHub'))
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
@@ -49,6 +52,8 @@ import CreateTest from './admin/pages/CreateTest'
 import AdminTests from './admin/pages/Tests'
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
+const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
+const AdminGallery = lazy(() => import('./admin/pages/AdminGallery'))
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -118,6 +123,11 @@ function App() {
               <Route element={<MainLayout><Outlet /></MainLayout>}>
                 <Route path="/" element={<Home />} />
                 <Route path="/courses/:courseId?" element={<CoursesPage />} />
+                <Route path="/enroll/:courseId" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <EnrollmentForm />
+                  </Suspense>
+                } />
 
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/gallery" element={<Gallery />} />
@@ -134,6 +144,13 @@ function App() {
                   </Suspense>
                 } />
 
+                {/* Security Flow */}
+                <Route path="/force-password-change" element={
+                  <ProtectedRoute>
+                    <ForcePasswordChange />
+                  </ProtectedRoute>
+                } />
+
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/login" element={<Navigate to="/" replace />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
@@ -143,6 +160,13 @@ function App() {
                 {/* Catch all to Home - Only inside MainLayout */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
+
+              {/* Standalone Typing Practice Page */}
+              <Route path="/typing-practice" element={
+                <Suspense fallback={<PageSkeleton />}>
+                  <TypingPractice />
+                </Suspense>
+              } />
 
               {/* Quick Access - Protected but Shared */}
               <Route path="/quick-access" element={
@@ -196,6 +220,12 @@ function App() {
                 <Route path="tests/:id/edit" element={<CreateTest />} />
                 <Route path="finance" element={<AdminFinance />} />
                 <Route path="discount-claims" element={<DiscountClaims />} />
+                <Route path="enrollments" element={<EnrollmentApplications />} />
+                <Route path="gallery" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminGallery />
+                  </Suspense>
+                } />
               </Route>
 
               {/* Teacher Routes - Independent Layout */}

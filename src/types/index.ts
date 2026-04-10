@@ -5,7 +5,7 @@ export interface UserProfile {
     role: 'student' | 'teacher' | 'admin';
     created_at: string;
     // Extended Profile Fields
-    father_name?: string;
+    guardian_name?: string;
     address?: string;
     pincode?: string;
     district?: string;
@@ -16,6 +16,7 @@ export interface UserProfile {
     post_office?: string;
     enrollment_center?: string;
     is_profile_complete?: boolean; // Computed or derived
+    temp_password?: string | null;
 }
 
 // --- Test System Types ---
@@ -65,4 +66,30 @@ export interface TestResult {
     answers: Record<string, string>; // question_id -> option_id
     completed_at: string;
     test?: Test; // Joined view
+}
+
+export interface EnrollmentApplication {
+    id: string;
+    reference_id: string;
+    student_id?: string;
+    full_name: string;
+    guardian_name: string;
+    phone: string;
+    email?: string;
+    gender: string;
+    dob?: string;
+    pincode: string;
+    state: string;
+    district: string;
+    post_office: string;
+    address: string;
+    course_id: number;
+    payment_plan: 'one_time' | 'monthly' | 'quarterly' | 'yearly';
+    opt_spoken_english: boolean;
+    status: 'pending' | 'approved' | 'rejected';
+    created_at: string;
+    course?: {
+        course_name: string;
+        title: string;
+    };
 }

@@ -20,7 +20,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 .from('profiles')
                 .update({
                     full_name: data.full_name,
-                    father_name: data.father_name,
+                    guardian_name: data.guardian_name,
                     dob: data.dob,
                     address: data.address,
                     pincode: data.pincode,
