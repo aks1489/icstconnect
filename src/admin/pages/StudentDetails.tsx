@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp, KeyRound, Users } from 'lucide-react'
+import { X, ArrowLeft, Pencil, Search, ChevronDown, ChevronUp, KeyRound } from 'lucide-react'
 import { getIcon } from '../../utils/iconMapper'
 import ProfileForm from '../../components/common/ProfileForm'
 import FeeStructureModal from '../components/FeeStructureModal'

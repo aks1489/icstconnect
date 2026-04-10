@@ -11,7 +11,8 @@ import {
     UserCog,
     Library,
     LayoutGrid,
-    CalendarDays
+    CalendarDays,
+    Image
 } from 'lucide-react'
 
 export interface NavItem {
@@ -155,5 +156,12 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: FileText,
         color: 'text-indigo-600',
         description: 'Review and approve student enrollments'
+    },
+    {
+        label: 'Gallery Management',
+        path: '/admin/gallery',
+        icon: Image,
+        color: 'text-pink-600',
+        description: 'Manage images and layout styles'
     }
 ]

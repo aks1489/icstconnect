@@ -53,6 +53,7 @@ import AdminTests from './admin/pages/Tests'
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
 const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
+const AdminGallery = lazy(() => import('./admin/pages/AdminGallery'))
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -220,6 +221,11 @@ function App() {
                 <Route path="finance" element={<AdminFinance />} />
                 <Route path="discount-claims" element={<DiscountClaims />} />
                 <Route path="enrollments" element={<EnrollmentApplications />} />
+                <Route path="gallery" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminGallery />
+                  </Suspense>
+                } />
               </Route>
 
               {/* Teacher Routes - Independent Layout */}
