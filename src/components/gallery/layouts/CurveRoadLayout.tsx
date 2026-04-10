@@ -331,7 +331,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                             {expandedImage.categories && expandedImage.categories.length > 0 && (
                                 <div className="mt-8 pt-6 border-t border-slate-100 flex gap-2 flex-wrap">
                                     <span className="text-[10px] text-slate-400 uppercase tracking-widest block w-full mb-1">Tags</span>
-                                    {expandedImage.categories.slice(0,3).map((id: string, i: number) => (
+                                    {expandedImage.categories.slice(0,3).map((_: string, i: number) => (
                                         <span key={i} className="text-xs bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1 rounded">Category Info</span>
                                     ))}
                                 </div>
