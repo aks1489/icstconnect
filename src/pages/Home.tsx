@@ -1,6 +1,8 @@
 import HeroSection from '../components/sections/HeroSection'
 import TechTickerSection from '../components/sections/TechTickerSection'
+import ScholarshipHeroBanner from '../components/sections/ScholarshipHeroBanner'
 import LearningHubPreview from '../components/sections/LearningHubPreview'
+import ScholarshipPromoSection from '../components/sections/ScholarshipPromoSection'
 import FeaturesSection from '../components/sections/FeaturesSection'
 import AboutSection from '../components/sections/AboutSection'
 import CoursesSection from '../components/sections/CoursesSection'
@@ -12,7 +14,9 @@ const Home = () => {
         <>
             <HeroSection />
             <TechTickerSection />
+            <ScholarshipHeroBanner />
             <LearningHubPreview />
+            <ScholarshipPromoSection />
             <AboutSection />
             <CoursesSection />
             <FeaturesSection />

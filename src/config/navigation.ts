@@ -12,7 +12,8 @@ import {
     Library,
     LayoutGrid,
     CalendarDays,
-    Image
+    Image,
+    GraduationCap
 } from 'lucide-react'
 
 export interface NavItem {
@@ -156,6 +157,13 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: FileText,
         color: 'text-indigo-600',
         description: 'Review and approve student enrollments'
+    },
+    {
+        label: 'ICST Scholarships',
+        path: '/admin/scholarships',
+        icon: GraduationCap,
+        color: 'text-amber-500',
+        description: 'Manage scholarship banners, settings, and winners'
     },
     {
         label: 'Gallery Management',
