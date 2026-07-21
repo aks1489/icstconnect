@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, ArrowRight, Award, Trophy } from 'lucide-react'
+import { GraduationCap, ArrowRight, Trophy } from 'lucide-react'
 import { scholarshipService } from '../../services/scholarshipService'
 import type { ScholarshipSettings } from '../../types/scholarship'
 

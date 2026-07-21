@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import {
-    GraduationCap,
     Trophy,
     Medal,
     Award,
     ExternalLink,
-    ChevronDown,
-    ArrowLeft,
     Sparkles,
     Calendar,
-    CheckCircle2,
     Camera,
-    Image as ImageIcon,
     X
 } from 'lucide-react'
 import { scholarshipService } from '../services/scholarshipService'
