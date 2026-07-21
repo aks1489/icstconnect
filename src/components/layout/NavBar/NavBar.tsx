@@ -28,6 +28,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
     const navLinks = [
         { name: 'Home', href: '/' },
         { name: 'Courses', href: '/courses' },
+        { name: 'Scholarships', href: '/scholarships' },
         { name: 'Notifications', href: '/notifications' },
         { name: 'Gallery', href: '/gallery' },
         { name: 'Online Test', href: '/online-test' },

@@ -10,6 +10,7 @@ const Home = lazy(() => import('./pages/Home'))
 const CoursesPage = lazy(() => import('./pages/Courses'))
 const Notifications = lazy(() => import('./pages/Notifications'))
 const Gallery = lazy(() => import('./pages/Gallery'))
+const ScholarshipsPage = lazy(() => import('./pages/Scholarships'))
 const OnlineTest = lazy(() => import('./pages/OnlineTest'))
 const TestPlayer = lazy(() => import('./pages/TestPlayer'))
 const EnrollmentForm = lazy(() => import('./pages/EnrollmentForm'))
@@ -53,6 +54,7 @@ import AdminTests from './admin/pages/Tests'
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
 const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
+const AdminScholarships = lazy(() => import('./admin/pages/AdminScholarships'))
 const AdminGallery = lazy(() => import('./admin/pages/AdminGallery'))
 
 // Teacher Imports
@@ -131,6 +133,11 @@ function App() {
 
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/gallery" element={<Gallery />} />
+                <Route path="/scholarships" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <ScholarshipsPage />
+                  </Suspense>
+                } />
 
                 <Route path="/online-test" element={
                   <Suspense fallback={<PageSkeleton />}>
@@ -221,6 +228,11 @@ function App() {
                 <Route path="finance" element={<AdminFinance />} />
                 <Route path="discount-claims" element={<DiscountClaims />} />
                 <Route path="enrollments" element={<EnrollmentApplications />} />
+                <Route path="scholarships" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminScholarships />
+                  </Suspense>
+                } />
                 <Route path="gallery" element={
                   <Suspense fallback={<PageSkeleton />}>
                     <AdminGallery />

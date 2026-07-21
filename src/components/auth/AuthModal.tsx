@@ -221,7 +221,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             }
 
         } catch (err: any) {
-            console.error('Auth Error:', err)
+            if (!err.message?.includes('Restricted access')) {
+                console.error('Auth Error:', err)
+            }
             let msg = err.message
             if (msg.includes('User already registered') || msg.includes('unique constraint')) {
                 msg = 'User account already exists with this email. Please Login with this email.'
