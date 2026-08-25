@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Check } from 'lucide-react';
+import { IconX as X, IconCheck as Check } from '@tabler/icons-react';
 import { financeService } from '../../services/financeService';
 import { useToast } from '../../contexts/ToastContext';
 import type { Database } from '../../types/supabase';

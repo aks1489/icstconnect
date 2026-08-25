@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Clock, HelpCircle, ArrowRight, Lock, Globe, BookOpen } from 'lucide-react'
+import { IconClock as Clock, IconHelpCircle as HelpCircle, IconArrowRight as ArrowRight, IconLock as Lock, IconWorld as Globe, IconBook2 as BookOpen } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
 import type { Test } from '../types'
 

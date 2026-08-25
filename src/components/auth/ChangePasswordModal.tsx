@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { X, Check, AlertTriangle } from 'lucide-react'
+import { IconX as X, IconCheck as Check, IconAlertTriangle as AlertTriangle } from '@tabler/icons-react'
 
 interface ChangePasswordModalProps {
     isOpen: boolean

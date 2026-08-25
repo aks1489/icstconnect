@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import type { UserProfile } from '../../types'
 import ImageUpload from './ImageUpload'
-import { Check, AlertTriangle } from 'lucide-react'
+import { IconCheck as Check, IconAlertTriangle as AlertTriangle } from '@tabler/icons-react'
 
 interface ProfileFormProps {
     initialData: Partial<UserProfile>

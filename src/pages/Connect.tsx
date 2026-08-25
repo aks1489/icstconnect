@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react';
+import { IconExternalLink as ExternalLink } from '@tabler/icons-react';
 import logo from '../assets/logo.jpg';
 import { useMemo, useState } from 'react';
 import DiscountForm from './Connect/DiscountForm';
@@ -69,6 +69,15 @@ const Connect = () => {
     const [isDiscountFormOpen, setIsDiscountFormOpen] = useState(false);
 
     const links = useMemo(() => [
+        {
+            id: 'job-simulator',
+            label: 'Job Portal Simulator',
+            subLabel: 'Tech Hiring Assessment',
+            Icon: WebsiteLogo,
+            url: 'https://icst-job-portal-simulator.netlify.app/',
+            borderColor: 'group-hover:border-emerald-500/50',
+            bgHover: 'group-hover:bg-emerald-500/10'
+        },
         {
             id: 'maps',
             label: 'Visit Us',

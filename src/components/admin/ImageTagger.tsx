@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Plus, X, Tag } from 'lucide-react'
+import { IconPlus as Plus, IconX as X, IconTag as Tag } from '@tabler/icons-react'
 
 export interface ImageTag {
     id: string; // random local id

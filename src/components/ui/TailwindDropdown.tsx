@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { ChevronDown, Check } from 'lucide-react'
+import { IconChevronDown as ChevronDown, IconCheck as Check } from '@tabler/icons-react'
 
 export interface DropdownOption<T = string | number> {
     label: string

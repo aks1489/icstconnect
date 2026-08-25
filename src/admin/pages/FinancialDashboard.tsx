@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download, Plus, DollarSign, TrendingUp, TrendingDown, Activity, FileText, Trash2 } from 'lucide-react';
+import { IconDownload as Download, IconPlus as Plus, IconCurrencyDollar as DollarSign, IconTrendingUp as TrendingUp, IconTrendingDown as TrendingDown, IconActivity as Activity, IconFileText as FileText, IconTrash as Trash2 } from '@tabler/icons-react';
 import { financeService } from '../../services/financeService';
 import AddTransactionModal from '../components/AddTransactionModal';
 import StudentPaymentStatus from '../components/StudentPaymentStatus';

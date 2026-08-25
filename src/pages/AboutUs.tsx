@@ -1,4 +1,4 @@
-import { Target, Laptop, Award, MapPin, Mail, Users } from 'lucide-react'
+import { IconTarget as Target, IconDeviceLaptop as Laptop, IconAward as Award, IconMapPin as MapPin, IconMail as Mail, IconUsers as Users } from '@tabler/icons-react'
 
 const AboutUs = () => {
     return (

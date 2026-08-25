@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Save, Layout, Clock, Globe, Lock, BookOpen } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconDeviceFloppy as Save, IconLayout as Layout, IconClock as Clock, IconWorld as Globe, IconLock as Lock, IconBook2 as BookOpen } from '@tabler/icons-react'
 import QuestionEditor from '../../components/admin/QuestionEditor'
 import type { Test, TestQuestion } from '../../types'
 

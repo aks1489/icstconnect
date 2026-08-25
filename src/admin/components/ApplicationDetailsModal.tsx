@@ -1,4 +1,4 @@
-import { X, User, MapPin, BookOpen, CheckCircle2, CreditCard } from 'lucide-react'
+import { IconX as X, IconUser as User, IconMapPin as MapPin, IconBook2 as BookOpen, IconCircleCheck as CheckCircle2, IconCreditCard as CreditCard } from '@tabler/icons-react'
 import type { EnrollmentApplication } from '../../types'
 
 interface Props {

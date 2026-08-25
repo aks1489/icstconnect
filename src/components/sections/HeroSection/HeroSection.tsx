@@ -1,14 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-    Atom,
-    Box,
-    FileCode2,
-    Wind,
-    ArrowRight,
-    PlayCircle
-} from 'lucide-react'
+import { IconAtom as Atom, IconBox as Box, IconFileCode2 as FileCode2, IconWind as Wind, IconArrowRight as ArrowRight, IconPlayerPlay as PlayCircle } from '@tabler/icons-react'
 import InteractiveRobot from '../../common/InteractiveRobot'
 
 const HeroSection = () => {

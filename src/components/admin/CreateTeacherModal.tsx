@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { X, AlertTriangle, Check } from 'lucide-react'
+import { IconX as X, IconAlertTriangle as AlertTriangle, IconCheck as Check } from '@tabler/icons-react'
+import { useToast } from '../../contexts/ToastContext'
 
 interface CreateTeacherModalProps {
     isOpen: boolean
@@ -9,6 +10,7 @@ interface CreateTeacherModalProps {
 }
 
 export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: CreateTeacherModalProps) {
+    const { showToast } = useToast()
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -64,14 +66,16 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
             if (!data.user) throw new Error('Failed to create user')
 
             // Success! We don't need to do anything else. The Database Trigger does the rest.
-            alert('Teacher account created successfully!')
+            showToast('Teacher account created successfully!', 'success')
             onSuccess()
             onClose()
             setFormData({ fullName: '', email: '', password: '' })
 
         } catch (err: any) {
             console.error('Error creating teacher:', err)
-            setError(err.message || 'Failed to create teacher')
+            const message = err.message || 'Failed to create teacher'
+            setError(message)
+            showToast(message, 'error')
         } finally {
             setLoading(false)
         }

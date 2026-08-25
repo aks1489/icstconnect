@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import TypingTest, { TYPING_LEVELS } from '../components/typing/TypingTest';
-import { ArrowLeft, Lock, Trophy } from 'lucide-react';
+import { IconArrowLeft as ArrowLeft, IconLock as Lock, IconTrophy as Trophy } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo.jpg';
 

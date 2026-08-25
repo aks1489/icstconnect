@@ -1,4 +1,4 @@
-import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
+import { IconX as X, IconCircleCheck as CheckCircle, IconAlertCircle as AlertCircle, IconInfoCircle as Info, IconAlertTriangle as AlertTriangle } from '@tabler/icons-react'
 import { useToast, type ToastType } from '../../contexts/ToastContext'
 import { useEffect, useState } from 'react'
 

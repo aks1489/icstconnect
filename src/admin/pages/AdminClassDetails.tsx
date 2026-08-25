@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Users, X, Calendar, Clock, Plus, Trash2, UserPlus } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconUsers as Users, IconX as X, IconCalendar as Calendar, IconClock as Clock, IconPlus as Plus, IconTrash as Trash2, IconUserPlus as UserPlus } from '@tabler/icons-react'
 import AddStudentToClassModal from '../../components/admin/AddStudentToClassModal'
 import { useToast } from '../../contexts/ToastContext'
 

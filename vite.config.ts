@@ -11,7 +11,7 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
             return 'vendor-react';
           }
-          if (id.includes('node_modules/framer-motion') || id.includes('node_modules/lucide-react')) {
+          if (id.includes('node_modules/framer-motion') || id.includes('node_modules/@tabler/icons-react')) {
             return 'vendor-ui';
           }
           if (id.includes('node_modules/@supabase/supabase-js')) {

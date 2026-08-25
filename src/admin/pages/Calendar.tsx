@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import GlobalCalendar from '../../components/calendar/GlobalCalendar'
-import { CalendarPlus } from 'lucide-react'
+import { IconCalendarPlus as CalendarPlus } from '@tabler/icons-react'
 
 export default function AdminCalendar() {
     const navigate = useNavigate()

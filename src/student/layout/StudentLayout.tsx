@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, List, ChevronDown, Pencil, Key, Grid, LogOut, AlertCircle, Home, Book, Image as ImageIcon, MonitorPlay, Keyboard } from 'lucide-react'
+import { IconChevronRight as ChevronRight, IconList as List, IconChevronDown as ChevronDown, IconPencil as Pencil, IconKey as Key, IconLayoutGrid as Grid, IconLogout as LogOut, IconAlertCircle as AlertCircle, IconHome as Home, IconBook as Book, IconPhoto as ImageIcon, IconDeviceDesktop as MonitorPlay, IconKeyboard as Keyboard } from '@tabler/icons-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'

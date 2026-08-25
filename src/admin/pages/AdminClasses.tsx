@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Search, Inbox, Trash2 } from 'lucide-react'
+import { IconPlus as Plus, IconSearch as Search, IconInbox as Inbox, IconTrash as Trash2 } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
 import CreateClassModal from '../../components/admin/CreateClassModal'

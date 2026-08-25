@@ -10,7 +10,7 @@ import {
     isToday,
     addDays
 } from 'date-fns'
-import { ChevronLeft, ChevronRight, Plus, Clock, Loader2 } from 'lucide-react'
+import { IconChevronLeft as ChevronLeft, IconChevronRight as ChevronRight, IconPlus as Plus, IconClock as Clock, IconLoader2 as Loader2 } from '@tabler/icons-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'

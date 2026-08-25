@@ -2,6 +2,9 @@ import { createContext, useContext, useEffect, useState, useMemo, useRef } from 
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
+import type { AppPermission } from '../types/permissions'
+import { hasPermission } from '../utils/permissions'
+
 interface AuthContextType {
     session: Session | null
     user: User | null
@@ -10,8 +13,10 @@ interface AuthContextType {
     signOut: () => Promise<void>
     refreshProfile: () => Promise<void>
     isAdmin: boolean
+    isSuperAdmin: boolean
     isTeacher: boolean
     isProfileComplete: boolean
+    hasPerm: (permission: AppPermission) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -117,9 +122,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signOut,
         refreshProfile,
-        isAdmin: profile?.role === 'admin',
+        isAdmin: profile?.role === 'admin' || profile?.role === 'super_admin',
+        isSuperAdmin: profile?.role === 'super_admin',
         isTeacher: profile?.role === 'teacher',
-        isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob)
+        isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob),
+        hasPerm: (permission: AppPermission) => hasPermission(profile, permission)
     }), [session, user, profile, loading])
 
     return (

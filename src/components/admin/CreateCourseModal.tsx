@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { X, Code, Laptop, Database, Globe, Palette, Video, Bot, ShieldCheck } from 'lucide-react'
+import { IconX as X, IconCode as Code, IconDeviceLaptop as Laptop, IconDatabase as Database, IconWorld as Globe, IconPalette as Palette, IconVideo as Video, IconRobot as Bot, IconShieldCheck as ShieldCheck } from '@tabler/icons-react'
 
 interface CreateCourseModalProps {
     isOpen: boolean

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
-import { User, Camera } from 'lucide-react'
+import { IconUser as User, IconCamera as Camera } from '@tabler/icons-react'
 
 interface ImageUploadProps {
     currentImageUrl?: string

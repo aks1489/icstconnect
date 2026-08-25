@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Atom, Box, FileCode2, Wind, FileCode, Database, Server, Triangle } from 'lucide-react'
+import { IconAtom as Atom, IconBox as Box, IconFileCode2 as FileCode2, IconWind as Wind, IconFileCode as FileCode, IconDatabase as Database, IconServer as Server, IconTriangle as Triangle } from '@tabler/icons-react'
 import TechPopup from '../../ui/TechPopup'
 
 const TechTickerSection = () => {

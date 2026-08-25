@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Book, Trash2, Users, Layers } from 'lucide-react'
+import { IconPlus as Plus, IconBook as Book, IconTrash as Trash2, IconUsers as Users, IconLayersLinked as Layers } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import CreateCourseModal from '../../components/admin/CreateCourseModal'
 import { getIcon } from '../../utils/iconMapper'

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, AlertCircle } from 'lucide-react'
+import { IconCheck as Check, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
 
 export default function ResetPassword() {

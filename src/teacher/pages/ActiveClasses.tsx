@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Users, UserPlus, X, Search, ChevronRight } from 'lucide-react'
+import { IconUsers as Users, IconUserPlus as UserPlus, IconX as X, IconSearch as Search, IconChevronRight as ChevronRight } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
 

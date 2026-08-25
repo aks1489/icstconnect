@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Search, UserPlus, CheckCircle, ArrowLeft } from 'lucide-react'
+import { IconX as X, IconSearch as Search, IconUserPlus as UserPlus, IconCircleCheck as CheckCircle, IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../contexts/ToastContext'
 

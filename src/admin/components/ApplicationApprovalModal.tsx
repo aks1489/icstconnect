@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, CheckCircle, AlertTriangle, BookOpen, UserPlus, Info, CreditCard } from 'lucide-react'
+import { IconX as X, IconCircleCheck as CheckCircle, IconAlertTriangle as AlertTriangle, IconBook2 as BookOpen, IconUserPlus as UserPlus, IconInfoCircle as Info, IconCreditCard as CreditCard } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { enrollmentService } from '../../services/enrollmentService'
 import type { EnrollmentApplication } from '../../types'

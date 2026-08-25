@@ -1,24 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import {
-    GraduationCap,
-    Power,
-    Upload,
-    ExternalLink,
-    Trophy,
-    Eye,
-    Save,
-    Plus,
-    Trash2,
-    Edit3,
-    CheckCircle2,
-    AlertCircle,
-    Info,
-    Image as ImageIcon,
-    Link as LinkIcon,
-    Layers,
-    ArrowUpRight,
-    X
-} from 'lucide-react'
+import { IconSchool as GraduationCap, IconPower as Power, IconUpload as Upload, IconExternalLink as ExternalLink, IconTrophy as Trophy, IconEye as Eye, IconDeviceFloppy as Save, IconPlus as Plus, IconTrash as Trash2, IconEdit as Edit3, IconCircleCheck as CheckCircle2, IconAlertCircle as AlertCircle, IconInfoCircle as Info, IconPhoto as ImageIcon, IconLink as LinkIcon, IconLayersLinked as Layers, IconArrowUpRight as ArrowUpRight, IconX as X } from '@tabler/icons-react'
 import { scholarshipService } from '../../services/scholarshipService'
 import type { ScholarshipSettings, ScholarshipWinner, ScholarshipExamImage } from '../../types/scholarship'
 import { useToast } from '../../contexts/ToastContext'

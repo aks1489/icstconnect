@@ -1,7 +1,4 @@
-import {
-    Code, Database, Globe, Cpu, Palette, Calculator,
-    BookOpen, Beaker, Music, Camera, Briefcase, Award
-} from 'lucide-react'
+import { IconCode as Code, IconDatabase as Database, IconWorld as Globe, IconCpu as Cpu, IconPalette as Palette, IconCalculator as Calculator, IconBook2 as BookOpen, IconFlask as Beaker, IconMusic as Music, IconCamera as Camera, IconBriefcase as Briefcase, IconAward as Award } from '@tabler/icons-react'
 
 // Default Icon
 export const DefaultIcon = BookOpen

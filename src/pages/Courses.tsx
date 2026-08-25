@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, Hash, X } from 'lucide-react'
+import { IconSearch as Search, IconHash as Hash, IconX as X } from '@tabler/icons-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'

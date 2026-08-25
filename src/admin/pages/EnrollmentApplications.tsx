@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText, Search, Filter, Check, X } from 'lucide-react'
+import { IconFileText as FileText, IconSearch as Search, IconFilter as Filter, IconCheck as Check, IconX as X } from '@tabler/icons-react'
 import { useToast } from '../../contexts/ToastContext'
 import { enrollmentService } from '../../services/enrollmentService'
 import type { EnrollmentApplication } from '../../types'

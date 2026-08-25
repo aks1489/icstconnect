@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
-import { Plus, Trash2, GripVertical, CheckCircle2, Circle } from 'lucide-react'
+import { IconPlus as Plus, IconTrash as Trash2, IconGripVertical as GripVertical, IconCircleCheck as CheckCircle2, IconCircle as Circle } from '@tabler/icons-react'
 import type { TestQuestion } from '../../types'
 
 interface QuestionEditorProps {

@@ -1,14 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-    Trophy,
-    Medal,
-    Award,
-    ExternalLink,
-    Sparkles,
-    Calendar,
-    Camera,
-    X
-} from 'lucide-react'
+import { IconTrophy as Trophy, IconMedal as Medal, IconAward as Award, IconExternalLink as ExternalLink, IconSparkles as Sparkles, IconCalendar as Calendar, IconCamera as Camera, IconX as X } from '@tabler/icons-react'
 import { scholarshipService } from '../services/scholarshipService'
 import type { ScholarshipSettings, ScholarshipWinner, ScholarshipExamImage } from '../types/scholarship'
 import TailwindDropdown from '../components/ui/TailwindDropdown'

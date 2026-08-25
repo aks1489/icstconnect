@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Sparkles, ArrowRight } from 'lucide-react'
+import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'

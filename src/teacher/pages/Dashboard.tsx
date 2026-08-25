@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Presentation, FileText, Users, Plus, CalendarPlus } from 'lucide-react'
+import { IconPresentation as Presentation, IconFileText as FileText, IconUsers as Users, IconPlus as Plus, IconCalendarPlus as CalendarPlus } from '@tabler/icons-react'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function TeacherDashboard() {

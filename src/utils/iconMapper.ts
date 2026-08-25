@@ -1,10 +1,4 @@
-import {
-    Atom, Box, FileCode2, Wind, FileCode, Database, Server, Triangle,
-    BookOpen, LayoutDashboard, Calendar, Building2, Laptop,
-    Users, TrendingUp, CalendarCheck, Shield, Book, Trophy, Star,
-    Globe, Calculator, Router, AppWindow, Award, Code,
-    Bell, Info, CheckCircle, AlertTriangle, Megaphone, Zap
-} from 'lucide-react'
+import { IconAtom as Atom, IconBox as Box, IconFileCode2 as FileCode2, IconWind as Wind, IconFileCode as FileCode, IconDatabase as Database, IconServer as Server, IconTriangle as Triangle, IconBook2 as BookOpen, IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconUsers as Users, IconTrendingUp as TrendingUp, IconCalendarCheck as CalendarCheck, IconShield as Shield, IconBook as Book, IconTrophy as Trophy, IconStar as Star, IconWorld as Globe, IconCalculator as Calculator, IconRouter as Router, IconAppWindow as AppWindow, IconAward as Award, IconCode as Code, IconBell as Bell, IconInfoCircle as Info, IconCircleCheck as CheckCircle, IconAlertTriangle as AlertTriangle, IconSpeakerphone as Megaphone, IconBolt as Zap } from '@tabler/icons-react'
 
 export const getIcon = (iconName: string) => {
     // Icon mapping for specific tech/course icons

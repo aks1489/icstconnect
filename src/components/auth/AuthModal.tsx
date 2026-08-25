@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
-import { X, UserCircle, UserPlus, Check, ShieldCheck, Key, Mail, Lock, AlertCircle, CheckCircle, User } from 'lucide-react'
+import { IconX as X, IconUserCircle as UserCircle, IconUserPlus as UserPlus, IconCheck as Check, IconShieldCheck as ShieldCheck, IconKey as Key, IconMail as Mail, IconLock as Lock, IconAlertCircle as AlertCircle, IconCircleCheck as CheckCircle, IconUser as User } from '@tabler/icons-react'
 
 interface AuthModalProps {
     isOpen: boolean

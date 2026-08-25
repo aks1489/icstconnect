@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Users, BookText, CalendarCheck, CloudDownload, UserPlus, Book } from 'lucide-react'
+import { IconUsers as Users, IconBook2 as BookText, IconCalendarCheck as CalendarCheck, IconCloudDownload as CloudDownload, IconUserPlus as UserPlus, IconBook as Book } from '@tabler/icons-react'
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({

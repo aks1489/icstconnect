@@ -1,4 +1,4 @@
-import { X, Calendar, Clock, BookOpen, Info } from 'lucide-react'
+import { IconX as X, IconCalendar as Calendar, IconClock as Clock, IconBook2 as BookOpen, IconInfoCircle as Info } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
 
 interface CalendarEvent {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Check, BookX } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconCheck as Check, IconBookOff as BookX } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
 

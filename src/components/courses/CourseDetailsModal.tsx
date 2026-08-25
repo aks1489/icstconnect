@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Course, Module } from '../../types/course'
 import { courseService } from '../../services/courseService'
-import { X, Check, ArrowRight } from 'lucide-react'
+import { IconX as X, IconCheck as Check, IconArrowRight as ArrowRight } from '@tabler/icons-react'
 import { getIcon } from '../../utils/iconMapper'
 
 interface CourseDetailsModalProps {

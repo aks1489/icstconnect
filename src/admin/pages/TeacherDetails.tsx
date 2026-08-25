@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Check, X, Pencil, Mail, Calendar, CalendarX, UserMinus, Ban } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconCheck as Check, IconX as X, IconPencil as Pencil, IconMail as Mail, IconCalendar as Calendar, IconCalendarX as CalendarX, IconUserMinus as UserMinus, IconBan as Ban } from '@tabler/icons-react'
 
 interface TeacherProfile {
     id: string

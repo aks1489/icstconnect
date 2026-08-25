@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { financeService } from '../../services/financeService';
 import { supabase } from '../../lib/supabase';
-import { Search } from 'lucide-react';
+import { IconSearch as Search } from '@tabler/icons-react';
 import { useToast } from '../../contexts/ToastContext';
 
 interface StudentPayment {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Grid, List, UserPlus, Users, ChevronRight, Search } from 'lucide-react'
+import { IconLayoutGrid as Grid, IconList as List, IconUserPlus as UserPlus, IconUsers as Users, IconChevronRight as ChevronRight, IconSearch as Search } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import CreateTeacherModal from '../../components/admin/CreateTeacherModal'
 

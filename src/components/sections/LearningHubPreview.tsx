@@ -1,5 +1,5 @@
 
-import { Gamepad2, Star, Trophy } from 'lucide-react';
+import { IconDeviceGamepad2 as Gamepad2, IconStar as Star, IconTrophy as Trophy } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 
 const LearningHubPreview = () => {

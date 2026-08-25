@@ -1,16 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import {
-    Search,
-    Clock,
-    CheckCircle,
-    XCircle,
-    Calendar,
-    Phone,
-    Trash2,
-    AlertTriangle,
-    X
-} from 'lucide-react';
+import { IconSearch as Search, IconClock as Clock, IconCircleCheck as CheckCircle, IconCircleX as XCircle, IconCalendar as Calendar, IconPhone as Phone, IconTrash as Trash2, IconAlertTriangle as AlertTriangle, IconX as X } from '@tabler/icons-react';
 import { format } from 'date-fns';
 
 interface Inquiry {

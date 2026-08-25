@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import type { FormEvent } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { 
-    CheckCircle2, ArrowRight, BookOpen, MapPin, Phone, MessageSquare, 
-    Info, CreditCard, ChevronDown, CheckCircle, X 
-} from 'lucide-react'
+import { IconCircleCheck as CheckCircle2, IconArrowRight as ArrowRight, IconBook2 as BookOpen, IconMapPin as MapPin, IconPhone as Phone, IconMessage as MessageSquare, IconInfoCircle as Info, IconCreditCard as CreditCard, IconChevronDown as ChevronDown, IconCircleCheck as CheckCircle, IconX as X } from '@tabler/icons-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { courseService } from '../services/courseService'

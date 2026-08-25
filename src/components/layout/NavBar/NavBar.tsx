@@ -1,16 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import {
-    Home,
-    Book,
-    Image as ImageIcon,
-    Info,
-    LayoutDashboard,
-    User,
-    Menu,
-    X
-} from 'lucide-react'
+import { IconHome as Home, IconBook as Book, IconPhoto as ImageIcon, IconInfoCircle as Info, IconLayoutDashboard as LayoutDashboard, IconUser as User, IconMenu2 as Menu, IconX as X } from '@tabler/icons-react'
+import ThemeToggle from '../../ui/ThemeToggle'
 import logo from '../../../assets/logo.jpg'
 
 interface NavigationProps {
@@ -101,6 +93,8 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                     </button>
                                 )
                             )}
+
+                            <ThemeToggle />
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -152,6 +146,11 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 </button>
                             )
                         )}
+
+                        <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Theme</span>
+                            <ThemeToggle showLabel />
+                        </div>
                     </div>
                 </div>
             </nav>

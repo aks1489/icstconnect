@@ -1,8 +1,11 @@
+export * from './permissions';
+
 export interface UserProfile {
     id: string;
     email: string; // Often joined from auth.users but useful to have in type
     full_name: string;
-    role: 'student' | 'teacher' | 'admin';
+    role: 'student' | 'teacher' | 'admin' | 'super_admin';
+    custom_permissions?: string[];
     created_at: string;
     // Extended Profile Fields
     guardian_name?: string;

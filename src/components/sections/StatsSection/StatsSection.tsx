@@ -1,5 +1,5 @@
 
-import { Users, TrendingUp, BookOpen, CalendarCheck } from 'lucide-react'
+import { IconUsers as Users, IconTrendingUp as TrendingUp, IconBook2 as BookOpen, IconCalendarCheck as CalendarCheck } from '@tabler/icons-react'
 
 const StatsSection = () => {
     const stats = [

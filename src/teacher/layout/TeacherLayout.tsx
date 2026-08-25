@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, List, Grid, LogOut } from 'lucide-react'
+import { IconChevronRight as ChevronRight, IconList as List, IconLayoutGrid as Grid, IconLogout as LogOut } from '@tabler/icons-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { TEACHER_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'

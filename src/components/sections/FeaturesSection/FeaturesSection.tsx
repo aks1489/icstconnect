@@ -1,5 +1,5 @@
 
-import { UserCheck, Laptop, Briefcase, Clock } from 'lucide-react'
+import { IconUserCheck as UserCheck, IconDeviceLaptop as Laptop, IconBriefcase as Briefcase, IconClock as Clock } from '@tabler/icons-react'
 
 const FeaturesSection = () => {
     const features = [

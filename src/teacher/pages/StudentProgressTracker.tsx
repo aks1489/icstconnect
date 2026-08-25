@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Check } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconCheck as Check } from '@tabler/icons-react'
 
 interface Topic {
     id: number

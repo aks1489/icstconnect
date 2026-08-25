@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { getIcon } from '../../utils/iconMapper'
 
 export default function CourseForm() {

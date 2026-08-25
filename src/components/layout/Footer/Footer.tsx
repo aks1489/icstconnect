@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Facebook, Instagram, MapPin, Mail, Phone } from 'lucide-react'
+import { IconBrandFacebook as Facebook, IconBrandInstagram as Instagram, IconMapPin as MapPin, IconMail as Mail, IconPhone as Phone } from '@tabler/icons-react'
 
 const Footer: React.FC = () => {
     return (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { UserPlus, Users, ArrowRight, Mail, KeyRound } from 'lucide-react'
+import { IconUserPlus as UserPlus, IconUsers as Users, IconArrowRight as ArrowRight, IconMail as Mail, IconKey as KeyRound } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import CreateStudentModal from '../../components/admin/CreateStudentModal'
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { GraduationCap, ArrowRight, Trophy } from 'lucide-react'
+import { IconSchool as GraduationCap, IconArrowRight as ArrowRight, IconTrophy as Trophy } from '@tabler/icons-react'
 import { scholarshipService } from '../../services/scholarshipService'
 import type { ScholarshipSettings } from '../../types/scholarship'
 

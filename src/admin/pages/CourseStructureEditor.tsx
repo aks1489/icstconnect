@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Book, Plus, GripVertical, Pencil, Trash2, X, ArrowLeft } from 'lucide-react'
+import { IconBook as Book, IconPlus as Plus, IconGripVertical as GripVertical, IconPencil as Pencil, IconTrash as Trash2, IconX as X, IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import type { DropResult } from '@hello-pangea/dnd'

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, X } from 'lucide-react';
+import { IconSearch as Search, IconX as X } from '@tabler/icons-react';
 import { supabase } from '../../lib/supabase';
 
 interface Student {

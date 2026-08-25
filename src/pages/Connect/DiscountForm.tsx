@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Check, Loader2, AlertCircle } from 'lucide-react';
+import { IconX as X, IconCheck as Check, IconLoader2 as Loader2, IconAlertCircle as AlertCircle } from '@tabler/icons-react';
 import { supabase } from '../../lib/supabase';
 
 interface DiscountFormProps {

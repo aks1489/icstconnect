@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { User, Home, LogOut } from 'lucide-react'
+import { IconUser as User, IconHome as Home, IconLogout as LogOut } from '@tabler/icons-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS, TEACHER_ACTIONS, ADMIN_ACTIONS } from '../../config/navigation'
 import type { NavItem } from '../../config/navigation'

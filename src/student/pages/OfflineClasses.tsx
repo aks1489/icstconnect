@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Calendar } from 'lucide-react'
+import { IconCalendar as Calendar } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 

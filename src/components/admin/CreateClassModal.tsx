@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Check } from 'lucide-react'
+import { IconX as X, IconCheck as Check } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 
 interface CreateClassModalProps {

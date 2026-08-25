@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { Book, Trophy, Star, BookPlus, ChevronRight } from 'lucide-react'
+import { IconBook as Book, IconTrophy as Trophy, IconStar as Star, IconBookUpload as BookPlus, IconChevronRight as ChevronRight } from '@tabler/icons-react'
 import { getIcon } from '../../utils/iconMapper'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 

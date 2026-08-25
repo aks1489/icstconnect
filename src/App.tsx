@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { Suspense, lazy, useState, useEffect } from 'react'
-import { AlertCircle, X } from 'lucide-react'
+import { IconAlertCircle as AlertCircle, IconX as X } from '@tabler/icons-react'
 import MainLayout from './components/layout/MainLayout'
 
 import PageSkeleton from './components/ui/PageSkeleton'
@@ -109,17 +109,19 @@ const ErrorToast = () => {
 }
 
 import { ToastProvider } from './contexts/ToastContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import ToastContainer from './components/ui/ToastContainer'
 
 function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <Router>
-          <ErrorToast />
-          <ToastContainer />
+    <ThemeProvider>
+      <AuthProvider>
+        <ToastProvider>
+          <Router>
+            <ErrorToast />
+            <ToastContainer />
 
-          <Suspense fallback={<PageSkeleton />}>
+            <Suspense fallback={<PageSkeleton />}>
             <Routes>
               {/* Public Routes with MainLayout */}
               <Route element={<MainLayout><Outlet /></MainLayout>}>
@@ -259,8 +261,9 @@ function App() {
             </Routes>
           </Suspense>
         </Router>
-      </ToastProvider>
-    </AuthProvider >
+        </ToastProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

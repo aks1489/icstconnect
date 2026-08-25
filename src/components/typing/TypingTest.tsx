@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { RotateCcw, CheckCircle2, XCircle } from 'lucide-react';
+import { IconRotate as RotateCcw, IconCircleCheck as CheckCircle2, IconCircleX as XCircle } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 import useTypingEngine from './useTypingEngine';
 

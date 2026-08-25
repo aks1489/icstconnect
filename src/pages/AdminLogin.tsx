@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Shield, Mail, Lock, AlertCircle } from 'lucide-react'
+import { IconShield as Shield, IconMail as Mail, IconLock as Lock, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
 
 export default function AdminLogin() {

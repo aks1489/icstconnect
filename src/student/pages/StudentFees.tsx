@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Calendar } from 'lucide-react';
+import { IconCalendar as Calendar } from '@tabler/icons-react';
 import type { Database } from '../../types/supabase';
 import { supabase } from '../../lib/supabase';
 import StudentViewPaymentGrid from '../components/StudentViewPaymentGrid';

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { X, Check } from 'lucide-react'
+import { IconX as X, IconCheck as Check } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
+import { useToast } from '../../contexts/ToastContext'
 
 interface AddEventModalProps {
     isOpen: boolean
@@ -10,6 +11,7 @@ interface AddEventModalProps {
 }
 
 export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventModalProps) {
+    const { showToast } = useToast()
     const [eventType, setEventType] = useState<'holiday' | 'extra_class'>('extra_class')
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
@@ -76,6 +78,7 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
             const { error } = await supabase.from('calendar_events').insert(eventData)
             if (error) throw error
 
+            showToast('Event added successfully!', 'success')
             onSuccess()
             onClose()
             // Reset form
@@ -84,7 +87,7 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
             setEventType('extra_class')
         } catch (error: any) {
             console.error('Error adding event:', error)
-            alert(error.message || 'Failed to add event')
+            showToast(error.message || 'Failed to add event', 'error')
         } finally {
             setLoading(false)
         }

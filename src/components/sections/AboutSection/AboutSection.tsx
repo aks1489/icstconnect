@@ -1,5 +1,5 @@
 
-import { BadgeCheck, Users } from 'lucide-react'
+import { IconRosetteDiscountCheck as BadgeCheck, IconUsers as Users } from '@tabler/icons-react'
 
 const AboutSection = () => {
     return (

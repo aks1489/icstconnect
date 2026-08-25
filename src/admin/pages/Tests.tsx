@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { Plus, Search, FileText, Clock, BarChart3, Pencil, Trash2, Globe, Lock } from 'lucide-react'
+import { IconPlus as Plus, IconSearch as Search, IconFileText as FileText, IconClock as Clock, IconChartBar as BarChart3, IconPencil as Pencil, IconTrash as Trash2, IconWorld as Globe, IconLock as Lock } from '@tabler/icons-react'
 import type { Test } from '../../types'
 
 export default function Tests() {

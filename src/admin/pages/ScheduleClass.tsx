@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { addMonths, eachDayOfInterval, format, set, addMinutes } from 'date-fns'
-import { ArrowLeft } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 
 interface Course {
     id: number

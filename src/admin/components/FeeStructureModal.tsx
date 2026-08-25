@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, DollarSign, Calendar, CheckCircle, Calculator } from 'lucide-react';
+import { IconX as X, IconCurrencyDollar as DollarSign, IconCalendar as Calendar, IconCircleCheck as CheckCircle, IconCalculator as Calculator } from '@tabler/icons-react';
 
 interface FeeStructureModalProps {
     isOpen: boolean;

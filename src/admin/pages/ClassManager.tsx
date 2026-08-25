@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconPlus as Plus, IconUsers as Users, IconTrash as Trash2 } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 
 interface ClassBatch {

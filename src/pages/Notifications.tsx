@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Skeleton from '../components/ui/Skeleton'
 import { api, type Notification } from '../services/api'
 import { getIcon } from '../utils/iconMapper'
-import { Bell, Calendar, ChevronRight } from 'lucide-react'
+import { IconBell as Bell, IconCalendar as Calendar, IconChevronRight as ChevronRight } from '@tabler/icons-react'
 
 const Notifications = () => {
     const [loading, setLoading] = useState(true)

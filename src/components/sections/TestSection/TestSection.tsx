@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { IconArrowRight as ArrowRight } from '@tabler/icons-react'
 
 const TestSection = () => {
     return (

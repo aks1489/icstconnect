@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Clock, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react'
+import { IconClock as Clock, IconArrowLeft as ArrowLeft, IconArrowRight as ArrowRight, IconLoader2 as Loader2 } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
+import { useToast } from '../contexts/ToastContext'
 import type { Test, TestQuestion } from '../types'
 
 const TestPlayer = () => {
     const { testId } = useParams()
     const navigate = useNavigate()
     const location = useLocation()
+    const { showToast } = useToast()
     const isStudentPortal = location.pathname.includes('/student')
     const backPath = isStudentPortal ? '/student/tests' : '/online-test'
 
@@ -72,7 +74,7 @@ const TestPlayer = () => {
             // 2. Access Control Check
             if (testData.access_type === 'private') {
                 if (!user) {
-                    alert('You must be logged in to access this private test.')
+                    showToast('You must be logged in to access this private test.', 'warning')
                     return navigate('/login')
                 }
 
@@ -85,7 +87,7 @@ const TestPlayer = () => {
                     .single()
 
                 if (!enrollment) {
-                    alert('You are not enrolled in the course for this test.')
+                    showToast('You are not enrolled in the course for this test.', 'warning')
                     return navigate(backPath)
                 }
             }

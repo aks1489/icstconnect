@@ -2,7 +2,9 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { UserProfile } from '../../types'
 import ProfileForm from '../../components/common/ProfileForm'
-import { X } from 'lucide-react'
+import { IconX as X } from '@tabler/icons-react'
+
+import { useToast } from '../../contexts/ToastContext'
 
 interface EditProfileModalProps {
     isOpen: boolean
@@ -11,6 +13,7 @@ interface EditProfileModalProps {
 
 export default function EditProfileModal({ isOpen, onClose }: EditProfileModalProps) {
     const { user, profile, refreshProfile } = useAuth()
+    const { showToast } = useToast()
 
     if (!isOpen || !user || !profile) return null
 
@@ -37,7 +40,7 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
 
             await refreshProfile()
             onClose()
-            alert('Profile updated successfully!')
+            showToast('Profile updated successfully!', 'success')
 
         } catch (error) {
             console.error('Error updating profile:', error)

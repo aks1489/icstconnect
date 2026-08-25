@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { financeService } from '../../services/financeService';
 import { supabase } from '../../lib/supabase';
-import { FileText } from 'lucide-react';
+import { IconFileText as FileText } from '@tabler/icons-react';
 
 export default function StudentViewPaymentGrid() {
     const [loading, setLoading] = useState(true);
