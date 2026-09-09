@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom'
-import { Suspense, lazy, useState, useEffect } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { IconAlertCircle as AlertCircle, IconX as X } from '@tabler/icons-react'
 import MainLayout from './components/layout/MainLayout'
 
@@ -56,6 +56,9 @@ const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
 const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
 const AdminScholarships = lazy(() => import('./admin/pages/AdminScholarships'))
 const AdminGallery = lazy(() => import('./admin/pages/AdminGallery'))
+const AdminPermissions = lazy(() => import('./admin/pages/AdminPermissions'))
+const AdminAuditLogs = lazy(() => import('./admin/pages/AdminAuditLogs'))
+const AdminEcosystem = lazy(() => import('./admin/pages/AdminEcosystem'))
 
 // Teacher Imports
 import TeacherLayout from './teacher/layout/TeacherLayout'
@@ -69,23 +72,19 @@ import StudentProgressTracker from './teacher/pages/StudentProgressTracker'
 
 // Simple Toast Component for global errors
 const ErrorToast = () => {
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Check URL hash for errors (Supabase redirect)
+  const [error, setError] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
     const hash = window.location.hash
     if (hash && hash.includes('error=')) {
-      const params = new URLSearchParams(hash.substring(1)) // remove #
+      const params = new URLSearchParams(hash.substring(1))
       const errorDescription = params.get('error_description')
-      // const errorCode = params.get('error_code')
-
       if (errorDescription) {
-        setError(errorDescription.replace(/\+/g, ' '))
-        // Clear hash to prevent showing error on refresh
         window.history.replaceState(null, '', window.location.pathname)
+        return errorDescription.replace(/\+/g, ' ')
       }
     }
-  }, [])
+    return null
+  })
 
   if (!error) return null
 
@@ -111,6 +110,7 @@ const ErrorToast = () => {
 import { ToastProvider } from './contexts/ToastContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import ToastContainer from './components/ui/ToastContainer'
+import AppErrorBoundary from './components/ui/AppErrorBoundary'
 
 function App() {
   return (
@@ -118,13 +118,18 @@ function App() {
       <AuthProvider>
         <ToastProvider>
           <Router>
-            <ErrorToast />
-            <ToastContainer />
+            <AppErrorBoundary>
+              <ErrorToast />
+              <ToastContainer />
 
-            <Suspense fallback={<PageSkeleton />}>
-            <Routes>
-              {/* Public Routes with MainLayout */}
-              <Route element={<MainLayout><Outlet /></MainLayout>}>
+              <Suspense fallback={<PageSkeleton />}>
+              <Routes>
+                {/* Public Routes with MainLayout */}
+                <Route element={
+                  <AppErrorBoundary fallbackTitle="Public Portal Error">
+                    <MainLayout><Outlet /></MainLayout>
+                  </AppErrorBoundary>
+                }>
                 <Route path="/" element={<Home />} />
                 <Route path="/courses/:courseId?" element={<CoursesPage />} />
                 <Route path="/enroll/:courseId" element={
@@ -187,7 +192,9 @@ function App() {
               } />
               <Route path="/student" element={
                 <ProtectedRoute requireStudent>
-                  <StudentLayout />
+                  <AppErrorBoundary fallbackTitle="Student Portal Unavailable">
+                    <StudentLayout />
+                  </AppErrorBoundary>
                 </ProtectedRoute>
               }>
                 <Route index element={<Navigate to="dashboard" replace />} />
@@ -206,7 +213,9 @@ function App() {
               {/* Admin Routes - Independent Layout */}
               <Route path="/admin" element={
                 <ProtectedRoute requireAdmin>
-                  <AdminLayout />
+                  <AppErrorBoundary fallbackTitle="Admin Portal Unavailable">
+                    <AdminLayout />
+                  </AppErrorBoundary>
                 </ProtectedRoute>
               }>
                 <Route index element={<Navigate to="dashboard" replace />} />
@@ -240,12 +249,29 @@ function App() {
                     <AdminGallery />
                   </Suspense>
                 } />
+                <Route path="permissions" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminPermissions />
+                  </Suspense>
+                } />
+                <Route path="audit-logs" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminAuditLogs />
+                  </Suspense>
+                } />
+                <Route path="ecosystem" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminEcosystem />
+                  </Suspense>
+                } />
               </Route>
 
               {/* Teacher Routes - Independent Layout */}
               <Route path="/teacher" element={
                 <ProtectedRoute requireTeacher>
-                  <TeacherLayout />
+                  <AppErrorBoundary fallbackTitle="Teacher Portal Unavailable">
+                    <TeacherLayout />
+                  </AppErrorBoundary>
                 </ProtectedRoute>
               }>
                 <Route index element={<Navigate to="dashboard" replace />} />
@@ -260,6 +286,7 @@ function App() {
 
             </Routes>
           </Suspense>
+          </AppErrorBoundary>
         </Router>
         </ToastProvider>
       </AuthProvider>

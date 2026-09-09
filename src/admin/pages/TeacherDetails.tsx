@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { IconArrowLeft as ArrowLeft, IconCheck as Check, IconX as X, IconPencil as Pencil, IconMail as Mail, IconCalendar as Calendar, IconCalendarX as CalendarX, IconUserMinus as UserMinus, IconBan as Ban } from '@tabler/icons-react'
+import { useToast } from '../../contexts/ToastContext'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 interface TeacherProfile {
     id: string
@@ -14,6 +16,16 @@ interface TeacherProfile {
 export default function TeacherDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const { showToast } = useToast()
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        confirmLabel: string
+        variant: 'danger' | 'warning' | 'primary'
+        action: () => Promise<void>
+    } | null>(null)
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false)
     const [teacher, setTeacher] = useState<TeacherProfile | null>(null)
     const [loading, setLoading] = useState(true)
 
@@ -39,23 +51,34 @@ export default function TeacherDetails() {
         setLoading(false)
     }
 
-    const handleDemote = async () => {
-        if (!window.confirm('Are you sure you want to remove Teacher privileges? This user will become a regular Student.')) return
+    const handleDemote = () => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Remove Teacher Privileges',
+            description: 'Are you sure you want to remove Teacher privileges? This user will become a regular Student.',
+            confirmLabel: 'Demote to Student',
+            variant: 'warning',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    const { error } = await supabase
+                        .from('profiles')
+                        .update({ role: 'student' })
+                        .eq('id', id)
 
-        try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({ role: 'student' })
-                .eq('id', id)
+                    if (error) throw error
 
-            if (error) throw error
-
-            alert('User role updated to Student.')
-            navigate('/admin/teachers')
-        } catch (error) {
-            console.error('Error:', error)
-            alert('Failed to update role')
-        }
+                    showToast('User role updated to Student.', 'success')
+                    navigate('/admin/teachers')
+                } catch (error) {
+                    console.error('Error:', error)
+                    showToast('Failed to update role', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
     const handleUpdateId = async () => {
@@ -69,10 +92,10 @@ export default function TeacherDetails() {
 
             setTeacher(prev => prev ? { ...prev, teacher_id: newTeacherId } : null)
             setIsEditingId(false)
-            alert('Teacher ID updated successfully')
+            showToast('Teacher ID updated successfully', 'success')
         } catch (error) {
             console.error('Error updating ID:', error)
-            alert('Failed to update Teacher ID')
+            showToast('Failed to update Teacher ID', 'error')
         }
     }
 
@@ -176,6 +199,19 @@ export default function TeacherDetails() {
                     </div>
                 </div>
             </div>
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
+            )}
         </div>
     )
 }

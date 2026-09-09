@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { IconSearch as Search, IconClock as Clock, IconCircleCheck as CheckCircle, IconCircleX as XCircle, IconCalendar as Calendar, IconPhone as Phone, IconTrash as Trash2, IconAlertTriangle as AlertTriangle, IconX as X } from '@tabler/icons-react';
 import { format } from 'date-fns';
+import { useToast } from '../../contexts/ToastContext';
 
 interface Inquiry {
     id: string;
@@ -17,6 +18,7 @@ interface Inquiry {
 }
 
 const DiscountClaims = () => {
+    const { showToast } = useToast();
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -86,18 +88,19 @@ const DiscountClaims = () => {
             // RLS Check: If no data returned, it means nothing was deleted (permission denied)
             if (!data || data.length === 0) {
                 console.error('Delete operation failed: No records deleted. Check RLS policies.');
-                alert('Permission Denied: Unable to delete record from database.');
+                showToast('Permission Denied: Unable to delete record from database.', 'error');
                 setShowDeleteModal(false);
                 return;
             }
 
             // Update local state only if DB delete was successful
             setInquiries(inquiries.filter(item => item.id !== deleteId));
+            showToast('Record deleted successfully', 'success');
             setShowDeleteModal(false);
             setDeleteId(null);
         } catch (error) {
             console.error('Error deleting inquiry:', error);
-            alert('Failed to delete record: ' + (error as any).message);
+            showToast('Failed to delete record: ' + (error as any).message, 'error');
             setShowDeleteModal(false);
         }
     };

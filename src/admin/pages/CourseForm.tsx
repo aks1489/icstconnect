@@ -3,10 +3,12 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { getIcon } from '../../utils/iconMapper'
+import { useToast } from '../../contexts/ToastContext'
 
 export default function CourseForm() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const { showToast } = useToast()
     const isEditing = !!id
 
     const [loading, setLoading] = useState(false)
@@ -64,7 +66,7 @@ export default function CourseForm() {
             }
         } catch (error) {
             console.error('Error fetching course:', error)
-            alert('Failed to load course details')
+            showToast('Failed to load course details', 'error')
             navigate('/admin/courses')
         } finally {
             setFetching(false)
@@ -91,10 +93,11 @@ export default function CourseForm() {
                 if (error) throw error
             }
 
+            showToast(isEditing ? 'Course updated successfully!' : 'Course created successfully!', 'success')
             navigate('/admin/courses')
         } catch (error) {
             console.error('Error saving course:', error)
-            alert('Failed to save course')
+            showToast('Failed to save course', 'error')
         } finally {
             setLoading(false)
         }

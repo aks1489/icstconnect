@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { addMonths, eachDayOfInterval, format, set, addMinutes } from 'date-fns'
 import { IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Course {
     id: number
@@ -13,6 +14,7 @@ interface Course {
 
 export default function ScheduleClass() {
     const navigate = useNavigate()
+    const { showToast } = useToast()
     const [courses, setCourses] = useState<Course[]>([])
     const [submitting, setSubmitting] = useState(false)
 
@@ -63,7 +65,7 @@ export default function ScheduleClass() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!selectedCourseId || selectedDays.length === 0) {
-            alert('Please select a course and at least one day.')
+            showToast('Please select a course and at least one day.', 'warning')
             return
         }
 
@@ -127,12 +129,12 @@ export default function ScheduleClass() {
                 if (eventsError) throw eventsError
             }
 
-            alert(`Successfully scheduled ${eventsToInsert.length} classes!`)
+            showToast(`Successfully scheduled ${eventsToInsert.length} classes!`, 'success')
             navigate('/admin/calendar')
 
         } catch (error: any) {
             console.error('Error scheduling class:', error)
-            alert('Failed to schedule class: ' + error.message)
+            showToast('Failed to schedule class: ' + (error?.message || 'Error'), 'error')
         } finally {
             setSubmitting(false)
         }

@@ -3,9 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { IconPlus as Plus, IconSearch as Search, IconFileText as FileText, IconClock as Clock, IconChartBar as BarChart3, IconPencil as Pencil, IconTrash as Trash2, IconWorld as Globe, IconLock as Lock } from '@tabler/icons-react'
 import type { Test } from '../../types'
+import { useToast } from '../../contexts/ToastContext'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 export default function Tests() {
     const navigate = useNavigate()
+    const { showToast } = useToast()
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        confirmLabel: string
+        variant: 'danger' | 'warning' | 'primary'
+        action: () => Promise<void>
+    } | null>(null)
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false)
     const [tests, setTests] = useState<Test[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -41,28 +53,41 @@ export default function Tests() {
             setTests(data || [])
         } catch (error) {
             console.error('Error fetching tests:', error)
+            showToast('Failed to load tests', 'error')
         } finally {
             setLoading(false)
         }
     }
 
-    const handleDelete = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this test? This action cannot be undone.')) return
+    const handleDelete = (id: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Test',
+            description: 'Are you sure you want to delete this test? This action cannot be undone and will remove all student submissions.',
+            confirmLabel: 'Delete Test',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    const { error } = await supabase
+                        .from('tests')
+                        .delete()
+                        .eq('id', id)
 
-        try {
-            const { error } = await supabase
-                .from('tests')
-                .delete()
-                .eq('id', id)
+                    if (error) throw error
 
-            if (error) throw error
-
-            // Remove from local state
-            setTests(tests.filter(t => t.id !== id))
-        } catch (error) {
-            console.error('Error deleting test:', error)
-            alert('Failed to delete test')
-        }
+                    // Remove from local state
+                    setTests(tests.filter(t => t.id !== id))
+                    showToast('Test deleted successfully', 'success')
+                } catch (error) {
+                    console.error('Error deleting test:', error)
+                    showToast('Failed to delete test', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
     const filteredTests = tests.filter(test =>
@@ -188,6 +213,19 @@ export default function Tests() {
                         </div>
                     ))}
                 </div>
+            )}
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
             )}
         </div>
     )

@@ -7,6 +7,8 @@ import ProfileForm from '../../components/common/ProfileForm'
 import FeeStructureModal from '../components/FeeStructureModal'
 import { feesService } from '../../services/feesService'
 import type { UserProfile } from '../../types'
+import { useToast } from '../../contexts/ToastContext'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 interface Enrollment {
     course_id: number
@@ -28,6 +30,16 @@ interface Course {
 export default function StudentDetails() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const { showToast } = useToast()
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        confirmLabel: string
+        variant: 'danger' | 'warning' | 'primary'
+        action: () => Promise<void>
+    } | null>(null)
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false)
     const [student, setStudent] = useState<UserProfile | null>(null)
     const [enrollments, setEnrollments] = useState<Enrollment[]>([])
     const [allCourses, setAllCourses] = useState<Course[]>([])
@@ -173,7 +185,7 @@ export default function StudentDetails() {
 
         } catch (error: any) {
             console.error('Error fetching data:', error)
-            alert(error.message || 'Error loading student details')
+            showToast(error.message || 'Error loading student details', 'error')
         } finally {
             setLoading(false)
         }
@@ -207,19 +219,19 @@ export default function StudentDetails() {
 
             if (error) throw error
 
-            alert('Batch switched successfully!')
+            showToast('Batch switched successfully!', 'success')
             setIsChangeBatchOpen(false)
             fetchData(true)
         } catch (error) {
             console.error('Error switching batch:', error)
-            alert('Failed to switch batch')
+            showToast('Failed to switch batch', 'error')
         }
     }
 
 
     const onEnrollClick = () => {
         if (!selectedCourseId || !selectedClassId) {
-            alert('Please select both a course and a batch class.')
+            showToast('Please select both a course and a batch class.', 'warning')
             return
         }
         setPendingEnrollment({
@@ -248,10 +260,10 @@ export default function StudentDetails() {
             setSelectedCourseId('')
             setSelectedClassId('')
             setPendingEnrollment(null)
-            alert('Student enrolled and fee structure assigned successfully!')
+            showToast('Student enrolled and fee structure assigned successfully!', 'success')
         } catch (error) {
             console.error('Error assigning fees:', error)
-            alert('Enrollment successful but failed to assign fees. Please check logs.')
+            showToast('Enrollment successful but failed to assign fees. Please check logs.', 'error')
         }
     }
 
@@ -270,7 +282,7 @@ export default function StudentDetails() {
 
             if (error) {
                 if (error.code === '23505') {
-                    alert('Student is already enrolled in this course')
+                    showToast('Student is already enrolled in this course', 'warning')
                 } else {
                     throw error
                 }
@@ -295,62 +307,97 @@ export default function StudentDetails() {
             setEnrollments(prev => prev.map(e =>
                 e.course_id === courseId ? { ...e, progress: newProgress } : e
             ))
+            showToast('Progress updated successfully', 'success')
         } catch (error) {
             console.error('Error updating progress:', error)
-            alert('Failed to update progress')
+            showToast('Failed to update progress', 'error')
         }
     }
 
-    const handleUnenroll = async (courseId: number) => {
-        if (!window.confirm('Are you sure you want to unenroll this student? Progress will be lost.')) return
+    const handleUnenroll = (courseId: number) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Unenroll Student',
+            description: 'Are you sure you want to unenroll this student? Course progress will be lost.',
+            confirmLabel: 'Unenroll',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    const { error } = await supabase
+                        .from('enrollments')
+                        .delete()
+                        .match({ student_id: id, course_id: courseId })
 
-        try {
-            const { error } = await supabase
-                .from('enrollments')
-                .delete()
-                .match({ student_id: id, course_id: courseId })
-
-            if (error) throw error
-            fetchData(true)
-        } catch (error) {
-            console.error('Error unenrolling:', error)
-            alert('Failed to unenroll student')
-        }
+                    if (error) throw error
+                    showToast('Student unenrolled successfully', 'success')
+                    fetchData(true)
+                } catch (error) {
+                    console.error('Error unenrolling:', error)
+                    showToast('Failed to unenroll student', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
-    const handleMakeTeacher = async () => {
-        if (!window.confirm('Are you sure you want to promote this user to a Teacher?')) return
+    const handleMakeTeacher = () => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Promote to Teacher',
+            description: 'Are you sure you want to promote this user to a Teacher? They will gain teacher permissions.',
+            confirmLabel: 'Promote',
+            variant: 'primary',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    const { error } = await supabase
+                        .from('profiles')
+                        .update({ role: 'teacher' })
+                        .eq('id', id)
 
-        try {
-            const { error } = await supabase
-                .from('profiles')
-                .update({ role: 'teacher' })
-                .eq('id', id)
+                    if (error) throw error
 
-            if (error) throw error
-
-            alert('User promoted to Teacher successfully!')
-            navigate('/admin/students')
-        } catch (error) {
-            console.error('Error promoting user:', error)
-            alert('Failed to promote user')
-        }
+                    showToast('User promoted to Teacher successfully!', 'success')
+                    navigate('/admin/students')
+                } catch (error) {
+                    console.error('Error promoting user:', error)
+                    showToast('Failed to promote user', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
-    const handleDeleteUser = async () => {
-        if (!window.confirm('Are you sure you want to delete this account? This action cannot be undone.')) return
+    const handleDeleteUser = () => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete User Account',
+            description: 'Are you sure you want to delete this account? This action cannot be undone and will permanently remove their records.',
+            confirmLabel: 'Delete Account',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    const { error } = await supabase.rpc('delete_user_by_id', { user_id: id })
 
-        try {
-            const { error } = await supabase.rpc('delete_user_by_id', { user_id: id })
+                    if (error) throw error
 
-            if (error) throw error
-
-            alert('User deleted successfully.')
-            navigate('/admin/students')
-        } catch (error: any) {
-            console.error('Error deleting user:', error)
-            alert('Failed to delete user: ' + error.message)
-        }
+                    showToast('User deleted successfully.', 'success')
+                    navigate('/admin/students')
+                } catch (error: any) {
+                    console.error('Error deleting user:', error)
+                    showToast('Failed to delete user: ' + error.message, 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
     const handleUpdateProfile = async (data: Partial<UserProfile>) => {
@@ -379,9 +426,10 @@ export default function StudentDetails() {
 
             setStudent(prev => prev ? ({ ...prev, ...updates } as UserProfile) : null)
             setIsEditOpen(false)
-            alert('Profile updated successfully')
+            showToast('Profile updated successfully', 'success')
         } catch (error: any) {
             console.error('Error updating profile:', error)
+            showToast(error.message || 'Failed to update profile', 'error')
             throw error
         }
     }
@@ -759,6 +807,19 @@ export default function StudentDetails() {
                     </div>
                 </div>
             </div>
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
+            )}
         </div>
     )
 }

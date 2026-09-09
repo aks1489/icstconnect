@@ -3,6 +3,8 @@ import { supabase } from '../../lib/supabase'
 import { uploadToCloudinary, getOptimizedImageUrl } from '../../lib/cloudinary'
 import { IconPlus as Plus, IconPhoto as ImageIcon, IconTrash as Trash2, IconFolderPlus as FolderPlus, IconCircleCheck as CheckCircle2, IconEdit as Edit2, IconX as X, IconDeviceFloppy as Save } from '@tabler/icons-react'
 import ImageTagger, { type ImageTag } from '../../components/admin/ImageTagger'
+import { useToast } from '../../contexts/ToastContext'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 interface Category {
     id: string;
@@ -23,6 +25,16 @@ interface GalleryImage {
 }
 
 export default function AdminGallery() {
+    const { showToast } = useToast()
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        confirmLabel: string
+        variant: 'danger' | 'warning' | 'primary'
+        action: () => Promise<void>
+    } | null>(null)
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false)
     const [categories, setCategories] = useState<Category[]>([]);
     const [images, setImages] = useState<GalleryImage[]>([]);
     const [loading, setLoading] = useState(true);
@@ -96,8 +108,9 @@ export default function AdminGallery() {
             setCategories([...categories, data].sort((a, b) => a.name.localeCompare(b.name)));
             setIsCreatingCategory(false);
             setNewCatName('');
+            showToast('Category created successfully!', 'success');
         } catch (error: any) {
-            alert('Failed to create category: ' + error.message);
+            showToast('Failed to create category: ' + error.message, 'error');
         }
     };
 
@@ -159,24 +172,38 @@ export default function AdminGallery() {
             setSelectedFile(null);
             resetFormFields();
             if (fileInputRef.current) fileInputRef.current.value = '';
+            showToast('Image uploaded successfully!', 'success');
 
         } catch (error: any) {
-            alert('Upload failed: ' + error.message);
+            showToast('Upload failed: ' + error.message, 'error');
         } finally {
             setIsUploading(false);
         }
     };
 
-    const handleDelete = async (id: string, e: React.MouseEvent) => {
+    const handleDelete = (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!confirm('Are you sure you want to delete this image?')) return;
-        try {
-            const { error } = await supabase.from('gallery_images').delete().eq('id', id);
-            if (error) throw error;
-            setImages(images.filter(img => img.id !== id));
-        } catch (error: any) {
-            alert('Failed to delete: ' + error.message);
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Image',
+            description: 'Are you sure you want to delete this image? This action cannot be undone.',
+            confirmLabel: 'Delete Image',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true);
+                try {
+                    const { error } = await supabase.from('gallery_images').delete().eq('id', id);
+                    if (error) throw error;
+                    setImages(images.filter(img => img.id !== id));
+                    showToast('Image deleted successfully', 'info');
+                } catch (error: any) {
+                    showToast('Failed to delete: ' + error.message, 'error');
+                } finally {
+                    setIsConfirmLoading(false);
+                    setConfirmModal(null);
+                }
+            }
+        });
     };
 
     const openEditModal = (img: GalleryImage) => {
@@ -211,8 +238,9 @@ export default function AdminGallery() {
             setImages(images.map(img => img.id === data.id ? data : img));
             setEditingImage(null);
             resetFormFields();
+            showToast('Image metadata updated!', 'success');
         } catch (error: any) {
-            alert('Save failed: ' + error.message);
+            showToast('Save failed: ' + error.message, 'error');
         } finally {
             setIsSavingEdit(false);
         }
@@ -572,6 +600,19 @@ export default function AdminGallery() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
             )}
         </div>
     )

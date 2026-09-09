@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { IconUser as User, IconCamera as Camera } from '@tabler/icons-react'
+import { useToast } from '../../contexts/ToastContext'
 
 interface ImageUploadProps {
     currentImageUrl?: string
@@ -9,6 +10,7 @@ interface ImageUploadProps {
 }
 
 export default function ImageUpload({ currentImageUrl, onUploadComplete, userId }: ImageUploadProps) {
+    const { showToast } = useToast()
     const [uploading, setUploading] = useState(false)
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null)
     const fileInputRef = useRef<HTMLInputElement>(null)
@@ -113,10 +115,10 @@ export default function ImageUpload({ currentImageUrl, onUploadComplete, userId 
                 .getPublicUrl(filePath)
 
             onUploadComplete(publicUrl)
-
+            showToast('Image uploaded successfully!', 'success')
         } catch (error: any) {
             console.error('Error uploading image:', error)
-            alert('Error uploading image: ' + error.message)
+            showToast('Error uploading image: ' + (error?.message || 'Upload error'), 'error')
         } finally {
             setUploading(false)
         }

@@ -30,7 +30,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
 
             return {
                 name,
-                date: cover.event_date ? new Date(cover.event_date) : new Date(cover.created_at || Date.now()),
+                date: cover.event_date ? new Date(cover.event_date) : new Date(cover.created_at || 0),
                 cover,
                 others
             }
@@ -42,8 +42,8 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
     // STORY VIEW: Flat list sorted by date globally
     const storyImages = useMemo(() => {
         return [...images].sort((a, b) => {
-            const dateA = a.event_date ? new Date(a.event_date).getTime() : new Date(a.created_at || Date.now()).getTime();
-            const dateB = b.event_date ? new Date(b.event_date).getTime() : new Date(b.created_at || Date.now()).getTime();
+            const dateA = a.event_date ? new Date(a.event_date).getTime() : new Date(a.created_at || 0).getTime();
+            const dateB = b.event_date ? new Date(b.event_date).getTime() : new Date(b.created_at || 0).getTime();
             return dateB - dateA;
         });
     }, [images]);

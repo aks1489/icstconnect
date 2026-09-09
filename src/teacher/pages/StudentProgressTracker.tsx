@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { IconArrowLeft as ArrowLeft, IconCheck as Check } from '@tabler/icons-react'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Topic {
     id: number
@@ -20,6 +21,7 @@ interface Module {
 
 export default function StudentProgressTracker() {
     const { studentId, courseId } = useParams()
+    const { showToast } = useToast()
     const [modules, setModules] = useState<Module[]>([])
     const [studentData, setStudentData] = useState<any>(null)
     const [courseData, setCourseData] = useState<any>(null)
@@ -85,7 +87,7 @@ export default function StudentProgressTracker() {
 
         } catch (error) {
             console.error('Error loading data:', error)
-            alert('Failed to load progress data')
+            showToast('Failed to load progress data', 'error')
         } finally {
             setLoading(false)
         }
@@ -125,7 +127,7 @@ export default function StudentProgressTracker() {
 
         } catch (error) {
             console.error('Error updating status:', error)
-            alert('Failed to update status')
+            showToast('Failed to update status', 'error')
         }
     }
 

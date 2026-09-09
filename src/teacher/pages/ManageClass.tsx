@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { IconArrowLeft as ArrowLeft, IconCheck as Check, IconBookOff as BookX } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Topic {
     id: number
@@ -21,6 +22,7 @@ interface Course {
 
 export default function ManageClass() {
     const { courseId } = useParams()
+    const { showToast } = useToast()
     const [course, setCourse] = useState<Course | null>(null)
     const [topics, setTopics] = useState<Topic[]>([])
     const [loading, setLoading] = useState(true)
@@ -102,7 +104,7 @@ export default function ManageClass() {
 
         } catch (error) {
             console.error('Error updating topic:', error)
-            alert('Failed to update status')
+            showToast('Failed to update topic status', 'error')
             // Revert
             setTopics(topics.map(t => t.id === topicId ? { ...t, is_cleared: currentStatus } : t))
         }

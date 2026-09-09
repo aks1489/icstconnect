@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 
@@ -29,6 +29,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Using a ref to track the last seen access token to prevent redundant updates
     const accessTokenRef = useRef<string | null>(null)
+
+    const fetchProfile = useCallback(async (userId: string) => {
+        try {
+            // Removed setLoading(true) to prevent full page loaders on background refreshes
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single()
+
+            if (error) {
+                console.error('Error fetching profile:', error)
+            } else {
+                setProfile(data)
+            }
+        } catch (error) {
+            console.error('Error:', error)
+        }
+    }, [])
 
     useEffect(() => {
         let mounted = true
@@ -80,26 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             mounted = false
             subscription.unsubscribe()
         }
-    }, [])
-
-    const fetchProfile = async (userId: string) => {
-        try {
-            // Removed setLoading(true) to prevent full page loaders on background refreshes
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single()
-
-            if (error) {
-                console.error('Error fetching profile:', error)
-            } else {
-                setProfile(data)
-            }
-        } catch (error) {
-            console.error('Error:', error)
-        }
-    }
+    }, [fetchProfile])
 
     const signOut = async () => {
         await supabase.auth.signOut()
@@ -109,11 +109,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         accessTokenRef.current = null
     }
 
-    const refreshProfile = async () => {
+    const refreshProfile = useCallback(async () => {
         if (user) {
             await fetchProfile(user.id)
         }
-    }
+    }, [user, fetchProfile])
 
     const value = useMemo(() => ({
         session,
@@ -127,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isTeacher: profile?.role === 'teacher',
         isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob),
         hasPerm: (permission: AppPermission) => hasPermission(profile, permission)
-    }), [session, user, profile, loading])
+    }), [session, user, profile, loading, refreshProfile])
 
     return (
         <AuthContext.Provider value={value}>

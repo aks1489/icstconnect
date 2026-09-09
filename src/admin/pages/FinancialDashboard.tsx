@@ -5,11 +5,21 @@ import AddTransactionModal from '../components/AddTransactionModal';
 import StudentPaymentStatus from '../components/StudentPaymentStatus';
 import type { Database } from '../../types/supabase';
 import { useToast } from '../../contexts/ToastContext';
+import ConfirmDialog from '../../components/ui/ConfirmDialog';
 
 type Transaction = Database['public']['Tables']['institution_transactions']['Row'];
 
 export default function FinancialDashboard() {
     const { showToast } = useToast();
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        confirmLabel: string;
+        variant: 'danger' | 'warning' | 'primary';
+        action: () => Promise<void>;
+    } | null>(null);
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false);
     const [activeTab, setActiveTab] = useState<'overview' | 'payments'>('overview');
     const [stats, setStats] = useState({
         totalIncome: 0,
@@ -70,17 +80,28 @@ export default function FinancialDashboard() {
         showToast('CSV Exported Successfully', 'success');
     };
 
-    const handleDeleteTransaction = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this transaction?')) return;
-
-        try {
-            await financeService.deleteTransaction(id);
-            showToast('Transaction deleted successfully', 'success');
-            fetchData();
-        } catch (error) {
-            console.error('Error deleting transaction:', error);
-            showToast('Failed to delete transaction', 'error');
-        }
+    const handleDeleteTransaction = (id: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Transaction',
+            description: 'Are you sure you want to delete this transaction? This action will affect financial reporting.',
+            confirmLabel: 'Delete',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true);
+                try {
+                    await financeService.deleteTransaction(id);
+                    showToast('Transaction deleted successfully', 'success');
+                    fetchData();
+                } catch (error) {
+                    console.error('Error deleting transaction:', error);
+                    showToast('Failed to delete transaction', 'error');
+                } finally {
+                    setIsConfirmLoading(false);
+                    setConfirmModal(null);
+                }
+            }
+        });
     };
 
     return (
@@ -241,6 +262,19 @@ export default function FinancialDashboard() {
                 onClose={() => setIsAddModalOpen(false)}
                 onSuccess={fetchData}
             />
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
+            )}
         </div>
     );
 }

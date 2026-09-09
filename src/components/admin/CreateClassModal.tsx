@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { IconX as X, IconCheck as Check } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
+import { useToast } from '../../contexts/ToastContext'
 
 interface CreateClassModalProps {
     isOpen: boolean
@@ -9,6 +10,7 @@ interface CreateClassModalProps {
 }
 
 export default function CreateClassModal({ isOpen, onClose, onSuccess }: CreateClassModalProps) {
+    const { showToast } = useToast()
     const [courses, setCourses] = useState<any[]>([])
     const [loadingCourses, setLoadingCourses] = useState(false)
 
@@ -82,11 +84,12 @@ export default function CreateClassModal({ isOpen, onClose, onSuccess }: CreateC
 
             if (error) throw error
 
+            showToast('Batch created successfully!', 'success')
             onSuccess()
             onClose()
         } catch (error: any) {
             console.error('Error creating batch:', error)
-            alert('Failed to create batch: ' + error.message)
+            showToast('Failed to create batch: ' + (error?.message || 'Error'), 'error')
         } finally {
             setLoading(false)
         }

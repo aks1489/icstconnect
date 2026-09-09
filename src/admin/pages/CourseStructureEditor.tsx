@@ -4,6 +4,8 @@ import { IconBook as Book, IconPlus as Plus, IconGripVertical as GripVertical, I
 import { supabase } from '../../lib/supabase'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import type { DropResult } from '@hello-pangea/dnd'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Topic {
     id: number
@@ -22,8 +24,11 @@ interface Module {
 
 export default function CourseStructureEditor() {
     const { id } = useParams()
+    const { showToast } = useToast()
     const [modules, setModules] = useState<Module[]>([])
     const [loading, setLoading] = useState(true)
+    const [itemToDelete, setItemToDelete] = useState<{ type: 'module' | 'topic'; id: number; name: string } | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [courseName, setCourseName] = useState('')
 
     // Edit States
@@ -144,16 +149,17 @@ export default function CourseStructureEditor() {
 
                     if (topicsError) {
                         console.error('Error adding topics:', topicsError)
-                        alert('Module created but failed to save some topics.')
+                        showToast('Module created but failed to save some topics.', 'warning')
                     }
                 }
             }
+            showToast('Module saved successfully!', 'success')
             setShowModuleModal(false)
             setEditingModule(null)
             fetchStructure(true)
         } catch (error) {
             console.error('Error saving module:', error)
-            alert('Failed to save module')
+            showToast('Failed to save module', 'error')
         } finally {
             setIsSaving(false)
         }
@@ -172,13 +178,26 @@ export default function CourseStructureEditor() {
         }
     }
 
-    const handleDeleteModule = async (moduleId: number) => {
-        if (!confirm('Delete this module? All topics will be deleted.')) return
+    const executeDeleteItem = async () => {
+        if (!itemToDelete) return
         try {
-            await supabase.from('course_modules').delete().eq('id', moduleId)
+            setIsDeleting(true)
+            if (itemToDelete.type === 'module') {
+                const { error } = await supabase.from('course_modules').delete().eq('id', itemToDelete.id)
+                if (error) throw error
+                showToast(`Module "${itemToDelete.name}" deleted successfully`, 'success')
+            } else {
+                const { error } = await supabase.from('course_topics').delete().eq('id', itemToDelete.id)
+                if (error) throw error
+                showToast(`Topic "${itemToDelete.name}" deleted successfully`, 'success')
+            }
+            setItemToDelete(null)
             fetchStructure(true)
         } catch (error) {
-            console.error('Error deleting module:', error)
+            console.error('Error deleting item:', error)
+            showToast('Failed to delete item', 'error')
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -212,24 +231,15 @@ export default function CourseStructureEditor() {
                         sort_order: currentTopicsCount
                     })
             }
+            showToast('Topic saved successfully!', 'success')
             setIsTopicModalOpen(false)
             setEditingTopic(null)
             fetchStructure(true)
         } catch (error) {
             console.error('Error saving topic:', error)
-            alert('Failed to save topic')
+            showToast('Failed to save topic', 'error')
         } finally {
             setIsSaving(false)
-        }
-    }
-
-    const handleDeleteTopic = async (topicId: number) => {
-        if (!confirm('Delete this topic?')) return
-        try {
-            await supabase.from('course_topics').delete().eq('id', topicId)
-            fetchStructure(true)
-        } catch (error) {
-            console.error('Error deleting topic:', error)
         }
     }
 
@@ -262,7 +272,7 @@ export default function CourseStructureEditor() {
                 if (error) throw error
             } catch (error) {
                 console.error('Error reordering modules:', error)
-                alert('Failed to save module order.')
+                showToast('Failed to save module order', 'error')
                 fetchStructure(true)
             }
         } else if (type === 'topic') {
@@ -331,7 +341,7 @@ export default function CourseStructureEditor() {
                 if (error) throw error
             } catch (error) {
                 console.error('Error reordering topics:', error)
-                alert('Failed to save topic order.')
+                showToast('Failed to save topic order', 'error')
                 fetchStructure(true)
             }
         }
@@ -422,7 +432,7 @@ export default function CourseStructureEditor() {
                                                             <Pencil size={16} />
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDeleteModule(module.id)}
+                                                            onClick={() => setItemToDelete({ type: 'module', id: module.id, name: module.title })}
                                                             className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-white transition-all flex items-center justify-center"
                                                             title="Delete Module"
                                                         >
@@ -464,7 +474,7 @@ export default function CourseStructureEditor() {
                                                                                             <Pencil size={14} />
                                                                                         </button>
                                                                                         <button
-                                                                                            onClick={() => handleDeleteTopic(topic.id)}
+                                                                                            onClick={() => setItemToDelete({ type: 'topic', id: topic.id, name: topic.title })}
                                                                                             className="p-1.5 rounded text-slate-400 hover:text-rose-600"
                                                                                         >
                                                                                             <X size={14} />
@@ -605,6 +615,22 @@ export default function CourseStructureEditor() {
             >
                 <Plus size={28} />
             </button>
+
+            <ConfirmDialog
+                open={!!itemToDelete}
+                onOpenChange={(open) => !open && setItemToDelete(null)}
+                title={itemToDelete?.type === 'module' ? "Delete Course Module" : "Delete Course Topic"}
+                description={
+                    itemToDelete?.type === 'module'
+                        ? `Are you sure you want to permanently delete "${itemToDelete?.name}"? All topics within this module will also be deleted. This action cannot be undone.`
+                        : `Are you sure you want to delete topic "${itemToDelete?.name}"? This action cannot be undone.`
+                }
+                confirmLabel={itemToDelete?.type === 'module' ? "Delete Module" : "Delete Topic"}
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={executeDeleteItem}
+            />
         </div>
     )
 }

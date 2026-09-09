@@ -4,9 +4,19 @@ import { scholarshipService } from '../../services/scholarshipService'
 import type { ScholarshipSettings, ScholarshipWinner, ScholarshipExamImage } from '../../types/scholarship'
 import { useToast } from '../../contexts/ToastContext'
 import TailwindDropdown from '../../components/ui/TailwindDropdown'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 export default function AdminScholarships() {
     const { showToast } = useToast()
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        confirmLabel: string
+        variant: 'danger' | 'warning' | 'primary'
+        action: () => Promise<void>
+    } | null>(null)
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false)
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -218,15 +228,27 @@ export default function AdminScholarships() {
         }
     }
 
-    const handleDeleteWinner = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this winner record?')) return
-        try {
-            await scholarshipService.deleteWinner(id)
-            setWinners(prev => prev.filter(w => w.id !== id))
-            showToast('Winner record deleted.', 'info')
-        } catch (err) {
-            showToast('Failed to delete record.', 'error')
-        }
+    const handleDeleteWinner = (id: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Winner Record',
+            description: 'Are you sure you want to delete this winner record? This cannot be undone.',
+            confirmLabel: 'Delete Winner',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    await scholarshipService.deleteWinner(id)
+                    setWinners(prev => prev.filter(w => w.id !== id))
+                    showToast('Winner record deleted.', 'info')
+                } catch (err) {
+                    showToast('Failed to delete record.', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
     const handleToggleWinnerPublished = async (winner: ScholarshipWinner) => {
@@ -322,15 +344,27 @@ export default function AdminScholarships() {
         }
     }
 
-    const handleDeleteExamImage = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this exam photo?')) return
-        try {
-            await scholarshipService.deleteExamImage(id)
-            setExamImages(prev => prev.filter(e => e.id !== id))
-            showToast('Exam photo deleted.', 'info')
-        } catch (err) {
-            showToast('Failed to delete exam photo.', 'error')
-        }
+    const handleDeleteExamImage = (id: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Exam Photo',
+            description: 'Are you sure you want to delete this exam photo? This cannot be undone.',
+            confirmLabel: 'Delete Photo',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    await scholarshipService.deleteExamImage(id)
+                    setExamImages(prev => prev.filter(e => e.id !== id))
+                    showToast('Exam photo deleted.', 'info')
+                } catch (err) {
+                    showToast('Failed to delete exam photo.', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
     const handleToggleExamPublished = async (item: ScholarshipExamImage) => {
@@ -1299,6 +1333,19 @@ export default function AdminScholarships() {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
             )}
         </div>
     )

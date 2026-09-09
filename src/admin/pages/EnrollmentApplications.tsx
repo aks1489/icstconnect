@@ -5,9 +5,19 @@ import { enrollmentService } from '../../services/enrollmentService'
 import type { EnrollmentApplication } from '../../types'
 import ApplicationApprovalModal from '../components/ApplicationApprovalModal'
 import ApplicationDetailsModal from '../components/ApplicationDetailsModal'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 export default function EnrollmentApplications() {
     const { showToast } = useToast()
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean
+        title: string
+        description: string
+        confirmLabel: string
+        variant: 'danger' | 'warning' | 'primary'
+        action: () => Promise<void>
+    } | null>(null)
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false)
     const [applications, setApplications] = useState<EnrollmentApplication[]>([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')
@@ -45,18 +55,28 @@ export default function EnrollmentApplications() {
         setIsDetailsModalOpen(true)
     }
 
-    const handleRejectClick = async (app: EnrollmentApplication) => {
+    const handleRejectClick = (app: EnrollmentApplication) => {
         setIsDetailsModalOpen(false) // Close details if open
-        const confirm = window.confirm(`Are you sure you want to reject application ${app.reference_id}?`)
-        if (!confirm) return
-
-        try {
-            await enrollmentService.rejectApplication(app.id, app)
-            showToast("Application rejected", "success")
-            fetchApplications()
-        } catch (error: any) {
-            showToast(error.message || "Failed to reject application", "error")
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Reject Application',
+            description: `Are you sure you want to reject application ${app.reference_id}? This cannot be undone.`,
+            confirmLabel: 'Reject Application',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    await enrollmentService.rejectApplication(app.id, app)
+                    showToast("Application rejected", "success")
+                    fetchApplications()
+                } catch (error: any) {
+                    showToast(error.message || "Failed to reject application", "error")
+                } finally {
+                    setIsConfirmLoading(false)
+                    setConfirmModal(null)
+                }
+            }
+        })
     }
 
     const onApproveSuccess = () => {
@@ -221,6 +241,19 @@ export default function EnrollmentApplications() {
                         onSuccess={onApproveSuccess}
                     />
                 </>
+            )}
+
+            {confirmModal && (
+                <ConfirmDialog
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    description={confirmModal.description}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    isLoading={isConfirmLoading}
+                    onConfirm={confirmModal.action}
+                    onCancel={() => setConfirmModal(null)}
+                />
             )}
         </div>
     )

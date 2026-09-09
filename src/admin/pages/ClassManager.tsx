@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { IconArrowLeft as ArrowLeft, IconPlus as Plus, IconUsers as Users, IconTrash as Trash2 } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../contexts/ToastContext'
 
 interface ClassBatch {
     id: number
@@ -19,10 +21,13 @@ interface Course {
 
 export default function ClassManager() {
     const { id } = useParams()
+    const { showToast } = useToast()
     const [course, setCourse] = useState<Course | null>(null)
     const [classes, setClasses] = useState<ClassBatch[]>([])
     const [loading, setLoading] = useState(true)
     const [createLoading, setCreateLoading] = useState(false)
+    const [batchToDelete, setBatchToDelete] = useState<{ id: number; name: string } | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [capacity, setCapacity] = useState(30)
     const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -74,7 +79,7 @@ export default function ClassManager() {
 
         } catch (error) {
             console.error('Error loading data:', error)
-            alert('Failed to load class data')
+            showToast('Failed to load class data', 'error')
         } finally {
             setLoading(false)
         }
@@ -85,53 +90,62 @@ export default function ClassManager() {
         setCreateLoading(true)
 
         try {
-            // Determine next batch number
-            const lastBatch = classes.length > 0 ? classes[classes.length - 1] : null
-            const nextNumber = lastBatch ? lastBatch.batch_number + 1 : 1
+            // Find highest batch number
+            const nextBatchNum = classes.length > 0
+                ? Math.max(...classes.map(c => c.batch_number)) + 1
+                : 1
 
-            // Generate Name
-            const shortCode = course.short_code || course.course_name.substring(0, 3).toUpperCase()
-            const batchName = `${shortCode} Batch ${nextNumber}`
+            const batchName = `${course.short_code || course.course_name} Batch ${nextBatchNum}`
 
             const { error } = await supabase
                 .from('classes')
                 .insert({
-                    course_id: id,
+                    course_id: course.id,
                     batch_name: batchName,
-                    batch_number: nextNumber,
-                    capacity: capacity
+                    batch_number: nextBatchNum,
+                    capacity: Number(capacity)
                 })
 
             if (error) throw error
 
+            showToast('Batch created successfully!', 'success')
             setShowCreateModal(false)
             fetchData()
         } catch (error) {
             console.error('Error creating batch:', error)
-            alert('Failed to create batch')
+            showToast('Failed to create batch', 'error')
         } finally {
             setCreateLoading(false)
         }
     }
 
-    const handleDeleteBatch = async (batchId: number, enrolledCount: number) => {
-        if (enrolledCount > 0) {
-            alert('Cannot delete a batch with enrolled students.')
+    const initiateDeleteBatch = (batch: ClassBatch) => {
+        if (batch.enrolled_count > 0) {
+            showToast('Cannot delete a batch with enrolled students.', 'warning')
             return
         }
-        if (!confirm('Are you sure you want to delete this batch?')) return
+        setBatchToDelete({ id: batch.id, name: batch.batch_name })
+    }
+
+    const executeDeleteBatch = async () => {
+        if (!batchToDelete) return
 
         try {
+            setIsDeleting(true)
             const { error } = await supabase
                 .from('classes')
                 .delete()
-                .eq('id', batchId)
+                .eq('id', batchToDelete.id)
 
             if (error) throw error
+            showToast(`Batch "${batchToDelete.name}" deleted successfully`, 'success')
+            setBatchToDelete(null)
             fetchData()
         } catch (error) {
             console.error('Error deleting batch:', error)
-            alert('Failed to delete batch')
+            showToast('Failed to delete batch', 'error')
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -195,7 +209,7 @@ export default function ClassManager() {
 
                             <div className="flex justify-end pt-4 border-t border-slate-50">
                                 <button
-                                    onClick={() => handleDeleteBatch(cls.id, cls.enrolled_count)}
+                                    onClick={() => initiateDeleteBatch(cls)}
                                     className="text-slate-400 hover:text-red-600 text-sm flex items-center gap-1 transition-colors disabled:opacity-30 disabled:hover:text-slate-400"
                                     disabled={cls.enrolled_count > 0}
                                     title={cls.enrolled_count > 0 ? "Cannot delete non-empty batch" : "Delete Batch"}
@@ -258,6 +272,18 @@ export default function ClassManager() {
                     </div>
                 </div>
             )}
+
+            <ConfirmDialog
+                open={!!batchToDelete}
+                onOpenChange={(open) => !open && setBatchToDelete(null)}
+                title="Delete Class Batch"
+                description={`Are you sure you want to permanently delete "${batchToDelete?.name}"? This action cannot be undone.`}
+                confirmLabel="Delete Batch"
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={executeDeleteBatch}
+            />
         </div>
     )
 }

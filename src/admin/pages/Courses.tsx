@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { IconPlus as Plus, IconBook as Book, IconTrash as Trash2, IconUsers as Users, IconLayersLinked as Layers } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import CreateCourseModal from '../../components/admin/CreateCourseModal'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../contexts/ToastContext'
 import { getIcon } from '../../utils/iconMapper'
 
 interface Course {
@@ -15,9 +17,12 @@ interface Course {
 }
 
 export default function AdminCourses() {
+    const { showToast } = useToast()
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+    const [courseToDelete, setCourseToDelete] = useState<Course | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     useEffect(() => {
         fetchCourses()
@@ -34,26 +39,31 @@ export default function AdminCourses() {
             setCourses(data || [])
         } catch (error) {
             console.error('Error fetching courses:', error)
-            alert('Failed to load courses')
+            showToast('Failed to load courses', 'error')
         } finally {
             setLoading(false)
         }
     }
 
-    const handleDelete = async (id: number) => {
-        if (!window.confirm('Are you sure you want to delete this course?')) return
+    const executeDeleteCourse = async () => {
+        if (!courseToDelete) return
 
         try {
+            setIsDeleting(true)
             const { error } = await supabase
                 .from('courses')
                 .delete()
-                .eq('id', id)
+                .eq('id', courseToDelete.id)
 
             if (error) throw error
+            showToast(`Course "${courseToDelete.course_name}" deleted successfully`, 'success')
+            setCourseToDelete(null)
             fetchCourses()
         } catch (error) {
             console.error('Error deleting course:', error)
-            alert('Failed to delete course')
+            showToast('Failed to delete course', 'error')
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -133,7 +143,7 @@ export default function AdminCourses() {
                                             <Layers size={16} />
                                         </Link>
                                         <button
-                                            onClick={() => handleDelete(course.id)}
+                                            onClick={() => setCourseToDelete(course)}
                                             className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition-colors"
                                             title="Delete Course"
                                         >
@@ -146,6 +156,18 @@ export default function AdminCourses() {
                     ))}
                 </div>
             )}
+
+            <ConfirmDialog
+                open={!!courseToDelete}
+                onOpenChange={(open) => !open && setCourseToDelete(null)}
+                title="Delete Course"
+                description={`Are you sure you want to permanently delete "${courseToDelete?.course_name}"? This action cannot be undone and will affect all related course modules and topics.`}
+                confirmLabel="Delete Course"
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={executeDeleteCourse}
+            />
         </div>
     )
 }

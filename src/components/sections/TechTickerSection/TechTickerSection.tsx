@@ -117,12 +117,12 @@ const TechTickerSection = () => {
     const activeTechData = techs.find(t => t.name === hoveredTech)
 
     return (
-        <section className="py-8 bg-white border-y border-slate-100 overflow-hidden relative">
+        <section className="py-8 bg-white dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800/80 transition-colors duration-300 overflow-hidden relative">
             <div className="w-full">
                 <div className="flex items-center overflow-hidden relative">
                     {/* Gradient Masks */}
-                    <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
 
                     <div className="flex items-center gap-16 animate-marquee py-4 touch-pan-y">
                         {/* Duplicate the list to create seamless loop */}
@@ -135,8 +135,8 @@ const TechTickerSection = () => {
                                 onMouseLeave={handleMouseLeave}
                                 onClick={(e) => handleClick(e, tech.name)}
                             >
-                                <tech.icon className={`text-3xl text-slate-300 group-hover:text-[color:var(--tech-color)] transition-colors duration-300`} style={{ '--tech-color': tech.color } as React.CSSProperties} size={32} />
-                                <span className="font-bold text-lg text-slate-400 group-hover:text-slate-800 transition-colors duration-300">{tech.name}</span>
+                                <tech.icon className={`text-3xl text-slate-300 dark:text-slate-600 group-hover:text-[color:var(--tech-color)] transition-colors duration-300`} style={{ '--tech-color': tech.color } as React.CSSProperties} size={32} />
+                                <span className="font-bold text-lg text-slate-400 dark:text-slate-500 group-hover:text-slate-800 dark:group-hover:text-slate-200 transition-colors duration-300">{tech.name}</span>
                             </div>
                         ))}
                     </div>

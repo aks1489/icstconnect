@@ -1,4 +1,4 @@
-import { IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconCalendarPlus as CalendarPlus, IconPresentation as Presentation, IconFileText as FileText, IconShield as Shield, IconUsers as Users, IconUserCog as UserCog, IconBooks as Library, IconLayoutGrid as LayoutGrid, IconCalendarEvent as CalendarDays, IconPhoto as Image, IconSchool as GraduationCap } from '@tabler/icons-react'
+import { IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconCalendarPlus as CalendarPlus, IconPresentation as Presentation, IconFileText as FileText, IconShield as Shield, IconUsers as Users, IconUserCog as UserCog, IconBooks as Library, IconLayoutGrid as LayoutGrid, IconCalendarEvent as CalendarDays, IconPhoto as Image, IconSchool as GraduationCap, IconKey as KeyRound, IconHistory as History, IconWorld as Globe } from '@tabler/icons-react'
 
 export interface NavItem {
     label: string
@@ -155,5 +155,26 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: Image,
         color: 'text-pink-600',
         description: 'Manage images and layout styles'
+    },
+    {
+        label: 'Permissions Matrix',
+        path: '/admin/permissions',
+        icon: KeyRound,
+        color: 'text-indigo-600',
+        description: 'Manage role capabilities and RBAC governance'
+    },
+    {
+        label: 'Security & Audit Logs',
+        path: '/admin/audit-logs',
+        icon: History,
+        color: 'text-amber-600',
+        description: 'Inspect chronological administrative actions'
+    },
+    {
+        label: 'Companion Ecosystem',
+        path: '/admin/ecosystem',
+        icon: Globe,
+        color: 'text-cyan-600',
+        description: 'Manage registered companion websites and simulators'
     }
 ]

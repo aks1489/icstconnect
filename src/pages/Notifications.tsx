@@ -46,7 +46,7 @@ const Notifications = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-12">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12 text-slate-900 dark:text-slate-100 transition-colors">
             <div className="container mx-auto px-4 max-w-4xl">
                 <div className="text-center mb-12">
                     <motion.div
@@ -54,18 +54,18 @@ const Notifications = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 font-outfit flex items-center justify-center gap-3">
-                            <Bell className="text-blue-600 animate-bounce" />
+                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4 font-outfit flex items-center justify-center gap-3">
+                            <Bell className="text-blue-600 dark:text-blue-400 animate-bounce" />
                             Notifications & Updates
                         </h1>
-                        <p className="text-slate-500 text-lg">Stay informed about the latest news, announcements, and events.</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-lg">Stay informed about the latest news, announcements, and events.</p>
                     </motion.div>
                 </div>
 
                 <div className="space-y-4">
                     {loading ? (
                         [1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-6">
+                            <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-6">
                                 <Skeleton className="w-12 h-12 rounded-full flex-shrink-0" />
                                 <div className="flex-grow">
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
@@ -97,9 +97,9 @@ const Notifications = () => {
                                                 boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.1)'
                                             }}
                                             whileTap={{ scale: 0.98 }}
-                                            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 transition-colors duration-300 relative overflow-hidden group cursor-pointer"
+                                            className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300 relative overflow-hidden group cursor-pointer"
                                         >
-                                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-50 to-transparent rounded-bl-full -mr-16 -mt-16 transition-opacity group-hover:opacity-50 opacity-0 pointer-events-none"></div>
+                                            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-50 dark:from-slate-800/40 to-transparent rounded-bl-full -mr-16 -mt-16 transition-opacity group-hover:opacity-50 opacity-0 pointer-events-none"></div>
 
                                             <div className="flex flex-col sm:flex-row gap-6 relative z-10">
                                                 <div className={`w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center ${notification.bgColor} ${notification.color} transform transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110 shadow-sm`}>
@@ -108,20 +108,20 @@ const Notifications = () => {
 
                                                 <div className="flex-grow">
                                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                                                        <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                                             {notification.title}
                                                         </h3>
-                                                        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full whitespace-nowrap w-fit">
+                                                        <div className="flex items-center gap-2 text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full whitespace-nowrap w-fit">
                                                             <Calendar size={12} />
                                                             {notification.date}
                                                         </div>
                                                     </div>
-                                                    <p className="text-slate-600 leading-relaxed text-base">
+                                                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-base">
                                                         {notification.message}
                                                     </p>
 
                                                     <div className="mt-4 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
-                                                        <span className="text-blue-600 text-sm font-semibold flex items-center gap-1">
+                                                        <span className="text-blue-600 dark:text-blue-400 text-sm font-semibold flex items-center gap-1">
                                                             Read more <ChevronRight size={16} />
                                                         </span>
                                                     </div>
@@ -136,7 +136,7 @@ const Notifications = () => {
                 </div>
 
                 <div className="mt-12 text-center">
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-slate-400 dark:text-slate-500 text-sm">
                         Showing {notifications.length} recent notifications
                     </p>
                 </div>

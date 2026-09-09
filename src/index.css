@@ -1,76 +1,85 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
     --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --color-primary: #1e3a8a;
-    --color-accent: #0284c7;
-    --color-primary-light: #38bdf8;
+    --color-primary: #2572ab;
+    --color-accent: #4c96c2;
+    --color-primary-light: #78a5c5;
 }
 
 /* ==============================================================================
    SEMANTIC BRAND & DESIGN TOKENS (LIGHT / DARK SYSTEM)
+   Derived strictly from official ICST Logo (upgrade.md Section 4)
    ============================================================================== */
 
 :root,
-html.light {
-    --brand-primary: #1e3a8a;
-    --brand-primary-strong: #172554;
-    --brand-primary-soft: #dbeafe;
-    --brand-secondary: #0f766e;
-    --brand-accent: #0284c7;
-    --brand-navy: #0f172a;
-    --brand-cyan: #06b6d4;
+html.light,
+[data-theme="light"] {
+    color-scheme: light;
+    --brand-primary: #2572AB;
+    --brand-primary-strong: #1E5E91;
+    --brand-primary-soft: #EAF4FB;
+    --brand-charcoal: #474747;
+    --brand-muted-blue: #78A5C5;
+    --brand-navy: #234D68;
+    --brand-cyan: #4C96C2;
 
-    --surface: #ffffff;
-    --surface-elevated: #f8fafc;
+    --surface: #FFFFFF;
+    --surface-subtle: #F5F8FA;
+    --surface-elevated: #FFFFFF;
     --surface-glass: rgba(255, 255, 255, 0.75);
     
-    --foreground: #0f172a;
-    --foreground-muted: #64748b;
-    --border: #e2e8f0;
-    --border-subtle: #f1f5f9;
+    --foreground: #262626;
+    --foreground-muted: #66717A;
+    --border: #DCE5EA;
+    --border-subtle: #EDF3F7;
 
-    --success: #16a34a;
-    --warning: #d97706;
-    --danger: #dc2626;
-    --info: #0284c7;
+    --success: #2E7D5B;
+    --warning: #B7791F;
+    --danger: #C44747;
+    --info: #3578A8;
 
     /* Glass Tokens */
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.5);
     --glass-highlight: rgba(255, 255, 255, 0.8);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(35, 77, 104, 0.08);
     --glass-blur: 16px;
 }
 
-html.dark {
-    --brand-primary: #3b82f6;
-    --brand-primary-strong: #60a5fa;
-    --brand-primary-soft: #1e293b;
-    --brand-secondary: #14b8a6;
-    --brand-accent: #38bdf8;
-    --brand-navy: #020617;
-    --brand-cyan: #22d3ee;
+html.dark,
+[data-theme="dark"] {
+    color-scheme: dark;
+    --brand-primary: #4C96C2;
+    --brand-primary-strong: #78A5C5;
+    --brand-primary-soft: #182C3D;
+    --brand-charcoal: #A3AFB8;
+    --brand-muted-blue: #78A5C5;
+    --brand-navy: #0F1F2C;
+    --brand-cyan: #4C96C2;
 
-    --surface: #0f172a;
-    --surface-elevated: #1e293b;
-    --surface-glass: rgba(15, 23, 42, 0.8);
+    --surface: #0F1C26;
+    --surface-subtle: #162734;
+    --surface-elevated: #1D3242;
+    --surface-glass: rgba(15, 28, 38, 0.8);
     
-    --foreground: #f8fafc;
-    --foreground-muted: #94a3b8;
-    --border: #334155;
-    --border-subtle: #1e293b;
+    --foreground: #F0F4F8;
+    --foreground-muted: #9BB0C1;
+    --border: #2A4356;
+    --border-subtle: #1D3242;
 
-    --success: #22c55e;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --info: #38bdf8;
+    --success: #3E9D73;
+    --warning: #D8942E;
+    --danger: #DC5A5A;
+    --info: #4C96C2;
 
     /* Glass Tokens */
-    --glass-bg: rgba(15, 23, 42, 0.75);
+    --glass-bg: rgba(15, 28, 38, 0.75);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-highlight: rgba(255, 255, 255, 0.05);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
     --glass-blur: 16px;
 }
 
@@ -79,7 +88,6 @@ html.dark {
     line-height: 1.5;
     font-weight: 400;
 
-    color-scheme: light dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import { IconX as X, IconCode as Code, IconDeviceLaptop as Laptop, IconDatabase as Database, IconWorld as Globe, IconPalette as Palette, IconVideo as Video, IconRobot as Bot, IconShieldCheck as ShieldCheck } from '@tabler/icons-react'
+import { useToast } from '../../contexts/ToastContext'
 
 interface CreateCourseModalProps {
     isOpen: boolean
@@ -9,6 +10,7 @@ interface CreateCourseModalProps {
 }
 
 export default function CreateCourseModal({ isOpen, onClose, onSuccess }: CreateCourseModalProps) {
+    const { showToast } = useToast()
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         course_name: '',
@@ -62,11 +64,12 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 category: 'Development',
                 tags: []
             })
+            showToast('Course created successfully!', 'success')
             onSuccess()
             onClose()
         } catch (error) {
             console.error('Error saving course:', error)
-            alert('Failed to save course')
+            showToast('Failed to save course', 'error')
         } finally {
             setLoading(false)
         }

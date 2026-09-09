@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { IconUsers as Users, IconUserPlus as UserPlus, IconX as X, IconSearch as Search, IconChevronRight as ChevronRight } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
+import { useToast } from '../../contexts/ToastContext'
 
 export interface Student {
     id: string
@@ -21,6 +22,7 @@ export interface Student {
 }
 
 export default function ActiveClasses() {
+    const { showToast } = useToast()
     const [students, setStudents] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
 
@@ -122,7 +124,7 @@ export default function ActiveClasses() {
 
     const handleEnrollStudent = async () => {
         if (!selectedStudentId || !selectedCourseId || !selectedClassId) {
-            alert('Please select a student, course, and class batch.')
+            showToast('Please select a student, course, and class batch.', 'warning')
             return
         }
 
@@ -136,10 +138,10 @@ export default function ActiveClasses() {
             })
 
             if (error) {
-                if (error.code === '23505') alert('Student is already enrolled in this course.')
+                if (error.code === '23505') showToast('Student is already enrolled in this course.', 'warning')
                 else throw error
             } else {
-                alert('Student enrolled successfully!')
+                showToast('Student enrolled successfully!', 'success')
                 setIsEnrollModalOpen(false)
                 // Refresh list
                 fetchActiveClasses()
@@ -150,7 +152,7 @@ export default function ActiveClasses() {
             }
         } catch (error) {
             console.error('Error enrolling student:', error)
-            alert('Failed to enroll student.')
+            showToast('Failed to enroll student.', 'error')
         } finally {
             setEnrollLoading(false)
         }

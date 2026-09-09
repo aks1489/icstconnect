@@ -6,7 +6,7 @@
 
 **ICST Connect** (`icstconnect`) is an enterprise-grade Institutional Management System (IMS), Educational Resource Planning (ERP) platform, and Public Web Portal built for the **Institute of Computer Science & Technology (ICST)**. 
 
-Root Directory: `d:\VS Code\Project\icstconnect`
+Root Directory: `e:\Project\icstconnect`
 
 The platform unifies all institutional operations across four user personas:
 1. **Public Prospective Students & Guests**: Course catalog discovery, online admission wizard, scholarship merit lists, interactive media galleries, social referral discount calculators, and speed typing practice.
@@ -29,7 +29,7 @@ The platform unifies all institutional operations across four user personas:
 | **CSS & Design Engine** | Tailwind CSS | `^4.1.17` | Utility-First CSS Framework (PostCSS 8 Engine) |
 | **PostCSS Processor** | `@tailwindcss/postcss` | `^4.1.17` | PostCSS Plugin for Tailwind v4 |
 | **Motion & Animation** | Framer Motion | `^12.23.26` | Physics-based animations & page transitions |
-| **Icons** | Lucide React | `^0.561.0` | Modern SVG Icon Library |
+| **Icons** | Tabler Icons (`@tabler/icons-react`) | `^3.46.0` | Unified modern institutional SVG icon system (Zero Lucide) |
 | **Drag & Drop** | `@hello-pangea/dnd` | `^18.0.1` | Accessible Drag & Drop for Course Hierarchy Editor |
 | **Date Calculations** | date-fns | `^4.1.0` | Immutable, lightweight date manipulation |
 | **Database & Auth (BaaS)** | `@supabase/supabase-js` | `^2.86.2` | PostgreSQL DB, RLS Auth & Realtime Subscriptions |
@@ -45,7 +45,7 @@ The platform unifies all institutional operations across four user personas:
 ### 2.2 Complete Build & Tooling Configuration Files
 
 #### 1. Vite Configuration
-- **File**: [`d:/VS Code/Project/icstconnect/vite.config.ts`](file:///d:/VS%20Code/Project/icstconnect/vite.config.ts)
+- **File**: [`e:/Project/icstconnect/vite.config.ts`](file:///e:/Project/icstconnect/vite.config.ts)
 - **Role**: Bundling, React fast-refresh plugin, and manual chunk splitting optimization for optimized caching:
 ```typescript
 import { defineConfig } from 'vite'
@@ -61,7 +61,7 @@ export default defineConfig({
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
             return 'vendor-react';
           }
-          if (id.includes('node_modules/framer-motion') || id.includes('node_modules/lucide-react')) {
+          if (id.includes('node_modules/framer-motion') || id.includes('node_modules/@tabler/icons-react')) {
             return 'vendor-ui';
           }
           if (id.includes('node_modules/@supabase/supabase-js')) {
@@ -881,6 +881,60 @@ In adherence with [`d:/VS Code/Project/icstconnect/docs/PROJECT_RULES.md`](file:
    - The data fetch function checks `if (!isBackground) setLoading(true)` — therefore skipping the loading state.
    - New database records update the state seamlessly without unmounting components or jumping the user's scroll position.
 3. **Optimistic Updates**: For operations like marking syllabus topics, toggling publish flags, or deleting items, the UI immediately filters/updates local state arrays, rolling back only if the Supabase promise returns an error.
+
+---
+
+## 10. ICST Connect Modernization & Architecture Upgrade (Upgrade V2 Compliance)
+
+### 10.1 Complete Elimination of Radix UI & Lucide (Hard Dependency Rule)
+- **ZERO RADIX UI**: Absolutely 0 application dependencies on `@radix-ui/*` in `package.json`, `package-lock.json`, or source files.
+  - All 7 former `@radix-ui/*` packages (`react-accordion`, `react-dialog`, `react-dropdown-menu`, `react-popover`, `react-select`, `react-tabs`, `react-tooltip`) were completely uninstalled and pruned from `node_modules`.
+  - Replaced with ICST-owned, lightweight, accessible native primitives (`role="dialog"`, `aria-modal="true"`, `aria-labelledby`, `aria-describedby`, keyboard Escape dismissal, body scroll locking).
+- **ZERO LUCIDE**: The application strictly standardizes on `@tabler/icons-react` (`^3.46.0`) for institutional iconography with zero references to `lucide-react`.
+
+### 10.2 ICST-Owned Local UI Primitives Suite (`src/components/ui/`)
+An ICST-owned, shadcn/ui-inspired local component architecture built using Tailwind CSS, semantic HTML, and native browser capabilities:
+- [`Button.tsx`](file:///e:/Project/icstconnect/src/components/ui/Button.tsx): Accessible button supporting variants (`primary`, `secondary`, `outline`, `ghost`, `danger`), sizes, loading spinner, and icon slots.
+- [`Input.tsx`](file:///e:/Project/icstconnect/src/components/ui/Input.tsx): Accessible text/number input with semantic label, helper text, inline error state, and icon elements.
+- [`Badge.tsx`](file:///e:/Project/icstconnect/src/components/ui/Badge.tsx): Status badge with brand color variants (`primary`, `success`, `warning`, `danger`, `info`, `neutral`) and optional status dot.
+- [`Card.tsx`](file:///e:/Project/icstconnect/src/components/ui/Card.tsx): Standard solid surface container with subcomponents (`CardHeader`, `CardTitle`, `CardDescription`, `CardContent`, `CardFooter`).
+- [`GlassCard.tsx`](file:///e:/Project/icstconnect/src/components/ui/GlassCard.tsx): Selective glassmorphic card with backdrop blur and robust solid fallback for browsers without `backdrop-filter`.
+- [`EmptyState.tsx`](file:///e:/Project/icstconnect/src/components/ui/EmptyState.tsx): Accessible empty data state with icon, title, description, and action CTA.
+- [`ErrorState.tsx`](file:///e:/Project/icstconnect/src/components/ui/ErrorState.tsx): Accessible error fallback displaying deterministic `ICST-[DOMAIN]-[TYPE]-[NUMBER]` codes, retry button, and issue reporting.
+- [`Tabs.tsx`](file:///e:/Project/icstconnect/src/components/ui/Tabs.tsx): Pure accessible tabs without Radix using `role="tablist"`, `role="tab"`, and `role="tabpanel"`.
+- [`Dialog.tsx`](file:///e:/Project/icstconnect/src/components/ui/Dialog.tsx) & [`ConfirmDialog.tsx`](file:///e:/Project/icstconnect/src/components/ui/ConfirmDialog.tsx): Accessible modal dialogs with keyboard trap, Escape dismissal, backdrop, and dark mode support.
+
+### 10.3 Complete Elimination of Native Browser Dialogs
+- All native browser dialogs (`window.alert`, `window.confirm`, `window.prompt`) have been completely eliminated across the entire codebase.
+- **Destructive Operations**: Wrapped in accessible, theme-aware [`ConfirmDialog`](file:///e:/Project/icstconnect/src/components/ui/ConfirmDialog.tsx) components featuring title, consequence description, and async loading indicators.
+- **Informational & Action Feedback**: Handled uniformly via [`useToast()`](file:///e:/Project/icstconnect/src/contexts/ToastContext.tsx) with deterministic levels (`success`, `error`, `warning`, `info`).
+
+### 10.4 Live Teacher Dashboard Data & Zero Fake Production Metrics
+- Hardcoded mock values (`activeClasses: 5, upcomingExams: 2, students: 120`) in [`TeacherDashboard`](file:///e:/Project/icstconnect/src/teacher/pages/Dashboard.tsx) have been replaced with live Supabase database queries:
+  - **Active Classes**: Exact count queried from `classes` table.
+  - **Active Examinations**: Exact count queried from `tests` where `is_active = true`.
+  - **Enrolled Students**: Exact count queried from `enrollments` table.
+  - **Isolated Widget Failures**: Each metric widget loads and handles errors independently with retry buttons and deterministic error codes (`ICST-TEA-CLS-001`, `ICST-TEA-EXM-001`, `ICST-TEA-STU-001`).
+  - **Live Quick Actions**: Operational links routed directly to `/teacher/classes` and `/teacher/calendar`.
+
+### 10.5 Typing Engine Web Worker Integration
+- Live computational metrics (WPM, CPM, accuracy, grade) during Typing Practice are offloaded to [`typingCalculator.worker.ts`](file:///e:/Project/icstconnect/src/workers/typingCalculator.worker.ts) off the main React rendering thread via [`useTypingWorker.ts`](file:///e:/Project/icstconnect/src/hooks/useTypingWorker.ts).
+- Automatic synchronous fallback ensures smooth 60fps typing even if Web Workers are restricted by browser policy.
+- Clean lifecycle management: Web Worker is initialized once and terminated on component unmount to prevent leaks.
+
+### 10.6 Brand Design Tokens & Non-AI Visual Foundation
+- Design tokens defined in [`src/index.css`](file:///e:/Project/icstconnect/src/index.css) derive directly from the official immutable ICST logo:
+  - Primary Institutional Blue: `#2572AB`
+  - Strong Action Blue: `#1E5E91`
+  - Serious Charcoal: `#474747`
+  - Clean light and deep navy surfaces for light, dark, and system themes.
+- Content-specific density, clean educational typography, and restrained micro-interactions replace AI-generated card tropes.
+
+### 10.7 Super Admin & Governance Systems
+- **Central Permissions Matrix (`/admin/permissions`)**: Capability governance for `super_admin`, `admin`, `teacher`, and `student` with bulk module toggles and role toggles.
+- **Audit Logging (`/admin/audit-logs`)**: Centralized logging via [`auditService.ts`](file:///e:/Project/icstconnect/src/services/auditService.ts) and PostgreSQL `audit_logs` table.
+- **Companion Ecosystem Registry (`/admin/ecosystem`)**: Central registry for companion web tools via [`ecosystemService.ts`](file:///e:/Project/icstconnect/src/services/ecosystemService.ts) with **ICST Job Portal Simulator** (`https://icst-job-portal-simulator.netlify.app/`).
+- **Central Media Registry**: Managed via [`mediaService.ts`](file:///e:/Project/icstconnect/src/services/mediaService.ts) with guaranteed resilient fallbacks.
 
 ---
 

@@ -14,8 +14,10 @@ import { IconChevronLeft as ChevronLeft, IconChevronRight as ChevronRight, IconP
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
 import AddEventModal from './AddEventModal'
 import EventDetailsModal from './EventDetailsModal'
+import ConfirmDialog from '../ui/ConfirmDialog'
 
 interface CalendarEvent {
     id: string
@@ -46,11 +48,13 @@ interface ClassSchedule {
 
 export default function GlobalCalendar() {
     const { user, isAdmin, isTeacher } = useAuth()
+    const { showToast } = useToast()
     const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 })) // Start Monday
     const [events, setEvents] = useState<CalendarEvent[]>([])
     const [loading, setLoading] = useState(true)
     const [isAddEventOpen, setIsAddEventOpen] = useState(false)
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
+    const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false)
 
     // Role helpers
     const role = isAdmin ? 'admin' : isTeacher ? 'teacher' : 'student'
@@ -178,20 +182,19 @@ export default function GlobalCalendar() {
     const prevWeek = () => setCurrentWeekStart(subWeeks(currentWeekStart, 1))
     const resetToday = () => setCurrentWeekStart(startOfWeek(new Date(), { weekStartsOn: 1 }))
 
-    const handleDeleteEvent = async () => {
+    const handleDeleteEvent = () => {
+        if (!selectedEvent || !isAdmin) return
+        setIsConfirmDeleteOpen(true)
+    }
+
+    const executeDeleteEvent = async () => {
         if (!selectedEvent || !isAdmin) return
 
         const isRecurring = selectedEvent.id.startsWith('sched-')
         const isOneOff = selectedEvent.id.startsWith('evt-')
 
-        let confirmMessage = "Are you sure you want to delete this event?"
-        if (isRecurring) {
-            confirmMessage = "WARNING: This is a recurring class schedule. Deleting this will remove this class slot for ALL future weeks. Are you sure?"
-        }
-
-        if (!window.confirm(confirmMessage)) return
-
         setLoading(true)
+        setIsConfirmDeleteOpen(false)
         try {
             if (isOneOff) {
                 const id = selectedEvent.id.replace('evt-', '')
@@ -214,10 +217,11 @@ export default function GlobalCalendar() {
             // Close modal and refresh
             setSelectedEvent(null)
             fetchCalendarData()
+            showToast('Event deleted successfully', 'success')
 
         } catch (err) {
             console.error("Error deleting event:", err)
-            alert("Failed to delete event. Please try again.")
+            showToast("Failed to delete event. Please try again.", "error")
         } finally {
             setLoading(false)
         }
@@ -367,6 +371,40 @@ export default function GlobalCalendar() {
                     )
                 })}
             </div>
+
+            {/* Add Event Modal */}
+            <AddEventModal
+                isOpen={isAddEventOpen}
+                onClose={() => setIsAddEventOpen(false)}
+                onSuccess={() => {
+                    setIsAddEventOpen(false)
+                    fetchCalendarData()
+                }}
+            />
+
+            {/* Event Details Modal */}
+            <EventDetailsModal
+                isOpen={!!selectedEvent}
+                onClose={() => setSelectedEvent(null)}
+                event={selectedEvent}
+                onDelete={isAdmin ? handleDeleteEvent : undefined}
+            />
+
+            {/* Deletion Confirmation Dialog */}
+            <ConfirmDialog
+                open={isConfirmDeleteOpen}
+                onOpenChange={setIsConfirmDeleteOpen}
+                title="Delete Calendar Schedule"
+                description={
+                    selectedEvent?.id.startsWith('sched-')
+                        ? "WARNING: This is a recurring class schedule. Deleting this will permanently remove this class slot for all future weeks. Are you sure you want to proceed?"
+                        : "Are you sure you want to delete this event from the calendar? This action cannot be undone."
+                }
+                confirmLabel="Delete Schedule"
+                cancelLabel="Cancel"
+                variant="danger"
+                onConfirm={executeDeleteEvent}
+            />
         </div>
     )
 }

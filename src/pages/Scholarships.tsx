@@ -45,10 +45,10 @@ export default function ScholarshipsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center pt-24 font-inter">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center pt-24 font-inter">
                 <div className="flex flex-col items-center gap-3">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-                    <p className="text-sm text-slate-500 font-medium">Loading Scholarship Portal...</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Loading Scholarship Portal...</p>
                 </div>
             </div>
         )
@@ -67,7 +67,7 @@ export default function ScholarshipsPage() {
     const otherWinners = yearWinners.filter(w => w.rank > 3)
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-20 font-inter">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20 font-inter text-slate-900 dark:text-slate-100 transition-colors">
 
             {/* HERO BANNER SECTION */}
             <div className="bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white py-16 px-4 md:px-6 relative overflow-hidden">
@@ -108,20 +108,20 @@ export default function ScholarshipsPage() {
             <div className="max-w-7xl mx-auto px-4 md:px-6 mt-12 space-y-12">
 
                 {/* YEAR FILTER BAR */}
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
+                        <div className="p-3 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-indigo-800">
                             <Trophy size={24} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">Scholarship Winners Gallery</h2>
-                            <p className="text-xs text-slate-500">Select an academic year to view position holders and marks.</p>
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Scholarship Winners Gallery</h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Select an academic year to view position holders and marks.</p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-3 w-full md:w-auto">
-                        <label className="text-sm font-semibold text-slate-700 shrink-0 flex items-center gap-1.5">
-                            <Calendar size={16} className="text-indigo-600" />
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 shrink-0 flex items-center gap-1.5">
+                            <Calendar size={16} className="text-indigo-600 dark:text-indigo-400" />
                             Select Year:
                         </label>
                         <TailwindDropdown
@@ -137,10 +137,10 @@ export default function ScholarshipsPage() {
                 </div>
 
                 {yearWinners.length === 0 ? (
-                    <div className="bg-white p-12 rounded-3xl shadow-sm border border-slate-200 text-center space-y-3">
-                        <Award className="mx-auto text-slate-300" size={48} />
-                        <h3 className="text-lg font-bold text-slate-800">No Winners Announced for {selectedYear}</h3>
-                        <p className="text-slate-500 text-sm">Winner records for this academic year will be published shortly.</p>
+                    <div className="bg-white dark:bg-slate-900 p-12 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 text-center space-y-3">
+                        <Award className="mx-auto text-slate-300 dark:text-slate-600" size={48} />
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">No Winners Announced for {selectedYear}</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Winner records for this academic year will be published shortly.</p>
                     </div>
                 ) : (
                     <div className="space-y-12">
@@ -199,12 +199,12 @@ export default function ScholarshipsPage() {
                         {(secondRank || thirdRank) && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {secondRank && (
-                                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row items-center gap-6">
+                                    <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row items-center gap-6">
                                         <div className="relative shrink-0">
                                             <img
                                                 src={secondRank.photo}
                                                 alt={secondRank.studentName}
-                                                className="w-32 h-32 rounded-2xl object-cover border-2 border-slate-200 shadow-md"
+                                                className="w-32 h-32 rounded-2xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-md"
                                                 loading="lazy"
                                             />
                                             <div className="absolute -top-3 -left-3 bg-slate-700 text-white font-extrabold text-[11px] px-2.5 py-1 rounded-full shadow">
@@ -213,10 +213,10 @@ export default function ScholarshipsPage() {
                                         </div>
 
                                         <div className="space-y-2 text-center sm:text-left flex-1">
-                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Silver Medalist</span>
-                                            <h4 className="text-xl font-bold text-slate-900">{secondRank.studentName}</h4>
-                                            <p className="text-xs text-slate-600 font-medium">{secondRank.schoolName} ({secondRank.district})</p>
-                                            <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-100">
+                                            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Silver Medalist</span>
+                                            <h4 className="text-xl font-bold text-slate-900 dark:text-white">{secondRank.studentName}</h4>
+                                            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{secondRank.schoolName} ({secondRank.district})</p>
+                                            <div className="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-lg border border-indigo-100 dark:border-indigo-800">
                                                 Score: {secondRank.marks}
                                             </div>
                                         </div>
@@ -224,12 +224,12 @@ export default function ScholarshipsPage() {
                                 )}
 
                                 {thirdRank && (
-                                    <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row items-center gap-6">
+                                    <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl shadow-lg border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all duration-300 flex flex-col sm:flex-row items-center gap-6">
                                         <div className="relative shrink-0">
                                             <img
                                                 src={thirdRank.photo}
                                                 alt={thirdRank.studentName}
-                                                className="w-32 h-32 rounded-2xl object-cover border-2 border-slate-200 shadow-md"
+                                                className="w-32 h-32 rounded-2xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-md"
                                                 loading="lazy"
                                             />
                                             <div className="absolute -top-3 -left-3 bg-amber-800 text-white font-extrabold text-[11px] px-2.5 py-1 rounded-full shadow">
@@ -238,10 +238,10 @@ export default function ScholarshipsPage() {
                                         </div>
 
                                         <div className="space-y-2 text-center sm:text-left flex-1">
-                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bronze Medalist</span>
-                                            <h4 className="text-xl font-bold text-slate-900">{thirdRank.studentName}</h4>
-                                            <p className="text-xs text-slate-600 font-medium">{thirdRank.schoolName} ({thirdRank.district})</p>
-                                            <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-lg border border-indigo-100">
+                                            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Bronze Medalist</span>
+                                            <h4 className="text-xl font-bold text-slate-900 dark:text-white">{thirdRank.studentName}</h4>
+                                            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">{thirdRank.schoolName} ({thirdRank.district})</p>
+                                            <div className="inline-block px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold text-xs rounded-lg border border-indigo-100 dark:border-indigo-800">
                                                 Score: {thirdRank.marks}
                                             </div>
                                         </div>
@@ -253,8 +253,8 @@ export default function ScholarshipsPage() {
                         {/* OTHER TOP WINNERS - RESPONSIVE GRID (4 DESKTOP / 2 TABLET / 1 MOBILE) */}
                         {otherWinners.length > 0 && (
                             <div className="space-y-4">
-                                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                    <Medal className="text-indigo-600" size={20} />
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Medal className="text-indigo-600 dark:text-indigo-400" size={20} />
                                     Top Merit Position Holders ({selectedYear})
                                 </h3>
 
@@ -262,13 +262,13 @@ export default function ScholarshipsPage() {
                                     {otherWinners.map(winner => (
                                         <div
                                             key={winner.id}
-                                            className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 space-y-3"
+                                            className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 space-y-3"
                                         >
                                             <div className="relative">
                                                 <img
                                                     src={winner.photo}
                                                     alt={winner.studentName}
-                                                    className="w-full h-44 rounded-xl object-cover border border-slate-100"
+                                                    className="w-full h-44 rounded-xl object-cover border border-slate-100 dark:border-slate-800"
                                                     loading="lazy"
                                                 />
                                                 <span className="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg">
@@ -280,10 +280,10 @@ export default function ScholarshipsPage() {
                                             </div>
 
                                             <div>
-                                                <h4 className="font-bold text-slate-900 text-base line-clamp-1">{winner.studentName}</h4>
-                                                <p className="text-xs text-slate-500 line-clamp-1 font-medium">{winner.schoolName}</p>
+                                                <h4 className="font-bold text-slate-900 dark:text-white text-base line-clamp-1">{winner.studentName}</h4>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 font-medium">{winner.schoolName}</p>
                                                 {winner.district && (
-                                                    <p className="text-[11px] text-slate-400">{winner.district}</p>
+                                                    <p className="text-[11px] text-slate-400 dark:text-slate-500">{winner.district}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -296,21 +296,21 @@ export default function ScholarshipsPage() {
                 )}
 
                 {/* SCHOLARSHIP EXAMINATION GALLERY & MOMENTS SECTION */}
-                <div className="pt-8 border-t border-slate-200/80 space-y-6">
+                <div className="pt-8 border-t border-slate-200/80 dark:border-slate-800 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-100">
+                            <div className="p-3 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-2xl border border-indigo-100 dark:border-indigo-800">
                                 <Camera size={24} />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-bold text-slate-900">Scholarship Examination Moments</h3>
-                                <p className="text-xs text-slate-500">Glimpses from talent search examinations conducted across participating schools and centers.</p>
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Scholarship Examination Moments</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Glimpses from talent search examinations conducted across participating schools and centers.</p>
                             </div>
                         </div>
                     </div>
 
                     {examImages.length === 0 ? (
-                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 text-center text-slate-400 text-sm">
+                        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 text-center text-slate-400 dark:text-slate-500 text-sm">
                             No examination gallery photos published yet.
                         </div>
                     ) : (
@@ -319,7 +319,7 @@ export default function ScholarshipsPage() {
                                 <div
                                     key={imgItem.id}
                                     onClick={() => setSelectedExamImage(imgItem)}
-                                    className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl transition-all duration-300 group cursor-pointer flex flex-col"
+                                    className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-xl transition-all duration-300 group cursor-pointer flex flex-col"
                                 >
                                     <div className="relative h-52 bg-slate-900 overflow-hidden">
                                         <img
@@ -339,14 +339,14 @@ export default function ScholarshipsPage() {
 
                                     <div className="p-6 flex-1 flex flex-col justify-between space-y-3">
                                         <div className="space-y-1.5">
-                                            <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider block">{imgItem.schoolName}</span>
-                                            <h4 className="font-bold text-slate-900 text-base group-hover:text-indigo-600 transition-colors line-clamp-1">{imgItem.title}</h4>
+                                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">{imgItem.schoolName}</span>
+                                            <h4 className="font-bold text-slate-900 dark:text-white text-base group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">{imgItem.title}</h4>
                                             {imgItem.description && (
-                                                <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{imgItem.description}</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{imgItem.description}</p>
                                             )}
                                         </div>
 
-                                        <div className="pt-2 text-xs font-bold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                        <div className="pt-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                                             <span>View full photo</span>
                                             <span>→</span>
                                         </div>
@@ -366,7 +366,7 @@ export default function ScholarshipsPage() {
                     onClick={() => setSelectedExamImage(null)}
                 >
                     <div
-                        className="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-white/20 animate-in fade-in zoom-in-95 duration-200"
+                        className="bg-white dark:bg-slate-900 rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-white/20 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-200"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="relative bg-slate-950 flex items-center justify-center min-h-[300px] max-h-[60vh]">
@@ -377,24 +377,24 @@ export default function ScholarshipsPage() {
                             />
                             <button
                                 onClick={() => setSelectedExamImage(null)}
-                                className="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white p-2 rounded-full backdrop-blur-md border border-white/20 transition-all"
+                                className="absolute top-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white p-2 rounded-full backdrop-blur-md border border-white/20 transition-all cursor-pointer"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
-                        <div className="p-6 space-y-2 bg-white">
+                        <div className="p-6 space-y-2 bg-white dark:bg-slate-900">
                             <div className="flex items-center gap-2">
-                                <span className="px-3 py-1 bg-amber-100 text-amber-900 text-xs font-bold rounded-full">
+                                <span className="px-3 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 text-xs font-bold rounded-full">
                                     {selectedExamImage.session}
                                 </span>
-                                <span className="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full">
+                                <span className="px-3 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-full">
                                     School: {selectedExamImage.schoolName}
                                 </span>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900">{selectedExamImage.title}</h3>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{selectedExamImage.title}</h3>
                             {selectedExamImage.description && (
-                                <p className="text-sm text-slate-600 leading-relaxed">{selectedExamImage.description}</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">{selectedExamImage.description}</p>
                             )}
                         </div>
                     </div>

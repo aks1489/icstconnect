@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { IconArrowLeft as ArrowLeft, IconUsers as Users, IconX as X, IconCalendar as Calendar, IconClock as Clock, IconPlus as Plus, IconTrash as Trash2, IconUserPlus as UserPlus } from '@tabler/icons-react'
 import AddStudentToClassModal from '../../components/admin/AddStudentToClassModal'
 import { useToast } from '../../contexts/ToastContext'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
 
 
 interface Student {
@@ -53,6 +54,8 @@ export default function AdminClassDetails() {
     })
 
     const [isAddStudentOpen, setIsAddStudentOpen] = useState(false)
+    const [scheduleToDelete, setScheduleToDelete] = useState<number | null>(null)
+    const [isDeletingSchedule, setIsDeletingSchedule] = useState(false)
 
     useEffect(() => {
         if (id) {
@@ -176,20 +179,28 @@ export default function AdminClassDetails() {
         }
     }
 
-    const handleDeleteSchedule = async (id: number) => {
-        if (!confirm('Delete this schedule?')) return
+    const handleDeleteSchedule = (id: number) => {
+        setScheduleToDelete(id)
+    }
+
+    const executeDeleteSchedule = async () => {
+        if (!scheduleToDelete) return
         try {
+            setIsDeletingSchedule(true)
             const { error } = await supabase
                 .from('class_schedules')
                 .delete()
-                .eq('id', id)
+                .eq('id', scheduleToDelete)
 
             if (error) throw error
-            setSchedules(prev => prev.filter(s => s.id !== id))
-            showToast('Schedule deleted', 'success')
+            setSchedules(prev => prev.filter(s => s.id !== scheduleToDelete))
+            showToast('Schedule deleted successfully', 'success')
+            setScheduleToDelete(null)
         } catch (error) {
             console.error('Error deleting schedule:', error)
             showToast('Failed to delete schedule', 'error')
+        } finally {
+            setIsDeletingSchedule(false)
         }
     }
 
@@ -422,6 +433,18 @@ export default function AdminClassDetails() {
                     </table>
                 </div>
             )}
+
+            <ConfirmDialog
+                open={scheduleToDelete !== null}
+                onOpenChange={(open) => !open && setScheduleToDelete(null)}
+                title="Delete Class Schedule"
+                description="Are you sure you want to delete this scheduled class slot? This action will remove this timing from the class schedule."
+                confirmLabel="Delete Schedule"
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeletingSchedule}
+                onConfirm={executeDeleteSchedule}
+            />
         </div>
     )
 }

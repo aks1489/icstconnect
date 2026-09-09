@@ -210,26 +210,26 @@ const TestPlayer = () => {
         }
 
         return (
-            <div className="min-h-screen bg-slate-50 pt-24 pb-12 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12 flex items-center justify-center p-4 text-slate-900 dark:text-slate-100 transition-colors">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center border border-slate-100"
+                    className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl p-8 max-w-md w-full text-center border border-slate-100 dark:border-slate-800"
                 >
-                    <div className="w-24 h-24 rounded-full bg-slate-50 mx-auto mb-6 flex items-center justify-center shadow-inner">
+                    <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-slate-800 mx-auto mb-6 flex items-center justify-center shadow-inner">
                         <span className={`text-4xl font-bold ${color}`}>{percentage}%</span>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Test Completed</h2>
-                    <p className="text-slate-500 mb-8">{message}</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Test Completed</h2>
+                    <p className="text-slate-500 dark:text-slate-400 mb-8">{message}</p>
 
                     <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <p className="text-xs text-slate-400 uppercase font-bold mb-1">Score</p>
-                            <p className="text-xl font-bold text-slate-900">{score} / {totalMarks}</p>
+                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800">
+                            <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold mb-1">Score</p>
+                            <p className="text-xl font-bold text-slate-900 dark:text-white">{score} / {totalMarks}</p>
                         </div>
-                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                            <p className="text-xs text-slate-400 uppercase font-bold mb-1">Status</p>
-                            <p className={`text-xl font-bold ${percentage >= 50 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800">
+                            <p className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold mb-1">Status</p>
+                            <p className={`text-xl font-bold ${percentage >= 50 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                                 {percentage >= 50 ? 'Passed' : 'Failed'}
                             </p>
                         </div>
@@ -237,7 +237,7 @@ const TestPlayer = () => {
 
                     <Link
                         to={backPath}
-                        className="block w-full py-4 rounded-2xl bg-slate-900 text-white font-bold hover:bg-indigo-600 transition-colors shadow-lg hover:shadow-indigo-200"
+                        className="block w-full py-4 rounded-2xl bg-slate-900 dark:bg-indigo-600 text-white font-bold hover:bg-indigo-600 dark:hover:bg-indigo-500 transition-colors shadow-lg hover:shadow-indigo-200 dark:hover:shadow-none"
                     >
                         Back to Tests
                     </Link>
@@ -248,28 +248,28 @@ const TestPlayer = () => {
 
     // --- TEST PLAYER VIEW ---
     return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-12">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12 text-slate-900 dark:text-slate-100 transition-colors">
             <div className="container mx-auto px-4 max-w-3xl">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900">{test.title}</h2>
-                        <p className="text-sm text-slate-500 font-medium mt-1">
-                            Question {currentQuestionIndex + 1} <span className="text-slate-300">/</span> {totalQuestions}
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{test.title}</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
+                            Question {currentQuestionIndex + 1} <span className="text-slate-300 dark:text-slate-700">/</span> {totalQuestions}
                         </p>
                     </div>
                     <div className="text-right hidden md:block">
-                        <div className="text-sm font-bold text-slate-900 bg-white px-4 py-2 rounded-xl shadow-sm border border-slate-200 flex items-center gap-2">
-                            <Clock className="text-indigo-500" size={18} />
+                        <div className="text-sm font-bold text-slate-900 dark:text-white bg-white dark:bg-slate-900 px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex items-center gap-2">
+                            <Clock className="text-indigo-500 dark:text-indigo-400" size={18} />
                             <span>{formatTime(timeLeft)}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Progress Bar */}
-                <div className="w-full h-3 bg-slate-200 rounded-full mb-8 overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full mb-8 overflow-hidden">
                     <motion.div
-                        className="h-full bg-indigo-600"
+                        className="h-full bg-indigo-600 dark:bg-indigo-500"
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
                         transition={{ duration: 0.5 }}
@@ -282,9 +282,9 @@ const TestPlayer = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 p-6 md:p-10 mb-8 border border-white"
+                    className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/60 dark:shadow-none p-6 md:p-10 mb-8 border border-slate-100 dark:border-slate-800"
                 >
-                    <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-8 leading-snug">
+                    <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-white mb-8 leading-snug">
                         {currentQuestion.text}
                     </h3>
 
@@ -295,14 +295,14 @@ const TestPlayer = () => {
                                 <button
                                     key={option.id || index}
                                     onClick={() => handleOptionSelect(index)}
-                                    className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 group ${isSelected
-                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-900 shadow-md shadow-indigo-100'
-                                        : 'border-slate-100 hover:border-slate-300 text-slate-600 hover:bg-slate-50'
+                                    className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 group cursor-pointer ${isSelected
+                                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-900 dark:text-indigo-200 shadow-md shadow-indigo-100 dark:shadow-none'
+                                        : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                                         }`}
                                 >
                                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isSelected
-                                        ? 'border-indigo-600 bg-indigo-600'
-                                        : 'border-slate-300 group-hover:border-slate-400'
+                                        ? 'border-indigo-600 bg-indigo-600 dark:bg-indigo-500'
+                                        : 'border-slate-300 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500'
                                         }`}>
                                         {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
                                     </div>
@@ -318,9 +318,9 @@ const TestPlayer = () => {
                     <button
                         onClick={handlePrev}
                         disabled={currentQuestionIndex === 0}
-                        className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors ${currentQuestionIndex === 0
-                            ? 'text-slate-300 cursor-not-allowed hidden'
-                            : 'text-slate-600 hover:bg-white hover:shadow-sm'
+                        className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors cursor-pointer ${currentQuestionIndex === 0
+                            ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed hidden'
+                            : 'text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 hover:shadow-sm'
                             }`}
                     >
                         <ArrowLeft size={20} /> Previous
@@ -329,14 +329,14 @@ const TestPlayer = () => {
                     {currentQuestionIndex === totalQuestions - 1 ? (
                         <button
                             onClick={handleSubmit}
-                            className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5"
+                            className="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-200 dark:shadow-none transition-all transform hover:-translate-y-0.5 cursor-pointer"
                         >
                             Submit Test
                         </button>
                     ) : (
                         <button
                             onClick={handleNext}
-                            className="px-8 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-indigo-600 shadow-lg shadow-slate-200 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+                            className="px-8 py-3 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-bold hover:bg-indigo-600 dark:hover:bg-indigo-500 shadow-lg shadow-slate-200 dark:shadow-none transition-all transform hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer"
                         >
                             Next <ArrowRight size={20} />
                         </button>

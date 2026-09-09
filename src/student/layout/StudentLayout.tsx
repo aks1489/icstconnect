@@ -7,6 +7,7 @@ import { STUDENT_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
 import EditProfileModal from '../components/EditProfileModal'
 import ChangePasswordModal from '../../components/auth/ChangePasswordModal'
+import ThemeToggle from '../../components/ui/ThemeToggle'
 
 export default function StudentLayout() {
     const { profile, signOut, isProfileComplete } = useAuth()
@@ -35,10 +36,6 @@ export default function StudentLayout() {
     useEffect(() => {
         if (profile && !isProfileComplete && location.pathname !== '/student/complete-profile') {
             navigate('/student/complete-profile')
-            setShowProfileAlert(true)
-
-            const timer = setTimeout(() => setShowProfileAlert(false), 5000)
-            return () => clearTimeout(timer)
         }
     }, [profile, isProfileComplete, navigate, location.pathname])
 
@@ -72,7 +69,7 @@ export default function StudentLayout() {
     }
 
     return (
-        <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
+        <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-inter">
             <EditProfileModal
                 isOpen={isEditProfileOpen}
                 onClose={() => setIsEditProfileOpen(false)}
@@ -134,14 +131,14 @@ export default function StudentLayout() {
             <aside
                 className={`
                     fixed lg:static inset-y-0 left-0 z-40
-                    bg-white border-r border-slate-200 transition-all duration-300 ease-in-out
+                    bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out
                     ${isSidebarOpen ? 'w-72 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden w-72'}
                     flex flex-col shadow-xl lg:shadow-none
                 `}
             >
                 <div className="w-72 flex flex-col h-full">
                     {/* Logo Area */}
-                    <div className="h-20 flex items-center px-8 border-b border-slate-100 shrink-0">
+                    <div className="h-20 flex items-center px-8 border-b border-slate-100 dark:border-slate-800 shrink-0">
                         <div className="flex items-center gap-3">
                             <img
                                 src={logo}
@@ -149,15 +146,15 @@ export default function StudentLayout() {
                                 className="w-10 h-10 rounded-xl object-cover shadow-sm"
                             />
                             <div>
-                                <h1 className="text-lg font-bold tracking-tight text-slate-800">Student Portal</h1>
-                                <p className="text-xs text-slate-500">ICST Connect</p>
+                                <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-white">Student Portal</h1>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">ICST Connect</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
                     <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto custom-scrollbar">
-                        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-4">
+                        <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Menu
                         </div>
                         {STUDENT_ACTIONS.map((item) => (
@@ -167,12 +164,12 @@ export default function StudentLayout() {
                                 className={`
                                     flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                                     ${isActive(item.path)
-                                        ? 'bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100'
-                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                        ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 shadow-sm shadow-indigo-100 dark:shadow-none font-semibold'
+                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white'
                                     }
                                 `}
                             >
-                                <item.icon className={`text-lg ${isActive(item.path) ? 'text-indigo-600' : 'text-slate-400 group-hover:text-slate-600'}`} size={20} />
+                                <item.icon className={`text-lg ${isActive(item.path) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300'}`} size={20} />
                                 <span className="font-medium">{item.label}</span>
                                 {isActive(item.path) && (
                                     <ChevronRight className="ml-auto text-xs opacity-50" size={16} />
@@ -181,29 +178,29 @@ export default function StudentLayout() {
                         ))}
 
                         <div className="mt-8 mb-4">
-                            <div className="h-px bg-slate-100 mx-4 mb-6"></div>
-                            <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-4">
+                            <div className="h-px bg-slate-100 dark:bg-slate-800 mx-4 mb-6"></div>
+                            <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 px-4">
                                 Main Website
                             </div>
                             <div className="space-y-1">
-                                <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-                                    <Home className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                <Link to="/" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white">
+                                    <Home className="text-lg text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" size={20} />
                                     <span className="font-medium">Home Page</span>
                                 </Link>
-                                <Link to="/courses" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-                                    <Book className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                <Link to="/courses" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white">
+                                    <Book className="text-lg text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" size={20} />
                                     <span className="font-medium">All Courses</span>
                                 </Link>
-                                <Link to="/online-test" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-                                    <MonitorPlay className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                <Link to="/online-test" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white">
+                                    <MonitorPlay className="text-lg text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" size={20} />
                                     <span className="font-medium">Online Tests</span>
                                 </Link>
-                                <Link to="/typing-practice" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-                                    <Keyboard className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                <Link to="/typing-practice" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white">
+                                    <Keyboard className="text-lg text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" size={20} />
                                     <span className="font-medium">Typing Portal</span>
                                 </Link>
-                                <Link to="/gallery" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-                                    <ImageIcon className="text-lg text-slate-400 group-hover:text-slate-600" size={20} />
+                                <Link to="/gallery" className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white">
+                                    <ImageIcon className="text-lg text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" size={20} />
                                     <span className="font-medium">Gallery</span>
                                 </Link>
                             </div>
@@ -215,30 +212,32 @@ export default function StudentLayout() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Header for Mobile and Desktop Toggle */}
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-8 z-20">
+                <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 z-20 transition-colors">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                            className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600 lg:hidden"
+                            className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 lg:hidden cursor-pointer"
                         >
                             <List className="text-2xl" size={24} />
                         </button>
-                        <span className="font-semibold text-slate-700 lg:hidden">Student Portal</span>
+                        <span className="font-semibold text-slate-700 dark:text-slate-200 lg:hidden">Student Portal</span>
                     </div>
 
 
-                    {/* Top Right Profile Section */}
-                    <div className="flex items-center gap-4">
+                    {/* Top Right Profile & Theme Section */}
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <ThemeToggle />
+
                         <div className="relative" ref={dropdownRef}>
                             <button
                                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                                className="flex items-center gap-3 p-1 pl-3 pr-2 rounded-full border border-slate-200 hover:bg-slate-50 hover:shadow-sm transition-all group"
+                                className="flex items-center gap-3 p-1 pl-3 pr-2 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:shadow-sm transition-all group cursor-pointer"
                             >
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-slate-700 leading-tight">{profile?.full_name}</p>
-                                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wide">Student</p>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">{profile?.full_name}</p>
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wide">Student</p>
                                 </div>
-                                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-bold text-indigo-700 border border-white shadow-sm overflow-hidden">
+                                <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/60 flex items-center justify-center text-xs font-bold text-indigo-700 dark:text-indigo-300 border border-white dark:border-slate-700 shadow-sm overflow-hidden">
                                     {profile?.avatar_url ? (
                                         <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                                     ) : (
@@ -250,23 +249,23 @@ export default function StudentLayout() {
 
                             {/* Dropdown Menu */}
                             {isUserMenuOpen && (
-                                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
-                                    <div className="p-4 bg-slate-50/50 border-b border-slate-100 sm:hidden">
-                                        <p className="font-bold text-slate-800">{profile?.full_name}</p>
-                                        <p className="text-xs text-slate-500">{profile?.email}</p>
+                                <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right z-50">
+                                    <div className="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 sm:hidden">
+                                        <p className="font-bold text-slate-800 dark:text-white">{profile?.full_name}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{profile?.email}</p>
                                     </div>
 
                                     <div className="p-2 space-y-1">
                                         <button
                                             onClick={() => { setIsEditProfileOpen(true); setIsUserMenuOpen(false); }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
                                         >
                                             <Pencil className="text-lg" size={18} />
                                             Edit Profile
                                         </button>
                                         <button
                                             onClick={() => { setIsChangePasswordOpen(true); setIsUserMenuOpen(false); }}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
                                         >
                                             <Key className="text-lg" size={18} />
                                             Change Password
@@ -274,17 +273,17 @@ export default function StudentLayout() {
                                         <Link
                                             to="/quick-access"
                                             onClick={() => setIsUserMenuOpen(false)}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                                         >
                                             <Grid className="text-lg" size={18} />
                                             Quick Access
                                         </Link>
                                     </div>
 
-                                    <div className="p-2 border-t border-slate-100">
+                                    <div className="p-2 border-t border-slate-100 dark:border-slate-800">
                                         <button
                                             onClick={handleSignOut}
-                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                                            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 dark:text-rose-400 hover:bg-red-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                                         >
                                             <LogOut className="text-lg" size={18} />
                                             Sign Out
@@ -297,7 +296,7 @@ export default function StudentLayout() {
                 </header>
 
                 {/* Scrollable Page Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 lg:p-8 scroll-smooth">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 lg:p-8 scroll-smooth transition-colors">
                     <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <Outlet context={{ dismissAlert }} />
                     </div>

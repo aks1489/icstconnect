@@ -77,7 +77,7 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
       onKeyDown={handleKeyDown}
     >
       {state === 'start' && (
-        <div className="text-indigo-600 text-3xl mb-8 font-mono font-bold tracking-wider">
+        <div className="text-indigo-600 dark:text-indigo-400 text-3xl mb-8 font-mono font-bold tracking-wider">
           {timeLeft}s
         </div>
       )}
@@ -87,10 +87,10 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center w-full mt-4 bg-white p-10 sm:p-12 rounded-2xl shadow-sm border border-slate-100"
+          className="flex flex-col items-center justify-center w-full mt-4 bg-white dark:bg-slate-900 p-10 sm:p-12 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800"
         >
           {/* Success / Fail Banner */}
-          <div className={`flex items-center gap-2 mb-8 px-5 py-2 rounded-full font-medium ${passed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div className={`flex items-center gap-2 mb-8 px-5 py-2 rounded-full font-medium ${passed ? 'bg-green-100 dark:bg-green-950/60 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-rose-950/60 text-red-700 dark:text-rose-300'}`}>
              {passed ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
              <span>
                {passed ? 'Level Passed!' : `Failed. Need ${TARGET_WPM} WPM & ${TARGET_ACCURACY}% Acc.`}
@@ -98,30 +98,30 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:gap-16 text-center mb-10 w-full max-w-md">
-            <div className={`flex flex-col items-center p-6 rounded-xl ${finalWpm >= TARGET_WPM ? 'bg-green-50' : 'bg-red-50'}`}>
-              <span className="text-slate-500 text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">WPM</span>
-              <span className={`text-5xl sm:text-6xl font-black ${finalWpm >= TARGET_WPM ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`flex flex-col items-center p-6 rounded-xl ${finalWpm >= TARGET_WPM ? 'bg-green-50 dark:bg-green-950/40' : 'bg-red-50 dark:bg-rose-950/40'}`}>
+              <span className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">WPM</span>
+              <span className={`text-5xl sm:text-6xl font-black ${finalWpm >= TARGET_WPM ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-rose-400'}`}>
                 {finalWpm}
               </span>
-              <span className="text-[10px] text-slate-400 mt-2 uppercase tracking-wide">Goal: {TARGET_WPM}</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wide">Goal: {TARGET_WPM}</span>
             </div>
-            <div className={`flex flex-col items-center p-6 rounded-xl ${finalAcc >= TARGET_ACCURACY ? 'bg-green-50' : 'bg-red-50'}`}>
-              <span className="text-slate-500 text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">Accuracy</span>
-              <span className={`text-5xl sm:text-6xl font-black ${finalAcc >= TARGET_ACCURACY ? 'text-green-600' : 'text-red-600'}`}>
+            <div className={`flex flex-col items-center p-6 rounded-xl ${finalAcc >= TARGET_ACCURACY ? 'bg-green-50 dark:bg-green-950/40' : 'bg-red-50 dark:bg-rose-950/40'}`}>
+              <span className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">Accuracy</span>
+              <span className={`text-5xl sm:text-6xl font-black ${finalAcc >= TARGET_ACCURACY ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-rose-400'}`}>
                 {finalAcc}%
               </span>
-               <span className="text-[10px] text-slate-400 mt-2 uppercase tracking-wide">Goal: {TARGET_ACCURACY}%</span>
+               <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wide">Goal: {TARGET_ACCURACY}%</span>
             </div>
           </div>
           
-          <div className="flex gap-12 text-slate-600 mb-10 text-sm">
+          <div className="flex gap-12 text-slate-600 dark:text-slate-300 mb-10 text-sm">
             <div className="flex flex-col items-center">
-              <span className="mb-1 text-slate-400 font-medium">Keystrokes</span>
-              <span className="text-lg font-bold text-slate-700">{totalKeystrokes}</span>
+              <span className="mb-1 text-slate-400 dark:text-slate-500 font-medium">Keystrokes</span>
+              <span className="text-lg font-bold text-slate-700 dark:text-slate-200">{totalKeystrokes}</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="mb-1 text-slate-400 font-medium">Errors</span>
-              <span className="text-lg font-bold text-red-500">{errors}</span>
+              <span className="mb-1 text-slate-400 dark:text-slate-500 font-medium">Errors</span>
+              <span className="text-lg font-bold text-red-500 dark:text-rose-400">{errors}</span>
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
               setActiveLineIndex(0);
               containerRef.current?.focus();
             }}
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all font-medium"
+            className="flex items-center justify-center gap-2 px-6 py-3 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:-translate-y-0.5 transition-all font-medium cursor-pointer"
           >
             <RotateCcw size={18} />
             Try Again
@@ -150,14 +150,14 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
                transition={{ type: "tween", ease: "easeInOut", duration: 0.2 }}
              >
               {words.split('').map((char: string, index: number) => {
-                let colorClass = 'text-slate-400'; // default untyped color
+                let colorClass = 'text-slate-400 dark:text-slate-600'; // default untyped color
                 let isError = false;
 
                 if (index < typed.length) {
                   if (typed[index] === char) {
-                    colorClass = 'text-slate-900 font-medium'; // correct typed color
+                    colorClass = 'text-slate-900 dark:text-slate-100 font-medium'; // correct typed color
                   } else {
-                    colorClass = 'text-red-500'; // error color
+                    colorClass = 'text-red-500 dark:text-rose-400'; // error color
                     isError = true;
                   }
                 }
@@ -176,12 +176,12 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
                        <motion.span 
                           animate={{ opacity: [1, 0] }}
                           transition={{ repeat: Infinity, duration: 0.8 }}
-                          className="absolute left-0 top-[10%] bottom-[10%] w-[3px] bg-indigo-600 rounded-full"
+                          className="absolute left-0 top-[10%] bottom-[10%] w-[3px] bg-indigo-600 dark:bg-indigo-400 rounded-full"
                        />
                     )}
                     {/* Character */}
                     <span 
-                      className={`transition-colors duration-100 ${colorClass} ${isError && char === ' ' ? 'bg-red-200' : ''}`}
+                      className={`transition-colors duration-100 ${colorClass} ${isError && char === ' ' ? 'bg-red-200 dark:bg-rose-900/60' : ''}`}
                     >
                       {char}
                     </span>
@@ -195,10 +195,10 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
                   ref={activeCharRef}
                   animate={{ opacity: [1, 0] }}
                   transition={{ repeat: Infinity, duration: 0.8 }}
-                  className="absolute w-[3px] h-[80%] top-[10%] bg-indigo-600 rounded-full"
+                  className="absolute w-[3px] h-[80%] top-[10%] bg-indigo-600 dark:bg-indigo-400 rounded-full"
                 />
               )}
-            </motion.div>
+             </motion.div>
           </div>
 
           <div className="mt-16 flex justify-center">
@@ -208,7 +208,7 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
                 setActiveLineIndex(0);
                 containerRef.current?.focus();
               }}
-              className="flex items-center justify-center p-3 rounded-full text-slate-400 hover:text-indigo-600 hover:bg-slate-100 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-600/50"
+              className="flex items-center justify-center p-3 rounded-full text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-600/50 cursor-pointer"
               title="Restart Test"
             >
               <RotateCcw size={24} />

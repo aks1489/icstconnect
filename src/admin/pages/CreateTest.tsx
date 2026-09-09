@@ -4,9 +4,11 @@ import { supabase } from '../../lib/supabase'
 import { IconArrowLeft as ArrowLeft, IconDeviceFloppy as Save, IconLayout as Layout, IconClock as Clock, IconWorld as Globe, IconLock as Lock, IconBook2 as BookOpen } from '@tabler/icons-react'
 import QuestionEditor from '../../components/admin/QuestionEditor'
 import type { Test, TestQuestion } from '../../types'
+import { useToast } from '../../contexts/ToastContext'
 
 export default function CreateTest() {
     const navigate = useNavigate()
+    const { showToast } = useToast()
     const { id } = useParams() // Get ID for edit mode
     const isEditMode = !!id
 
@@ -72,7 +74,7 @@ export default function CreateTest() {
 
             } catch (error) {
                 console.error('Error fetching test:', error)
-                alert('Failed to load test details')
+                showToast('Failed to load test details', 'error')
                 navigate('/admin/tests')
             } finally {
                 setLoading(false)
@@ -83,15 +85,33 @@ export default function CreateTest() {
     }, [id, isEditMode, navigate])
 
     const handleSave = async () => {
-        if (!testData.title) return alert('Please enter a test title')
-        if (!testData.course_id) return alert('Please select a related course')
-        if (questions.length === 0) return alert('Please add at least one question')
+        if (!testData.title) {
+            showToast('Please enter a test title', 'warning')
+            return
+        }
+        if (!testData.course_id) {
+            showToast('Please select a related course', 'warning')
+            return
+        }
+        if (questions.length === 0) {
+            showToast('Please add at least one question', 'warning')
+            return
+        }
 
         // Validate Questions
         for (const q of questions) {
-            if (!q.text) return alert('All questions must have text')
-            if (q.options.some(o => !o.text)) return alert('All options must have text')
-            if (!q.options.some(o => o.is_correct)) return alert('Each question must have one correct answer')
+            if (!q.text) {
+                showToast('All questions must have text', 'warning')
+                return
+            }
+            if (q.options.some(o => !o.text)) {
+                showToast('All options must have text', 'warning')
+                return
+            }
+            if (!q.options.some(o => o.is_correct)) {
+                showToast('Each question must have one correct answer', 'warning')
+                return
+            }
         }
 
         setLoading(true)
@@ -184,11 +204,12 @@ export default function CreateTest() {
 
             if (oError) throw oError
 
+            showToast(isEditMode ? 'Test updated successfully!' : 'Test created successfully!', 'success')
             navigate('/admin/tests')
 
         } catch (error: any) {
             console.error('Error saving test:', error)
-            alert('Failed to save test: ' + error.message)
+            showToast('Failed to save test: ' + error.message, 'error')
         } finally {
             setLoading(false)
         }

@@ -58,14 +58,14 @@ const LearningHubPreview = () => {
                             <motion.div
                                 animate={{ y: [0, -20, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="absolute top-0 right-0 w-36 h-36 sm:w-48 sm:h-48 bg-white rounded-3xl shadow-2xl p-4 flex flex-col items-center justify-center gap-2 sm:gap-4 z-20 border-b-8 border-slate-200 rotate-6"
+                                className="absolute top-0 right-0 w-36 h-36 sm:w-48 sm:h-48 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-4 flex flex-col items-center justify-center gap-2 sm:gap-4 z-20 border-b-8 border-slate-200 dark:border-slate-800 rotate-6 transition-colors duration-300"
                             >
                                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white shadow-lg">
                                     <Trophy size={24} className="sm:w-8 sm:h-8" />
                                 </div>
                                 <div className="text-center">
-                                    <div className="font-black text-sm sm:text-base text-slate-800">Earn Badges</div>
-                                    <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Competitive Fun</div>
+                                    <div className="font-black text-sm sm:text-base text-slate-800 dark:text-white transition-colors">Earn Badges</div>
+                                    <div className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Competitive Fun</div>
                                 </div>
                             </motion.div>
 
@@ -73,14 +73,14 @@ const LearningHubPreview = () => {
                             <motion.div
                                 animate={{ y: [0, 20, 0] }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                                className="absolute bottom-8 left-0 w-44 h-44 sm:w-56 sm:h-56 bg-white rounded-3xl shadow-2xl p-4 flex flex-col items-center justify-center gap-2 sm:gap-4 z-30 border-b-8 border-slate-200 -rotate-3"
+                                className="absolute bottom-8 left-0 w-44 h-44 sm:w-56 sm:h-56 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-4 flex flex-col items-center justify-center gap-2 sm:gap-4 z-30 border-b-8 border-slate-200 dark:border-slate-800 -rotate-3 transition-colors duration-300"
                             >
                                 <div className="w-14 h-14 sm:w-20 sm:h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                                     <Gamepad2 size={32} className="sm:w-10 sm:h-10" />
                                 </div>
                                 <div className="text-center">
-                                    <div className="font-black text-lg sm:text-xl text-slate-800">Arcade Mode</div>
-                                    <div className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase">Interactive Learning</div>
+                                    <div className="font-black text-lg sm:text-xl text-slate-800 dark:text-white transition-colors">Arcade Mode</div>
+                                    <div className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Interactive Learning</div>
                                 </div>
                             </motion.div>
 

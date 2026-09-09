@@ -70,7 +70,7 @@ export default function Gallery() {
     }, [images, activeCategoryId]);
 
     return (
-        <div className="min-h-screen bg-slate-50 overflow-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors overflow-hidden">
             
             {/* Dynamic Hero Section */}
             <div className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">

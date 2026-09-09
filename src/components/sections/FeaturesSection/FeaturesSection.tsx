@@ -30,25 +30,25 @@ const FeaturesSection = () => {
     ]
 
     return (
-        <section className="py-20 bg-white" id="features">
+        <section className="py-20 bg-white dark:bg-slate-950 transition-colors duration-300" id="features">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900">Why Choose Us?</h2>
-                    <p className="text-xl text-slate-500 max-w-3xl mx-auto">
+                    <h2 className="text-4xl lg:text-5xl font-bold mb-4 text-slate-900 dark:text-white transition-colors">Why Choose Us?</h2>
+                    <p className="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto transition-colors">
                         We provide top-notch education and training to help you succeed in the competitive IT industry.
                     </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {features.map((feature, index) => (
                         <div key={index} className="group">
-                            <div className="bg-white rounded-2xl p-8 text-center h-full border border-slate-100 hover:shadow-xl hover:border-transparent hover:-translate-y-2 transition-all duration-300">
+                            <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center h-full border border-slate-100 dark:border-slate-800 hover:shadow-xl hover:border-transparent dark:hover:border-slate-700 hover:-translate-y-2 transition-all duration-300">
                                 <div className="mb-6 inline-block">
-                                    <div className={`w-20 h-20 flex items-center justify-center rounded-2xl ${feature.color} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                                    <div className={`w-20 h-20 flex items-center justify-center rounded-2xl ${feature.color} dark:bg-opacity-20 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                                         <feature.icon className="text-4xl" size={40} />
                                     </div>
                                 </div>
-                                <h4 className="text-xl font-bold mb-3 text-slate-900">{feature.title}</h4>
-                                <p className="text-slate-500 mb-0 leading-relaxed">{feature.description}</p>
+                                <h4 className="text-xl font-bold mb-3 text-slate-900 dark:text-white transition-colors">{feature.title}</h4>
+                                <p className="text-slate-500 dark:text-slate-400 mb-0 leading-relaxed transition-colors">{feature.description}</p>
                             </div>
                         </div>
                     ))}

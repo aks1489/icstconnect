@@ -4,6 +4,8 @@ import { IconPlus as Plus, IconSearch as Search, IconInbox as Inbox, IconTrash a
 import { supabase } from '../../lib/supabase'
 import { getIcon } from '../../utils/iconMapper'
 import CreateClassModal from '../../components/admin/CreateClassModal'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../contexts/ToastContext'
 
 interface ClassBatch {
     id: number
@@ -28,11 +30,14 @@ interface Course {
 }
 
 export default function AdminClasses() {
+    const { showToast } = useToast()
     const [classes, setClasses] = useState<ClassBatch[]>([])
     const [filteredClasses, setFilteredClasses] = useState<ClassBatch[]>([])
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
     const [selectedCourse, setSelectedCourse] = useState<string>('all')
+    const [classToDelete, setClassToDelete] = useState<ClassBatch | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     const [searchQuery, setSearchQuery] = useState('')
     const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -115,25 +120,34 @@ export default function AdminClasses() {
         setFilteredClasses(filtered)
     }
 
-    const handleDelete = async (id: number, count: number) => {
-        if (count > 0) {
-            alert('Cannot delete a batch with enrolled students.')
+    const initiateDelete = (cls: ClassBatch) => {
+        if (cls.enrolled_count > 0) {
+            showToast('Cannot delete a batch with enrolled students.', 'warning')
             return
         }
-        if (!confirm('Are you sure you want to delete this batch?')) return
+        setClassToDelete(cls)
+    }
+
+    const executeDeleteClass = async () => {
+        if (!classToDelete) return
 
         try {
+            setIsDeleting(true)
             const { error } = await supabase
                 .from('classes')
                 .delete()
-                .eq('id', id)
+                .eq('id', classToDelete.id)
 
             if (error) throw error
+            showToast(`Batch "${classToDelete.batch_name}" deleted successfully`, 'success')
+            setClassToDelete(null)
             fetchData()
 
         } catch (error) {
             console.error('Error deleting batch:', error)
-            alert('Failed to delete batch')
+            showToast('Failed to delete batch', 'error')
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -247,7 +261,7 @@ export default function AdminClasses() {
                                             View Details
                                         </Link>
                                         <button
-                                            onClick={() => handleDelete(cls.id, cls.enrolled_count)}
+                                            onClick={() => initiateDelete(cls)}
                                             className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-30"
                                             disabled={cls.enrolled_count > 0}
                                             title="Delete Batch"
@@ -261,6 +275,18 @@ export default function AdminClasses() {
                     })}
                 </div>
             )}
+
+            <ConfirmDialog
+                open={!!classToDelete}
+                onOpenChange={(open) => !open && setClassToDelete(null)}
+                title="Delete Class Batch"
+                description={`Are you sure you want to permanently delete batch "${classToDelete?.batch_name}"? This action cannot be undone.`}
+                confirmLabel="Delete Batch"
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={executeDeleteClass}
+            />
         </div>
     )
 }

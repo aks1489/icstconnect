@@ -243,7 +243,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             ></div>
 
             {/* Modal Card */}
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-0 overflow-hidden animate-in fade-in zoom-in duration-300 mx-4">
+            <div className="relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-md p-0 overflow-hidden animate-in fade-in zoom-in duration-300 mx-4">
 
                 <AuthHeader isLogin={isLogin} onClose={onClose} />
 
@@ -289,7 +289,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         )}
 
                         {error && (
-                            <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${error.includes('sent') ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                            <div className={`flex items-start gap-2 p-3 rounded-xl text-sm ${error.includes('sent') ? 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-rose-950/40 text-red-600 dark:text-rose-400 border border-red-200 dark:border-rose-900/50'}`}>
                                 {error.includes('sent') ? <CheckCircle className="mt-0.5" size={16} /> : <AlertCircle className="mt-0.5" size={16} />}
                                 <span>{error}</span>
                             </div>
@@ -323,7 +323,7 @@ const AuthHeader = ({ isLogin, onClose }: { isLogin: boolean, onClose: () => voi
 
         <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-1 w-8 h-8 flex items-center justify-center backdrop-blur-md"
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-1 w-8 h-8 flex items-center justify-center backdrop-blur-md cursor-pointer"
         >
             <X size={18} />
         </button>
@@ -343,20 +343,20 @@ const AuthHeader = ({ isLogin, onClose }: { isLogin: boolean, onClose: () => voi
 )
 
 const AuthTabs = ({ isLogin, isForgotPassword, onTabChange }: { isLogin: boolean, isForgotPassword: boolean, onTabChange: (login: boolean) => void }) => (
-    <div className="flex p-1 rounded-xl bg-slate-100 mb-8 relative">
+    <div className="flex p-1 rounded-xl bg-slate-100 dark:bg-slate-800 mb-8 relative">
         <div
-            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-white shadow-sm transition-all duration-300 ease-out ${isForgotPassword ? 'hidden' : isLogin ? 'left-1' : 'left-[calc(50%+4px)]'}`}
+            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-lg bg-white dark:bg-slate-700 shadow-sm transition-all duration-300 ease-out ${isForgotPassword ? 'hidden' : isLogin ? 'left-1' : 'left-[calc(50%+4px)]'}`}
         ></div>
         <button
             type="button"
-            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${isLogin && !isForgotPassword ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 cursor-pointer ${isLogin && !isForgotPassword ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
             onClick={() => onTabChange(true)}
         >
             Sign In
         </button>
         <button
             type="button"
-            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 ${!isLogin && !isForgotPassword ? 'text-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+            className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-300 cursor-pointer ${!isLogin && !isForgotPassword ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
             onClick={() => onTabChange(false)}
         >
             Sign Up
@@ -366,12 +366,12 @@ const AuthTabs = ({ isLogin, isForgotPassword, onTabChange }: { isLogin: boolean
 
 const AuthFooter = ({ onClose }: { onClose: () => void }) => (
     <div className="px-8 pb-8 text-center space-y-4">
-        <div className="flex justify-center gap-4 text-xs font-medium text-slate-500">
-            <Link to="/teacher/login" onClick={onClose} className="hover:text-emerald-600 transition-colors">Teacher Login</Link>
-            <span className="text-slate-300">|</span>
-            <Link to="/admin/login" onClick={onClose} className="hover:text-indigo-600 transition-colors">Admin Login</Link>
+        <div className="flex justify-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
+            <Link to="/teacher/login" onClick={onClose} className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Teacher Login</Link>
+            <span className="text-slate-300 dark:text-slate-700">|</span>
+            <Link to="/admin/login" onClick={onClose} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Admin Login</Link>
         </div>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-400 dark:text-slate-500">
             By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
     </div>
@@ -379,19 +379,19 @@ const AuthFooter = ({ onClose }: { onClose: () => void }) => (
 
 const SuccessView = ({ otpType, onNavigate }: { otpType: string | null, onNavigate: () => void }) => (
     <div className="space-y-6 text-center animate-in fade-in zoom-in duration-300 py-4">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-2 ring-8 ring-green-50">
-            <Check className="text-4xl text-green-600" size={40} />
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-950/60 mb-2 ring-8 ring-green-50 dark:ring-green-900/30">
+            <Check className="text-4xl text-green-600 dark:text-green-400" size={40} />
         </div>
         <div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">Verified!</h3>
-            <p className="text-slate-500 max-w-[260px] mx-auto">
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Verified!</h3>
+            <p className="text-slate-500 dark:text-slate-400 max-w-[260px] mx-auto">
                 Your email has been successfully verified. You can now proceed to your dashboard.
             </p>
         </div>
         <button
             type="button"
             onClick={onNavigate}
-            className="w-full py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 transform hover:-translate-y-0.5 transition-all duration-200"
+            className="w-full py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg shadow-green-500/30 transform hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
         >
             Go to {otpType === 'recovery' ? 'Reset Password' : 'Dashboard'}
         </button>
@@ -401,22 +401,22 @@ const SuccessView = ({ otpType, onNavigate }: { otpType: string | null, onNaviga
 const OtpInput = ({ email, otpCode, setOtpCode, onCancel, otpType }: { email: string, otpCode: string, setOtpCode: (c: string) => void, onCancel: () => void, otpType: string | null }) => (
     <div className="space-y-4 animate-in fade-in zoom-in duration-300">
         <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 mb-3 border border-indigo-100">
-                <ShieldCheck className="text-2xl text-indigo-600" size={28} />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 dark:bg-indigo-950/60 mb-3 border border-indigo-100 dark:border-indigo-800">
+                <ShieldCheck className="text-2xl text-indigo-600 dark:text-indigo-400" size={28} />
             </div>
-            <h3 className="text-xl font-bold text-slate-900">Enter Verification Code</h3>
-            <p className="text-sm text-slate-500 mt-1">
-                We sent a verification code to <span className="font-semibold text-slate-700">{email}</span>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">Enter Verification Code</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                We sent a verification code to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span>
             </p>
         </div>
 
         <div>
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-2 block">Verification Code</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1 mb-2 block">Verification Code</label>
             <input
                 type="text"
                 required
                 maxLength={otpType === 'signup' ? 4 : 6}
-                className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono font-bold"
+                className="w-full text-center text-2xl tracking-[0.5em] py-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono font-bold"
                 placeholder={otpType === 'signup' ? "0000" : "000000"}
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').substring(0, otpType === 'signup' ? 4 : 6))}
@@ -426,7 +426,7 @@ const OtpInput = ({ email, otpCode, setOtpCode, onCancel, otpType }: { email: st
         <button
             type="button"
             onClick={onCancel}
-            className="text-xs text-indigo-600 hover:text-indigo-700 font-medium block text-center"
+            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium block text-center cursor-pointer"
         >
             Wrong email? Go back
         </button>
@@ -436,23 +436,23 @@ const OtpInput = ({ email, otpCode, setOtpCode, onCancel, otpType }: { email: st
 const ForgotPasswordInputs = ({ email, setEmail, onBack }: { email: string, setEmail: (e: string) => void, onBack: () => void }) => (
     <div className="space-y-1.5 animate-in fade-in slide-in-from-right-4 duration-300">
         <div className="text-center mb-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 mb-3">
-                <Key className="text-xl text-indigo-600" size={24} />
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/60 mb-3">
+                <Key className="text-xl text-indigo-600 dark:text-indigo-400" size={24} />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900">Forgot Password?</h3>
-            <p className="text-sm text-slate-500">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Forgot Password?</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
                 Enter your email address to receive a verification code.
             </p>
         </div>
-        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+        <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
         <div className="relative group">
-            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+            <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-colors">
                 <Mail size={18} />
             </span>
             <input
                 type="email"
                 required
-                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -461,7 +461,7 @@ const ForgotPasswordInputs = ({ email, setEmail, onBack }: { email: string, setE
         <button
             type="button"
             onClick={onBack}
-            className="text-xs text-indigo-600 hover:text-indigo-700 font-medium block text-center mt-2"
+            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium block text-center mt-2 cursor-pointer"
         >
             Back to Sign In
         </button>
@@ -472,15 +472,15 @@ const AuthInputs = ({ isLogin, email, setEmail, password, setPassword, fullName,
     <>
         {!isLogin && (
             <div className="space-y-1.5 animate-in fade-in slide-in-from-right-4 duration-300">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Full Name</label>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Full Name</label>
                 <div className="relative group">
-                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-colors">
                         <User size={18} />
                     </span>
                     <input
                         type="text"
                         required
-                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
                         placeholder="John Doe"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
@@ -490,15 +490,15 @@ const AuthInputs = ({ isLogin, email, setEmail, password, setPassword, fullName,
         )}
 
         <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+            <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
             <div className="relative group">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-colors">
                     <Mail size={18} />
                 </span>
                 <input
                     type="email"
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -508,25 +508,25 @@ const AuthInputs = ({ isLogin, email, setEmail, password, setPassword, fullName,
 
         <div className="space-y-1.5">
             <div className="flex justify-between items-center px-1">
-                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Password</label>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Password</label>
                 {isLogin && (
                     <button
                         type="button"
                         onClick={onForgotPassword}
-                        className="text-xs text-indigo-600 hover:text-indigo-700 font-medium"
+                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium cursor-pointer"
                     >
                         Forgot Password?
                     </button>
                 )}
             </div>
             <div className="relative group">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
+                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-colors">
                     <Lock size={18} />
                 </span>
                 <input
                     type="password"
                     required
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-medium"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
