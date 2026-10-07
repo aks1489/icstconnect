@@ -174,10 +174,10 @@ const DiscountClaims = () => {
                                 <th className="px-6 py-4 font-semibold">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
                                         Loading inquiries...
                                     </td>
                                 </tr>

@@ -299,24 +299,24 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none transition-all"
                             />
                             {pincodeLoading && (
-                                <div className="absolute right-3 top-[34px] bg-slate-50 pl-2">
-                                    <div className="w-4 h-4 rounded-full bg-slate-200 animate-pulse"></div>
+                                <div className="absolute right-3 top-[34px] bg-slate-50 dark:bg-slate-900 pl-2">
+                                    <div className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                                 </div>
                             )}
                         </div>
 
                         <div className="space-y-2 relative">
-                            <label className="text-sm font-semibold text-slate-700">State</label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">State</label>
                             <input
                                 type="text"
                                 name="state"
                                 readOnly
                                 value={formData.state || ''}
-                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none transition-all"
+                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 focus:outline-none transition-all"
                             />
                             {pincodeLoading && (
-                                <div className="absolute right-3 top-[34px] bg-slate-50 pl-2">
-                                    <div className="w-4 h-4 rounded-full bg-slate-200 animate-pulse"></div>
+                                <div className="absolute right-3 top-[34px] bg-slate-50 dark:bg-slate-900 pl-2">
+                                    <div className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                                 </div>
                             )}
                         </div>

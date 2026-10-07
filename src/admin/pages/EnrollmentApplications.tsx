@@ -139,12 +139,12 @@ export default function EnrollmentApplications() {
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {loading ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                                        <p className="text-slate-500 text-sm">Loading applications...</p>
+                                        <p className="text-slate-500 dark:text-slate-400 text-sm">Loading applications...</p>
                                     </td>
                                 </tr>
                             ) : filtered.length === 0 ? (

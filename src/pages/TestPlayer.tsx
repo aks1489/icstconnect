@@ -173,7 +173,7 @@ const TestPlayer = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center transition-colors">
                 <Loader2 className="animate-spin text-indigo-600" size={40} />
             </div>
         )

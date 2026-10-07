@@ -281,9 +281,9 @@ export default function FinancialDashboard() {
 
 function StatCard({ title, amount, icon, bgClass, textClass }: any) {
     return (
-        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between transition-colors">
             <div>
-                <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{title}</p>
                 <h3 className={`text-2xl font-bold ${textClass}`}>₹{amount.toLocaleString()}</h3>
             </div>
             <div className={`p-3 rounded-xl ${bgClass}`}>

@@ -120,9 +120,9 @@ export default function AdminAuditLogs() {
             </div>
 
             {/* Logs Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
                 {loading ? (
-                    <div className="p-12 text-center text-slate-400">Loading audit records...</div>
+                    <div className="p-12 text-center text-slate-400 dark:text-slate-500">Loading audit records...</div>
                 ) : filteredLogs.length === 0 ? (
                     <div className="p-12 text-center text-slate-400">
                         <IconDatabase size={40} className="mx-auto mb-2 text-slate-300" />

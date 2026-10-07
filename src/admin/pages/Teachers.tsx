@@ -49,7 +49,7 @@ export default function Teachers() {
 
     if (loading) return (
         <div className="flex items-center justify-center p-12">
-            <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-4 border-indigo-200 dark:border-indigo-900 border-t-indigo-600 rounded-full animate-spin"></div>
         </div>
     )
 

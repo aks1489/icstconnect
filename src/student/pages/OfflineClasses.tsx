@@ -69,7 +69,22 @@ export default function OfflineClasses() {
     }
 
     if (loading) {
-        return <div>Loading classes...</div>
+        return (
+            <div className="space-y-6">
+                <div className="h-8 w-48 bg-slate-200 dark:bg-slate-800 rounded-lg animate-pulse" />
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-48 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between animate-pulse">
+                            <div className="space-y-3">
+                                <div className="h-5 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-6 w-3/4 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="h-4 w-1/2 bg-slate-200 dark:bg-slate-800 rounded" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )
     }
 
     return (

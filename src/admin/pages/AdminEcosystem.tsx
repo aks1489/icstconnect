@@ -192,9 +192,18 @@ export default function AdminEcosystem() {
                 </div>
             </div>
 
-            {/* Sites Grid */}
             {loading ? (
-                <div className="p-12 text-center text-slate-400">Loading ecosystem registry...</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-between animate-pulse">
+                            <div className="space-y-3">
+                                <div className="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                        </div>
+                    ))}
+                </div>
             ) : sites.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-12 text-center text-slate-500">
                     No external companion platforms registered.

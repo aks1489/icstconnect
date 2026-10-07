@@ -198,7 +198,17 @@ export default function AdminClasses() {
             </div>
 
             {loading ? (
-                <div className="text-center py-12 text-slate-500 dark:text-slate-400">Loading classes...</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="h-44 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between animate-pulse">
+                            <div className="space-y-3">
+                                <div className="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                                <div className="h-4 w-48 bg-slate-200 dark:bg-slate-800 rounded" />
+                            </div>
+                            <div className="h-8 w-full bg-slate-200 dark:bg-slate-800 rounded-xl" />
+                        </div>
+                    ))}
+                </div>
             ) : filteredClasses.length === 0 ? (
                 <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500">
                     <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">

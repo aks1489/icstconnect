@@ -136,11 +136,11 @@ export default function StudentPaymentStatus() {
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {loading ? (
-                                <tr><td colSpan={18} className="p-8 text-center text-slate-500">Loading payment data...</td></tr>
+                                <tr><td colSpan={18} className="p-8 text-center text-slate-500 dark:text-slate-400">Loading payment data...</td></tr>
                             ) : filteredData.length === 0 ? (
-                                <tr><td colSpan={18} className="p-8 text-center text-slate-500">No students found.</td></tr>
+                                <tr><td colSpan={18} className="p-8 text-center text-slate-500 dark:text-slate-400">No students found.</td></tr>
                             ) : (
                                 filteredData.map((student, idx) => (
                                     <tr key={student.studentId} className="hover:bg-slate-50 transition-colors">

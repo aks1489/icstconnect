@@ -42,7 +42,7 @@ export default function AdminDashboard() {
         return (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-pulse">
                 {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-32 bg-slate-200 rounded-2xl"></div>
+                    <div key={i} className="h-32 bg-slate-200 dark:bg-slate-800 rounded-2xl"></div>
                 ))}
             </div>
         )

@@ -13,7 +13,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
     width,
     height
 }) => {
-    const baseClasses = 'animate-pulse bg-slate-200'
+    const baseClasses = 'animate-pulse bg-slate-200 dark:bg-slate-800'
     const variantClasses = {
         text: 'rounded-md',
         circular: 'rounded-full',

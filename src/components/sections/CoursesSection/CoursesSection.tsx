@@ -104,7 +104,14 @@ const CoursesSection = () => {
                 {loading ? (
                     <div className="flex gap-8 overflow-hidden px-4">
                         {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="min-w-[240px] md:min-w-[280px] bg-white dark:bg-slate-900 h-72 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 animate-pulse"></div>
+                            <div key={i} className="min-w-[240px] md:min-w-[280px] bg-white dark:bg-slate-900 h-72 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between animate-pulse">
+                                <div className="space-y-3">
+                                    <div className="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                                    <div className="h-8 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                                    <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                                </div>
+                                <div className="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                            </div>
                         ))}
                     </div>
                 ) : (

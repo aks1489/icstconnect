@@ -189,7 +189,14 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="h-80 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 animate-pulse" />
+                            <div key={i} className="h-80 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between animate-pulse">
+                                <div className="space-y-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+                                    <div className="h-6 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                                    <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                                </div>
+                                <div className="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-xl" />
+                            </div>
                         ))}
                     </div>
                 ) : filteredTests.length === 0 ? (

@@ -62,7 +62,7 @@ export default function StudentViewPaymentGrid() {
                                 <div className="text-xs font-medium text-slate-500 text-center uppercase tracking-wider">{m}</div>
                                 <div className={`h-12 flex items-center justify-center rounded-lg border border-slate-100 transition-colors ${getCellStyle(amount)}`}>
                                     {loading ? (
-                                        <div className="w-4 h-4 rounded-full border-2 border-slate-200 border-t-slate-400 animate-spin" />
+                                        <div className="w-4 h-4 rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-slate-400 dark:border-t-slate-200 animate-spin" />
                                     ) : amount > 0 ? (
                                         `₹${amount}`
                                     ) : (

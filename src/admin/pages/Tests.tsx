@@ -132,7 +132,7 @@ export default function Tests() {
             {loading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[1, 2, 3].map(i => (
-                        <div key={i} className="h-48 bg-slate-100 rounded-2xl animate-pulse" />
+                        <div key={i} className="h-48 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse border border-slate-200/50 dark:border-slate-800" />
                     ))}
                 </div>
             ) : filteredTests.length === 0 ? (

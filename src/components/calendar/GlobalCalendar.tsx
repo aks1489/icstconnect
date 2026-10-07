@@ -285,7 +285,7 @@ export default function GlobalCalendar() {
             {/* Week Grid */}
             <div className="grid grid-cols-7 min-h-[500px] divide-x divide-slate-100 relative">
                 {loading && (
-                    <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 z-10 flex items-center justify-center backdrop-blur-sm">
                         <Loader2 className="animate-spin text-indigo-600" size={32} />
                     </div>
                 )}

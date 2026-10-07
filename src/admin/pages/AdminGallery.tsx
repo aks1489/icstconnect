@@ -480,7 +480,7 @@ export default function AdminGallery() {
 
                         {loading ? (
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                                {[1,2,3,4,5,6].map(i => <div key={i} className="aspect-square bg-slate-100 animate-pulse rounded-xl"></div>)}
+                                {[1,2,3,4,5,6].map(i => <div key={i} className="aspect-square bg-slate-100 dark:bg-slate-800 animate-pulse rounded-xl"></div>)}
                             </div>
                         ) : images.length === 0 ? (
                             <div className="text-center py-20 text-slate-400 flex flex-col items-center">
