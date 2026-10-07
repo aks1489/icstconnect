@@ -1,4 +1,5 @@
 
+import { Link } from 'react-router-dom'
 import { IconRosetteDiscountCheck as BadgeCheck, IconUsers as Users } from '@tabler/icons-react'
 
 const AboutSection = () => {
@@ -11,8 +12,11 @@ const AboutSection = () => {
                         <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-purple-100 dark:bg-purple-900/20 rounded-full -z-10"></div>
                         <img
                             src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
-                            className="w-full rounded-3xl shadow-2xl transform hover:scale-[1.02] transition-transform duration-500"
-                            alt="About ICST"
+                            width={870}
+                            height={580}
+                            loading="lazy"
+                            className="w-full aspect-[3/2] object-cover rounded-3xl shadow-2xl transform hover:scale-[1.02] transition-transform duration-500"
+                            alt="ICST Chowberia modern computer lab classroom with students learning programming"
                         />
                     </div>
                     <div className="w-full lg:w-1/2">
@@ -35,7 +39,7 @@ const AboutSection = () => {
                                     <BadgeCheck className="text-xl" size={24} />
                                 </div>
                                 <div>
-                                    <h6 className="text-lg font-bold text-slate-900 dark:text-white mb-1 transition-colors">Certified Courses</h6>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 transition-colors">Certified Courses</h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors">Industry recognized certifications upon completion.</p>
                                 </div>
                             </div>
@@ -44,15 +48,18 @@ const AboutSection = () => {
                                     <Users className="text-xl" size={24} />
                                 </div>
                                 <div>
-                                    <h6 className="text-lg font-bold text-slate-900 dark:text-white mb-1 transition-colors">Expert Mentors</h6>
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 transition-colors">Expert Mentors</h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors">Learn directly from experienced industry professionals.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <button className="px-8 py-3 rounded-full bg-slate-900 dark:bg-sky-600 text-white font-semibold shadow-lg hover:bg-slate-800 dark:hover:bg-sky-500 hover:-translate-y-1 transition-all cursor-pointer">
-                            Read More
-                        </button>
+                        <Link
+                            to="/about"
+                            className="inline-block px-8 py-3 rounded-full bg-slate-900 dark:bg-sky-600 text-white font-semibold shadow-lg hover:bg-slate-800 dark:hover:bg-sky-500 hover:-translate-y-1 transition-all no-underline"
+                        >
+                            Read More About Us
+                        </Link>
                     </div>
                 </div>
             </div>

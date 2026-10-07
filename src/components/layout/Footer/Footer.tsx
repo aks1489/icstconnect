@@ -43,21 +43,26 @@ const Footer: React.FC = () => {
                         <ul className="space-y-3 text-sm">
                             <li><Link to="/" className="hover:text-white transition-colors no-underline">Home</Link></li>
                             <li><Link to="/courses" className="hover:text-white transition-colors no-underline">Our Courses</Link></li>
-                            <li><Link to="/about" className="hover:text-white transition-colors no-underline">About Us</Link></li>
+                            <li><Link to="/scholarships" className="hover:text-white transition-colors no-underline">Scholarships</Link></li>
+                            <li><Link to="/notifications" className="hover:text-white transition-colors no-underline">Notifications</Link></li>
                             <li><Link to="/gallery" className="hover:text-white transition-colors no-underline">Gallery</Link></li>
-                            <li><a href="#contact" className="hover:text-white transition-colors no-underline">Contact</a></li>
+                            <li><Link to="/online-test" className="hover:text-white transition-colors no-underline">Practice Tests</Link></li>
+                            <li><Link to="/typing-practice" className="hover:text-white transition-colors no-underline">Typing Tutor</Link></li>
+                            <li><Link to="/connect" className="hover:text-white transition-colors no-underline">Ecosystem & Hub</Link></li>
+                            <li><Link to="/about" className="hover:text-white transition-colors no-underline">About Us</Link></li>
                         </ul>
                     </div>
 
                     {/* Courses */}
                     <div>
-                        <h3 className="text-white font-bold mb-6">Popular Courses</h3>
+                        <h3 className="text-white font-bold mb-6">Popular Programs</h3>
                         <ul className="space-y-3 text-sm">
-                            <li><a href="#" className="hover:text-white transition-colors no-underline">Web Development</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors no-underline">Data Science</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors no-underline">Digital Marketing</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors no-underline">Graphic Design</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors no-underline">Basic Computer</a></li>
+                            <li><Link to="/courses/48" className="hover:text-white transition-colors no-underline">Adv Diploma in Comp App (ADCA)</Link></li>
+                            <li><Link to="/courses/34" className="hover:text-white transition-colors no-underline">Diploma in IT App (DITA)</Link></li>
+                            <li><Link to="/courses/20" className="hover:text-white transition-colors no-underline">Full Stack Web Development</Link></li>
+                            <li><Link to="/courses/46" className="hover:text-white transition-colors no-underline">Diploma in Cyber Security</Link></li>
+                            <li><Link to="/courses/36" className="hover:text-white transition-colors no-underline">Diploma in Comp App (DCA)</Link></li>
+                            <li><Link to="/courses" className="text-sky-400 hover:text-sky-300 font-medium transition-colors no-underline flex items-center gap-1">View Full Catalog →</Link></li>
                         </ul>
                     </div>
 

@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { IconSearch as Search, IconHash as Hash, IconX as X } from '@tabler/icons-react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
+import SEOHead from '../components/common/SEOHead'
 import { courseService } from '../services/courseService'
 import type { Course } from '../types/course'
 
@@ -47,6 +48,48 @@ const CoursesPage = () => {
             setSelectedCourse(null)
         }
     }, [courseId, courses])
+
+    // SEO Data computations
+    const pageTitle = selectedCourse
+        ? `${selectedCourse.title || selectedCourse.course_name} Syllabus & Details | ICST Chowberia`
+        : 'Computer Courses & Professional IT Diplomas | ICST Chowberia'
+
+    const pageDescription = selectedCourse
+        ? `Enroll in ${selectedCourse.title || selectedCourse.course_name} (${selectedCourse.duration || 'Certified'}) at ICST Chowberia. ${selectedCourse.description ? selectedCourse.description.substring(0, 130) : 'Practical hands-on computer training.'}`
+        : 'Explore certified computer courses at ICST Chowberia: ADCA, DCA, DITA, Python, Java, Full Stack Web Development, Financial Accounting, and Cyber Security.'
+
+    const canonicalPath = selectedCourse ? `/courses/${selectedCourse.id}` : '/courses'
+
+    const breadcrumbs = selectedCourse
+        ? [
+            { name: 'Home', path: '/' },
+            { name: 'Courses', path: '/courses' },
+            { name: selectedCourse.title || selectedCourse.course_name, path: `/courses/${selectedCourse.id}` }
+        ]
+        : [
+            { name: 'Home', path: '/' },
+            { name: 'Courses', path: '/courses' }
+        ]
+
+    const courseSchema = selectedCourse
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'Course',
+            name: selectedCourse.title || selectedCourse.course_name,
+            description: selectedCourse.description,
+            provider: {
+                '@type': 'EducationalOrganization',
+                name: 'ICST Chowberia',
+                url: 'https://icstconnect.com'
+            },
+            timeRequired: selectedCourse.duration ? `P${selectedCourse.duration.replace(/\D/g, '')}M` : undefined
+        }
+        : {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: 'ICST Chowberia Course Catalog',
+            description: 'Certified diploma and certificate programs in computer technology and software development.'
+        }
 
     // Real-time keyboard search activation
     useEffect(() => {
@@ -92,7 +135,36 @@ const CoursesPage = () => {
 
     return (
         <div className="pt-24 pb-20 min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+            <SEOHead
+                title={pageTitle}
+                description={pageDescription}
+                canonicalPath={canonicalPath}
+                breadcrumbs={breadcrumbs}
+                schema={courseSchema}
+            />
+
             <div className="container mx-auto px-4 md:px-6">
+                {/* Visual Breadcrumb Navigation */}
+                <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <Link to="/" className="hover:text-blue-600 dark:hover:text-sky-400 no-underline transition-colors">
+                        Home
+                    </Link>
+                    <span>/</span>
+                    {selectedCourse ? (
+                        <>
+                            <Link to="/courses" className="hover:text-blue-600 dark:hover:text-sky-400 no-underline transition-colors">
+                                Courses
+                            </Link>
+                            <span>/</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium truncate max-w-xs">
+                                {selectedCourse.title || selectedCourse.course_name}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-slate-800 dark:text-slate-200 font-medium">Courses</span>
+                    )}
+                </nav>
+
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 font-outfit transition-colors">

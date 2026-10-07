@@ -4,6 +4,7 @@ import { IconKey as KeyRound, IconShieldCheck as ShieldCheck, IconAlertCircle as
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
+import { SEOHead } from '../components/common/SEOHead'
 
 export default function ForcePasswordChange() {
     const { user, profile, refreshProfile } = useAuth()
@@ -70,6 +71,12 @@ export default function ForcePasswordChange() {
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 p-4">
+            <SEOHead
+                title="Update Password - ICST Connect Security"
+                description="Secure password update portal for ICST Connect accounts."
+                canonical="/force-password-change"
+                noindex={true}
+            />
             <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
                 <div className="bg-indigo-600 p-8 text-center relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-10">

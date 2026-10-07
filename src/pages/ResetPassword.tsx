@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { IconCheck as Check, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
+import SEOHead from '../components/common/SEOHead'
 
 export default function ResetPassword() {
     const [password, setPassword] = useState('')
@@ -57,6 +58,7 @@ export default function ResetPassword() {
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+                <SEOHead title="Password Reset Success | ICST Chowberia" noindex={true} />
                 <div className="max-w-md w-full space-y-8 text-center">
                     <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
                         <Check className="text-green-600" size={24} />
@@ -72,6 +74,7 @@ export default function ResetPassword() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
+            <SEOHead title="Reset Your Password | ICST Chowberia" noindex={true} />
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
                 <div>
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

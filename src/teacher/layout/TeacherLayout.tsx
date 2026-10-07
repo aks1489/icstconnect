@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { TEACHER_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
 import ThemeToggle from '../../components/ui/ThemeToggle'
+import { SEOHead } from '../../components/common/SEOHead'
 
 export default function TeacherLayout() {
     const { signOut, user, profile } = useAuth()
@@ -36,6 +37,12 @@ export default function TeacherLayout() {
 
     return (
         <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-inter">
+            <SEOHead
+                title="Teacher Portal - ICST Connect"
+                description="ICST Connect Faculty and Teacher Portal for managing classes, attendance, and examinations."
+                canonical="/teacher"
+                noindex={true}
+            />
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -60,10 +67,12 @@ export default function TeacherLayout() {
                             <img
                                 src={logo}
                                 alt="ICST Logo"
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-500/10"
                             />
                             <div>
-                                <h1 className="text-lg font-bold tracking-tight">Teacher Portal</h1>
+                                <span className="text-lg font-bold tracking-tight block">Teacher Portal</span>
                                 <p className="text-xs text-slate-400">ICST Connect</p>
                             </div>
                         </div>

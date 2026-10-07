@@ -8,6 +8,7 @@ import logo from '../../assets/logo.jpg'
 import EditProfileModal from '../components/EditProfileModal'
 import ChangePasswordModal from '../../components/auth/ChangePasswordModal'
 import ThemeToggle from '../../components/ui/ThemeToggle'
+import { SEOHead } from '../../components/common/SEOHead'
 
 export default function StudentLayout() {
     const { profile, signOut, isProfileComplete } = useAuth()
@@ -70,6 +71,12 @@ export default function StudentLayout() {
 
     return (
         <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-inter">
+            <SEOHead
+                title="Student Portal - ICST Connect"
+                description="ICST Connect Student Portal - Access classes, exams, fees, and learning resources."
+                canonical="/student"
+                noindex={true}
+            />
             <EditProfileModal
                 isOpen={isEditProfileOpen}
                 onClose={() => setIsEditProfileOpen(false)}
@@ -143,10 +150,12 @@ export default function StudentLayout() {
                             <img
                                 src={logo}
                                 alt="ICST Logo"
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-xl object-cover shadow-sm"
                             />
                             <div>
-                                <h1 className="text-lg font-bold tracking-tight text-slate-800 dark:text-white">Student Portal</h1>
+                                <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-white block">Student Portal</span>
                                 <p className="text-xs text-slate-500 dark:text-slate-400">ICST Connect</p>
                             </div>
                         </div>

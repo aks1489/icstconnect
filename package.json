@@ -7,7 +7,9 @@
     "dev": "vite",
     "dev:all": "concurrently \"npm run dev\" \"npm run email\"",
     "email": "node email-server.js",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/generate-sitemap.js && node scripts/prerender.js",
+    "sitemap": "node scripts/generate-sitemap.js",
+    "prerender": "node scripts/prerender.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

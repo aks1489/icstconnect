@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import type { FormEvent } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { IconCircleCheck as CheckCircle2, IconArrowRight as ArrowRight, IconBook2 as BookOpen, IconMapPin as MapPin, IconPhone as Phone, IconMessage as MessageSquare, IconInfoCircle as Info, IconCreditCard as CreditCard, IconChevronDown as ChevronDown, IconCircleCheck as CheckCircle, IconX as X } from '@tabler/icons-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
+import SEOHead from '../components/common/SEOHead'
 import { courseService } from '../services/courseService'
 import { enrollmentService } from '../services/enrollmentService'
 import type { Course } from '../types/course'
@@ -460,7 +461,34 @@ export default function EnrollmentForm() {
                 <span className="font-bold text-sm text-indigo-600">{progress}%</span>
             </div>
 
+            <SEOHead
+                title={`Enroll in ${course?.title || 'Computer Course'} | ICST Chowberia Admission`}
+                description={`Online admission application for ${course?.title || 'technical courses'} at ICST Chowberia. Reserve your seat and receive enrollment confirmation.`}
+                canonicalPath={`/enroll/${courseId}`}
+                breadcrumbs={[
+                    { name: 'Home', path: '/' },
+                    { name: 'Courses', path: '/courses' },
+                    ...(course ? [{ name: course.title, path: `/courses/${course.id}` }] : []),
+                    { name: 'Enroll', path: `/enroll/${courseId}` }
+                ]}
+            />
+
             <div className="max-w-3xl mx-auto mt-8 px-4">
+                {/* Breadcrumbs */}
+                <nav aria-label="Breadcrumb" className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500">
+                    <Link to="/" className="hover:text-indigo-600 no-underline transition-colors">Home</Link>
+                    <span>/</span>
+                    <Link to="/courses" className="hover:text-indigo-600 no-underline transition-colors">Courses</Link>
+                    {course && (
+                        <>
+                            <span>/</span>
+                            <Link to={`/courses/${course.id}`} className="hover:text-indigo-600 no-underline transition-colors truncate max-w-[150px]">{course.title}</Link>
+                        </>
+                    )}
+                    <span>/</span>
+                    <span className="text-slate-800 font-medium">Enrollment</span>
+                </nav>
+
                 <div className="text-center mb-8 animate-in slide-in-from-bottom-4 duration-500">
                     <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Course Enrollment</h1>
                     <p className="text-slate-500">Fill out this quick application to reserve your seat.</p>

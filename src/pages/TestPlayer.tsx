@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { IconClock as Clock, IconArrowLeft as ArrowLeft, IconArrowRight as ArrowRight, IconLoader2 as Loader2 } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
+import SEOHead from '../components/common/SEOHead'
 import { useToast } from '../contexts/ToastContext'
 import type { Test, TestQuestion } from '../types'
 
@@ -211,6 +212,10 @@ const TestPlayer = () => {
 
         return (
             <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12 flex items-center justify-center p-4 text-slate-900 dark:text-slate-100 transition-colors">
+                <SEOHead
+                    title="Assessment Result | ICST Chowberia"
+                    noindex={true}
+                />
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -249,6 +254,10 @@ const TestPlayer = () => {
     // --- TEST PLAYER VIEW ---
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+            <SEOHead
+                title={`${test.title} | Assessment Session`}
+                noindex={true}
+            />
             <div className="container mx-auto px-4 max-w-3xl">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">

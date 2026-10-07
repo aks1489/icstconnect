@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { IconClock as Clock, IconHelpCircle as HelpCircle, IconArrowRight as ArrowRight, IconLock as Lock, IconWorld as Globe, IconBook2 as BookOpen } from '@tabler/icons-react'
 import { motion } from 'framer-motion'
+import SEOHead from '../components/common/SEOHead'
 import type { Test } from '../types'
 
 import { useAuth } from '../contexts/AuthContext'
@@ -100,12 +101,37 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
 
     return (
         <div className={`min-h-screen ${isStudentPortal ? 'bg-transparent' : 'bg-slate-50 dark:bg-slate-950 pt-24 pb-20'} text-slate-900 dark:text-slate-100 transition-colors`}>
+            <SEOHead
+                title={isStudentPortal ? 'Student Assessment Portal | ICST Chowberia' : 'Free Online Computer Practice Tests & Quizzes | ICST Chowberia'}
+                description={isStudentPortal ? 'Interactive computer assessments for ICST students.' : 'Test your knowledge with practice tests in computer fundamentals, programming, web design, and office automation at ICST Chowberia.'}
+                canonicalPath={isStudentPortal ? undefined : '/online-test'}
+                noindex={isStudentPortal}
+                breadcrumbs={isStudentPortal ? undefined : [
+                    { name: 'Home', path: '/' },
+                    { name: 'Practice Tests', path: '/online-test' }
+                ]}
+                schema={isStudentPortal ? undefined : {
+                    '@context': 'https://schema.org',
+                    '@type': 'Quiz',
+                    name: 'ICST Online Computer Science Assessments',
+                    description: 'Interactive quizzes in computer fundamentals and programming.'
+                }}
+            />
+
             <div className={`container mx-auto px-4 ${isStudentPortal ? '' : 'max-w-6xl'}`}>
+                {!isStudentPortal && (
+                    <nav aria-label="Breadcrumb" className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 no-underline transition-colors">Home</Link>
+                        <span>/</span>
+                        <span className="text-slate-800 dark:text-slate-200 font-medium">Practice Tests</span>
+                    </nav>
+                )}
+
                 {isStudentPortal ? (
                     // --- Student Portal Header ---
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-6">
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Available Tests</h1>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Available Tests</h2>
                             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Select a test to start your assessment</p>
                         </div>
 

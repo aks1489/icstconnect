@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Skeleton from '../components/ui/Skeleton'
+import SEOHead from '../components/common/SEOHead'
 import { api, type Notification } from '../services/api'
 import { getIcon } from '../utils/iconMapper'
 import { IconBell as Bell, IconCalendar as Calendar, IconChevronRight as ChevronRight } from '@tabler/icons-react'
@@ -47,7 +49,30 @@ const Notifications = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-12 text-slate-900 dark:text-slate-100 transition-colors">
+            <SEOHead
+                title="Notice Board, Circulars & Academic Updates | ICST Chowberia"
+                description="Stay updated with official notices, exam timetables, batch announcements, and institutional circulars from ICST Chowberia."
+                canonicalPath="/notifications"
+                breadcrumbs={[
+                    { name: 'Home', path: '/' },
+                    { name: 'Notifications', path: '/notifications' }
+                ]}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'CollectionPage',
+                    name: 'ICST Chowberia Notice Board',
+                    description: 'Official bulletins and academic announcements.'
+                }}
+            />
+
             <div className="container mx-auto px-4 max-w-4xl">
+                {/* Visual Breadcrumb Navigation */}
+                <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <Link to="/" className="hover:text-blue-600 dark:hover:text-sky-400 no-underline transition-colors">Home</Link>
+                    <span>/</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-medium">Notifications</span>
+                </nav>
+
                 <div className="text-center mb-12">
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}

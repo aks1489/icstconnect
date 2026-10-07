@@ -19,38 +19,39 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 const ForcePasswordChange = lazy(() => import('./pages/ForcePasswordChange'))
 const Connect = lazy(() => import('./pages/Connect'))
 const TypingPractice = lazy(() => import('./pages/TypingPractice'))
-// const LearningHub = lazy(() => import('./pages/LearningHub'))
-import AdminLogin from './pages/AdminLogin'
-import TeacherLogin from './pages/TeacherLogin'
+const NotFound = lazy(() => import('./pages/NotFound'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const TeacherLogin = lazy(() => import('./pages/TeacherLogin'))
+const QuickAccess = lazy(() => import('./components/dashboard/QuickAccess'))
+
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/auth/ProtectedRoute'
-import QuickAccess from './components/dashboard/QuickAccess'
 
-// Student Imports
-import StudentLayout from './student/layout/StudentLayout'
-import StudentDashboard from './student/pages/Dashboard'
-import OfflineClasses from './student/pages/OfflineClasses'
-import StudentCalendar from './student/pages/Calendar'
-import CompleteProfile from './student/pages/CompleteProfile'
-import StudentFeesPage from './student/pages/StudentFees'
+// Student Imports (Lazy-loaded)
+const StudentLayout = lazy(() => import('./student/layout/StudentLayout'))
+const StudentDashboard = lazy(() => import('./student/pages/Dashboard'))
+const OfflineClasses = lazy(() => import('./student/pages/OfflineClasses'))
+const StudentCalendar = lazy(() => import('./student/pages/Calendar'))
+const CompleteProfile = lazy(() => import('./student/pages/CompleteProfile'))
+const StudentFeesPage = lazy(() => import('./student/pages/StudentFees'))
 
-// Admin Imports
-import AdminLayout from './admin/layout/AdminLayout'
-import AdminDashboard from './admin/pages/Dashboard'
-import ManageStudents from './admin/pages/Students'
-import StudentDetails from './admin/pages/StudentDetails'
-import AdminCourses from './admin/pages/Courses'
-import CourseForm from './admin/pages/CourseForm'
-import AdminCalendar from './admin/pages/Calendar'
-import ScheduleClass from './admin/pages/ScheduleClass'
-import AdminTeachers from './admin/pages/Teachers'
-import TeacherDetails from './admin/pages/TeacherDetails'
-import CourseStructureEditor from './admin/pages/CourseStructureEditor'
-import ClassManager from './admin/pages/ClassManager'
-import AdminClasses from './admin/pages/AdminClasses'
-import AdminClassDetails from './admin/pages/AdminClassDetails'
-import CreateTest from './admin/pages/CreateTest'
-import AdminTests from './admin/pages/Tests'
+// Admin Imports (Lazy-loaded)
+const AdminLayout = lazy(() => import('./admin/layout/AdminLayout'))
+const AdminDashboard = lazy(() => import('./admin/pages/Dashboard'))
+const ManageStudents = lazy(() => import('./admin/pages/Students'))
+const StudentDetails = lazy(() => import('./admin/pages/StudentDetails'))
+const AdminCourses = lazy(() => import('./admin/pages/Courses'))
+const CourseForm = lazy(() => import('./admin/pages/CourseForm'))
+const AdminCalendar = lazy(() => import('./admin/pages/Calendar'))
+const ScheduleClass = lazy(() => import('./admin/pages/ScheduleClass'))
+const AdminTeachers = lazy(() => import('./admin/pages/Teachers'))
+const TeacherDetails = lazy(() => import('./admin/pages/TeacherDetails'))
+const CourseStructureEditor = lazy(() => import('./admin/pages/CourseStructureEditor'))
+const ClassManager = lazy(() => import('./admin/pages/ClassManager'))
+const AdminClasses = lazy(() => import('./admin/pages/AdminClasses'))
+const AdminClassDetails = lazy(() => import('./admin/pages/AdminClassDetails'))
+const CreateTest = lazy(() => import('./admin/pages/CreateTest'))
+const AdminTests = lazy(() => import('./admin/pages/Tests'))
 const DiscountClaims = lazy(() => import('./admin/pages/DiscountClaims'))
 const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
 const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
@@ -60,14 +61,14 @@ const AdminPermissions = lazy(() => import('./admin/pages/AdminPermissions'))
 const AdminAuditLogs = lazy(() => import('./admin/pages/AdminAuditLogs'))
 const AdminEcosystem = lazy(() => import('./admin/pages/AdminEcosystem'))
 
-// Teacher Imports
-import TeacherLayout from './teacher/layout/TeacherLayout'
-import TeacherDashboard from './teacher/pages/Dashboard'
-import TeacherCalendar from './teacher/pages/Calendar'
-import ActiveClasses from './teacher/pages/ActiveClasses'
-import ManageClass from './teacher/pages/ManageClass'
-import TeacherExams from './teacher/pages/Exams'
-import StudentProgressTracker from './teacher/pages/StudentProgressTracker'
+// Teacher Imports (Lazy-loaded)
+const TeacherLayout = lazy(() => import('./teacher/layout/TeacherLayout'))
+const TeacherDashboard = lazy(() => import('./teacher/pages/Dashboard'))
+const TeacherCalendar = lazy(() => import('./teacher/pages/Calendar'))
+const ActiveClasses = lazy(() => import('./teacher/pages/ActiveClasses'))
+const ManageClass = lazy(() => import('./teacher/pages/ManageClass'))
+const TeacherExams = lazy(() => import('./teacher/pages/Exams'))
+const StudentProgressTracker = lazy(() => import('./teacher/pages/StudentProgressTracker'))
 
 
 // Simple Toast Component for global errors
@@ -171,8 +172,8 @@ function App() {
                 <Route path="/teacher/login" element={<TeacherLogin />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* Catch all to Home - Only inside MainLayout */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Dedicated 404 Not Found Route */}
+                <Route path="*" element={<NotFound />} />
               </Route>
 
               {/* Standalone Typing Practice Page */}
@@ -283,6 +284,13 @@ function App() {
                 <Route path="exams" element={<TeacherExams />} />
                 {/* Add more teacher routes here */}
               </Route>
+
+              {/* Global 404 Catch-All Route */}
+              <Route path="*" element={
+                <MainLayout>
+                  <NotFound />
+                </MainLayout>
+              } />
 
             </Routes>
           </Suspense>

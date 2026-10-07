@@ -25,10 +25,9 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
         { name: 'Gallery', href: '/gallery' },
         { name: 'Online Test', href: '/online-test' },
         { name: 'Typing', href: '/typing-practice' },
+        { name: 'Connect', href: '/connect' },
         { name: 'About Us', href: '/about' },
     ];
-
-
 
     const getLinkClasses = (isActive: boolean) => {
         return isActive
@@ -47,7 +46,9 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                         <Link to="/" className="flex items-center gap-3 group no-underline">
                             <img
                                 src={logo}
-                                alt="ICST Logo"
+                                alt="ICST Chowberia Official Institute Logo"
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300"
                             />
                             <div className="flex flex-col">

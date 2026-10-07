@@ -3,6 +3,7 @@ import { IconUser as User, IconHome as Home, IconLogout as LogOut } from '@table
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS, TEACHER_ACTIONS, ADMIN_ACTIONS } from '../../config/navigation'
 import type { NavItem } from '../../config/navigation'
+import { SEOHead } from '../common/SEOHead'
 
 export default function QuickAccess() {
     const { profile, signOut } = useAuth()
@@ -32,6 +33,12 @@ export default function QuickAccess() {
 
     return (
         <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+            <SEOHead
+                title="Quick Access Hub - ICST Connect"
+                description="Authenticated portal quick access dashboard for ICST students, teachers, and staff."
+                canonical="/quick-access"
+                noindex={true}
+            />
             <div className="max-w-4xl w-full">
 
                 {/* Header Section */}

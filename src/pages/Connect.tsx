@@ -1,7 +1,9 @@
-import { IconExternalLink as ExternalLink } from '@tabler/icons-react';
+import { IconExternalLink as ExternalLink, IconArrowLeft as ArrowLeft } from '@tabler/icons-react';
+import { Link } from 'react-router-dom';
 import logo from '../assets/logo.jpg';
 import { useMemo, useState } from 'react';
 import DiscountForm from './Connect/DiscountForm';
+import SEOHead from '../components/common/SEOHead';
 
 // REFINED: Usage of the correct multi-colored modern Google Maps logo (2020 version)
 const GoogleMapsLogo = ({ className }: { className?: string }) => (
@@ -126,7 +128,32 @@ const Connect = () => {
     ], []);
 
     return (
-        <div className="min-h-screen w-full bg-[#0f172a] text-white flex flex-col items-center justify-center py-2 px-4 relative overflow-hidden font-sans">
+        <div className="min-h-screen w-full bg-[#0f172a] text-white flex flex-col items-center justify-center py-6 px-4 relative overflow-hidden font-sans">
+            <SEOHead
+                title="ICST Ecosystem, Social Hub & Direct Contact | ICST Chowberia"
+                description="Connect with ICST Chowberia: quick links, social media channels, discount coupons, companion portals, and direct WhatsApp / phone assistance."
+                canonicalPath="/connect"
+                breadcrumbs={[
+                    { name: 'Home', path: '/' },
+                    { name: 'Connect & Social Hub', path: '/connect' }
+                ]}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'EducationalOrganization',
+                    name: 'Institute of Computer Science and Technology (ICST) Chowberia',
+                    url: 'https://icstconnect.com',
+                    sameAs: ['https://www.facebook.com/icstconnect', 'https://www.instagram.com/icstconnect/']
+                }}
+            />
+
+            {/* Quick Return Nav */}
+            <div className="w-full max-w-[340px] z-20 flex justify-between items-center mb-2">
+                <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors no-underline">
+                    <ArrowLeft size={14} />
+                    <span>Back to Home</span>
+                </Link>
+                <span className="text-[11px] text-slate-500 font-medium">Hub</span>
+            </div>
 
             {/* Background Effects */}
             <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
@@ -141,7 +168,9 @@ const Connect = () => {
                         <div className="absolute -inset-2 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur-md opacity-40 group-hover:opacity-60 transition duration-500"></div>
                         <img
                             src={logo}
-                            alt="ICST Logo"
+                            alt="ICST Chowberia Official Institute Logo"
+                            width={96}
+                            height={96}
                             className="relative w-24 h-24 rounded-full border-[3px] border-[#0f172a] shadow-xl object-cover transform transition duration-500 hover:scale-105"
                         />
                     </div>

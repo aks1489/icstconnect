@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Disallow: /student/
+Disallow: /teacher/
+Disallow: /admin/
+Disallow: /quick-access
+Disallow: /force-password-change
+Disallow: /reset-password
+Disallow: /online-test/*
+
+User-agent: Googlebot
+Allow: /
+Disallow: /student/
+Disallow: /teacher/
+Disallow: /admin/
+Disallow: /quick-access
+Disallow: /force-password-change
+Disallow: /reset-password
+Disallow: /online-test/*
+
+Sitemap: https://icstconnect.com/sitemap.xml

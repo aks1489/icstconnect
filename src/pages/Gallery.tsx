@@ -1,7 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { supabase } from '../lib/supabase'
 import Skeleton from '../components/ui/Skeleton'
+import SEOHead from '../components/common/SEOHead'
 
 // Layouts
 import CurveRoadLayout from '../components/gallery/layouts/CurveRoadLayout'
@@ -71,6 +73,21 @@ export default function Gallery() {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors overflow-hidden">
+            <SEOHead
+                title="Campus Moments & Event Gallery | ICST Chowberia"
+                description="Browse photos of classroom activities, computer lab sessions, annual celebrations, scholarship distribution, and workshops at ICST Chowberia."
+                canonicalPath="/gallery"
+                breadcrumbs={[
+                    { name: 'Home', path: '/' },
+                    { name: 'Gallery', path: '/gallery' }
+                ]}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'ImageGallery',
+                    name: 'ICST Chowberia Campus Life Gallery',
+                    description: 'Photos and event highlights from ICST Chowberia campus.'
+                }}
+            />
             
             {/* Dynamic Hero Section */}
             <div className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900">
@@ -84,7 +101,14 @@ export default function Gallery() {
                         <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 gap-2 opacity-30 transform scale-110 -rotate-6 blur-[2px]">
                             {images.slice(0, 24).map(img => (
                                 <div key={img.id} className="aspect-square bg-slate-800 rounded-lg overflow-hidden">
-                                    <img src={img.cloudinary_url} className="w-full h-full object-cover" alt="" />
+                                    <img
+                                        src={img.cloudinary_url}
+                                        className="w-full h-full object-cover"
+                                        alt={img.title || "ICST Chowberia campus life moment"}
+                                        width={150}
+                                        height={150}
+                                        loading="lazy"
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -94,13 +118,20 @@ export default function Gallery() {
 
                 {/* Content */}
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
+                    {/* Visual Breadcrumb Navigation */}
+                    <nav aria-label="Breadcrumb" className="mb-4 flex items-center justify-center gap-2 text-xs text-slate-400">
+                        <Link to="/" className="hover:text-blue-400 no-underline transition-colors">Home</Link>
+                        <span>/</span>
+                        <span className="text-white font-medium">Gallery</span>
+                    </nav>
+
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
                     >
                         <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
-                            Visual <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Chronicles</span>
+                            Campus Life & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Event Gallery</span>
                         </h1>
                         <p className="text-slate-300 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto">
                             Immerse yourself in the moments that define our vibrant community. Explore interactive stories, events, and campus life.

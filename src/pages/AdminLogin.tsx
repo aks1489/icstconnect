@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { IconShield as Shield, IconMail as Mail, IconLock as Lock, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
+import SEOHead from '../components/common/SEOHead'
 
 export default function AdminLogin() {
     const [email, setEmail] = useState('')
@@ -62,6 +63,7 @@ export default function AdminLogin() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            <SEOHead title="Admin Portal Sign In" noindex={true} />
             {/* Background Accents */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>

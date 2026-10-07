@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { IconTrophy as Trophy, IconMedal as Medal, IconAward as Award, IconExternalLink as ExternalLink, IconSparkles as Sparkles, IconCalendar as Calendar, IconCamera as Camera, IconX as X } from '@tabler/icons-react'
+import SEOHead from '../components/common/SEOHead'
 import { scholarshipService } from '../services/scholarshipService'
 import type { ScholarshipSettings, ScholarshipWinner, ScholarshipExamImage } from '../types/scholarship'
 import TailwindDropdown from '../components/ui/TailwindDropdown'
@@ -68,6 +70,46 @@ export default function ScholarshipsPage() {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-24 pb-20 font-inter text-slate-900 dark:text-slate-100 transition-colors">
+            <SEOHead
+                title="Merit Scholarships & Talent Search Results | ICST Chowberia"
+                description="Discover ICST Chowberia Talent Search scholarships, position holders, merit awards, and academic fee discount programs for deserving students."
+                canonicalPath="/scholarships"
+                breadcrumbs={[
+                    { name: 'Home', path: '/' },
+                    { name: 'Scholarships', path: '/scholarships' }
+                ]}
+                schema={{
+                    '@context': 'https://schema.org',
+                    '@type': 'FAQPage',
+                    mainEntity: [
+                        {
+                            '@type': 'Question',
+                            name: 'Who is eligible for ICST Talent Search Scholarships?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'Students enrolled in school or secondary education who achieve top percentiles in the ICST Talent Search Examination are eligible for tuition fee concessions and merit awards.'
+                            }
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'How can I check ICST scholarship results?',
+                            acceptedAnswer: {
+                                '@type': 'Answer',
+                                text: 'Results and position holder lists are published directly on the ICST Connect Scholarship Portal and notice board annually.'
+                            }
+                        }
+                    ]
+                }}
+            />
+
+            {/* Visual Breadcrumb Navigation */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 mb-4">
+                <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 no-underline transition-colors">Home</Link>
+                    <span>/</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-medium">Scholarships</span>
+                </nav>
+            </div>
 
             {/* HERO BANNER SECTION */}
             <div className="bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white py-16 px-4 md:px-6 relative overflow-hidden">
@@ -155,6 +197,8 @@ export default function ScholarshipsPage() {
                                         <img
                                             src={firstRank.photo}
                                             alt={firstRank.studentName}
+                                            width={224}
+                                            height={224}
                                             className="w-48 h-48 md:w-56 md:h-56 rounded-3xl object-cover border-4 border-white/40 shadow-2xl"
                                             loading="lazy"
                                         />
@@ -204,6 +248,8 @@ export default function ScholarshipsPage() {
                                             <img
                                                 src={secondRank.photo}
                                                 alt={secondRank.studentName}
+                                                width={128}
+                                                height={128}
                                                 className="w-32 h-32 rounded-2xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-md"
                                                 loading="lazy"
                                             />
@@ -229,6 +275,8 @@ export default function ScholarshipsPage() {
                                             <img
                                                 src={thirdRank.photo}
                                                 alt={thirdRank.studentName}
+                                                width={128}
+                                                height={128}
                                                 className="w-32 h-32 rounded-2xl object-cover border-2 border-slate-200 dark:border-slate-700 shadow-md"
                                                 loading="lazy"
                                             />
@@ -268,6 +316,8 @@ export default function ScholarshipsPage() {
                                                 <img
                                                     src={winner.photo}
                                                     alt={winner.studentName}
+                                                    width={300}
+                                                    height={176}
                                                     className="w-full h-44 rounded-xl object-cover border border-slate-100 dark:border-slate-800"
                                                     loading="lazy"
                                                 />
@@ -325,6 +375,8 @@ export default function ScholarshipsPage() {
                                         <img
                                             src={imgItem.image}
                                             alt={imgItem.title}
+                                            width={400}
+                                            height={208}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             loading="lazy"
                                         />
@@ -373,6 +425,9 @@ export default function ScholarshipsPage() {
                             <img
                                 src={selectedExamImage.image}
                                 alt={selectedExamImage.title}
+                                width={800}
+                                height={500}
+                                loading="lazy"
                                 className="max-h-[60vh] w-auto max-w-full object-contain"
                             />
                             <button
