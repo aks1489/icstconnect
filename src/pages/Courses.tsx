@@ -192,7 +192,7 @@ const CoursesPage = () => {
                                 onClick={() => handleCourseClick(course)}
                                 className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 dark:border-slate-800 flex flex-col h-full cursor-pointer"
                             >
-                                <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
+                                <div className={`h-32 ${course.color} dark:!bg-slate-800/80 dark:border-b dark:border-slate-800/60 flex items-center justify-center relative overflow-hidden`}>
                                     <div className="absolute inset-0 opacity-10 pattern-dots"></div>
                                     {(() => {
                                         const Icon = getIcon(course.icon)
@@ -203,7 +203,7 @@ const CoursesPage = () => {
                                             />
                                         )
                                     })()}
-                                    <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm">
+                                    <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm border border-transparent dark:border-slate-700/60">
                                         {course.duration}
                                     </div>
                                 </div>

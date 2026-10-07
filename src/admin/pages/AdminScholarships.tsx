@@ -398,20 +398,20 @@ export default function AdminScholarships() {
     return (
         <div className="space-y-8 pb-16 font-inter">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-inner">
+                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner">
                         <GraduationCap size={32} />
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">ICST Scholarships</h1>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${settings.masterEnabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'}`}>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">ICST Scholarships</h1>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${settings.masterEnabled ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60'}`}>
                                 <span className={`w-2 h-2 rounded-full ${settings.masterEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
                                 {settings.masterEnabled ? 'System Active' : 'System Disabled'}
                             </span>
                         </div>
-                        <p className="text-sm text-slate-500 mt-0.5">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
                             Manage all scholarship banners, marketing content, results, links and homepage visibility.
                         </p>
                     </div>
@@ -430,24 +430,24 @@ export default function AdminScholarships() {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-200 gap-2">
+            <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2">
                 <button
                     onClick={() => setActiveTab('settings')}
-                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-500 hover:text-slate-900'}`}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
                 >
                     <Layers size={18} />
                     <span>Control Panel & Banner</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('winners')}
-                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'winners' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-500 hover:text-slate-900'}`}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'winners' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
                 >
                     <Trophy size={18} />
                     <span>Winner Management ({winners.length})</span>
                 </button>
                 <button
                     onClick={() => setActiveTab('examPhotos')}
-                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'examPhotos' ? 'border-indigo-600 text-indigo-600 bg-white' : 'border-transparent text-slate-500 hover:text-slate-900'}`}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'examPhotos' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
                 >
                     <ImageIcon size={18} />
                     <span>Exam Photos & Moments ({examImages.length})</span>
@@ -458,33 +458,33 @@ export default function AdminScholarships() {
                 <div className="space-y-8">
 
                     {/* MASTER SWITCH CARD */}
-                    <div className={`p-6 rounded-2xl border transition-all duration-300 ${settings.masterEnabled ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-slate-800 shadow-xl' : 'bg-slate-100 border-slate-300 text-slate-700'}`}>
+                    <div className={`p-6 rounded-2xl border transition-all duration-300 ${settings.masterEnabled ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-slate-800 shadow-xl' : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300'}`}>
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="flex items-start gap-4">
-                                <div className={`p-3.5 rounded-2xl ${settings.masterEnabled ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/40' : 'bg-slate-300 text-slate-600'}`}>
+                                <div className={`p-3.5 rounded-2xl ${settings.masterEnabled ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/40' : 'bg-slate-300 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                                     <Power size={28} />
                                 </div>
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <h2 className="text-xl font-bold">Scholarship System Master Switch</h2>
-                                        <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${settings.masterEnabled ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-400/30' : 'bg-slate-300 text-slate-600'}`}>
+                                        <span className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${settings.masterEnabled ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-400/30' : 'bg-slate-300 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}`}>
                                             Global Control
                                         </span>
                                     </div>
-                                    <p className={`text-sm mt-1 max-w-2xl ${settings.masterEnabled ? 'text-slate-300' : 'text-slate-500'}`}>
+                                    <p className={`text-sm mt-1 max-w-2xl ${settings.masterEnabled ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
                                         Master switch controls all public scholarship features. Turning this OFF hides all banners, results, navigation items, and winner pages site-wide immediately.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 bg-slate-800/40 p-3 rounded-2xl border border-white/10 shrink-0">
+                            <div className="flex items-center gap-4 bg-slate-800/40 dark:bg-slate-950/60 p-3 rounded-2xl border border-white/10 dark:border-slate-800 shrink-0">
                                 <span className="text-sm font-semibold tracking-wide">
                                     {settings.masterEnabled ? 'Scholarship System [ ON ]' : 'Scholarship System [ OFF ]'}
                                 </span>
                                 <button
                                     type="button"
                                     onClick={() => setSettings(prev => ({ ...prev, masterEnabled: !prev.masterEnabled }))}
-                                    className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${settings.masterEnabled ? 'bg-emerald-500' : 'bg-slate-400'}`}
+                                    className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${settings.masterEnabled ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-slate-700'}`}
                                 >
                                     <span
                                         className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${settings.masterEnabled ? 'translate-x-9' : 'translate-x-1'}`}
@@ -494,8 +494,8 @@ export default function AdminScholarships() {
                         </div>
 
                         {!settings.masterEnabled && (
-                            <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 text-sm flex items-center gap-3">
-                                <AlertCircle size={20} className="shrink-0 text-amber-600" />
+                            <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-sm flex items-center gap-3">
+                                <AlertCircle size={20} className="shrink-0 text-amber-600 dark:text-amber-400" />
                                 <span>
                                     <strong>Master Switch is OFF:</strong> All public scholarship features, banner sliders, result buttons, navigation links, and winner showcases are completely hidden from website visitors.
                                 </span>
@@ -504,11 +504,11 @@ export default function AdminScholarships() {
                     </div>
 
                     {/* DETAILED CONTROLS TOGGLES GRID */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900">Module Visibility Controls</h3>
-                                <p className="text-xs text-slate-500">Enable or disable specific components independently when Master Switch is ON.</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Module Visibility Controls</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Enable or disable specific components independently when Master Switch is ON.</p>
                             </div>
                         </div>
 
@@ -525,21 +525,21 @@ export default function AdminScholarships() {
                             ].map(ctrl => {
                                 const isChecked = (settings as any)[ctrl.key]
                                 return (
-                                    <div key={ctrl.key} className={`p-4 rounded-xl border transition-all ${isChecked ? 'bg-indigo-50/40 border-indigo-200' : 'bg-slate-50 border-slate-200 opacity-70'}`}>
+                                    <div key={ctrl.key} className={`p-4 rounded-xl border transition-all ${isChecked ? 'bg-indigo-50/40 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800/60' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/60 opacity-70'}`}>
                                         <div className="flex items-center justify-between mb-1">
-                                            <span className="font-semibold text-sm text-slate-900 flex items-center gap-1.5">
-                                                <CheckCircle2 size={16} className={isChecked ? 'text-indigo-600' : 'text-slate-400'} />
+                                            <span className="font-semibold text-sm text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
+                                                <CheckCircle2 size={16} className={isChecked ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
                                                 {ctrl.label}
                                             </span>
                                             <button
                                                 type="button"
                                                 onClick={() => setSettings(prev => ({ ...prev, [ctrl.key]: !(prev as any)[ctrl.key] }))}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isChecked ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isChecked ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                                             >
                                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isChecked ? 'translate-x-6' : 'translate-x-1'}`} />
                                             </button>
                                         </div>
-                                        <p className="text-xs text-slate-500">{ctrl.desc}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{ctrl.desc}</p>
                                     </div>
                                 )
                             })}
@@ -547,22 +547,22 @@ export default function AdminScholarships() {
                     </div>
 
                     {/* HOMEPAGE SCHOLARSHIP BANNER CARD */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                    <ImageIcon className="text-indigo-600" size={22} />
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <ImageIcon className="text-indigo-600 dark:text-indigo-400" size={22} />
                                     Homepage Scholarship Banner
                                 </h3>
-                                <p className="text-xs text-slate-500">Configure manual banner upload, target click link, and preview rendering.</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Configure manual banner upload, target click link, and preview rendering.</p>
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-slate-700">Enable Banner:</span>
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Enable Banner:</span>
                                 <button
                                     type="button"
                                     onClick={() => setSettings(prev => ({ ...prev, bannerEnabled: !prev.bannerEnabled }))}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${settings.bannerEnabled ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${settings.bannerEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                                 >
                                     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.bannerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                 </button>
@@ -573,7 +573,7 @@ export default function AdminScholarships() {
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                             {/* Upload Dropzone & Inputs */}
                             <div className="lg:col-span-7 space-y-4">
-                                <label className="block text-sm font-semibold text-slate-700">Banner Image Source</label>
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Banner Image Source</label>
 
                                 <div className="flex gap-2">
                                     <input
@@ -581,7 +581,7 @@ export default function AdminScholarships() {
                                         value={settings.bannerImage}
                                         onChange={(e) => setSettings(prev => ({ ...prev, bannerImage: e.target.value }))}
                                         placeholder="https://... image URL or upload below"
-                                        className="flex-1 px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="flex-1 px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                     />
                                     <input
                                         type="file"
@@ -594,7 +594,7 @@ export default function AdminScholarships() {
                                         type="button"
                                         onClick={() => bannerInputRef.current?.click()}
                                         disabled={uploadingBanner}
-                                        className="px-4 py-2.5 bg-slate-900 text-white font-medium text-sm rounded-xl hover:bg-slate-800 transition-colors flex items-center gap-2 shrink-0"
+                                        className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 text-white font-medium text-sm rounded-xl hover:bg-slate-800 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 transition-colors flex items-center gap-2 shrink-0"
                                     >
                                         <Upload size={16} />
                                         <span>{uploadingBanner ? 'Uploading...' : 'Upload Image'}</span>
@@ -602,19 +602,19 @@ export default function AdminScholarships() {
                                 </div>
 
                                 {/* Banner Redirect URL Fields */}
-                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 mt-4">
+                                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/70 space-y-3 mt-4">
                                     <div className="flex items-center justify-between">
-                                        <label className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
-                                            <LinkIcon size={16} className="text-indigo-600" />
+                                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                                            <LinkIcon size={16} className="text-indigo-600 dark:text-indigo-400" />
                                             Banner Redirect URL
                                         </label>
 
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs text-slate-500">Enable Click Link:</span>
+                                            <span className="text-xs text-slate-500 dark:text-slate-400">Enable Click Link:</span>
                                             <button
                                                 type="button"
                                                 onClick={() => setSettings(prev => ({ ...prev, bannerRedirectEnabled: !prev.bannerRedirectEnabled }))}
-                                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${settings.bannerRedirectEnabled ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${settings.bannerRedirectEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                                             >
                                                 <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${settings.bannerRedirectEnabled ? 'translate-x-4.5' : 'translate-x-1'}`} />
                                             </button>
@@ -627,73 +627,73 @@ export default function AdminScholarships() {
                                         onChange={(e) => setSettings(prev => ({ ...prev, bannerRedirectUrl: e.target.value }))}
                                         placeholder="https://... target link on banner click"
                                         disabled={!settings.bannerRedirectEnabled}
-                                        className="w-full px-4 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                        className="w-full px-4 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
                                     />
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
                                         When enabled, clicking anywhere on the banner redirects the user directly to the specified URL.
                                     </p>
                                 </div>
                             </div>
 
                             {/* Recommended Image Size Helper Box */}
-                            <div className="lg:col-span-5 bg-gradient-to-br from-indigo-50/70 to-purple-50/70 p-5 rounded-2xl border border-indigo-100 space-y-3 text-xs">
-                                <div className="flex items-center gap-2 text-indigo-900 font-bold text-sm border-b border-indigo-100 pb-2">
-                                    <Info size={18} className="text-indigo-600" />
+                            <div className="lg:col-span-5 bg-gradient-to-br from-indigo-50/70 to-purple-50/70 dark:from-indigo-950/40 dark:to-purple-950/40 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-3 text-xs">
+                                <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-300 font-bold text-sm border-b border-indigo-100 dark:border-indigo-900/50 pb-2">
+                                    <Info size={18} className="text-indigo-600 dark:text-indigo-400" />
                                     <span>Recommended Banner Specifications</span>
                                 </div>
 
-                                <ul className="space-y-2 text-slate-700">
-                                    <li className="flex justify-between border-b border-indigo-50 pb-1">
-                                        <span className="font-semibold text-slate-900">Desktop Resolution:</span>
-                                        <span className="font-mono bg-white px-2 py-0.5 rounded text-indigo-700 font-bold">1920 × 700 px</span>
+                                <ul className="space-y-2 text-slate-700 dark:text-slate-300">
+                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Desktop Resolution:</span>
+                                        <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-indigo-700 dark:text-indigo-300 font-bold">1920 × 700 px</span>
                                     </li>
-                                    <li className="flex justify-between border-b border-indigo-50 pb-1">
-                                        <span className="font-semibold text-slate-900">Tablet Resolution:</span>
-                                        <span className="font-mono bg-white px-2 py-0.5 rounded text-slate-700">1400 × 600 px</span>
+                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Tablet Resolution:</span>
+                                        <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-700 dark:text-slate-300">1400 × 600 px</span>
                                     </li>
-                                    <li className="flex justify-between border-b border-indigo-50 pb-1">
-                                        <span className="font-semibold text-slate-900">Mobile Resolution:</span>
-                                        <span className="font-mono bg-white px-2 py-0.5 rounded text-slate-700">1080 × 1350 px</span>
+                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Mobile Resolution:</span>
+                                        <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-700 dark:text-slate-300">1080 × 1350 px</span>
                                     </li>
-                                    <li className="flex justify-between border-b border-indigo-50 pb-1">
-                                        <span className="font-semibold text-slate-900">Aspect Ratio:</span>
+                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Aspect Ratio:</span>
                                         <span>Approximately 2.75 : 1</span>
                                     </li>
-                                    <li className="flex justify-between border-b border-indigo-50 pb-1">
-                                        <span className="font-semibold text-slate-900">Safe Content Area:</span>
+                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Safe Content Area:</span>
                                         <span>Center 70% of banner</span>
                                     </li>
-                                    <li className="flex justify-between border-b border-indigo-50 pb-1">
-                                        <span className="font-semibold text-slate-900">Maximum File Size:</span>
-                                        <span className="text-amber-700 font-bold">5 MB max</span>
+                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Maximum File Size:</span>
+                                        <span className="text-amber-700 dark:text-amber-400 font-bold">5 MB max</span>
                                     </li>
                                     <li className="flex justify-between">
-                                        <span className="font-semibold text-slate-900">Preferred Format:</span>
-                                        <span className="text-emerald-700 font-bold">WEBP (Auto-optimized)</span>
+                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Preferred Format:</span>
+                                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">WEBP (Auto-optimized)</span>
                                     </li>
                                 </ul>
 
-                                <div className="p-2.5 bg-white/80 rounded-xl text-slate-600 border border-indigo-100 text-[11px] leading-relaxed">
+                                <div className="p-2.5 bg-white/80 dark:bg-slate-850/80 rounded-xl text-slate-600 dark:text-slate-300 border border-indigo-100 dark:border-indigo-900/40 text-[11px] leading-relaxed">
                                     💡 <strong>Design Note:</strong> Following these dimensions ensures your banner loads instantly, avoids layout shift, and looks crisp across all screens without degrading user experience.
                                 </div>
                             </div>
                         </div>
 
                         {/* Banner Live Preview */}
-                        <div className="space-y-2 pt-2 border-t border-slate-100">
+                        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                    <Eye size={14} className="text-indigo-600" />
+                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Eye size={14} className="text-indigo-600 dark:text-indigo-400" />
                                     Live Homepage Banner Preview
                                 </span>
                                 {settings.bannerRedirectEnabled && settings.bannerRedirectUrl && (
-                                    <span className="text-xs text-indigo-600 font-medium flex items-center gap-1">
+                                    <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1">
                                         <ExternalLink size={12} /> Clickable target: {settings.bannerRedirectUrl}
                                     </span>
                                 )}
                             </div>
 
-                            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-slate-900 group">
+                            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-slate-900 group">
                                 {settings.bannerImage ? (
                                     <div className="relative">
                                         <img
@@ -733,7 +733,7 @@ export default function AdminScholarships() {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="h-48 flex items-center justify-center text-slate-400 text-sm italic">
+                                    <div className="h-48 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm italic">
                                         No banner image set. Please upload or specify an image URL above.
                                     </div>
                                 )}
@@ -742,19 +742,19 @@ export default function AdminScholarships() {
                     </div>
 
                     {/* SCHOLARSHIP RESULT BUTTON CARD */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900">Scholarship Result Button</h3>
-                                <p className="text-xs text-slate-500">Configure CTA button leading to external or internal result pages.</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Scholarship Result Button</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Configure CTA button leading to external or internal result pages.</p>
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-slate-700">Enable Result Button:</span>
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Enable Result Button:</span>
                                 <button
                                     type="button"
                                     onClick={() => setSettings(prev => ({ ...prev, resultEnabled: !prev.resultEnabled }))}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.resultEnabled ? 'bg-indigo-600' : 'bg-slate-300'}`}
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.resultEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
                                 >
                                     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.resultEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                 </button>
@@ -763,24 +763,24 @@ export default function AdminScholarships() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Result Target URL</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Result Target URL</label>
                                 <input
                                     type="text"
                                     value={settings.resultUrl}
                                     onChange={(e) => setSettings(prev => ({ ...prev, resultUrl: e.target.value }))}
                                     placeholder="https://icstconnect.com/results/scholarship-2026"
-                                    className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Button Text</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Button Text</label>
                                 <input
                                     type="text"
                                     value={settings.resultButtonText}
                                     onChange={(e) => setSettings(prev => ({ ...prev, resultButtonText: e.target.value }))}
                                     placeholder="View Scholarship Result"
-                                    className="w-full px-4 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                         </div>
@@ -793,14 +793,14 @@ export default function AdminScholarships() {
                 <div className="space-y-6">
 
                     {/* Winner Management Actions Header */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-600">
+                            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400">
                                 <Trophy size={24} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900">Position Holder & Winner Management</h3>
-                                <p className="text-xs text-slate-500">Manage student photos, ranks, marks, and year-wise gallery display.</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Position Holder & Winner Management</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Manage student photos, ranks, marks, and year-wise gallery display.</p>
                             </div>
                         </div>
 
@@ -827,10 +827,10 @@ export default function AdminScholarships() {
                     </div>
 
                     {/* Winners Table */}
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
-                                <thead className="bg-slate-50 text-slate-600 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200">
+                                <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
                                     <tr>
                                         <th className="px-6 py-4">Student</th>
                                         <th className="px-6 py-4">Year</th>
@@ -841,50 +841,50 @@ export default function AdminScholarships() {
                                         <th className="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                                     {filteredWinners.length === 0 ? (
                                         <tr>
-                                            <td colSpan={7} className="px-6 py-12 text-center text-slate-400 text-sm">
+                                            <td colSpan={7} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
                                                 No winner records found for the selected filter. Click "+ Add Position Holder" to create one.
                                             </td>
                                         </tr>
                                     ) : (
                                         filteredWinners.map(winner => (
-                                            <tr key={winner.id} className="hover:bg-slate-50/80 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-slate-900">
+                                            <tr key={winner.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                                                <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
                                                     <div className="flex items-center gap-3">
                                                         <img
                                                             src={winner.photo}
                                                             alt={winner.studentName}
-                                                            className="w-10 h-10 rounded-full object-cover border border-slate-200 shadow-sm shrink-0"
+                                                            className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-sm shrink-0"
                                                         />
                                                         <div>
-                                                            <div className="font-bold text-slate-900">{winner.studentName}</div>
+                                                            <div className="font-bold text-slate-900 dark:text-white">{winner.studentName}</div>
                                                             <div className="text-xs text-slate-400 line-clamp-1">{winner.description || 'No bio'}</div>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 font-bold text-slate-800">
-                                                    <span className="px-2.5 py-1 bg-slate-100 rounded-lg border border-slate-200 text-xs">
+                                                <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
+                                                    <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
                                                         {winner.year}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${winner.rank === 1 ? 'bg-amber-100 text-amber-800 border border-amber-300' : winner.rank === 2 ? 'bg-slate-200 text-slate-800 border border-slate-300' : winner.rank === 3 ? 'bg-amber-900/10 text-amber-900 border border-amber-900/20' : 'bg-indigo-50 text-indigo-700'}`}>
+                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${winner.rank === 1 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60' : winner.rank === 2 ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600' : winner.rank === 3 ? 'bg-amber-900/10 dark:bg-amber-900/30 text-amber-900 dark:text-amber-300 border border-amber-900/20 dark:border-amber-700/50' : 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300'}`}>
                                                         Rank #{winner.rank}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-xs text-slate-600">
-                                                    <div className="font-semibold text-slate-800">{winner.schoolName}</div>
+                                                <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-300">
+                                                    <div className="font-semibold text-slate-800 dark:text-slate-200">{winner.schoolName}</div>
                                                     <div className="text-slate-400">{winner.district}</div>
                                                 </td>
-                                                <td className="px-6 py-4 font-bold text-emerald-600">
+                                                <td className="px-6 py-4 font-bold text-emerald-600 dark:text-emerald-400">
                                                     {winner.marks}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <button
                                                         onClick={() => handleToggleWinnerPublished(winner)}
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${winner.published ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${winner.published ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                                                     >
                                                         <span className={`w-2 h-2 rounded-full ${winner.published ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
                                                         {winner.published ? 'Published' : 'Hidden'}
@@ -894,14 +894,14 @@ export default function AdminScholarships() {
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button
                                                             onClick={() => handleOpenWinnerModal(winner)}
-                                                            className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
                                                             title="Edit record"
                                                         >
                                                             <Edit3 size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteWinner(winner.id)}
-                                                            className="p-2 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
                                                             title="Delete record"
                                                         >
                                                             <Trash2 size={16} />
@@ -920,16 +920,16 @@ export default function AdminScholarships() {
 
             {/* ADD / EDIT WINNER MODAL */}
             {isWinnerModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
-                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <Trophy className="text-amber-500" size={20} />
                                 {editingWinner ? 'Edit Winner Record' : 'Add Position Holder'}
                             </h3>
                             <button
                                 onClick={() => setIsWinnerModalOpen(false)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
                             >
                                 <X size={20} />
                             </button>
@@ -938,86 +938,86 @@ export default function AdminScholarships() {
                         <form onSubmit={handleSaveWinner} className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Year *</label>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year *</label>
                                     <input
                                         type="number"
                                         required
                                         value={winnerForm.year}
                                         onChange={(e) => setWinnerForm(prev => ({ ...prev, year: Number(e.target.value) }))}
-                                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Rank / Position *</label>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Rank / Position *</label>
                                     <input
                                         type="number"
                                         required
                                         min={1}
                                         value={winnerForm.rank}
                                         onChange={(e) => setWinnerForm(prev => ({ ...prev, rank: Number(e.target.value) }))}
-                                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Student Full Name *</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Student Full Name *</label>
                                 <input
                                     type="text"
                                     required
                                     placeholder="e.g. Subhadip Roy"
                                     value={winnerForm.studentName}
                                     onChange={(e) => setWinnerForm(prev => ({ ...prev, studentName: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-700 mb-1">School Name *</label>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">School Name *</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="e.g. Chowberia High School"
                                         value={winnerForm.schoolName}
                                         onChange={(e) => setWinnerForm(prev => ({ ...prev, schoolName: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-700 mb-1">District</label>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">District</label>
                                     <input
                                         type="text"
                                         placeholder="e.g. Nadia"
                                         value={winnerForm.district}
                                         onChange={(e) => setWinnerForm(prev => ({ ...prev, district: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Marks / Percentage *</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Marks / Percentage *</label>
                                 <input
                                     type="text"
                                     required
                                     placeholder="e.g. 98.8%"
                                     value={winnerForm.marks}
                                     onChange={(e) => setWinnerForm(prev => ({ ...prev, marks: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
                             {/* Photo Upload */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Student Photo</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Student Photo</label>
                                 <div className="flex items-center gap-3">
                                     <img
                                         src={winnerForm.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'}
                                         alt="Student Preview"
-                                        className="w-14 h-14 rounded-full object-cover border border-slate-300 shadow-sm shrink-0"
+                                        className="w-14 h-14 rounded-full object-cover border border-slate-300 dark:border-slate-700 shadow-sm shrink-0"
                                     />
                                     <div className="flex-1 space-y-1">
                                         <input
@@ -1025,9 +1025,9 @@ export default function AdminScholarships() {
                                             value={winnerForm.photo}
                                             onChange={(e) => setWinnerForm(prev => ({ ...prev, photo: e.target.value }))}
                                             placeholder="https://... or upload photo"
-                                            className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg"
+                                            className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg"
                                         />
-                                        <div className="flex items-center justify-between text-[11px] text-slate-500">
+                                        <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                                             <span>Recommended: 600×600 px Square WebP (Max 2MB)</span>
                                             <input
                                                 type="file"
@@ -1040,7 +1040,7 @@ export default function AdminScholarships() {
                                                 type="button"
                                                 onClick={() => winnerPhotoInputRef.current?.click()}
                                                 disabled={uploadingWinnerPhoto}
-                                                className="text-indigo-600 font-semibold hover:underline"
+                                                className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
                                             >
                                                 {uploadingWinnerPhoto ? 'Uploading...' : 'Upload File'}
                                             </button>
@@ -1050,18 +1050,18 @@ export default function AdminScholarships() {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Achievement Description / Bio</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Achievement Description / Bio</label>
                                 <textarea
                                     rows={2}
                                     placeholder="Optional note about their achievement..."
                                     value={winnerForm.description}
                                     onChange={(e) => setWinnerForm(prev => ({ ...prev, description: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={winnerForm.published}
@@ -1072,11 +1072,11 @@ export default function AdminScholarships() {
                                 </label>
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                                 <button
                                     type="button"
                                     onClick={() => setIsWinnerModalOpen(false)}
-                                    className="px-4 py-2 text-slate-600 font-medium text-sm rounded-xl hover:bg-slate-100 transition-colors"
+                                    className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium text-sm rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -1095,14 +1095,14 @@ export default function AdminScholarships() {
             {activeTab === 'examPhotos' && (
                 <div className="space-y-6 font-inter">
                     {/* Exam Photos Actions Header */}
-                    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-200 text-indigo-600">
+                            <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl border border-indigo-200 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400">
                                 <ImageIcon size={24} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-900">Scholarship Examination Gallery</h3>
-                                <p className="text-xs text-slate-500">Upload and manage examination hall photos, sessions, and school event moments.</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Scholarship Examination Gallery</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Upload and manage examination hall photos, sessions, and school event moments.</p>
                             </div>
                         </div>
 
@@ -1117,13 +1117,13 @@ export default function AdminScholarships() {
 
                     {/* Exam Photos Grid */}
                     {examImages.length === 0 ? (
-                        <div className="bg-white p-12 rounded-2xl border border-slate-200 text-center text-slate-400 text-sm">
+                        <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-slate-200 dark:border-slate-800 text-center text-slate-400 dark:text-slate-500 text-sm">
                             No examination photos added yet. Click "+ Add Exam Photo" to upload one.
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {examImages.map(item => (
-                                <div key={item.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all">
+                                <div key={item.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all">
                                     <div className="relative h-48 bg-slate-900 overflow-hidden">
                                         <img
                                             src={item.image}
@@ -1145,27 +1145,27 @@ export default function AdminScholarships() {
 
                                     <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                                         <div className="space-y-1">
-                                            <div className="text-xs font-bold text-indigo-600 uppercase tracking-wider">{item.schoolName}</div>
-                                            <h4 className="font-bold text-slate-900 text-base line-clamp-1">{item.title}</h4>
+                                            <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{item.schoolName}</div>
+                                            <h4 className="font-bold text-slate-900 dark:text-white text-base line-clamp-1">{item.title}</h4>
                                             {item.description && (
-                                                <p className="text-xs text-slate-500 line-clamp-2">{item.description}</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{item.description}</p>
                                             )}
                                         </div>
 
-                                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                                            <span className="text-xs font-semibold text-slate-400">Year {item.year}</span>
+                                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Year {item.year}</span>
 
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     onClick={() => handleOpenExamModal(item)}
-                                                    className="p-2 text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                    className="p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
                                                     title="Edit Photo"
                                                 >
                                                     <Edit3 size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteExamImage(item.id)}
-                                                    className="p-2 text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                    className="p-2 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
                                                     title="Delete Photo"
                                                 >
                                                     <Trash2 size={16} />
@@ -1182,16 +1182,16 @@ export default function AdminScholarships() {
 
             {/* ADD / EDIT EXAM PHOTO MODAL */}
             {isExamModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50">
-                            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <ImageIcon className="text-indigo-600" size={20} />
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <ImageIcon className="text-indigo-600 dark:text-indigo-400" size={20} />
                                 {editingExamImage ? 'Edit Exam Photo Details' : 'Add Examination Photo'}
                             </h3>
                             <button
                                 onClick={() => setIsExamModalOpen(false)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
                             >
                                 <X size={20} />
                             </button>
@@ -1199,59 +1199,59 @@ export default function AdminScholarships() {
 
                         <form onSubmit={handleSaveExamPhoto} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Title / Event Name *</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Title / Event Name *</label>
                                 <input
                                     type="text"
                                     required
                                     placeholder="e.g. ICST Talent Search Exam 2026 - Main Center"
                                     value={examForm.title}
                                     onChange={(e) => setExamForm(prev => ({ ...prev, title: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-700 mb-1">School Name *</label>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">School Name *</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="e.g. Chowberia High School"
                                         value={examForm.schoolName}
                                         onChange={(e) => setExamForm(prev => ({ ...prev, schoolName: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-700 mb-1">Scholarship Session *</label>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Scholarship Session *</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="e.g. 2026-2027 Session"
                                         value={examForm.session}
                                         onChange={(e) => setExamForm(prev => ({ ...prev, session: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Year</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year</label>
                                 <input
                                     type="number"
                                     required
                                     value={examForm.year}
                                     onChange={(e) => setExamForm(prev => ({ ...prev, year: Number(e.target.value) }))}
-                                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
                             {/* Image Upload */}
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Exam Photo *</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Exam Photo *</label>
                                 <div className="space-y-2">
-                                    <div className="relative h-40 rounded-xl overflow-hidden border border-slate-300 bg-slate-100">
+                                    <div className="relative h-40 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
                                         {examForm.image ? (
                                             <img
                                                 src={examForm.image}
@@ -1259,7 +1259,7 @@ export default function AdminScholarships() {
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            <div className="h-full flex items-center justify-center text-xs text-slate-400 italic">
+                                            <div className="h-full flex items-center justify-center text-xs text-slate-400 dark:text-slate-500 italic">
                                                 No image selected
                                             </div>
                                         )}
@@ -1271,7 +1271,7 @@ export default function AdminScholarships() {
                                             value={examForm.image}
                                             onChange={(e) => setExamForm(prev => ({ ...prev, image: e.target.value }))}
                                             placeholder="https://... or upload file"
-                                            className="flex-1 px-3 py-1.5 text-xs border border-slate-300 rounded-lg"
+                                            className="flex-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg"
                                         />
                                         <input
                                             type="file"
@@ -1284,7 +1284,7 @@ export default function AdminScholarships() {
                                             type="button"
                                             onClick={() => examPhotoInputRef.current?.click()}
                                             disabled={uploadingExamPhoto}
-                                            className="px-3 py-1.5 bg-slate-900 text-white font-medium text-xs rounded-lg hover:bg-slate-800 transition-colors shrink-0"
+                                            className="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white font-medium text-xs rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 transition-colors shrink-0"
                                         >
                                             {uploadingExamPhoto ? 'Uploading...' : 'Upload Image'}
                                         </button>
@@ -1293,18 +1293,18 @@ export default function AdminScholarships() {
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 mb-1">Description / Notes</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Description / Notes</label>
                                 <textarea
                                     rows={2}
                                     placeholder="Optional details about this examination session..."
                                     value={examForm.description}
                                     onChange={(e) => setExamForm(prev => ({ ...prev, description: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
 
-                            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={examForm.published}
@@ -1315,11 +1315,11 @@ export default function AdminScholarships() {
                                 </label>
                             </div>
 
-                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                                 <button
                                     type="button"
                                     onClick={() => setIsExamModalOpen(false)}
-                                    className="px-4 py-2 text-slate-600 font-medium text-sm rounded-xl hover:bg-slate-100 transition-colors"
+                                    className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium text-sm rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                 >
                                     Cancel
                                 </button>

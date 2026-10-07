@@ -82,29 +82,29 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h3 className="text-lg font-bold text-slate-800">Add New Teacher</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">Add New Teacher</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {error && (
-                        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 flex items-center gap-2">
+                        <div className="p-3 bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 text-sm rounded-xl border border-red-100 dark:border-red-900/50 flex items-center gap-2">
                             <AlertTriangle size={16} className="shrink-0" />
                             {error}
                         </div>
                     )}
 
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1">Full Name</label>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Full Name</label>
                         <input
                             type="text"
                             required
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                             placeholder="e.g. John Doe"
                             value={formData.fullName}
                             onChange={e => setFormData({ ...formData, fullName: e.target.value })}
@@ -112,11 +112,11 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
                         <input
                             type="email"
                             required
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                             placeholder="e.g. john@school.com"
                             value={formData.email}
                             onChange={e => setFormData({ ...formData, email: e.target.value })}
@@ -124,12 +124,12 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
                     </div>
 
                     <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Password</label>
                         <input
                             type="password"
                             required
                             minLength={6}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
                             placeholder="Min 6 chars"
                             value={formData.password}
                             onChange={e => setFormData({ ...formData, password: e.target.value })}
@@ -140,7 +140,7 @@ export default function CreateTeacherModal({ isOpen, onClose, onSuccess }: Creat
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-2.5 border border-slate-200 text-slate-600 font-semibold rounded-xl hover:bg-slate-50 transition-all"
+                            className="flex-1 py-2.5 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                         >
                             Cancel
                         </button>

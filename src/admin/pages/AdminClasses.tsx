@@ -155,14 +155,14 @@ export default function AdminClasses() {
         <div className="max-w-7xl mx-auto pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Manage Classes</h1>
-                    <p className="text-slate-500 text-sm mt-1">View and manage student batches across all courses</p>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Manage Classes</h1>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">View and manage student batches across all courses</p>
                 </div>
 
                 {/* Create Batch Action */}
                 <button
                     onClick={() => setIsCreateOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none"
                 >
                     <Plus size={20} />
                     Create Batch
@@ -172,22 +172,22 @@ export default function AdminClasses() {
             <CreateClassModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} onSuccess={fetchData} />
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm mb-6 flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-3 text-slate-400" size={18} />
+                    <Search className="absolute left-3 top-3 text-slate-400 dark:text-slate-500" size={18} />
                     <input
                         type="text"
                         placeholder="Search batches..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-indigo-200 outline-none text-slate-600"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-indigo-200 outline-none text-slate-600 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500"
                     />
                 </div>
                 <div className="w-full md:w-64">
                     <select
                         value={selectedCourse}
                         onChange={(e) => setSelectedCourse(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-indigo-200 outline-none text-slate-600"
+                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-indigo-200 outline-none text-slate-600 dark:text-slate-200"
                     >
                         <option value="all">All Courses</option>
                         {courses.map(course => (
@@ -198,11 +198,11 @@ export default function AdminClasses() {
             </div>
 
             {loading ? (
-                <div className="text-center py-12 text-slate-500">Loading classes...</div>
+                <div className="text-center py-12 text-slate-500 dark:text-slate-400">Loading classes...</div>
             ) : filteredClasses.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200 text-slate-400">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
-                        <Inbox className="text-2xl text-slate-300" size={32} />
+                <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500">
+                    <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                        <Inbox className="text-2xl text-slate-300 dark:text-slate-600" size={32} />
                     </div>
                     <p>No classes found matching your filters.</p>
                 </div>
@@ -215,36 +215,36 @@ export default function AdminClasses() {
                         const courseBg = (cls.course.color || '').split(' ')[1] || 'bg-slate-50'
 
                         return (
-                            <div key={cls.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                            <div key={cls.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all group">
                                 <div className="p-6">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${courseBg.replace('50', '100')}`}>
+                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${courseBg.replace('50', '100')} dark:bg-slate-800`}>
                                                 {(() => {
                                                     const Icon = getIcon(cls.course.icon)
                                                     return <Icon className={`${courseColor}`} size={20} />
                                                 })()}
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-slate-800">{cls.batch_name}</h3>
-                                                <div className="flex items-center gap-1 text-xs text-slate-500">
+                                                <h3 className="font-bold text-slate-800 dark:text-white">{cls.batch_name}</h3>
+                                                <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                                                     <span className="font-medium">{cls.course.course_name}</span>
                                                     <span>•</span>
                                                     <span>#{cls.batch_number}</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${isFull ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                                        <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${isFull ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'}`}>
                                             {isFull ? 'Full' : 'Open'}
                                         </div>
                                     </div>
 
                                     <div className="mb-6">
-                                        <div className="flex justify-between text-xs font-medium text-slate-600 mb-1">
+                                        <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                                             <span>Capacity</span>
                                             <span>{cls.enrolled_count} / {cls.capacity}</span>
                                         </div>
-                                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full rounded-full ${isFull ? 'bg-red-500' : cls.enrolled_count > 0 ? 'bg-indigo-500' : 'bg-slate-300'}`}
                                                 style={{ width: `${percentage}%` }}
@@ -252,17 +252,17 @@ export default function AdminClasses() {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
+                                    <div className="flex items-center gap-2 pt-4 border-t border-slate-50 dark:border-slate-800">
                                         {/* Placeholder for Details Link */}
                                         <Link
                                             to={`/admin/classes/${cls.id}`}
-                                            className="flex-1 py-2 text-center text-sm font-medium text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                                            className="flex-1 py-2 text-center text-sm font-medium text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                                         >
                                             View Details
                                         </Link>
                                         <button
                                             onClick={() => initiateDelete(cls)}
-                                            className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-30"
+                                            className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-30"
                                             disabled={cls.enrolled_count > 0}
                                             title="Delete Batch"
                                         >

@@ -52,20 +52,20 @@ export default function TailwindDropdown<T extends string | number>({
                     px-4 py-2.5 rounded-xl font-bold text-sm transition-all duration-200
                     flex items-center justify-between gap-3 shadow-sm border focus:outline-none focus:ring-2 focus:ring-indigo-500/20
                     ${isOpen
-                        ? 'bg-white border-indigo-500 text-indigo-900 shadow-md ring-2 ring-indigo-500/20'
-                        : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-800'
+                        ? 'bg-white dark:bg-slate-900 border-indigo-500 dark:border-indigo-400 text-indigo-900 dark:text-indigo-300 shadow-md ring-2 ring-indigo-500/20'
+                        : 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100'
                     }
                     ${buttonClassName}
                 `}
             >
                 <span className="flex items-center gap-2 truncate">
-                    {labelPrefix && <span className="font-medium text-slate-500">{labelPrefix}</span>}
+                    {labelPrefix && <span className="font-medium text-slate-500 dark:text-slate-400">{labelPrefix}</span>}
                     {selectedOption?.icon}
-                    <span className="font-extrabold text-indigo-900">{selectedOption ? selectedOption.label : placeholder}</span>
+                    <span className="font-extrabold text-indigo-900 dark:text-indigo-400">{selectedOption ? selectedOption.label : placeholder}</span>
                 </span>
                 <ChevronDown
                     size={16}
-                    className={`text-slate-500 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-indigo-600' : ''}`}
+                    className={`text-slate-500 dark:text-slate-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-indigo-600 dark:text-indigo-400' : ''}`}
                 />
             </button>
 
@@ -73,7 +73,7 @@ export default function TailwindDropdown<T extends string | number>({
                 <div
                     className={`
                         absolute ${menuAlignment === 'right' ? 'right-0' : 'left-0'} top-full mt-2
-                        min-w-[180px] sm:w-full bg-white rounded-2xl shadow-xl border border-slate-200/90
+                        min-w-[180px] sm:w-full bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200/90 dark:border-slate-800
                         z-50 py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150
                     `}
                 >
@@ -92,8 +92,8 @@ export default function TailwindDropdown<T extends string | number>({
                                         w-full px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150
                                         flex items-center justify-between gap-3 text-left
                                         ${isSelected
-                                            ? 'bg-indigo-50 text-indigo-700 font-extrabold'
-                                            : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                                            ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-extrabold'
+                                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                                         }
                                     `}
                                 >
@@ -102,7 +102,7 @@ export default function TailwindDropdown<T extends string | number>({
                                         <span>{option.label}</span>
                                     </span>
                                     {isSelected && (
-                                        <Check size={16} className="text-indigo-600 shrink-0" />
+                                        <Check size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
                                     )}
                                 </button>
                             )

@@ -154,10 +154,10 @@ const InteractiveRobot = () => {
     return (
         <div
             ref={containerRef}
-            className="relative w-full max-w-sm lg:max-w-md mx-auto min-h-[500px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(8,112,184,0.1)] border border-slate-100 flex items-center justify-center p-6 overflow-visible"
+            className="relative w-full max-w-sm lg:max-w-md mx-auto min-h-[500px] bg-white dark:bg-slate-900/90 rounded-[2.5rem] shadow-[0_20px_50px_rgba(8,112,184,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-100 dark:border-slate-800 flex items-center justify-center p-6 overflow-visible backdrop-blur-sm"
         >
             {/* Decorative clean background element */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/50 to-transparent rounded-[2.5rem] pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/50 dark:from-blue-950/20 to-transparent rounded-[2.5rem] pointer-events-none"></div>
 
             <div className="flex items-center justify-center w-full h-full min-h-[400px]">
                 <div className="relative w-64 h-96 flex justify-center items-end pb-10">
@@ -189,14 +189,13 @@ const InteractiveRobot = () => {
                                     onMouseLeave={() => setHoveredIcon(null)}
                                 >
                                     <motion.div
-                                        className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center p-3 relative shadow-lg"
+                                        className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center p-3 relative shadow-lg border border-slate-200 dark:border-slate-700"
                                         whileHover={{
                                             scale: 1.2,
                                             boxShadow: "0 0 20px rgba(59, 130, 246, 0.6)",
                                             borderColor: "#3b82f6",
                                             zIndex: 50
                                         }}
-                                        style={{ border: "1px solid #e2e8f0" }}
                                     >
                                         <img src={item.url} alt={item.name} className="w-full h-full object-contain" width={64} height={64} loading="lazy" />
 
@@ -261,17 +260,17 @@ const InteractiveRobot = () => {
                         </motion.div>
 
                         {/* Body */}
-                        <div className="w-28 h-32 bg-slate-100 rounded-b-[3rem] rounded-t-xl -mt-5 pt-6 pb-2 relative z-10 shadow-lg border-2 border-slate-200 flex flex-col items-center">
-                            <div className="absolute bottom-0 w-24 h-20 bg-white rounded-b-[3rem] rounded-t-lg border-t-2 border-slate-100 shadow-sm flex items-center justify-center overflow-hidden z-0">
+                        <div className="w-28 h-32 bg-slate-100 dark:bg-slate-800 rounded-b-[3rem] rounded-t-xl -mt-5 pt-6 pb-2 relative z-10 shadow-lg border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center">
+                            <div className="absolute bottom-0 w-24 h-20 bg-white dark:bg-slate-900 rounded-b-[3rem] rounded-t-lg border-t-2 border-slate-100 dark:border-slate-750 shadow-sm flex items-center justify-center overflow-hidden z-0">
                                 <motion.div className="flex flex-col items-center justify-center p-2">
-                                    <div className="text-xs font-black text-blue-600 leading-none tracking-tighter">ICST</div>
-                                    <div className="w-8 h-[1px] bg-slate-200 my-0.5"></div>
+                                    <div className="text-xs font-black text-blue-600 dark:text-blue-400 leading-none tracking-tighter">ICST</div>
+                                    <div className="w-8 h-[1px] bg-slate-200 dark:bg-slate-700 my-0.5"></div>
                                     <div className="text-[5px] font-bold text-slate-400 uppercase tracking-wide leading-none">Chowberia</div>
                                 </motion.div>
                             </div>
 
                             <motion.div
-                                className="absolute top-8 -left-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -z-10 origin-top-right border-2 border-white"
+                                className="absolute top-8 -left-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -z-10 origin-top-right border-2 border-white dark:border-slate-800"
                                 animate={isInView ? { rotate: [0, 5, 0] } : {}}
                                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                             />
@@ -279,16 +278,16 @@ const InteractiveRobot = () => {
                             <motion.div
                                 animate={rightArmControls}
                                 initial={{ rotate: -10 }}
-                                className="absolute top-8 -right-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full origin-top-left border-2 border-white shadow-md cursor-pointer"
+                                className="absolute top-8 -right-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full origin-top-left border-2 border-white dark:border-slate-800 shadow-md cursor-pointer"
                             >
-                                <div className="absolute bottom-0 w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex justify-center">
+                                <div className="absolute bottom-0 w-8 h-8 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 flex justify-center">
                                     <AnimatePresence>
                                         {hoveredIcon && !isInteracting && (
                                             <motion.div
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: 12, opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
-                                                className="absolute -bottom-2 w-3 h-4 bg-blue-500 rounded-full border-2 border-white origin-top"
+                                                className="absolute -bottom-2 w-3 h-4 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 origin-top"
                                             />
                                         )}
                                     </AnimatePresence>
@@ -298,8 +297,8 @@ const InteractiveRobot = () => {
 
                         {/* Legs */}
                         <div className="flex gap-4 -mt-4">
-                            <div className="w-8 h-12 bg-slate-200 rounded-b-xl border-2 border-slate-300"></div>
-                            <div className="w-8 h-12 bg-slate-200 rounded-b-xl border-2 border-slate-300"></div>
+                            <div className="w-8 h-12 bg-slate-200 dark:bg-slate-700 rounded-b-xl border-2 border-slate-300 dark:border-slate-600"></div>
+                            <div className="w-8 h-12 bg-slate-200 dark:bg-slate-700 rounded-b-xl border-2 border-slate-300 dark:border-slate-600"></div>
                         </div>
 
                     </motion.div>

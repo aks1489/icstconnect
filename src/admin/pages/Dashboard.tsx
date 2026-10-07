@@ -54,24 +54,24 @@ export default function AdminDashboard() {
             value: stats.students,
             icon: Users,
             color: 'from-blue-500 to-blue-600',
-            bg: 'bg-blue-50',
-            textColor: 'text-blue-600'
+            bg: 'bg-blue-50 dark:bg-blue-950/40',
+            textColor: 'text-blue-600 dark:text-blue-400'
         },
         {
             label: 'Active Courses',
             value: stats.courses,
             icon: BookText,
             color: 'from-emerald-500 to-emerald-600',
-            bg: 'bg-emerald-50',
-            textColor: 'text-emerald-600'
+            bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+            textColor: 'text-emerald-600 dark:text-emerald-400'
         },
         {
             label: 'Scheduled Classes',
             value: stats.classes,
             icon: CalendarCheck,
             color: 'from-violet-500 to-violet-600',
-            bg: 'bg-violet-50',
-            textColor: 'text-violet-600'
+            bg: 'bg-violet-50 dark:bg-violet-950/40',
+            textColor: 'text-violet-600 dark:text-violet-400'
         }
     ]
 
@@ -79,10 +79,10 @@ export default function AdminDashboard() {
         <div>
             <div className="mb-8 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Dashboard Overview</h1>
-                    <p className="text-slate-500 mt-1">Welcome back to your control center.</p>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Dashboard Overview</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Welcome back to your control center.</p>
                 </div>
-                <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20">
+                <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-sky-600 text-white rounded-lg hover:bg-slate-800 dark:hover:bg-sky-500 transition-colors shadow-lg shadow-slate-900/20">
                     <CloudDownload size={18} />
                     <span>Generate Report</span>
                 </button>
@@ -92,19 +92,19 @@ export default function AdminDashboard() {
                 {statCards.map((stat, index) => (
                     <div
                         key={index}
-                        className="group bg-white p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 hover:-translate-y-1"
+                        className="group bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 dark:border-slate-800 hover:-translate-y-1"
                     >
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-3 rounded-xl ${stat.bg} group-hover:scale-110 transition-transform duration-300`}>
                                 <stat.icon className={`text-2xl ${stat.textColor}`} size={24} />
                             </div>
-                            <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-full uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-slate-400 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-1 rounded-full uppercase tracking-wider">
                                 Realtime
                             </span>
                         </div>
                         <div>
-                            <h3 className="text-3xl font-bold text-slate-800 mb-1">{stat.value}</h3>
-                            <p className="text-sm text-slate-500 font-medium">{stat.label}</p>
+                            <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-1">{stat.value}</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{stat.label}</p>
                         </div>
                     </div>
                 ))}
@@ -112,20 +112,20 @@ export default function AdminDashboard() {
 
             {/* Quick Actions / Recent Activity Placeholder */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Actions</h3>
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Quick Actions</h3>
                     <div className="grid grid-cols-2 gap-4">
-                        <button className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200 group">
-                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 group-hover:bg-indigo-200 transition-colors">
-                                <UserPlus className="text-slate-600 group-hover:text-indigo-600" size={24} />
+                        <button className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all duration-200 group">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-2 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-900/60 transition-colors">
+                                <UserPlus className="text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" size={24} />
                             </div>
-                            <span className="text-sm font-semibold text-slate-600 group-hover:text-indigo-700">Add Student</span>
+                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400">Add Student</span>
                         </button>
-                        <button className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-200 group">
-                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mb-2 group-hover:bg-emerald-200 transition-colors">
-                                <Book className="text-slate-600 group-hover:text-emerald-600" size={24} />
+                        <button className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all duration-200 group">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-2 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-900/60 transition-colors">
+                                <Book className="text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" size={24} />
                             </div>
-                            <span className="text-sm font-semibold text-slate-600 group-hover:text-emerald-700">New Course</span>
+                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-300 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">New Course</span>
                         </button>
                     </div>
                 </div>

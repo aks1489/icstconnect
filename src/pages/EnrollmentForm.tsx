@@ -469,21 +469,21 @@ export default function EnrollmentForm() {
                 <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden">
                     
                     {/* Course Summary Section (Auto-filled) */}
-                    <div className="bg-indigo-50/50 p-6 sm:p-8 border-b border-indigo-100/50">
-                        <h3 className="text-xs font-bold text-indigo-600 tracking-wider uppercase mb-4 flex items-center gap-2">
+                    <div className="bg-indigo-50/50 dark:bg-slate-800/50 p-6 sm:p-8 border-b border-indigo-100/50 dark:border-slate-700">
+                        <h3 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase mb-4 flex items-center gap-2">
                             <BookOpen size={16} /> Selected Course
                         </h3>
                         {course ? (
                             <div className="flex flex-col sm:flex-row gap-6">
-                                <div className={`w-20 h-20 rounded-2xl ${course.color} flex items-center justify-center shrink-0 shadow-inner`}>
+                                <div className={`w-20 h-20 rounded-2xl ${course.color} dark:!bg-slate-700 flex items-center justify-center shrink-0 shadow-inner`}>
                                     <BookOpen size={32} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold text-slate-900 mb-1">{course.title}</h4>
-                                    <p className="text-sm text-slate-600 line-clamp-2 max-w-md">{course.description}</p>
-                                    <div className="flex gap-4 mt-3 text-sm font-semibold text-slate-700">
-                                        <span className="bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">{course.duration}</span>
-                                        <span className="bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100 text-green-700">Fee: {course.price}</span>
+                                    <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{course.title}</h4>
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 max-w-md">{course.description}</p>
+                                    <div className="flex gap-4 mt-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                        <span className="bg-white dark:bg-slate-700 px-3 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600">{course.duration}</span>
+                                        <span className="bg-white dark:bg-slate-700 px-3 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600 text-green-700 dark:text-green-400">Fee: {course.price}</span>
                                     </div>
                                 </div>
                             </div>

@@ -51,7 +51,7 @@ export default function ManageStudents() {
             />
 
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-                <h2 className="text-2xl font-bold text-slate-800">Manage Students</h2>
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Manage Students</h2>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
                     className="w-full sm:w-auto bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20"
@@ -62,17 +62,17 @@ export default function ManageStudents() {
             </div>
 
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white shadow-sm overflow-hidden sm:rounded-xl border border-slate-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-slate-50">
+            <div className="hidden md:block bg-white dark:bg-slate-900 shadow-sm overflow-hidden sm:rounded-xl border border-slate-200 dark:border-slate-800">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-800">
+                    <thead className="bg-slate-50 dark:bg-slate-800/60">
                         <tr>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 Name
                             </th>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 Email
                             </th>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                 Joined
                             </th>
                             <th scope="col" className="relative px-6 py-4">
@@ -80,13 +80,13 @@ export default function ManageStudents() {
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-slate-100">
+                    <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
                         {students.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="px-6 py-12 text-center text-slate-500">
+                                <td colSpan={4} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                                     <div className="flex flex-col items-center justify-center">
-                                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3">
-                                            <Users className="text-xl text-slate-400" size={24} />
+                                        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                                            <Users className="text-xl text-slate-400 dark:text-slate-500" size={24} />
                                         </div>
                                         <p>No students found</p>
                                     </div>
@@ -94,44 +94,44 @@ export default function ManageStudents() {
                             </tr>
                         ) : (
                             students.map((student) => (
-                                <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
+                                <tr key={student.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="flex-shrink-0 h-10 w-10">
                                                 {student.avatar_url ? (
                                                     <img
-                                                        className="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-200"
+                                                        className="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-200 dark:border-slate-700"
                                                         src={student.avatar_url}
                                                         alt=""
                                                     />
                                                 ) : (
-                                                    <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                                                    <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shadow-sm">
                                                         {student.full_name?.charAt(0).toUpperCase() || 'S'}
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="ml-4">
-                                                <div className="text-sm font-semibold text-slate-900">{student.full_name || 'Unknown'}</div>
+                                                <div className="text-sm font-semibold text-slate-900 dark:text-white">{student.full_name || 'Unknown'}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-slate-600">
+                                        <div className="text-sm text-slate-600 dark:text-slate-300">
                                             {student.email}
                                             {student.temp_password && (
-                                                <div className="mt-1.5 flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm max-w-fit tracking-wide">
+                                                <div className="mt-1.5 flex items-center gap-1 text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-md border border-amber-200 dark:border-amber-900/50 shadow-sm max-w-fit tracking-wide">
                                                     <KeyRound size={12} /> {student.temp_password}
                                                 </div>
                                             )}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="text-sm text-slate-500">{new Date(student.created_at).toLocaleDateString()}</div>
+                                        <div className="text-sm text-slate-500 dark:text-slate-400">{new Date(student.created_at).toLocaleDateString()}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <Link
                                             to={`/admin/students/${student.id}`}
-                                            className="text-indigo-600 hover:text-indigo-900 font-medium inline-flex items-center gap-1 hover:gap-2 transition-all"
+                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium inline-flex items-center gap-1 hover:gap-2 transition-all"
                                         >
                                             View
                                             <ArrowRight size={16} />
@@ -147,42 +147,42 @@ export default function ManageStudents() {
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
                 {students.length === 0 ? (
-                    <div className="bg-white p-8 rounded-xl shadow-sm text-center border border-slate-200">
-                        <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Users className="text-xl text-slate-400" size={24} />
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm text-center border border-slate-200 dark:border-slate-800">
+                        <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <Users className="text-xl text-slate-400 dark:text-slate-500" size={24} />
                         </div>
-                        <p className="text-slate-500">No students found</p>
+                        <p className="text-slate-500 dark:text-slate-400">No students found</p>
                     </div>
                 ) : (
                     students.map((student) => (
-                        <div key={student.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <div key={student.id} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-3">
                                     {student.avatar_url ? (
                                         <img
                                             src={student.avatar_url}
                                             alt=""
-                                            className="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-200"
+                                            className="h-10 w-10 rounded-full object-cover shadow-sm border border-slate-200 dark:border-slate-700"
                                         />
                                     ) : (
-                                        <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                                        <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shadow-sm">
                                             {student.full_name?.charAt(0).toUpperCase() || 'S'}
                                         </div>
                                     )}
                                     <div>
-                                        <h3 className="font-semibold text-slate-900">{student.full_name || 'Unknown'}</h3>
-                                        <p className="text-xs text-slate-500">{new Date(student.created_at).toLocaleDateString()}</p>
+                                        <h3 className="font-semibold text-slate-900 dark:text-white">{student.full_name || 'Unknown'}</h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">{new Date(student.created_at).toLocaleDateString()}</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="mb-4 flex flex-col gap-2">
-                                    <div className="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 p-2 rounded-lg">
-                                        <Mail className="text-slate-400" size={16} />
+                                    <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 p-2 rounded-lg">
+                                        <Mail className="text-slate-400 dark:text-slate-500" size={16} />
                                         <span className="truncate">{student.email}</span>
                                     </div>
                                     {student.temp_password && (
-                                        <div className="flex items-center gap-2 text-sm text-amber-800 bg-amber-50 p-2 rounded-lg border border-amber-100 font-bold">
+                                        <div className="flex items-center gap-2 text-sm text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 p-2 rounded-lg border border-amber-100 dark:border-amber-900/50 font-bold">
                                             <KeyRound size={16} className="text-amber-500" />
                                             <span className="tracking-wider">{student.temp_password}</span>
                                         </div>
@@ -191,7 +191,7 @@ export default function ManageStudents() {
 
                             <Link
                                 to={`/admin/students/${student.id}`}
-                                className="w-full flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 text-slate-700 py-2.5 rounded-lg hover:bg-slate-100 hover:text-indigo-600 transition-colors font-medium text-sm"
+                                className="w-full flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-medium text-sm"
                             >
                                 View Profile
                             </Link>
