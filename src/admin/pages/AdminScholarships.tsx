@@ -1,10 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { IconSchool as GraduationCap, IconPower as Power, IconUpload as Upload, IconExternalLink as ExternalLink, IconTrophy as Trophy, IconEye as Eye, IconDeviceFloppy as Save, IconPlus as Plus, IconTrash as Trash2, IconEdit as Edit3, IconCircleCheck as CheckCircle2, IconAlertCircle as AlertCircle, IconInfoCircle as Info, IconPhoto as ImageIcon, IconLink as LinkIcon, IconLayersLinked as Layers, IconArrowUpRight as ArrowUpRight, IconX as X } from '@tabler/icons-react'
+import { useState, useEffect } from 'react'
+import {
+    IconSchool as GraduationCap,
+    IconPower as Power,
+    IconTrophy as Trophy,
+    IconDeviceFloppy as Save,
+    IconPlus as Plus,
+    IconTrash as Trash2,
+    IconEdit as Edit3,
+    IconCircleCheck as CheckCircle2,
+    IconAlertCircle as AlertCircle,
+    IconPhoto as ImageIcon,
+    IconLayersLinked as Layers,
+    IconX as X,
+    IconRefresh as RefreshCw,
+    IconCalendarTime as CalendarTime,
+    IconBuildingBank as SchoolIcon,
+    IconCheck as Check,
+    IconClock as Clock,
+    IconSparkles as Sparkles
+} from '@tabler/icons-react'
 import { scholarshipService } from '../../services/scholarshipService'
-import type { ScholarshipSettings, ScholarshipWinner, ScholarshipExamImage } from '../../types/scholarship'
+import type {
+    ScholarshipSettings,
+    ScholarshipCampaign,
+    ScholarshipSchool,
+    ScholarshipSchoolParticipation,
+    ScholarshipWinner,
+    ScholarshipExamImage,
+    ScholarshipSyncResult
+} from '../../types/scholarship'
 import { useToast } from '../../contexts/ToastContext'
 import TailwindDropdown from '../../components/ui/TailwindDropdown'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import ImageCropUploadField from '../../components/common/ImageCropUploadField'
 
 export default function AdminScholarships() {
     const { showToast } = useToast()
@@ -20,9 +48,22 @@ export default function AdminScholarships() {
 
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [activeTab, setActiveTab] = useState<'settings' | 'winners' | 'examPhotos'>('settings')
+    const [isSyncing, setIsSyncing] = useState(false)
+    const [pendingCount, setPendingCount] = useState<number>(() => scholarshipService.getPendingCount())
+    const [syncModalResult, setSyncModalResult] = useState<ScholarshipSyncResult | null>(null)
 
-    // Settings state
+    // Navigation Tabs
+    const [activeTab, setActiveTab] = useState<'flow' | 'winners' | 'settings' | 'examPhotos'>('flow')
+
+    // Core Data States
+    const [campaigns, setCampaigns] = useState<ScholarshipCampaign[]>([])
+    const [selectedCampaignId, setSelectedCampaignId] = useState<string>('')
+    const [schools, setSchools] = useState<ScholarshipSchool[]>([])
+    const [participations, setParticipations] = useState<ScholarshipSchoolParticipation[]>([])
+    const [winners, setWinners] = useState<ScholarshipWinner[]>([])
+    const [examImages, setExamImages] = useState<ScholarshipExamImage[]>([])
+
+    // Settings State
     const [settings, setSettings] = useState<ScholarshipSettings>({
         masterEnabled: true,
         bannerEnabled: true,
@@ -38,21 +79,44 @@ export default function AdminScholarships() {
         winnersGalleryEnabled: true
     })
 
-    // Banner file upload state
-    const [uploadingBanner, setUploadingBanner] = useState(false)
-    const bannerInputRef = useRef<HTMLInputElement>(null)
+    // Modal States: Campaign
+    const [isCampaignModalOpen, setIsCampaignModalOpen] = useState(false)
+    const [editingCampaign, setEditingCampaign] = useState<ScholarshipCampaign | null>(null)
+    const [campaignForm, setCampaignForm] = useState({
+        title: '',
+        year: new Date().getFullYear(),
+        session: `${new Date().getFullYear()}-${new Date().getFullYear() + 1} Session`,
+        description: '',
+        status: 'active' as 'active' | 'upcoming' | 'archived'
+    })
 
-    // Winners state
-    const [winners, setWinners] = useState<ScholarshipWinner[]>([])
-    const [selectedYearFilter, setSelectedYearFilter] = useState<number | 'all'>('all')
+    // Modal States: School
+    const [isSchoolModalOpen, setIsSchoolModalOpen] = useState(false)
+    const [editingSchool, setEditingSchool] = useState<ScholarshipSchool | null>(null)
+    const [schoolForm, setSchoolForm] = useState({
+        name: '',
+        district: 'Nadia',
+        address: '',
+        logo: ''
+    })
+
+    // Modal States: Schedule Publication Date & Time
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
+    const [schedulingParticipation, setSchedulingParticipation] = useState<{
+        school: ScholarshipSchool
+        participation?: ScholarshipSchoolParticipation
+        announcementDate: string
+        isOverride: boolean
+    } | null>(null)
 
     // Winner Modal / Form state
     const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false)
     const [editingWinner, setEditingWinner] = useState<ScholarshipWinner | null>(null)
-    const [uploadingWinnerPhoto, setUploadingWinnerPhoto] = useState(false)
-    const winnerPhotoInputRef = useRef<HTMLInputElement>(null)
+    const [selectedSchoolForWinner, setSelectedSchoolForWinner] = useState<string>('all')
 
     const [winnerForm, setWinnerForm] = useState({
+        scholarshipId: '',
+        schoolId: '',
         year: new Date().getFullYear(),
         rank: 1,
         studentName: '',
@@ -66,11 +130,8 @@ export default function AdminScholarships() {
     })
 
     // Exam Gallery Photos state
-    const [examImages, setExamImages] = useState<ScholarshipExamImage[]>([])
     const [isExamModalOpen, setIsExamModalOpen] = useState(false)
     const [editingExamImage, setEditingExamImage] = useState<ScholarshipExamImage | null>(null)
-    const [uploadingExamPhoto, setUploadingExamPhoto] = useState(false)
-    const examPhotoInputRef = useRef<HTMLInputElement>(null)
 
     const [examForm, setExamForm] = useState({
         title: '',
@@ -84,92 +145,280 @@ export default function AdminScholarships() {
 
     useEffect(() => {
         loadData()
+        const unsub = scholarshipService.onPendingChange(ops => {
+            setPendingCount(ops.length)
+        })
+        const unsubRealtime = scholarshipService.subscribeToChanges(() => {
+            loadData(false)
+        })
+        return () => {
+            unsub()
+            unsubRealtime()
+        }
     }, [])
 
-    const loadData = async () => {
-        setLoading(true)
+    const loadData = async (showSpinner = true) => {
+        if (showSpinner) setLoading(true)
         try {
-            const [s, w, e] = await Promise.all([
+            const [s, c, sc, p, w, e] = await Promise.all([
                 scholarshipService.getSettings(),
+                scholarshipService.getCampaigns(),
+                scholarshipService.getSchools(),
+                scholarshipService.getParticipations(),
                 scholarshipService.getWinners(),
                 scholarshipService.getExamImages()
             ])
             setSettings(s)
+            setCampaigns(c)
+            setSchools(sc)
+            setParticipations(p)
             setWinners(w)
             setExamImages(e)
+            setPendingCount(scholarshipService.getPendingCount())
+
+            if (c.length > 0 && !selectedCampaignId) {
+                setSelectedCampaignId(c[0].id)
+            }
         } catch (e) {
             console.error('Error loading scholarship data', e)
             showToast('Error loading scholarship data', 'error')
         } finally {
-            setLoading(false)
+            if (showSpinner) setLoading(false)
         }
     }
 
-    const handleSaveSettings = async () => {
-        setSaving(true)
-        try {
-            const updated = await scholarshipService.updateSettings(settings)
-            setSettings(updated)
-            showToast('Scholarship settings saved successfully!', 'success')
-        } catch (e) {
-            console.error('Failed to save settings', e)
-            showToast('Failed to save scholarship settings.', 'error')
-        } finally {
-            setSaving(false)
+    const currentCampaign = campaigns.find(c => c.id === selectedCampaignId) || campaigns[0]
+
+    // ----------------------------------------------------
+    // CAMPAIGN HANDLERS
+    // ----------------------------------------------------
+    const handleOpenCampaignModal = (camp?: ScholarshipCampaign) => {
+        if (camp) {
+            setEditingCampaign(camp)
+            setCampaignForm({
+                title: camp.title,
+                year: camp.year,
+                session: camp.session,
+                description: camp.description || '',
+                status: camp.status
+            })
+        } else {
+            setEditingCampaign(null)
+            const yr = new Date().getFullYear()
+            setCampaignForm({
+                title: `ICST Merit Scholarship Examination ${yr}`,
+                year: yr,
+                session: `${yr}-${yr + 1} Session`,
+                description: 'Official annual talent search and scholarship examination.',
+                status: 'active'
+            })
         }
+        setIsCampaignModalOpen(true)
     }
 
-    // Handle Banner File Upload
-    const handleBannerFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('File size exceeds 5 MB limit. Please select a smaller image.', 'error')
+    const handleSaveCampaign = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!campaignForm.title) {
+            showToast('Scholarship title is required.', 'error')
             return
         }
 
-        setUploadingBanner(true)
         try {
-            const imageUrl = await scholarshipService.processAndUploadImage(file, 1920, 700)
-            setSettings(prev => ({ ...prev, bannerImage: imageUrl }))
-            showToast('Banner image uploaded and optimized successfully!', 'success')
-        } catch (err) {
-            console.error('Upload error', err)
-            showToast('Failed to upload banner image', 'error')
-        } finally {
-            setUploadingBanner(false)
+            const saved = await scholarshipService.saveCampaign({
+                id: editingCampaign?.id,
+                ...campaignForm
+            })
+            setCampaigns(prev => {
+                const idx = prev.findIndex(c => c.id === saved.id)
+                return idx >= 0 ? prev.map(c => c.id === saved.id ? saved : c) : [saved, ...prev]
+            })
+            setSelectedCampaignId(saved.id)
+            setIsCampaignModalOpen(false)
+            showToast(editingCampaign ? 'Scholarship campaign updated!' : 'New scholarship campaign created!', 'success')
+        } catch (err: any) {
+            showToast(err.message || 'Failed to save scholarship campaign', 'error')
         }
     }
 
-    // Handle Winner Photo Upload
-    const handleWinnerPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
+    const handleDeleteCampaign = (id: string, title: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Scholarship Campaign',
+            description: `Are you sure you want to delete "${title}"? This will also un-link participating schools and winners for this campaign.`,
+            confirmLabel: 'Delete Campaign',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    await scholarshipService.deleteCampaign(id)
+                    setCampaigns(prev => prev.filter(c => c.id !== id))
+                    if (selectedCampaignId === id) {
+                        const remaining = campaigns.filter(c => c.id !== id)
+                        setSelectedCampaignId(remaining[0]?.id || '')
+                    }
+                    showToast('Scholarship campaign removed.', 'success')
+                    setConfirmModal(null)
+                } catch (e: any) {
+                    showToast(e.message || 'Failed to delete campaign', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                }
+            }
+        })
+    }
 
-        if (file.size > 2 * 1024 * 1024) {
-            showToast('Photo size exceeds 2 MB limit.', 'error')
+    // ----------------------------------------------------
+    // SCHOOL DIRECTORY & PARTICIPATION HANDLERS
+    // ----------------------------------------------------
+    const handleOpenSchoolModal = (sch?: ScholarshipSchool) => {
+        if (sch) {
+            setEditingSchool(sch)
+            setSchoolForm({
+                name: sch.name,
+                district: sch.district,
+                address: sch.address || '',
+                logo: sch.logo || ''
+            })
+        } else {
+            setEditingSchool(null)
+            setSchoolForm({
+                name: '',
+                district: 'Nadia',
+                address: '',
+                logo: ''
+            })
+        }
+        setIsSchoolModalOpen(true)
+    }
+
+    const handleSaveSchool = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!schoolForm.name || !schoolForm.district) {
+            showToast('School name and district are required.', 'error')
             return
         }
 
-        setUploadingWinnerPhoto(true)
         try {
-            const photoUrl = await scholarshipService.processAndUploadImage(file, 600, 600)
-            setWinnerForm(prev => ({ ...prev, photo: photoUrl }))
-            showToast('Student photo uploaded successfully!', 'success')
-        } catch (err) {
-            console.error('Photo upload error', err)
-            showToast('Failed to upload photo', 'error')
-        } finally {
-            setUploadingWinnerPhoto(false)
+            const saved = await scholarshipService.saveSchool({
+                id: editingSchool?.id,
+                ...schoolForm
+            })
+            setSchools(prev => {
+                const idx = prev.findIndex(s => s.id === saved.id)
+                return idx >= 0 ? prev.map(s => s.id === saved.id ? saved : s) : [...prev, saved]
+            })
+            setIsSchoolModalOpen(false)
+            showToast(editingSchool ? 'School record updated!' : 'New school registered to directory!', 'success')
+        } catch (err: any) {
+            showToast(err.message || 'Failed to save school', 'error')
         }
     }
 
-    // Open Modal for Add/Edit Winner
-    const handleOpenWinnerModal = (winner?: ScholarshipWinner) => {
+    const handleDeleteSchool = (id: string, name: string) => {
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete School From Directory',
+            description: `Delete "${name}"? This will remove this school from the reusable directory and unlink it from all scholarships.`,
+            confirmLabel: 'Delete School',
+            variant: 'danger',
+            action: async () => {
+                setIsConfirmLoading(true)
+                try {
+                    await scholarshipService.deleteSchool(id)
+                    setSchools(prev => prev.filter(s => s.id !== id))
+                    setParticipations(prev => prev.filter(p => p.schoolId !== id))
+                    showToast('School removed from directory.', 'success')
+                    setConfirmModal(null)
+                } catch (e: any) {
+                    showToast(e.message || 'Failed to delete school', 'error')
+                } finally {
+                    setIsConfirmLoading(false)
+                }
+            }
+        })
+    }
+
+    // Toggle School Participation for Current Campaign
+    const handleToggleSchoolParticipation = async (school: ScholarshipSchool) => {
+        if (!currentCampaign) {
+            showToast('Please create or select a scholarship campaign first.', 'warning')
+            return
+        }
+
+        const existing = participations.find(p => p.scholarshipId === currentCampaign.id && p.schoolId === school.id)
+
+        try {
+            if (existing) {
+                // Remove participation
+                await scholarshipService.deleteParticipation(existing.id)
+                setParticipations(prev => prev.filter(p => p.id !== existing.id))
+                showToast(`Unlinked ${school.name} from ${currentCampaign.title}.`, 'info')
+            } else {
+                // Add participation (default: announce soon / no date)
+                const added = await scholarshipService.saveParticipation({
+                    scholarshipId: currentCampaign.id,
+                    schoolId: school.id,
+                    announcementDate: null,
+                    isAnnouncedOverride: false,
+                    school
+                })
+                setParticipations(prev => [...prev, added])
+                showToast(`Added ${school.name} to ${currentCampaign.title}!`, 'success')
+            }
+        } catch (err: any) {
+            showToast(err.message || 'Failed to update participation', 'error')
+        }
+    }
+
+    // Open Schedule Publication Modal for a School
+    const handleOpenScheduleModal = (school: ScholarshipSchool) => {
+        if (!currentCampaign) return
+        const part = participations.find(p => p.scholarshipId === currentCampaign.id && p.schoolId === school.id)
+        setSchedulingParticipation({
+            school,
+            participation: part,
+            announcementDate: part?.announcementDate ? new Date(part.announcementDate).toISOString().slice(0, 16) : '',
+            isOverride: part?.isAnnouncedOverride ?? false
+        })
+        setIsScheduleModalOpen(true)
+    }
+
+    const handleSaveSchedule = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!schedulingParticipation || !currentCampaign) return
+
+        try {
+            const saved = await scholarshipService.saveParticipation({
+                id: schedulingParticipation.participation?.id,
+                scholarshipId: currentCampaign.id,
+                schoolId: schedulingParticipation.school.id,
+                announcementDate: schedulingParticipation.announcementDate ? new Date(schedulingParticipation.announcementDate).toISOString() : null,
+                isAnnouncedOverride: schedulingParticipation.isOverride,
+                school: schedulingParticipation.school
+            })
+
+            setParticipations(prev => {
+                const idx = prev.findIndex(p => p.id === saved.id)
+                return idx >= 0 ? prev.map(p => p.id === saved.id ? saved : p) : [...prev, saved]
+            })
+
+            setIsScheduleModalOpen(false)
+            showToast(`Publication schedule saved for ${schedulingParticipation.school.name}!`, 'success')
+        } catch (err: any) {
+            showToast(err.message || 'Failed to save publication schedule', 'error')
+        }
+    }
+
+    // ----------------------------------------------------
+    // WINNER HANDLERS
+    // ----------------------------------------------------
+    const handleOpenWinnerModal = (winner?: ScholarshipWinner, prefilledSchool?: ScholarshipSchool) => {
+        const camp = currentCampaign
         if (winner) {
             setEditingWinner(winner)
             setWinnerForm({
+                scholarshipId: winner.scholarshipId || camp?.id || '',
+                schoolId: winner.schoolId || '',
                 year: winner.year,
                 rank: winner.rank,
                 studentName: winner.studentName,
@@ -183,13 +432,16 @@ export default function AdminScholarships() {
             })
         } else {
             setEditingWinner(null)
-            const nextRank = winners.filter(w => w.year === (selectedYearFilter === 'all' ? 2026 : selectedYearFilter)).length + 1
+            const targetSchool = prefilledSchool || schools[0]
+            const nextRank = winners.filter(w => (camp ? w.year === camp.year : true)).length + 1
             setWinnerForm({
-                year: selectedYearFilter === 'all' ? 2026 : selectedYearFilter,
+                scholarshipId: camp?.id || '',
+                schoolId: targetSchool?.id || '',
+                year: camp ? camp.year : new Date().getFullYear(),
                 rank: nextRank,
                 studentName: '',
-                schoolName: '',
-                district: '',
+                schoolName: targetSchool ? targetSchool.name : '',
+                district: targetSchool ? targetSchool.district : 'Nadia',
                 marks: '',
                 photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
                 description: '',
@@ -222,17 +474,17 @@ export default function AdminScholarships() {
             }
 
             setIsWinnerModalOpen(false)
-        } catch (err) {
-            console.error('Save winner error', err)
-            showToast('Failed to save winner record.', 'error')
+        } catch (err: any) {
+            console.error('Save winner error:', err)
+            showToast(err.message || 'Failed to save winner record.', 'error')
         }
     }
 
-    const handleDeleteWinner = (id: string) => {
+    const handleDeleteWinner = (id: string, name: string) => {
         setConfirmModal({
             isOpen: true,
-            title: 'Delete Winner Record',
-            description: 'Are you sure you want to delete this winner record? This cannot be undone.',
+            title: 'Delete Position Holder',
+            description: `Are you sure you want to delete ${name}? This will remove them from the website immediately.`,
             confirmLabel: 'Delete Winner',
             variant: 'danger',
             action: async () => {
@@ -240,55 +492,20 @@ export default function AdminScholarships() {
                 try {
                     await scholarshipService.deleteWinner(id)
                     setWinners(prev => prev.filter(w => w.id !== id))
-                    showToast('Winner record deleted.', 'info')
-                } catch (err) {
-                    showToast('Failed to delete record.', 'error')
+                    showToast('Winner record deleted.', 'success')
+                    setConfirmModal(null)
+                } catch (e: any) {
+                    showToast(e.message || 'Failed to delete winner.', 'error')
                 } finally {
                     setIsConfirmLoading(false)
-                    setConfirmModal(null)
                 }
             }
         })
     }
 
-    const handleToggleWinnerPublished = async (winner: ScholarshipWinner) => {
-        try {
-            const updated = await scholarshipService.saveWinner({
-                ...winner,
-                published: !winner.published
-            })
-            setWinners(prev => prev.map(w => w.id === updated.id ? updated : w))
-            showToast(`Winner status set to ${updated.published ? 'Published' : 'Hidden'}`, 'info')
-        } catch (err) {
-            showToast('Failed to update status.', 'error')
-        }
-    }
-
     // ----------------------------------------------------
-    // EXAM GALLERY HANDLERS
+    // EXAM PHOTOS HANDLERS
     // ----------------------------------------------------
-    const handleExamPhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0]
-        if (!file) return
-
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('Photo size exceeds 5 MB limit.', 'error')
-            return
-        }
-
-        setUploadingExamPhoto(true)
-        try {
-            const imageUrl = await scholarshipService.processAndUploadImage(file, 1200, 800)
-            setExamForm(prev => ({ ...prev, image: imageUrl }))
-            showToast('Exam photo uploaded successfully!', 'success')
-        } catch (err) {
-            console.error('Exam photo upload error', err)
-            showToast('Failed to upload exam photo', 'error')
-        } finally {
-            setUploadingExamPhoto(false)
-        }
-    }
-
     const handleOpenExamModal = (item?: ScholarshipExamImage) => {
         if (item) {
             setEditingExamImage(item)
@@ -305,8 +522,8 @@ export default function AdminScholarships() {
             setEditingExamImage(null)
             setExamForm({
                 title: '',
-                schoolName: '',
-                session: '2026-2027 Session',
+                schoolName: schools[0]?.name || '',
+                session: `${new Date().getFullYear()}-${new Date().getFullYear() + 1} Session`,
                 year: new Date().getFullYear(),
                 image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
                 description: '',
@@ -318,8 +535,8 @@ export default function AdminScholarships() {
 
     const handleSaveExamPhoto = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!examForm.title || !examForm.schoolName || !examForm.image) {
-            showToast('Title, School Name, and Image are required.', 'error')
+        if (!examForm.title || !examForm.image) {
+            showToast('Title and Photo Image are required.', 'error')
             return
         }
 
@@ -330,17 +547,16 @@ export default function AdminScholarships() {
             })
 
             if (editingExamImage) {
-                setExamImages(prev => prev.map(e => e.id === saved.id ? saved : e))
-                showToast('Exam photo record updated successfully!', 'success')
+                setExamImages(prev => prev.map(img => img.id === saved.id ? saved : img))
+                showToast('Exam photo updated successfully!', 'success')
             } else {
                 setExamImages(prev => [saved, ...prev])
-                showToast('New exam photo added to gallery!', 'success')
+                showToast('New examination moment added!', 'success')
             }
 
             setIsExamModalOpen(false)
-        } catch (err) {
-            console.error('Save exam photo error', err)
-            showToast('Failed to save exam photo.', 'error')
+        } catch (err: any) {
+            showToast(err.message || 'Failed to save exam photo', 'error')
         }
     }
 
@@ -348,76 +564,131 @@ export default function AdminScholarships() {
         setConfirmModal({
             isOpen: true,
             title: 'Delete Exam Photo',
-            description: 'Are you sure you want to delete this exam photo? This cannot be undone.',
+            description: 'Are you sure you want to delete this examination photo from the gallery?',
             confirmLabel: 'Delete Photo',
             variant: 'danger',
             action: async () => {
                 setIsConfirmLoading(true)
                 try {
                     await scholarshipService.deleteExamImage(id)
-                    setExamImages(prev => prev.filter(e => e.id !== id))
-                    showToast('Exam photo deleted.', 'info')
-                } catch (err) {
-                    showToast('Failed to delete exam photo.', 'error')
+                    setExamImages(prev => prev.filter(img => img.id !== id))
+                    showToast('Exam photo removed from gallery.', 'success')
+                    setConfirmModal(null)
+                } catch (e: any) {
+                    showToast(e.message || 'Failed to delete photo', 'error')
                 } finally {
                     setIsConfirmLoading(false)
-                    setConfirmModal(null)
                 }
             }
         })
     }
 
-    const handleToggleExamPublished = async (item: ScholarshipExamImage) => {
+    // ----------------------------------------------------
+    // SETTINGS & SYNC HANDLERS
+    // ----------------------------------------------------
+    const handleSaveSettings = async () => {
+        setSaving(true)
         try {
-            const updated = await scholarshipService.saveExamImage({
-                ...item,
-                published: !item.published
-            })
-            setExamImages(prev => prev.map(e => e.id === updated.id ? updated : e))
-            showToast(`Exam photo status set to ${updated.published ? 'Published' : 'Hidden'}`, 'info')
-        } catch (err) {
-            showToast('Failed to update status.', 'error')
+            const updated = await scholarshipService.updateSettings(settings)
+            setSettings(updated)
+            showToast('Scholarship settings saved successfully!', 'success')
+        } catch (e: any) {
+            showToast(e.message || 'Failed to save scholarship settings.', 'error')
+        } finally {
+            setSaving(false)
         }
     }
 
-    const availableYears = Array.from(new Set(winners.map(w => w.year))).sort((a, b) => b - a)
-    if (!availableYears.includes(2026)) availableYears.unshift(2026)
+    const handleSyncToSupabase = async () => {
+        setIsSyncing(true)
+        try {
+            const res = await scholarshipService.syncPendingOperations()
+            setSyncModalResult(res)
+            if (res.errors.length === 0) {
+                if (res.syncedCount > 0) {
+                    showToast(`Successfully synced ${res.syncedCount} pending operation(s) to Supabase!`, 'success')
+                } else {
+                    showToast('All scholarship operations are fully synchronized with Supabase.', 'success')
+                }
+            } else {
+                showToast(`Sync completed with ${res.errors.length} issue(s). Check the acknowledgment report.`, 'warning')
+            }
+            await loadData(false)
+        } catch (err: any) {
+            console.error('Sync Supabase error:', err)
+            showToast(err.message || 'Failed to sync data to Supabase.', 'error')
+        } finally {
+            setIsSyncing(false)
+        }
+    }
 
-    const filteredWinners = selectedYearFilter === 'all'
-        ? winners
-        : winners.filter(w => w.year === selectedYearFilter)
+
+
+    // Filtered lists
+    const participatingSchoolIds = participations
+        .filter(p => currentCampaign ? p.scholarshipId === currentCampaign.id : true)
+        .map(p => p.schoolId)
+
+    const participatingSchools = schools.filter(s => participatingSchoolIds.includes(s.id))
+
+    const filteredWinners = winners.filter(w => {
+        const matchCamp = currentCampaign ? (w.scholarshipId ? w.scholarshipId === currentCampaign.id : w.year === currentCampaign.year) : true
+        const matchSchool = selectedSchoolForWinner === 'all' ? true : (w.schoolId === selectedSchoolForWinner || w.schoolName === selectedSchoolForWinner)
+        return matchCamp && matchSchool
+    })
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <div className="flex flex-col items-center justify-center min-h-[450px] gap-3">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Loading Scholarship Control Center...</p>
             </div>
         )
     }
 
     return (
-        <div className="space-y-8 pb-16 font-inter">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+        <div className="space-y-8 font-inter">
+
+            {/* TOP HEADER & CONTROLS */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-100 dark:border-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner">
-                        <GraduationCap size={32} />
+                    <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 rounded-2xl border border-indigo-200 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400">
+                        <GraduationCap size={28} />
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">ICST Scholarships</h1>
+                            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">ICST Scholarships & Publisher</h1>
                             <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 ${settings.masterEnabled ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60'}`}>
                                 <span className={`w-2 h-2 rounded-full ${settings.masterEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
                                 {settings.masterEnabled ? 'System Active' : 'System Disabled'}
                             </span>
                         </div>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                            Manage all scholarship banners, marketing content, results, links and homepage visibility.
+                            Step-by-step scholarship creation, school registration, scheduled publication dates, and position holders.
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                    <button
+                        onClick={handleSyncToSupabase}
+                        disabled={isSyncing}
+                        className={`px-4 py-2.5 font-semibold rounded-xl shadow-md transition-all flex items-center gap-2 transform hover:-translate-y-0.5 disabled:opacity-50 ${
+                            pendingCount > 0
+                                ? 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-950 shadow-amber-500/20 animate-pulse'
+                                : 'bg-slate-800 hover:bg-slate-700 active:bg-slate-900 text-white border border-slate-700 dark:border-slate-700'
+                        }`}
+                        title={pendingCount > 0 ? `${pendingCount} pending local changes waiting to sync to Supabase` : 'Sync all pending local operations to Supabase'}
+                    >
+                        <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
+                        <span>{isSyncing ? 'Syncing...' : 'Sync to Supabase'}</span>
+                        {pendingCount > 0 && (
+                            <span className="px-2 py-0.5 text-xs font-bold bg-slate-950 text-amber-300 rounded-full">
+                                {pendingCount} Pending
+                            </span>
+                        )}
+                    </button>
+
                     <button
                         onClick={handleSaveSettings}
                         disabled={saving}
@@ -429,34 +700,506 @@ export default function AdminScholarships() {
                 </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2">
+            {/* NAVIGATION TABS */}
+            <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2 overflow-x-auto">
+                <button
+                    onClick={() => setActiveTab('flow')}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 whitespace-nowrap ${activeTab === 'flow' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                >
+                    <Sparkles size={18} />
+                    <span>Publishing Flow & Schools</span>
+                </button>
+                <button
+                    onClick={() => setActiveTab('winners')}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 whitespace-nowrap ${activeTab === 'winners' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                >
+                    <Trophy size={18} />
+                    <span>All Position Holders ({winners.length})</span>
+                </button>
                 <button
                     onClick={() => setActiveTab('settings')}
-                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 whitespace-nowrap ${activeTab === 'settings' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
                 >
                     <Layers size={18} />
                     <span>Control Panel & Banner</span>
                 </button>
                 <button
-                    onClick={() => setActiveTab('winners')}
-                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'winners' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
-                >
-                    <Trophy size={18} />
-                    <span>Winner Management ({winners.length})</span>
-                </button>
-                <button
                     onClick={() => setActiveTab('examPhotos')}
-                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'examPhotos' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
+                    className={`px-5 py-3 font-semibold text-sm rounded-t-xl transition-colors border-b-2 flex items-center gap-2 whitespace-nowrap ${activeTab === 'examPhotos' ? 'border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-slate-900' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}`}
                 >
                     <ImageIcon size={18} />
                     <span>Exam Photos & Moments ({examImages.length})</span>
                 </button>
             </div>
 
-            {activeTab === 'settings' && (
+            {/* TAB 1: PUBLISHING FLOW & SCHOOLS DIRECTORY */}
+            {activeTab === 'flow' && (
                 <div className="space-y-8">
 
+                    {/* STEP 1: SCHOLARSHIP CAMPAIGN SELECTOR / CREATOR */}
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">1</span>
+                                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">Select or Create Scholarship Campaign</h2>
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Choose the scholarship examination or year to attach participating schools and schedule winner releases.
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => handleOpenCampaignModal()}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 self-start md:self-auto"
+                            >
+                                <Plus size={16} />
+                                <span>Create New Scholarship</span>
+                            </button>
+                        </div>
+
+                        {campaigns.length === 0 ? (
+                            <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 space-y-3">
+                                <GraduationCap size={36} className="mx-auto text-slate-400" />
+                                <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">No Scholarship Campaigns Found</h3>
+                                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                                    Click the button above to create your first scholarship examination (e.g. "ICST Merit Exam 2026").
+                                </p>
+                                <button
+                                    onClick={() => handleOpenCampaignModal()}
+                                    className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow"
+                                >
+                                    + Create First Scholarship
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {campaigns.map(camp => {
+                                    const isSelected = selectedCampaignId === camp.id
+                                    const countParticipating = participations.filter(p => p.scholarshipId === camp.id).length
+                                    return (
+                                        <div
+                                            key={camp.id}
+                                            onClick={() => setSelectedCampaignId(camp.id)}
+                                            className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${
+                                                isSelected
+                                                    ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/40 shadow-md shadow-indigo-600/10'
+                                                    : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
+                                            }`}
+                                        >
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div className="space-y-1">
+                                                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                                        {camp.session}
+                                                    </span>
+                                                    <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">{camp.title}</h3>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">Year {camp.year} • {countParticipating} Schools Linked</p>
+                                                </div>
+
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleOpenCampaignModal(camp)
+                                                        }}
+                                                        className="p-1 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                                                        title="Edit Scholarship"
+                                                    >
+                                                        <Edit3 size={15} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleDeleteCampaign(camp.id, camp.title)
+                                                        }}
+                                                        className="p-1 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-white dark:hover:bg-slate-800 transition-colors"
+                                                        title="Delete Scholarship"
+                                                    >
+                                                        <Trash2 size={15} />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {isSelected && (
+                                                <div className="mt-3 pt-2 border-t border-indigo-200 dark:border-indigo-800/60 flex items-center justify-between text-xs font-bold text-indigo-700 dark:text-indigo-400">
+                                                    <span>Active Campaign for Management</span>
+                                                    <CheckCircle2 size={16} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* STEP 2: PARTICIPATING SCHOOLS & ANNOUNCEMENT SCHEDULER */}
+                    {currentCampaign && (
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">2</span>
+                                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                                            Schools & Scheduled Winner Publication
+                                        </h2>
+                                    </div>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Click custom cards below to toggle participation for <strong>{currentCampaign.title}</strong>. Set winner publication date & time for each school.
+                                    </p>
+                                </div>
+
+                                <button
+                                    onClick={() => handleOpenSchoolModal()}
+                                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow transition-all flex items-center gap-1.5 self-start md:self-auto"
+                                >
+                                    <Plus size={16} />
+                                    <span>Register New School</span>
+                                </button>
+                            </div>
+
+                            {schools.length === 0 ? (
+                                <div className="p-8 text-center bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 space-y-3">
+                                    <SchoolIcon size={36} className="mx-auto text-slate-400" />
+                                    <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">School Directory is Empty</h3>
+                                    <p className="text-xs text-slate-500 max-w-md mx-auto">
+                                        Register schools once to build your permanent directory. You can then select them across all scholarship years.
+                                    </p>
+                                    <button
+                                        onClick={() => handleOpenSchoolModal()}
+                                        className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow"
+                                    >
+                                        + Register First School
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {schools.map(school => {
+                                        const isParticipating = participatingSchoolIds.includes(school.id)
+                                        const part = participations.find(p => p.scholarshipId === currentCampaign.id && p.schoolId === school.id)
+                                        const status = scholarshipService.evaluatePublicationStatus(currentCampaign.title, school.name, part)
+                                        const schoolWinnersCount = winners.filter(w => w.schoolId === school.id || w.schoolName === school.name).length
+
+                                        return (
+                                            <div
+                                                key={school.id}
+                                                className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-3 relative ${
+                                                    isParticipating
+                                                        ? 'border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/30 shadow-md'
+                                                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 opacity-80 hover:opacity-100'
+                                                }`}
+                                            >
+                                                {/* Header row with custom toggle button (NOT HTML checkbox) */}
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div
+                                                        onClick={() => handleToggleSchoolParticipation(school)}
+                                                        className="flex items-center gap-2.5 cursor-pointer select-none group"
+                                                    >
+                                                        {/* CUSTOM STYLED CARD CHECKBOX */}
+                                                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
+                                                            isParticipating
+                                                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30 ring-2 ring-indigo-400/40'
+                                                                : 'bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 group-hover:border-indigo-400'
+                                                        }`}>
+                                                            {isParticipating && <Check size={16} strokeWidth={3} />}
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                                {school.name}
+                                                            </h3>
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400">{school.district}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Edit & Delete School in Directory */}
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        <button
+                                                            onClick={() => handleOpenSchoolModal(school)}
+                                                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                                            title="Edit School Details"
+                                                        >
+                                                            <Edit3 size={15} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteSchool(school.id, school.name)}
+                                                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                                            title="Delete School from Directory"
+                                                        >
+                                                            <Trash2 size={15} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Participation Status & Scheduling Area */}
+                                                {isParticipating ? (
+                                                    <div className="space-y-2 pt-2 border-t border-indigo-100 dark:border-indigo-900/50">
+                                                        <div className="flex items-center justify-between text-xs">
+                                                            <span className="font-semibold text-slate-600 dark:text-slate-300">
+                                                                {schoolWinnersCount} Winner(s) Ready
+                                                            </span>
+
+                                                            {/* Status Badge */}
+                                                            {status.badgeType === 'announced' ? (
+                                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
+                                                                    ● LIVE / ANNOUNCED
+                                                                </span>
+                                                            ) : status.badgeType === 'scheduled' ? (
+                                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800">
+                                                                    🕒 SCHEDULED
+                                                                </span>
+                                                            ) : (
+                                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                                                    ⏳ WILL BE ANNOUNCED SOON
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Public Visitor Preview Text */}
+                                                        <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-indigo-100 dark:border-indigo-900/60 text-[11px] text-slate-600 dark:text-slate-300">
+                                                            <span className="font-bold text-indigo-600 dark:text-indigo-400 block mb-0.5">Visitor Notice:</span>
+                                                            <p className="italic line-clamp-2">"{status.displayText}"</p>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2 pt-1">
+                                                            <button
+                                                                onClick={() => handleOpenScheduleModal(school)}
+                                                                className="flex-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-1.5"
+                                                            >
+                                                                <CalendarTime size={14} />
+                                                                <span>{part?.announcementDate ? 'Change Date & Time' : 'Set Release Date'}</span>
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => handleOpenWinnerModal(undefined, school)}
+                                                                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1"
+                                                                title="Add position holder for this school"
+                                                            >
+                                                                <Plus size={14} />
+                                                                <span>Winner</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-xs text-slate-400 italic pt-2 border-t border-slate-200 dark:border-slate-800">
+                                                        Not participating in this campaign. Click checkbox above to include.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* STEP 3: POSITION HOLDERS FOR PARTICIPATING SCHOOLS */}
+                    {currentCampaign && (
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">3</span>
+                                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                                            Winners for {currentCampaign.title}
+                                        </h2>
+                                    </div>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                        Position holders will automatically become visible to visitors once their school's publication date & time is reached.
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <TailwindDropdown
+                                        labelPrefix="School:"
+                                        options={[
+                                            { label: 'All Participating Schools', value: 'all' },
+                                            ...participatingSchools.map(s => ({ label: s.name, value: s.id }))
+                                        ]}
+                                        value={selectedSchoolForWinner}
+                                        onChange={(val) => setSelectedSchoolForWinner(String(val))}
+                                    />
+
+                                    <button
+                                        onClick={() => handleOpenWinnerModal()}
+                                        className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow flex items-center gap-1.5 transition-all"
+                                    >
+                                        <Plus size={16} />
+                                        <span>Add Position Holder</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Winners Table */}
+                            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                        <tr>
+                                            <th className="px-6 py-4">Student</th>
+                                            <th className="px-6 py-4">Rank</th>
+                                            <th className="px-6 py-4">School & District</th>
+                                            <th className="px-6 py-4">Marks</th>
+                                            <th className="px-6 py-4">Publication Status</th>
+                                            <th className="px-6 py-4 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                        {filteredWinners.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-10 text-center text-slate-400 text-xs">
+                                                    No winners added yet for this filter. Click "+ Add Position Holder" to create one.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            filteredWinners.map(winner => {
+                                                const part = participations.find(p => p.scholarshipId === currentCampaign.id && (p.schoolId === winner.schoolId || p.school?.name === winner.schoolName))
+                                                const pubStatus = scholarshipService.evaluatePublicationStatus(currentCampaign.title, winner.schoolName, part)
+
+                                                return (
+                                                    <tr key={winner.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                                                        <td className="px-6 py-4 font-medium text-slate-900 dark:text-white flex items-center gap-3">
+                                                            <img
+                                                                src={winner.photo}
+                                                                alt={winner.studentName}
+                                                                className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                                                            />
+                                                            <div>
+                                                                <span className="font-bold text-sm block">{winner.studentName}</span>
+                                                                <span className="text-[11px] text-slate-500">Order #{winner.displayOrder}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/80">
+                                                                Rank #{winner.rank}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-medium">
+                                                            {winner.schoolName} ({winner.district})
+                                                        </td>
+                                                        <td className="px-6 py-4 font-bold text-emerald-600 dark:text-emerald-400">
+                                                            {winner.marks}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {pubStatus.badgeType === 'announced' ? (
+                                                                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                                    <CheckCircle2 size={14} /> LIVE on website
+                                                                </span>
+                                                            ) : pubStatus.badgeType === 'scheduled' ? (
+                                                                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1" title={pubStatus.displayText}>
+                                                                    <Clock size={14} /> Releases {pubStatus.dateText}
+                                                                </span>
+                                                            ) : (
+                                                                <span className="text-xs font-semibold text-slate-400">
+                                                                    ⏳ Pending schedule
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button
+                                                                    onClick={() => handleOpenWinnerModal(winner)}
+                                                                    className="p-1.5 text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
+                                                                >
+                                                                    <Edit3 size={16} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteWinner(winner.id, winner.studentName)}
+                                                                    className="p-1.5 text-slate-600 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* TAB 2: ALL POSITION HOLDERS LIST */}
+            {activeTab === 'winners' && (
+                <div className="space-y-6">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400">
+                                <Trophy size={24} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Master Position Holders Directory</h3>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">View and manage all registered student awardees across all campaigns.</p>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => handleOpenWinnerModal()}
+                            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-md flex items-center gap-2 transition-all"
+                        >
+                            <Plus size={18} />
+                            <span>Add Position Holder</span>
+                        </button>
+                    </div>
+
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th className="px-6 py-4">Student</th>
+                                    <th className="px-6 py-4">Year</th>
+                                    <th className="px-6 py-4">Rank</th>
+                                    <th className="px-6 py-4">School & District</th>
+                                    <th className="px-6 py-4">Marks</th>
+                                    <th className="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                {winners.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400 text-sm">
+                                            No winners found. Use the Publishing Flow tab or button above to add position holders.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    winners.map(w => (
+                                        <tr key={w.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
+                                            <td className="px-6 py-4 font-medium text-slate-900 dark:text-white flex items-center gap-3">
+                                                <img src={w.photo} alt={w.studentName} className="w-10 h-10 rounded-full object-cover border" />
+                                                <span className="font-bold">{w.studentName}</span>
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-semibold">{w.year}</td>
+                                            <td className="px-6 py-4">
+                                                <span className="px-2.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300">
+                                                    Rank #{w.rank}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-700 dark:text-slate-300">{w.schoolName} ({w.district})</td>
+                                            <td className="px-6 py-4 font-bold text-emerald-600">{w.marks}</td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button onClick={() => handleOpenWinnerModal(w)} className="p-1.5 hover:text-indigo-600">
+                                                        <Edit3 size={16} />
+                                                    </button>
+                                                    <button onClick={() => handleDeleteWinner(w.id, w.studentName)} className="p-1.5 hover:text-rose-600">
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {/* TAB 3: CONTROL PANEL & BANNERS */}
+            {activeTab === 'settings' && (
+                <div className="space-y-8">
                     {/* MASTER SWITCH CARD */}
                     <div className={`p-6 rounded-2xl border transition-all duration-300 ${settings.masterEnabled ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-slate-800 shadow-xl' : 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-300'}`}>
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -472,7 +1215,7 @@ export default function AdminScholarships() {
                                         </span>
                                     </div>
                                     <p className={`text-sm mt-1 max-w-2xl ${settings.masterEnabled ? 'text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
-                                        Master switch controls all public scholarship features. Turning this OFF hides all banners, results, navigation items, and winner pages site-wide immediately.
+                                        Master switch controls all public scholarship features. Turning this OFF hides all banners, results, navigation items, and winner showcases site-wide immediately.
                                     </p>
                                 </div>
                             </div>
@@ -486,615 +1229,59 @@ export default function AdminScholarships() {
                                     onClick={() => setSettings(prev => ({ ...prev, masterEnabled: !prev.masterEnabled }))}
                                     className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${settings.masterEnabled ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-slate-700'}`}
                                 >
-                                    <span
-                                        className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${settings.masterEnabled ? 'translate-x-9' : 'translate-x-1'}`}
-                                    />
+                                    <span className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${settings.masterEnabled ? 'translate-x-9' : 'translate-x-1'}`} />
                                 </button>
                             </div>
                         </div>
-
-                        {!settings.masterEnabled && (
-                            <div className="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-sm flex items-center gap-3">
-                                <AlertCircle size={20} className="shrink-0 text-amber-600 dark:text-amber-400" />
-                                <span>
-                                    <strong>Master Switch is OFF:</strong> All public scholarship features, banner sliders, result buttons, navigation links, and winner showcases are completely hidden from website visitors.
-                                </span>
-                            </div>
-                        )}
                     </div>
 
-                    {/* DETAILED CONTROLS TOGGLES GRID */}
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Module Visibility Controls</h3>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Enable or disable specific components independently when Master Switch is ON.</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {/* Control Switches */}
-                            {[
-                                { key: 'bannerEnabled', label: 'Homepage Banner', desc: 'Display banner image on home page' },
-                                { key: 'bannerRedirectEnabled', label: 'Banner Click Redirect', desc: 'Make entire banner clickable' },
-                                { key: 'resultEnabled', label: 'Homepage Result Button', desc: 'Display View Result CTA button' },
-                                { key: 'navigationEnabled', label: 'Scholarship Navigation', desc: 'Show Scholarships in top navbar' },
-                                { key: 'scholarshipPageEnabled', label: 'Scholarship Marketing Page', desc: 'Enable public /scholarships route' },
-                                { key: 'winnersGalleryEnabled', label: 'Winners Gallery', desc: 'Show position holders & year filter' },
-                                { key: 'homepagePromotionEnabled', label: 'Homepage Promotion Section', desc: 'Show promo section below hero' },
-                            ].map(ctrl => {
-                                const isChecked = (settings as any)[ctrl.key]
-                                return (
-                                    <div key={ctrl.key} className={`p-4 rounded-xl border transition-all ${isChecked ? 'bg-indigo-50/40 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800/60' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/60 opacity-70'}`}>
-                                        <div className="flex items-center justify-between mb-1">
-                                            <span className="font-semibold text-sm text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
-                                                <CheckCircle2 size={16} className={isChecked ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'} />
-                                                {ctrl.label}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() => setSettings(prev => ({ ...prev, [ctrl.key]: !(prev as any)[ctrl.key] }))}
-                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isChecked ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                                            >
-                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isChecked ? 'translate-x-6' : 'translate-x-1'}`} />
-                                            </button>
-                                        </div>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">{ctrl.desc}</p>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-
-                    {/* HOMEPAGE SCHOLARSHIP BANNER CARD */}
+                    {/* HOMEPAGE BANNER CONTROLS */}
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <ImageIcon className="text-indigo-600 dark:text-indigo-400" size={22} />
-                                    Homepage Scholarship Banner
-                                </h3>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Configure manual banner upload, target click link, and preview rendering.</p>
-                            </div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Homepage Hero Banner & Redirect</h3>
 
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Enable Banner:</span>
-                                <button
-                                    type="button"
-                                    onClick={() => setSettings(prev => ({ ...prev, bannerEnabled: !prev.bannerEnabled }))}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${settings.bannerEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                                >
-                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.bannerEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Banner Image Upload & Guidance Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                            {/* Upload Dropzone & Inputs */}
-                            <div className="lg:col-span-7 space-y-4">
-                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Banner Image Source</label>
-
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={settings.bannerImage}
-                                        onChange={(e) => setSettings(prev => ({ ...prev, bannerImage: e.target.value }))}
-                                        placeholder="https://... image URL or upload below"
-                                        className="flex-1 px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                    />
-                                    <input
-                                        type="file"
-                                        ref={bannerInputRef}
-                                        onChange={handleBannerFileChange}
-                                        accept="image/jpeg,image/png,image/webp"
-                                        className="hidden"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => bannerInputRef.current?.click()}
-                                        disabled={uploadingBanner}
-                                        className="px-4 py-2.5 bg-slate-900 dark:bg-slate-800 text-white font-medium text-sm rounded-xl hover:bg-slate-800 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 transition-colors flex items-center gap-2 shrink-0"
-                                    >
-                                        <Upload size={16} />
-                                        <span>{uploadingBanner ? 'Uploading...' : 'Upload Image'}</span>
-                                    </button>
-                                </div>
-
-                                {/* Banner Redirect URL Fields */}
-                                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700/70 space-y-3 mt-4">
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                                            <LinkIcon size={16} className="text-indigo-600 dark:text-indigo-400" />
-                                            Banner Redirect URL
-                                        </label>
-
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs text-slate-500 dark:text-slate-400">Enable Click Link:</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => setSettings(prev => ({ ...prev, bannerRedirectEnabled: !prev.bannerRedirectEnabled }))}
-                                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${settings.bannerRedirectEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                                            >
-                                                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${settings.bannerRedirectEnabled ? 'translate-x-4.5' : 'translate-x-1'}`} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <input
-                                        type="text"
-                                        value={settings.bannerRedirectUrl}
-                                        onChange={(e) => setSettings(prev => ({ ...prev, bannerRedirectUrl: e.target.value }))}
-                                        placeholder="https://... target link on banner click"
-                                        disabled={!settings.bannerRedirectEnabled}
-                                        className="w-full px-4 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                                    />
-                                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                                        When enabled, clicking anywhere on the banner redirects the user directly to the specified URL.
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Recommended Image Size Helper Box */}
-                            <div className="lg:col-span-5 bg-gradient-to-br from-indigo-50/70 to-purple-50/70 dark:from-indigo-950/40 dark:to-purple-950/40 p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/50 space-y-3 text-xs">
-                                <div className="flex items-center gap-2 text-indigo-900 dark:text-indigo-300 font-bold text-sm border-b border-indigo-100 dark:border-indigo-900/50 pb-2">
-                                    <Info size={18} className="text-indigo-600 dark:text-indigo-400" />
-                                    <span>Recommended Banner Specifications</span>
-                                </div>
-
-                                <ul className="space-y-2 text-slate-700 dark:text-slate-300">
-                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Desktop Resolution:</span>
-                                        <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-indigo-700 dark:text-indigo-300 font-bold">1920 × 700 px</span>
-                                    </li>
-                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Tablet Resolution:</span>
-                                        <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-700 dark:text-slate-300">1400 × 600 px</span>
-                                    </li>
-                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Mobile Resolution:</span>
-                                        <span className="font-mono bg-white dark:bg-slate-800 px-2 py-0.5 rounded text-slate-700 dark:text-slate-300">1080 × 1350 px</span>
-                                    </li>
-                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Aspect Ratio:</span>
-                                        <span>Approximately 2.75 : 1</span>
-                                    </li>
-                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Safe Content Area:</span>
-                                        <span>Center 70% of banner</span>
-                                    </li>
-                                    <li className="flex justify-between border-b border-indigo-50 dark:border-indigo-950/50 pb-1">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Maximum File Size:</span>
-                                        <span className="text-amber-700 dark:text-amber-400 font-bold">5 MB max</span>
-                                    </li>
-                                    <li className="flex justify-between">
-                                        <span className="font-semibold text-slate-900 dark:text-slate-200">Preferred Format:</span>
-                                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">WEBP (Auto-optimized)</span>
-                                    </li>
-                                </ul>
-
-                                <div className="p-2.5 bg-white/80 dark:bg-slate-850/80 rounded-xl text-slate-600 dark:text-slate-300 border border-indigo-100 dark:border-indigo-900/40 text-[11px] leading-relaxed">
-                                    💡 <strong>Design Note:</strong> Following these dimensions ensures your banner loads instantly, avoids layout shift, and looks crisp across all screens without degrading user experience.
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Banner Live Preview */}
-                        <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                    <Eye size={14} className="text-indigo-600 dark:text-indigo-400" />
-                                    Live Homepage Banner Preview
-                                </span>
-                                {settings.bannerRedirectEnabled && settings.bannerRedirectUrl && (
-                                    <span className="text-xs text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1">
-                                        <ExternalLink size={12} /> Clickable target: {settings.bannerRedirectUrl}
-                                    </span>
-                                )}
-                            </div>
-
-                            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800 bg-slate-900 group">
-                                {settings.bannerImage ? (
-                                    <div className="relative">
-                                        <img
-                                            src={settings.bannerImage}
-                                            alt="Scholarship Banner Preview"
-                                            className="w-full h-48 md:h-64 object-cover transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent flex flex-col justify-end p-6">
-                                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                                                <div>
-                                                    <span className="px-3 py-1 bg-amber-500 text-slate-950 font-bold text-xs rounded-full uppercase tracking-wider mb-2 inline-block shadow">
-                                                        ICST Scholarship
-                                                    </span>
-                                                    <h4 className="text-xl md:text-2xl font-black text-white">Empowering Young Minds Through Education</h4>
-                                                </div>
-
-                                                {settings.resultEnabled && (
-                                                    <a
-                                                        href={settings.resultUrl || '#'}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        onClick={(e) => e.stopPropagation()}
-                                                        className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg flex items-center gap-2 shrink-0 no-underline"
-                                                    >
-                                                        <span>{settings.resultButtonText || 'View Scholarship Result'}</span>
-                                                        <ArrowUpRight size={16} />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {settings.bannerRedirectEnabled && (
-                                            <div className="absolute top-4 right-4 bg-slate-900/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur border border-white/20 flex items-center gap-1.5 shadow">
-                                                <LinkIcon size={12} className="text-amber-400" />
-                                                <span>Clickable Banner Active</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="h-48 flex items-center justify-center text-slate-400 dark:text-slate-500 text-sm italic">
-                                        No banner image set. Please upload or specify an image URL above.
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* SCHOLARSHIP RESULT BUTTON CARD */}
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Scholarship Result Button</h3>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Configure CTA button leading to external or internal result pages.</p>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Enable Result Button:</span>
-                                <button
-                                    type="button"
-                                    onClick={() => setSettings(prev => ({ ...prev, resultEnabled: !prev.resultEnabled }))}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.resultEnabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'}`}
-                                >
-                                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.resultEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Result Target URL</label>
-                                <input
-                                    type="text"
-                                    value={settings.resultUrl}
-                                    onChange={(e) => setSettings(prev => ({ ...prev, resultUrl: e.target.value }))}
-                                    placeholder="https://icstconnect.com/results/scholarship-2026"
-                                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <ImageCropUploadField
+                                    value={settings.bannerImage}
+                                    onChange={(url) => setSettings(prev => ({ ...prev, bannerImage: url }))}
+                                    label="Banner Graphic Image"
+                                    uploadButtonText="Upload Banner"
+                                    aspectRatio={1920 / 700}
+                                    instruction="Hero Panoramic Banner (16:6). Frame wide banner header."
+                                    maxW={1920}
+                                    maxH={700}
+                                    placeholder="https://images.unsplash.com/... or click upload"
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Button Text</label>
+                            <div className="space-y-4">
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">Banner Click Destination</label>
                                 <input
                                     type="text"
-                                    value={settings.resultButtonText}
-                                    onChange={(e) => setSettings(prev => ({ ...prev, resultButtonText: e.target.value }))}
-                                    placeholder="View Scholarship Result"
-                                    className="w-full px-4 py-2.5 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    value={settings.bannerRedirectUrl}
+                                    onChange={(e) => setSettings(prev => ({ ...prev, bannerRedirectUrl: e.target.value }))}
+                                    placeholder="https://icst-isms.netlify.app/"
+                                    className="w-full px-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border rounded-xl"
                                 />
+                                <div className="pt-2">
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Result Button Target URL</label>
+                                    <input
+                                        type="text"
+                                        value={settings.resultUrl}
+                                        onChange={(e) => setSettings(prev => ({ ...prev, resultUrl: e.target.value }))}
+                                        placeholder="https://icst-isms.netlify.app/"
+                                        className="w-full px-4 py-2.5 text-xs bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                </div>
-            )}
-
-            {activeTab === 'winners' && (
-                <div className="space-y-6">
-
-                    {/* Winner Management Actions Header */}
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 rounded-xl border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400">
-                                <Trophy size={24} />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Position Holder & Winner Management</h3>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Manage student photos, ranks, marks, and year-wise gallery display.</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            {/* Year Filter */}
-                            <TailwindDropdown
-                                labelPrefix="Year Filter:"
-                                options={[
-                                    { label: 'All Years', value: 'all' },
-                                    ...availableYears.map(yr => ({ label: String(yr), value: yr }))
-                                ]}
-                                value={selectedYearFilter}
-                                onChange={(val) => setSelectedYearFilter(val === 'all' ? 'all' : Number(val))}
-                            />
-
-                            <button
-                                onClick={() => handleOpenWinnerModal()}
-                                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-md flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
-                            >
-                                <Plus size={18} />
-                                <span>Add Position Holder</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Winners Table */}
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm">
-                                <thead className="bg-slate-50 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200 dark:border-slate-800">
-                                    <tr>
-                                        <th className="px-6 py-4">Student</th>
-                                        <th className="px-6 py-4">Year</th>
-                                        <th className="px-6 py-4">Rank</th>
-                                        <th className="px-6 py-4">School & District</th>
-                                        <th className="px-6 py-4">Marks</th>
-                                        <th className="px-6 py-4">Status</th>
-                                        <th className="px-6 py-4 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                    {filteredWinners.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={7} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500 text-sm">
-                                                No winner records found for the selected filter. Click "+ Add Position Holder" to create one.
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        filteredWinners.map(winner => (
-                                            <tr key={winner.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-slate-900 dark:text-white">
-                                                    <div className="flex items-center gap-3">
-                                                        <img
-                                                            src={winner.photo}
-                                                            alt={winner.studentName}
-                                                            className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-sm shrink-0"
-                                                        />
-                                                        <div>
-                                                            <div className="font-bold text-slate-900 dark:text-white">{winner.studentName}</div>
-                                                            <div className="text-xs text-slate-400 line-clamp-1">{winner.description || 'No bio'}</div>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
-                                                    <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-xs">
-                                                        {winner.year}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${winner.rank === 1 ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60' : winner.rank === 2 ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600' : winner.rank === 3 ? 'bg-amber-900/10 dark:bg-amber-900/30 text-amber-900 dark:text-amber-300 border border-amber-900/20 dark:border-amber-700/50' : 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300'}`}>
-                                                        Rank #{winner.rank}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-300">
-                                                    <div className="font-semibold text-slate-800 dark:text-slate-200">{winner.schoolName}</div>
-                                                    <div className="text-slate-400">{winner.district}</div>
-                                                </td>
-                                                <td className="px-6 py-4 font-bold text-emerald-600 dark:text-emerald-400">
-                                                    {winner.marks}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <button
-                                                        onClick={() => handleToggleWinnerPublished(winner)}
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${winner.published ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
-                                                    >
-                                                        <span className={`w-2 h-2 rounded-full ${winner.published ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
-                                                        {winner.published ? 'Published' : 'Hidden'}
-                                                    </button>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button
-                                                            onClick={() => handleOpenWinnerModal(winner)}
-                                                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
-                                                            title="Edit record"
-                                                        >
-                                                            <Edit3 size={16} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteWinner(winner.id)}
-                                                            className="p-2 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
-                                                            title="Delete record"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* ADD / EDIT WINNER MODAL */}
-            {isWinnerModalOpen && (
-                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
-                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                <Trophy className="text-amber-500" size={20} />
-                                {editingWinner ? 'Edit Winner Record' : 'Add Position Holder'}
-                            </h3>
-                            <button
-                                onClick={() => setIsWinnerModalOpen(false)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSaveWinner} className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year *</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        value={winnerForm.year}
-                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, year: Number(e.target.value) }))}
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Rank / Position *</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        min={1}
-                                        value={winnerForm.rank}
-                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, rank: Number(e.target.value) }))}
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Student Full Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="e.g. Subhadip Roy"
-                                    value={winnerForm.studentName}
-                                    onChange={(e) => setWinnerForm(prev => ({ ...prev, studentName: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">School Name *</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="e.g. Chowberia High School"
-                                        value={winnerForm.schoolName}
-                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, schoolName: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">District</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Nadia"
-                                        value={winnerForm.district}
-                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, district: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Marks / Percentage *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    placeholder="e.g. 98.8%"
-                                    value={winnerForm.marks}
-                                    onChange={(e) => setWinnerForm(prev => ({ ...prev, marks: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            {/* Photo Upload */}
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Student Photo</label>
-                                <div className="flex items-center gap-3">
-                                    <img
-                                        src={winnerForm.photo || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'}
-                                        alt="Student Preview"
-                                        className="w-14 h-14 rounded-full object-cover border border-slate-300 dark:border-slate-700 shadow-sm shrink-0"
-                                    />
-                                    <div className="flex-1 space-y-1">
-                                        <input
-                                            type="text"
-                                            value={winnerForm.photo}
-                                            onChange={(e) => setWinnerForm(prev => ({ ...prev, photo: e.target.value }))}
-                                            placeholder="https://... or upload photo"
-                                            className="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg"
-                                        />
-                                        <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                                            <span>Recommended: 600×600 px Square WebP (Max 2MB)</span>
-                                            <input
-                                                type="file"
-                                                ref={winnerPhotoInputRef}
-                                                onChange={handleWinnerPhotoChange}
-                                                accept="image/jpeg,image/png,image/webp"
-                                                className="hidden"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => winnerPhotoInputRef.current?.click()}
-                                                disabled={uploadingWinnerPhoto}
-                                                className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
-                                            >
-                                                {uploadingWinnerPhoto ? 'Uploading...' : 'Upload File'}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Achievement Description / Bio</label>
-                                <textarea
-                                    rows={2}
-                                    placeholder="Optional note about their achievement..."
-                                    value={winnerForm.description}
-                                    onChange={(e) => setWinnerForm(prev => ({ ...prev, description: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-                                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={winnerForm.published}
-                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, published: e.target.checked }))}
-                                        className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
-                                    />
-                                    <span>Publish immediately to public website</span>
-                                </label>
-                            </div>
-
-                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsWinnerModalOpen(false)}
-                                    className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium text-sm rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-md transition-all"
-                                >
-                                    Save Winner
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
+            {/* TAB 4: EXAM PHOTOS GALLERY */}
             {activeTab === 'examPhotos' && (
-                <div className="space-y-6 font-inter">
-                    {/* Exam Photos Actions Header */}
+                <div className="space-y-6">
                     <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl border border-indigo-200 dark:border-indigo-900/50 text-indigo-600 dark:text-indigo-400">
@@ -1108,229 +1295,533 @@ export default function AdminScholarships() {
 
                         <button
                             onClick={() => handleOpenExamModal()}
-                            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-md flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+                            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-md flex items-center gap-2 transition-all"
                         >
                             <Plus size={18} />
                             <span>Add Exam Photo</span>
                         </button>
                     </div>
 
-                    {/* Exam Photos Grid */}
-                    {examImages.length === 0 ? (
-                        <div className="bg-white dark:bg-slate-900 p-12 rounded-2xl border border-slate-200 dark:border-slate-800 text-center text-slate-400 dark:text-slate-500 text-sm">
-                            No examination photos added yet. Click "+ Add Exam Photo" to upload one.
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {examImages.map(item => (
-                                <div key={item.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col group hover:shadow-md transition-all">
-                                    <div className="relative h-48 bg-slate-900 overflow-hidden">
-                                        <img
-                                            src={item.image}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                        <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-lg">
-                                            {item.session}
-                                        </div>
-                                        <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                                            <button
-                                                onClick={() => handleToggleExamPublished(item)}
-                                                className={`px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-md ${item.published ? 'bg-emerald-500/90 text-white' : 'bg-slate-700/90 text-slate-300'}`}
-                                            >
-                                                {item.published ? 'Published' : 'Hidden'}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                                        <div className="space-y-1">
-                                            <div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{item.schoolName}</div>
-                                            <h4 className="font-bold text-slate-900 dark:text-white text-base line-clamp-1">{item.title}</h4>
-                                            {item.description && (
-                                                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{item.description}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Year {item.year}</span>
-
-                                            <div className="flex items-center gap-2">
-                                                <button
-                                                    onClick={() => handleOpenExamModal(item)}
-                                                    className="p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors"
-                                                    title="Edit Photo"
-                                                >
-                                                    <Edit3 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteExamImage(item.id)}
-                                                    className="p-2 text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition-colors"
-                                                    title="Delete Photo"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {examImages.map(item => (
+                            <div key={item.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                                <div className="aspect-video relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="p-4 space-y-2">
+                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">{item.title}</h4>
+                                    <p className="text-xs text-slate-500">{item.schoolName} • Year {item.year}</p>
+                                    <div className="flex items-center justify-end gap-2 pt-2 border-t">
+                                        <button onClick={() => handleOpenExamModal(item)} className="p-1.5 hover:text-indigo-600">
+                                            <Edit3 size={15} />
+                                        </button>
+                                        <button onClick={() => handleDeleteExamImage(item.id)} className="p-1.5 hover:text-rose-600">
+                                            <Trash2 size={15} />
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 
-            {/* ADD / EDIT EXAM PHOTO MODAL */}
-            {isExamModalOpen && (
+            {/* MODAL: CREATE / EDIT SCHOLARSHIP CAMPAIGN */}
+            {isCampaignModalOpen && (
                 <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-8">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
                         <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                <ImageIcon className="text-indigo-600 dark:text-indigo-400" size={20} />
-                                {editingExamImage ? 'Edit Exam Photo Details' : 'Add Examination Photo'}
+                                <GraduationCap className="text-indigo-600 dark:text-indigo-400" size={20} />
+                                {editingCampaign ? 'Edit Scholarship Campaign' : 'Create Scholarship Campaign'}
                             </h3>
-                            <button
-                                onClick={() => setIsExamModalOpen(false)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-                            >
+                            <button onClick={() => setIsCampaignModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveCampaign} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Scholarship Title *</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={campaignForm.title}
+                                    onChange={(e) => setCampaignForm(prev => ({ ...prev, title: e.target.value }))}
+                                    placeholder="e.g. ICST Merit Scholarship Examination 2026"
+                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year *</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        value={campaignForm.year}
+                                        onChange={(e) => setCampaignForm(prev => ({ ...prev, year: Number(e.target.value) }))}
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Academic Session *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={campaignForm.session}
+                                        onChange={(e) => setCampaignForm(prev => ({ ...prev, session: e.target.value }))}
+                                        placeholder="2026-2027 Session"
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Description</label>
+                                <textarea
+                                    rows={3}
+                                    value={campaignForm.description}
+                                    onChange={(e) => setCampaignForm(prev => ({ ...prev, description: e.target.value }))}
+                                    placeholder="Annual talent hunt examination across participating secondary schools..."
+                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <button type="button" onClick={() => setIsCampaignModalOpen(false)} className="px-4 py-2 text-sm text-slate-500">Cancel</button>
+                                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow">Save Campaign</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: REGISTER / MODIFY SCHOOL DIRECTORY ENTRY */}
+            {isSchoolModalOpen && (
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <SchoolIcon className="text-emerald-600 dark:text-emerald-400" size={20} />
+                                {editingSchool ? 'Edit School Details' : 'Register School to Directory'}
+                            </h3>
+                            <button onClick={() => setIsSchoolModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveSchool} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">School Name *</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={schoolForm.name}
+                                    onChange={(e) => setSchoolForm(prev => ({ ...prev, name: e.target.value }))}
+                                    placeholder="e.g. Chowberia High School"
+                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">District *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={schoolForm.district}
+                                        onChange={(e) => setSchoolForm(prev => ({ ...prev, district: e.target.value }))}
+                                        placeholder="e.g. Nadia"
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Address / Landmark</label>
+                                    <input
+                                        type="text"
+                                        value={schoolForm.address}
+                                        onChange={(e) => setSchoolForm(prev => ({ ...prev, address: e.target.value }))}
+                                        placeholder="e.g. Chowberia, Ranaghat"
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <button type="button" onClick={() => setIsSchoolModalOpen(false)} className="px-4 py-2 text-sm text-slate-500">Cancel</button>
+                                <button type="submit" className="px-6 py-2 bg-emerald-600 text-white font-bold text-sm rounded-xl shadow">Save School</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: SET WINNER PUBLICATION DATE & TIME FOR A SCHOOL */}
+            {isScheduleModalOpen && schedulingParticipation && currentCampaign && (
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <CalendarTime className="text-indigo-600 dark:text-indigo-400" size={20} />
+                                    Winner Publication Schedule
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-0.5">{schedulingParticipation.school.name} • {currentCampaign.title}</p>
+                            </div>
+                            <button onClick={() => setIsScheduleModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveSchedule} className="p-6 space-y-5">
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Release Date & Exact Time (Local Time)
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    value={schedulingParticipation.announcementDate}
+                                    onChange={(e) => setSchedulingParticipation(prev => prev ? ({ ...prev, announcementDate: e.target.value }) : null)}
+                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                />
+                                <span className="text-[11px] text-slate-500 mt-1 block">
+                                    Winners from this school will automatically go live when this exact time arrives.
+                                </span>
+                            </div>
+
+                            {/* Quick Presets */}
+                            <div className="space-y-1.5">
+                                <span className="text-xs font-semibold text-slate-500">Quick Presets:</span>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const d = new Date()
+                                            d.setDate(d.getDate() + 2)
+                                            d.setHours(10, 0, 0, 0)
+                                            setSchedulingParticipation(prev => prev ? ({ ...prev, announcementDate: d.toISOString().slice(0, 16) }) : null)
+                                        }}
+                                        className="px-2.5 py-1 text-xs bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                    >
+                                        +2 Days (10:00 AM)
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const d = new Date()
+                                            d.setDate(d.getDate() + 7)
+                                            d.setHours(12, 0, 0, 0)
+                                            setSchedulingParticipation(prev => prev ? ({ ...prev, announcementDate: d.toISOString().slice(0, 16) }) : null)
+                                        }}
+                                        className="px-2.5 py-1 text-xs bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                    >
+                                        +1 Week (12:00 PM)
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSchedulingParticipation(prev => prev ? ({ ...prev, announcementDate: '' }) : null)}
+                                        className="px-2.5 py-1 text-xs bg-rose-50 dark:bg-rose-950/40 text-rose-600 rounded-lg transition-colors"
+                                    >
+                                        Clear (Announce Soon)
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Manual Force Live Checkbox */}
+                            <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border flex items-center justify-between">
+                                <div>
+                                    <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">Manual Override: Publish Immediately</span>
+                                    <span className="text-[11px] text-slate-500">Bypasses schedule and reveals winners right now</span>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={schedulingParticipation.isOverride}
+                                    onChange={(e) => setSchedulingParticipation(prev => prev ? ({ ...prev, isOverride: e.target.checked }) : null)}
+                                    className="w-4 h-4 rounded text-indigo-600"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <button type="button" onClick={() => setIsScheduleModalOpen(false)} className="px-4 py-2 text-sm text-slate-500">Cancel</button>
+                                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow">Save Schedule</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: ADD / EDIT POSITION HOLDER */}
+            {isWinnerModalOpen && (
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <Trophy className="text-amber-500" size={20} />
+                                {editingWinner ? 'Edit Position Holder' : 'Add Position Holder & Winner'}
+                            </h3>
+                            <button onClick={() => setIsWinnerModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveWinner} className="p-6 space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Participating School *</label>
+                                    <select
+                                        value={winnerForm.schoolId}
+                                        onChange={(e) => {
+                                            const sch = schools.find(s => s.id === e.target.value)
+                                            setWinnerForm(prev => ({
+                                                ...prev,
+                                                schoolId: e.target.value,
+                                                schoolName: sch ? sch.name : prev.schoolName,
+                                                district: sch ? sch.district : prev.district
+                                            }))
+                                        }}
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    >
+                                        <option value="">Select School</option>
+                                        {schools.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name} ({s.district})</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Rank / Position *</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min={1}
+                                        value={winnerForm.rank}
+                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, rank: Number(e.target.value), displayOrder: Number(e.target.value) }))}
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Student Name *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={winnerForm.studentName}
+                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, studentName: e.target.value }))}
+                                        placeholder="e.g. Subhadip Roy"
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Score / Percentage *</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={winnerForm.marks}
+                                        onChange={(e) => setWinnerForm(prev => ({ ...prev, marks: e.target.value }))}
+                                        placeholder="e.g. 98.8%"
+                                        className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                    />
+                                </div>
+                            </div>
+
+                            <ImageCropUploadField
+                                value={winnerForm.photo}
+                                onChange={(url) => setWinnerForm(prev => ({ ...prev, photo: url }))}
+                                label="Photo Image URL *"
+                                uploadButtonText="Upload Photo"
+                                aspectRatio={1}
+                                instruction="Student Portrait / DP (1:1). Position face centered."
+                                maxW={600}
+                                maxH={600}
+                                required
+                                placeholder="https://images.unsplash.com/... or click to upload"
+                            />
+
+                            <div>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Award Citation / Achievement Note</label>
+                                <textarea
+                                    rows={2}
+                                    value={winnerForm.description}
+                                    onChange={(e) => setWinnerForm(prev => ({ ...prev, description: e.target.value }))}
+                                    placeholder="Secured 1st rank with exemplary performance in Mathematics..."
+                                    className="w-full px-4 py-2 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <button type="button" onClick={() => setIsWinnerModalOpen(false)} className="px-4 py-2 text-sm text-slate-500">Cancel</button>
+                                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow">Save Winner</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: EXAM PHOTO */}
+            {isExamModalOpen && (
+                <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <ImageIcon className="text-indigo-600" size={20} />
+                                {editingExamImage ? 'Edit Exam Photo' : 'Add Examination Photo'}
+                            </h3>
+                            <button onClick={() => setIsExamModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
                                 <X size={20} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSaveExamPhoto} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Title / Event Name *</label>
+                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Event / Hall Title *</label>
                                 <input
                                     type="text"
                                     required
-                                    placeholder="e.g. ICST Talent Search Exam 2026 - Main Center"
                                     value={examForm.title}
                                     onChange={(e) => setExamForm(prev => ({ ...prev, title: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                                    placeholder="ICST Talent Search Examination Hall"
+                                    className="w-full px-4 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border rounded-xl"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">School Name *</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="e.g. Chowberia High School"
-                                        value={examForm.schoolName}
-                                        onChange={(e) => setExamForm(prev => ({ ...prev, schoolName: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
+                            <ImageCropUploadField
+                                value={examForm.image}
+                                onChange={(url) => setExamForm(prev => ({ ...prev, image: url }))}
+                                label="Photo Image URL *"
+                                uploadButtonText="Upload Photo"
+                                aspectRatio={16 / 9}
+                                instruction="Event & Examination (16:9). Frame the stage / students."
+                                maxW={1200}
+                                maxH={675}
+                                required
+                                placeholder="https://images.unsplash.com/... or click to upload"
+                            />
 
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Scholarship Session *</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        placeholder="e.g. 2026-2027 Session"
-                                        value={examForm.session}
-                                        onChange={(e) => setExamForm(prev => ({ ...prev, session: e.target.value }))}
-                                        className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Year</label>
-                                <input
-                                    type="number"
-                                    required
-                                    value={examForm.year}
-                                    onChange={(e) => setExamForm(prev => ({ ...prev, year: Number(e.target.value) }))}
-                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            {/* Image Upload */}
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Exam Photo *</label>
-                                <div className="space-y-2">
-                                    <div className="relative h-40 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
-                                        {examForm.image ? (
-                                            <img
-                                                src={examForm.image}
-                                                alt="Exam Preview"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="h-full flex items-center justify-center text-xs text-slate-400 dark:text-slate-500 italic">
-                                                No image selected
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={examForm.image}
-                                            onChange={(e) => setExamForm(prev => ({ ...prev, image: e.target.value }))}
-                                            placeholder="https://... or upload file"
-                                            className="flex-1 px-3 py-1.5 text-xs bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-lg"
-                                        />
-                                        <input
-                                            type="file"
-                                            ref={examPhotoInputRef}
-                                            onChange={handleExamPhotoFileChange}
-                                            accept="image/jpeg,image/png,image/webp"
-                                            className="hidden"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => examPhotoInputRef.current?.click()}
-                                            disabled={uploadingExamPhoto}
-                                            className="px-3 py-1.5 bg-slate-900 dark:bg-slate-800 text-white font-medium text-xs rounded-lg hover:bg-slate-800 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 transition-colors shrink-0"
-                                        >
-                                            {uploadingExamPhoto ? 'Uploading...' : 'Upload Image'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Description / Notes</label>
-                                <textarea
-                                    rows={2}
-                                    placeholder="Optional details about this examination session..."
-                                    value={examForm.description}
-                                    onChange={(e) => setExamForm(prev => ({ ...prev, description: e.target.value }))}
-                                    className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 placeholder-slate-400 dark:placeholder-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
-                                <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={examForm.published}
-                                        onChange={(e) => setExamForm(prev => ({ ...prev, published: e.target.checked }))}
-                                        className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
-                                    />
-                                    <span>Publish immediately to public website</span>
-                                </label>
-                            </div>
-
-                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsExamModalOpen(false)}
-                                    className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium text-sm rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-md transition-all"
-                                >
-                                    Save Photo
-                                </button>
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <button type="button" onClick={() => setIsExamModalOpen(false)} className="px-4 py-2 text-sm text-slate-500">Cancel</button>
+                                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl shadow">Save Photo</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* SYNC TO SUPABASE ACKNOWLEDGMENT MODAL */}
+            {syncModalResult && (
+                <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-[1200] flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+                        <div className={`p-6 border-b ${syncModalResult.errors.length === 0 ? 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/40' : 'bg-amber-50/60 dark:bg-amber-950/30 border-amber-100 dark:border-amber-900/40'}`}>
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={`p-2.5 rounded-2xl ${syncModalResult.errors.length === 0 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30'}`}>
+                                        {syncModalResult.errors.length === 0 ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                            {syncModalResult.errors.length === 0 ? 'Supabase Sync Acknowledgment' : 'Sync Acknowledgment with Issues'}
+                                        </h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                            {syncModalResult.errors.length === 0
+                                                ? 'All pending operations processed and synced with Supabase.'
+                                                : 'Some local operations encountered issues while syncing with Supabase.'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setSyncModalResult(null)} className="p-1 rounded-xl text-slate-400 hover:text-slate-600">
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2.5 mt-5">
+                                <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center shadow-sm">
+                                    <span className="block text-2xl font-black text-emerald-600 dark:text-emerald-400">{syncModalResult.syncedCount}</span>
+                                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Synced</span>
+                                </div>
+                                <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center shadow-sm">
+                                    <span className={`block text-2xl font-black ${syncModalResult.remainingCount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300'}`}>{syncModalResult.remainingCount}</span>
+                                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Remaining</span>
+                                </div>
+                                <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 text-center shadow-sm">
+                                    <span className={`block text-2xl font-black ${syncModalResult.errors.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{syncModalResult.errors.length}</span>
+                                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Errors</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 space-y-4 max-h-[50vh] overflow-y-auto">
+                            {syncModalResult.details.length > 0 && (
+                                <div>
+                                    <h4 className="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                                        <CheckCircle2 size={14} className="text-emerald-500" />
+                                        <span>Acknowledged Operations ({syncModalResult.details.length})</span>
+                                    </h4>
+                                    <ul className="space-y-2">
+                                        {syncModalResult.details.map((detail, idx) => (
+                                            <li key={idx} className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center gap-2.5 text-slate-800 dark:text-slate-100 font-medium text-xs shadow-sm">
+                                                <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                                                    <CheckCircle2 size={14} />
+                                                </div>
+                                                <span className="leading-snug">{detail}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {syncModalResult.errors.length > 0 && (
+                                <div>
+                                    <h4 className="text-xs font-bold text-rose-600 uppercase mb-2">Sync Errors</h4>
+                                    <ul className="space-y-1.5 text-xs text-rose-700 dark:text-rose-300">
+                                        {syncModalResult.errors.map((err, idx) => (
+                                            <li key={idx} className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2">
+                                                <AlertCircle size={14} className="text-rose-500 shrink-0" />
+                                                <span>{err}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+
+                        {syncModalResult.errors.some(e => e.includes('Could not find the table')) && (
+                            <div className="mx-6 mb-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+                                <div className="flex items-center gap-2 font-bold">
+                                    <AlertCircle size={16} className="text-amber-600 shrink-0" />
+                                    <span>Action Required: Run SQL Migration in Supabase</span>
+                                </div>
+                                <p className="leading-relaxed">
+                                    These new tables (<code className="bg-amber-200/50 dark:bg-amber-900/50 px-1 py-0.5 rounded">scholarship_campaigns</code>, <code className="bg-amber-200/50 dark:bg-amber-900/50 px-1 py-0.5 rounded">scholarship_schools</code>, <code className="bg-amber-200/50 dark:bg-amber-900/50 px-1 py-0.5 rounded">scholarship_school_participations</code>) do not exist in your Supabase project yet.
+                                </p>
+                                <p className="leading-relaxed font-semibold">
+                                    👉 Open your Supabase Dashboard &gt; <strong>SQL Editor</strong>, paste and run <code className="bg-amber-200/50 dark:bg-amber-900/50 px-1 py-0.5 rounded">scholarship_migration.sql</code>, then click <strong>"Retry Sync Now"</strong> below!
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t flex justify-end gap-3">
+                            {syncModalResult.remainingCount > 0 && (
+                                <button
+                                    onClick={() => {
+                                        setSyncModalResult(null)
+                                        handleSyncToSupabase()
+                                    }}
+                                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-1.5"
+                                >
+                                    <RefreshCw size={14} />
+                                    <span>Retry Sync Now</span>
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setSyncModalResult(null)}
+                                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow transition-colors"
+                            >
+                                Acknowledge & Dismiss
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

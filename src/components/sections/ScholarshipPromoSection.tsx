@@ -17,9 +17,16 @@ export default function ScholarshipPromoSection() {
             if (isMounted) setSettings(updated)
         })
 
+        const unsubRealtime = scholarshipService.subscribeToChanges(() => {
+            scholarshipService.getSettings().then(s => {
+                if (isMounted) setSettings(s)
+            })
+        })
+
         return () => {
             isMounted = false
             unsubscribe()
+            unsubRealtime()
         }
     }, [])
 
