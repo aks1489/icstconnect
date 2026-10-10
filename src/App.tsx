@@ -112,6 +112,7 @@ import { ToastProvider } from './contexts/ToastContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import ToastContainer from './components/ui/ToastContainer'
 import AppErrorBoundary from './components/ui/AppErrorBoundary'
+import ScrollToTop from './components/common/ScrollToTop'
 
 function App() {
   return (
@@ -119,6 +120,7 @@ function App() {
       <AuthProvider>
         <ToastProvider>
           <Router>
+            <ScrollToTop />
             <AppErrorBoundary>
               <ErrorToast />
               <ToastContainer />

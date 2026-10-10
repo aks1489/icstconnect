@@ -27,12 +27,12 @@ export default function Scatter3DLayout({ images }: { images: any[] }) {
     if (images.length === 0) return null;
 
     return (
-        <div className="relative w-full h-[80vh] min-h-[600px] overflow-hidden bg-slate-900 rounded-3xl perspective-1000 my-8 shadow-2xl flex items-center justify-center">
+        <div className="relative w-full h-[80vh] min-h-[600px] overflow-hidden bg-slate-900 dark:bg-slate-950 rounded-3xl perspective-1000 my-8 shadow-2xl flex items-center justify-center border border-slate-800">
             
             {/* Ambient Background Glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/50 via-slate-900 to-emerald-900/40 opacity-50 blur-3xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-indigo-900/50 via-slate-900 dark:via-slate-950 to-emerald-900/40 opacity-50 blur-3xl"></div>
             
-            <p className="absolute bottom-8 left-8 text-white/40 text-sm font-medium uppercase tracking-[0.2em] z-0">
+            <p className="absolute bottom-8 left-8 text-white/40 dark:text-slate-500 text-sm font-medium uppercase tracking-[0.2em] z-0">
                 Interactive Scatter View
             </p>
 
@@ -73,7 +73,7 @@ export default function Scatter3DLayout({ images }: { images: any[] }) {
                                     y: 0,
                                     boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
                                 }}
-                                className="w-48 md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-slate-800 border-4 border-white cursor-pointer"
+                                className="w-48 md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-slate-800 border-4 border-white dark:border-slate-700 cursor-pointer"
                             >
                                 <InteractiveImageMarker 
                                     src={getOptimizedImageUrl(img.cloudinary_url, 400)} 

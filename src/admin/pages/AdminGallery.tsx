@@ -250,13 +250,13 @@ export default function AdminGallery() {
         <div className="space-y-4">
             {/* Categories */}
             <div>
-                <label className="block text-xs font-medium text-slate-700 mb-2">Sections / Categories (Required)</label>
+                <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-2">Sections / Categories (Required)</label>
                 <div className="flex flex-wrap gap-2">
                     {categories.map(c => (
                         <button
                             key={c.id} type="button"
                             onClick={() => toggleUploadCategory(c.id)}
-                            className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1 ${uploadCategories.includes(c.id) ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            className={`text-xs px-3 py-1.5 rounded-full border transition-colors flex items-center gap-1 ${uploadCategories.includes(c.id) ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750'}`}
                         >
                             {uploadCategories.includes(c.id) && <CheckCircle2 size={12} />}
                             {c.name}
@@ -268,17 +268,17 @@ export default function AdminGallery() {
             <div className="grid grid-cols-1 gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">Title (Optional)</label>
-                        <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full text-sm rounded-lg border-slate-200" placeholder="Image Title" />
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Title (Optional)</label>
+                        <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full text-sm rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="Image Title" />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-slate-700 mb-1">Image Date (Optional)</label>
-                        <input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} className="w-full text-sm rounded-lg border-slate-200" />
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Image Date (Optional)</label>
+                        <input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} className="w-full text-sm rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                     </div>
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-slate-700 mb-1">Description (Optional)</label>
-                    <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full text-sm rounded-lg border-slate-200 h-16 resize-none" placeholder="Brief description..." />
+                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Description (Optional)</label>
+                    <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full text-sm rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white h-16 resize-none" placeholder="Brief description..." />
                 </div>
             </div>
 
@@ -304,31 +304,31 @@ export default function AdminGallery() {
                     }}
                     className="rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer w-4 h-4" 
                 />
-                <label htmlFor="isEventToggle" className="text-sm font-semibold text-slate-700 cursor-pointer">
+                <label htmlFor="isEventToggle" className="text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
                     Link image to an Event
                 </label>
             </div>
 
             {/* Event Grouping */}
             {(!!eventName || isNewEvent) && (
-                <div className="p-4 bg-pink-50 border border-pink-200 rounded-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="p-4 bg-pink-50 dark:bg-pink-950/30 border border-pink-200 dark:border-pink-900/50 rounded-xl space-y-4 animate-in fade-in slide-in-from-top-2">
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-xs font-semibold text-pink-800 uppercase tracking-wider">Event Grouping</h4>
-                            <button type="button" onClick={() => setIsNewEvent(!isNewEvent)} className="text-[10px] bg-pink-100 text-pink-700 px-2 py-1 rounded hover:bg-pink-200 transition-colors shadow-sm">
+                            <h4 className="text-xs font-semibold text-pink-800 dark:text-pink-300 uppercase tracking-wider">Event Grouping</h4>
+                            <button type="button" onClick={() => setIsNewEvent(!isNewEvent)} className="text-[10px] bg-pink-100 dark:bg-pink-900/50 text-pink-700 dark:text-pink-300 px-2 py-1 rounded hover:bg-pink-200 dark:hover:bg-pink-900 transition-colors shadow-sm">
                                 {isNewEvent ? 'Select Existing Event' : '+ Create New Event'}
                             </button>
                         </div>
-                        <p className="text-[10px] text-pink-600/80 leading-tight">If part of an event, images sharing the same Event Name will be grouped together.</p>
+                        <p className="text-[10px] text-pink-600/80 dark:text-pink-400/80 leading-tight">If part of an event, images sharing the same Event Name will be grouped together.</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-3">
                         <div>
-                            <label className="block text-xs text-pink-700 font-medium mb-1">Event Name (Required)</label>
+                            <label className="block text-xs text-pink-700 dark:text-pink-400 font-medium mb-1">Event Name (Required)</label>
                             {isNewEvent || existingEvents.length === 0 ? (
-                                <input type="text" value={eventName} onChange={e => setEventName(e.target.value)} className="w-full text-sm rounded-md border-pink-200 focus:ring-pink-500 focus:border-pink-500 bg-white" placeholder="e.g. Annual Fest" />
+                                <input type="text" value={eventName} onChange={e => setEventName(e.target.value)} className="w-full text-sm rounded-md border-pink-200 dark:border-pink-900/50 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. Annual Fest" />
                             ) : (
-                                <select value={eventName} onChange={e => setEventName(e.target.value)} className="w-full text-sm rounded-md border-pink-200 focus:ring-pink-500 focus:border-pink-500 bg-white shadow-sm">
+                                <select value={eventName} onChange={e => setEventName(e.target.value)} className="w-full text-sm rounded-md border-pink-200 dark:border-pink-900/50 focus:ring-pink-500 focus:border-pink-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm">
                                     <option value="">-- Select Event --</option>
                                     {existingEvents.map(evt => (
                                         <option key={evt} value={evt}>{evt}</option>
@@ -338,8 +338,8 @@ export default function AdminGallery() {
                         </div>
                     </div>
                     <label className="flex items-center gap-2 mt-2 cursor-pointer group w-max">
-                        <input type="checkbox" checked={isGroupCover} onChange={e => setIsGroupCover(e.target.checked)} className="rounded text-pink-600 border-pink-300 focus:ring-pink-500" />
-                        <span className="text-xs text-pink-800 font-medium group-hover:text-pink-900 transition-colors">Set as Event Cover</span>
+                        <input type="checkbox" checked={isGroupCover} onChange={e => setIsGroupCover(e.target.checked)} className="rounded text-pink-600 border-pink-300 dark:border-pink-800 focus:ring-pink-500" />
+                        <span className="text-xs text-pink-800 dark:text-pink-300 font-medium group-hover:text-pink-900 dark:group-hover:text-pink-200 transition-colors">Set as Event Cover</span>
                     </label>
                 </div>
             )}
@@ -350,8 +350,8 @@ export default function AdminGallery() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Gallery Management</h2>
-                    <p className="text-slate-500 text-sm">Upload images, manage categories, and edit gallery contents.</p>
+                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Gallery Management</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">Upload images, manage categories, and edit gallery contents.</p>
                 </div>
             </div>
 
@@ -361,34 +361,34 @@ export default function AdminGallery() {
                 <div className="space-y-6">
                     
                     {/* Categories Manager */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-                                <FolderPlus size={18} className="text-indigo-600" />
+                            <h3 className="font-semibold text-slate-800 dark:text-white flex items-center gap-2">
+                                <FolderPlus size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 Categories & Styles
                             </h3>
                             <button 
                                 onClick={() => setIsCreatingCategory(!isCreatingCategory)}
-                                className="text-xs text-indigo-600 font-medium hover:underline"
+                                className="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
                             >
                                 {isCreatingCategory ? 'Cancel' : '+ New Category'}
                             </button>
                         </div>
 
                         {isCreatingCategory && (
-                            <form onSubmit={handleCreateCategory} className="mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200 text-sm space-y-3">
+                            <form onSubmit={handleCreateCategory} className="mb-4 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm space-y-3">
                                 <div>
-                                    <label className="block text-xs text-slate-500 mb-1">Category Name</label>
+                                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Category Name</label>
                                     <input 
                                         type="text" required value={newCatName} onChange={e => setNewCatName(e.target.value)}
-                                        className="w-full rounded-lg border-slate-200" placeholder="e.g. Graduation 2026"
+                                        className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="e.g. Graduation 2026"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-slate-500 mb-1">Creative Layout Rule</label>
+                                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Creative Layout Rule</label>
                                     <select 
                                         value={newCatStyle} onChange={e => setNewCatStyle(e.target.value)}
-                                        className="w-full rounded-lg border-slate-200"
+                                        className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                                     >
                                         <option value="collage">Masonry Collage (Dynamic Grid)</option>
                                         <option value="curve_road">Curve Road (Timeline)</option>
@@ -396,24 +396,24 @@ export default function AdminGallery() {
                                         <option value="bento_flow">Bento Flow (Asymmetrical Box Mix)</option>
                                     </select>
                                 </div>
-                                <button type="submit" className="w-full bg-indigo-600 text-white rounded-lg py-2 text-xs font-semibold hover:bg-indigo-700">Save Category</button>
+                                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-2 text-xs font-semibold transition-colors">Save Category</button>
                             </form>
                         )}
 
                         <div className="flex flex-wrap gap-2">
                             {categories.map(c => (
-                                <div key={c.id} className="text-xs px-2.5 py-1 bg-white border border-slate-200 rounded-md shadow-sm text-slate-600 flex flex-col">
+                                <div key={c.id} className="text-xs px-2.5 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-sm text-slate-600 dark:text-slate-300 flex flex-col">
                                     <span className="font-semibold">{c.name}</span>
-                                    <span className="text-[10px] text-slate-400 capitalize">{c.layout_style.replace('_', ' ')}</span>
+                                    <span className="text-[10px] text-slate-400 dark:text-slate-500 capitalize">{c.layout_style.replace('_', ' ')}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Image Upload Form */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                        <h3 className="font-semibold text-slate-800 flex items-center gap-2 mb-4">
-                            <ImageIcon size={18} className="text-pink-600" />
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                        <h3 className="font-semibold text-slate-800 dark:text-white flex items-center gap-2 mb-4">
+                            <ImageIcon size={18} className="text-pink-600 dark:text-pink-400" />
                             Upload New Image
                         </h3>
 
@@ -423,11 +423,11 @@ export default function AdminGallery() {
                             {!previewUrl ? (
                                 <div 
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50 transition-colors"
+                                    className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                                 >
-                                    <Plus className="mx-auto text-slate-400 mb-2" size={24} />
-                                    <p className="text-sm font-medium text-slate-600">Click to select image</p>
-                                    <p className="text-xs text-slate-400 mt-1">High-res supported (Cloudinary optimized)</p>
+                                    <Plus className="mx-auto text-slate-400 dark:text-slate-500 mb-2" size={24} />
+                                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">Click to select image</p>
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">High-res supported (Cloudinary optimized)</p>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -472,10 +472,10 @@ export default function AdminGallery() {
 
                 {/* Right Column: Image Grid */}
                 <div className="lg:col-span-2">
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 h-[calc(100vh-140px)] overflow-y-auto w-full">
-                        <div className="flex items-center justify-between mb-4 sticky top-0 bg-white z-10 pb-2">
-                            <h3 className="font-semibold text-slate-800">Uploaded Images</h3>
-                            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-md">{images.length} Total</span>
+                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 h-[calc(100vh-140px)] overflow-y-auto w-full">
+                        <div className="flex items-center justify-between mb-4 sticky top-0 bg-white dark:bg-slate-900 z-10 pb-2">
+                            <h3 className="font-semibold text-slate-800 dark:text-white">Uploaded Images</h3>
+                            <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded-md">{images.length} Total</span>
                         </div>
 
                         {loading ? (
@@ -483,7 +483,7 @@ export default function AdminGallery() {
                                 {[1,2,3,4,5,6].map(i => <div key={i} className="aspect-square bg-slate-100 dark:bg-slate-800 animate-pulse rounded-xl"></div>)}
                             </div>
                         ) : images.length === 0 ? (
-                            <div className="text-center py-20 text-slate-400 flex flex-col items-center">
+                            <div className="text-center py-20 text-slate-400 dark:text-slate-500 flex flex-col items-center">
                                 <ImageIcon size={48} className="opacity-20 mb-3" />
                                 <p>No images uploaded yet.</p>
                             </div>
@@ -492,7 +492,7 @@ export default function AdminGallery() {
                                 {images.map(img => (
                                     <div 
                                         key={img.id} 
-                                        className="group relative rounded-xl overflow-hidden aspect-square border border-slate-200 shadow-sm bg-slate-50 cursor-pointer"
+                                        className="group relative rounded-xl overflow-hidden aspect-square border border-slate-200 dark:border-slate-700/80 shadow-sm bg-slate-50 dark:bg-slate-800 cursor-pointer"
                                         onClick={() => openEditModal(img)}
                                     >
                                         <img 
@@ -515,7 +515,7 @@ export default function AdminGallery() {
                                             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button 
                                                     onClick={(e) => handleDelete(img.id, e)}
-                                                    className="w-8 h-8 bg-red-500/90 hover:bg-red-600 rounded flex items-center justify-center text-white backdrop-blur-md"
+                                                    className="w-8 h-8 bg-red-500/90 hover:bg-red-600 rounded flex items-center justify-center text-white backdrop-blur-md transition-colors"
                                                 >
                                                     <Trash2 size={14} />
                                                 </button>
@@ -546,23 +546,23 @@ export default function AdminGallery() {
             {/* Edit Image Modal */}
             {editingImage && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setEditingImage(null)}></div>
-                    <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-20">
-                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                                <Edit2 size={18} className="text-indigo-600" />
+                    <div className="absolute inset-0 bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm" onClick={() => setEditingImage(null)}></div>
+                    <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-20">
+                            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                                <Edit2 size={18} className="text-indigo-600 dark:text-indigo-400" />
                                 Edit Image Details
                             </h3>
-                            <button onClick={() => setEditingImage(null)} className="p-1 hover:bg-slate-100 rounded-lg transition-colors">
-                                <X size={20} className="text-slate-500" />
+                            <button onClick={() => setEditingImage(null)} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                                <X size={20} className="text-slate-500 dark:text-slate-400" />
                             </button>
                         </div>
                         
                         <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Left: Tagger / Preview */}
                             <div className="space-y-4">
-                                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Image Content & Tags</h4>
-                                <div className="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden p-2">
+                                <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Image Content & Tags</h4>
+                                <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden p-2">
                                     <ImageTagger 
                                         imageUrl={getOptimizedImageUrl(editingImage.cloudinary_url, 800)}
                                         initialTags={imageTags}
@@ -573,22 +573,22 @@ export default function AdminGallery() {
 
                             {/* Right: Metadata Form */}
                             <div className="space-y-6">
-                                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-widest">Metadata</h4>
+                                <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Metadata</h4>
                                 {renderFormFields()}
                             </div>
                         </div>
 
-                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3 sticky bottom-0 z-20">
+                        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 sticky bottom-0 z-20">
                             <button 
                                 onClick={() => setEditingImage(null)}
-                                className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors"
+                                className="px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors"
                             >
                                 Cancel
                             </button>
                             <button 
                                 onClick={handleSaveEdit}
                                 disabled={isSavingEdit || uploadCategories.length === 0}
-                                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-indigo-600/20"
+                                className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-colors"
                             >
                                 {isSavingEdit ? 'Saving...' : (
                                     <>

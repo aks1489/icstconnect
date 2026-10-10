@@ -65,16 +65,16 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
             
             {/* View Mode Toggle */}
             <div className="flex justify-center mb-20 relative z-20">
-                <div className="bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-slate-100 flex items-center gap-1">
+                <div className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-1.5 rounded-full shadow-lg border border-slate-200/80 dark:border-slate-800 flex items-center gap-1 transition-colors">
                     <button 
                         onClick={() => { setViewMode('events'); setSelectedEvent(null); }}
-                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'events' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'events' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                     >
                         Event Stacks
                     </button>
                     <button 
                         onClick={() => { setViewMode('story'); setSelectedEvent(null); }}
-                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'story' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}
+                        className={`px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 ${viewMode === 'story' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'}`}
                     >
                         Story Timeline
                     </button>
@@ -112,13 +112,13 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                             viewport={{ once: true, margin: "-100px" }}
                                             className={`w-full md:w-1/2 flex flex-col ${isLeft ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center`}
                                         >
-                                            <h3 className="text-3xl font-bold text-slate-800 mb-2">{event.name}</h3>
+                                            <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{event.name}</h3>
                                             {event.cover.event_date && (
-                                                <p className="text-indigo-600 font-medium font-mono text-sm mb-4">
+                                                <p className="text-indigo-600 dark:text-indigo-400 font-medium font-mono text-sm mb-4">
                                                     {new Date(event.cover.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                 </p>
                                             )}
-                                            <p className="text-slate-500 max-w-sm">
+                                            <p className="text-slate-500 dark:text-slate-400 max-w-sm">
                                                 {event.cover.description || 'Explore the moments captured during this amazing event.'}
                                             </p>
                                             <button 
@@ -129,7 +129,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                                                     }, 100);
                                                 }}
-                                                className="mt-6 px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-semibold hover:bg-slate-700 transition-colors shadow-lg shadow-slate-900/20"
+                                                className="mt-6 px-6 py-2 bg-slate-900 dark:bg-indigo-600 text-white rounded-full text-sm font-semibold hover:bg-slate-700 dark:hover:bg-indigo-500 transition-colors shadow-lg shadow-slate-900/20 dark:shadow-indigo-900/30"
                                             >
                                                 View Gallery ({event.others.length + 1} photos)
                                             </button>
@@ -149,14 +149,14 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                                 {event.others.slice(0, 3).map((_, i) => (
                                                     <div 
                                                         key={i}
-                                                        className="absolute inset-0 bg-white rounded-2xl shadow-xl border border-slate-200 transition-transform duration-500 group-hover:-translate-y-2"
+                                                        className="absolute inset-0 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 transition-transform duration-500 group-hover:-translate-y-2"
                                                         style={{
                                                             transform: `rotate(${(i + 1) * 4 * (isLeft ? 1 : -1)}deg) translateX(${(i + 1) * 10}px)`,
                                                             zIndex: 10 - i
                                                         }}
                                                     ></div>
                                                 ))}
-                                                <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                                                <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-700 transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-2">
                                                     <img src={getOptimizedImageUrl(event.cover.cloudinary_url, 800)} alt={event.name} className="w-full h-full object-cover" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
                                                         <span className="text-white font-bold text-lg drop-shadow-md">{event.cover.title || 'Cover Photo'}</span>
@@ -171,12 +171,12 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                         initial={{ opacity: 0, y: 30 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 20 }}
-                                        className="w-full bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white max-h-[75vh] overflow-y-auto custom-scrollbar relative"
+                                        className="w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 max-h-[75vh] overflow-y-auto custom-scrollbar relative"
                                     >
-                                        <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-md px-6 md:px-10 pt-6 md:pt-10 pb-4 border-b border-slate-200 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                        <div className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-6 md:px-10 pt-6 md:pt-10 pb-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
                                             <div>
-                                                <h4 className="text-3xl font-bold text-slate-800 mb-2">{event.name}</h4>
-                                                <p className="text-sm text-slate-500">{event.others.length + 1} photos • Click any thumbnail to view full details</p>
+                                                <h4 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{event.name}</h4>
+                                                <p className="text-sm text-slate-500 dark:text-slate-400">{event.others.length + 1} photos • Click any thumbnail to view full details</p>
                                             </div>
                                             <button 
                                                 onClick={() => {
@@ -186,7 +186,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                                     }, 100);
                                                 }} 
-                                                className="self-start md:self-auto text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold bg-white border border-slate-200 px-5 py-2 rounded-full text-sm shadow-sm transition-colors"
+                                                className="self-start md:self-auto text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-5 py-2 rounded-full text-sm shadow-sm transition-colors"
                                             >
                                                 Collapse Gallery
                                             </button>
@@ -196,7 +196,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                             {[event.cover, ...event.others].map((img, idx) => (
                                                 <div 
                                                     key={img.id} 
-                                                    className={`rounded-xl overflow-hidden shadow-sm cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all bg-slate-100 ${getAspectClass(img.id, idx)}`}
+                                                    className={`rounded-xl overflow-hidden shadow-sm cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all bg-slate-100 dark:bg-slate-800 ${getAspectClass(img.id, idx)}`}
                                                     onClick={() => setExpandedImage(img)}
                                                 >
                                                     <img src={getOptimizedImageUrl(img.cloudinary_url, 600)} alt="Thumbnail" className="w-full h-full object-cover" />
@@ -209,10 +209,9 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                         </motion.div>
                     );
                 })}
-
                 {viewMode === 'events' && events.standalone.length > 0 && (
-                    <div className="mt-20 border-t border-slate-200 pt-20">
-                        <h3 className="text-2xl font-bold text-center mb-12 text-slate-400">Other Moments</h3>
+                    <div className="mt-20 border-t border-slate-200 dark:border-slate-800 pt-20">
+                        <h3 className="text-2xl font-bold text-center mb-12 text-slate-400 dark:text-slate-500">Other Moments</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {events.standalone.map(img => (
                                 <motion.div 
@@ -220,7 +219,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
-                                    className="rounded-xl overflow-hidden aspect-[4/3] md:aspect-square shadow-md hover:shadow-xl transition-shadow cursor-pointer"
+                                    className="rounded-xl overflow-hidden aspect-[4/3] md:aspect-square shadow-md hover:shadow-xl transition-shadow cursor-pointer bg-slate-100 dark:bg-slate-800"
                                     onClick={() => setExpandedImage(img)}
                                 >
                                     <img src={getOptimizedImageUrl(img.cloudinary_url, 400)} alt="Thumbnail" className="w-full h-full object-cover" />
@@ -249,21 +248,21 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                             >
                                 {img.event_name && (
                                     <div className={`flex w-full mb-3 ${isLeft ? 'md:justify-end justify-center' : 'md:justify-start justify-center'}`}>
-                                        <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-600 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full shadow-sm">
+                                        <span className="text-[10px] uppercase font-bold tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 px-3 py-1 rounded-full shadow-sm">
                                             {img.event_name}
                                         </span>
                                     </div>
                                 )}
-                                <h3 className="text-3xl font-bold text-slate-800 mb-2">
+                                <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
                                     {img.title || 'Captured Moment'}
                                 </h3>
                                 {(img.event_date || img.created_at) && (
-                                    <p className="text-slate-400 font-medium font-mono text-sm mb-4">
+                                    <p className="text-slate-400 dark:text-slate-500 font-medium font-mono text-sm mb-4">
                                         {new Date(img.event_date || img.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                                     </p>
                                 )}
                                 {img.description && (
-                                    <p className="text-slate-500 max-w-sm text-sm">
+                                    <p className="text-slate-500 dark:text-slate-400 max-w-sm text-sm">
                                         {img.description}
                                     </p>
                                 )}
@@ -275,8 +274,8 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                     className="relative w-[90%] sm:w-[80%] md:w-[90%] max-w-md aspect-[4/3] mx-auto cursor-pointer group"
                                     onClick={() => setExpandedImage(img)}
                                 >
-                                    <div className={`absolute inset-0 bg-white rounded-2xl shadow-xl -z-10 transition-transform duration-500 ${isLeft ? 'rotate-2 group-hover:rotate-6' : '-rotate-2 group-hover:-rotate-6'}`}></div>
-                                    <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white transition-transform duration-500 group-hover:scale-[1.02] group-hover:-translate-y-2">
+                                    <div className={`absolute inset-0 bg-white dark:bg-slate-800 rounded-2xl shadow-xl -z-10 transition-transform duration-500 ${isLeft ? 'rotate-2 group-hover:rotate-6' : '-rotate-2 group-hover:-rotate-6'}`}></div>
+                                    <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-700 transition-transform duration-500 group-hover:scale-[1.02] group-hover:-translate-y-2">
                                         <img src={getOptimizedImageUrl(img.cloudinary_url, 800)} alt={img.title || 'Story Moment'} className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
                                             <span className="text-white text-sm font-bold uppercase tracking-widest border-2 border-white/50 px-6 py-2 rounded-full">Explore Picture</span>
@@ -293,46 +292,46 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
             {/* Lightbox Overlay for Expanded Image Details */}
             {expandedImage && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-200/60 backdrop-blur-md" onClick={() => setExpandedImage(null)}></div>
-                    <div className="relative w-full max-w-6xl bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-slate-100">
+                    <div className="absolute inset-0 bg-slate-900/80 dark:bg-black/80 backdrop-blur-md" onClick={() => setExpandedImage(null)}></div>
+                    <div className="relative w-full max-w-6xl bg-white dark:bg-slate-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-slate-200 dark:border-slate-800">
                         <button 
                             onClick={() => setExpandedImage(null)} 
-                            className="absolute top-4 right-4 z-50 p-2 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-800 rounded-full hover:bg-slate-100 transition-colors shadow-sm"
+                            className="absolute top-4 right-4 z-50 p-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         </button>
                         
-                        <div className="w-full md:w-3/5 h-[40vh] sm:h-[50vh] md:h-auto bg-slate-50 flex items-center justify-center relative p-2 md:p-8">
+                        <div className="w-full md:w-3/5 h-[40vh] sm:h-[50vh] md:h-auto bg-slate-50 dark:bg-slate-950 flex items-center justify-center relative p-2 md:p-8">
                             <InteractiveImageMarker 
                                 src={getOptimizedImageUrl(expandedImage.cloudinary_url, 1200)} 
                                 alt={expandedImage.title || ''} 
-                                tags={expandedImage.tags || []}
+                                tags={expandedImage.tags || []} 
                             />
                         </div>
                         
-                        <div className="w-full md:w-2/5 p-6 md:p-8 flex flex-col overflow-y-auto bg-white min-h-[30vh]">
+                        <div className="w-full md:w-2/5 p-6 md:p-8 flex flex-col overflow-y-auto bg-white dark:bg-slate-900 min-h-[30vh]">
                             <div className="mb-4">
                                 {(expandedImage.event_name || expandedImage.event_date || expandedImage.created_at) && (
-                                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-500 block mb-3 bg-indigo-50 w-max px-3 py-1.5 rounded-full border border-indigo-100">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-500 dark:text-indigo-400 block mb-3 bg-indigo-50 dark:bg-indigo-950/60 w-max px-3 py-1.5 rounded-full border border-indigo-100 dark:border-indigo-900/50">
                                         {expandedImage.event_name ? `${expandedImage.event_name}` : 'Moment'}
                                         {' • '}
                                         {new Date(expandedImage.event_date || expandedImage.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                     </span>
                                 )}
-                                <h3 className="text-3xl font-bold text-slate-800 leading-tight">
+                                <h3 className="text-3xl font-bold text-slate-800 dark:text-white leading-tight">
                                     {expandedImage.title || 'Untitled Moment'}
                                 </h3>
                             </div>
                             
-                            <p className="text-slate-600 leading-relaxed whitespace-pre-wrap flex-grow mt-4">
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap flex-grow mt-4">
                                 {expandedImage.description || 'Explore the interactive tags in the photo to look at specific details!'}
                             </p>
                             
                             {expandedImage.categories && expandedImage.categories.length > 0 && (
-                                <div className="mt-8 pt-6 border-t border-slate-100 flex gap-2 flex-wrap">
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex gap-2 flex-wrap">
                                     <span className="text-[10px] text-slate-400 uppercase tracking-widest block w-full mb-1">Tags</span>
                                     {expandedImage.categories.slice(0,3).map((_: string, i: number) => (
-                                        <span key={i} className="text-xs bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1 rounded">Category Info</span>
+                                        <span key={i} className="text-xs bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded">Category Info</span>
                                     ))}
                                 </div>
                             )}

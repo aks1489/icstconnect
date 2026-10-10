@@ -188,3 +188,53 @@ html.dark,
         transform: rotateY(180deg);
     }
 }
+
+/* ==============================================================================
+   FUTURISTIC CIRCUIT SYSTEM MOUSE CURSOR
+   Uses Futuristic_Circuit_Cursor_Icon from icons folder
+   Hotspot calibrated to arrow tip (2px from left, 0px from top)
+   ============================================================================== */
+:root,
+html,
+body {
+    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, auto;
+}
+
+/* Interactive elements default to futuristic cursor pointer */
+a,
+button,
+[role="button"],
+.cursor-pointer,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+select,
+summary {
+    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, pointer !important;
+}
+
+/* Default cursor elements */
+.cursor-default {
+    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, default !important;
+}
+
+/* Text editing elements maintain native I-beam cursor */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+textarea,
+[contenteditable="true"],
+.cursor-text {
+    cursor: text !important;
+}
+
+/* Disabled elements maintain not-allowed cursor */
+[disabled],
+:disabled,
+.cursor-not-allowed {
+    cursor: not-allowed !important;
+}
