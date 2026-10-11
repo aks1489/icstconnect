@@ -57,6 +57,7 @@ const AdminFinance = lazy(() => import('./admin/pages/FinancialDashboard'))
 const EnrollmentApplications = lazy(() => import('./admin/pages/EnrollmentApplications'))
 const AdminScholarships = lazy(() => import('./admin/pages/AdminScholarships'))
 const AdminGallery = lazy(() => import('./admin/pages/AdminGallery'))
+const AdminHomeMedia = lazy(() => import('./admin/pages/AdminHomeMedia'))
 const AdminPermissions = lazy(() => import('./admin/pages/AdminPermissions'))
 const AdminAuditLogs = lazy(() => import('./admin/pages/AdminAuditLogs'))
 const AdminEcosystem = lazy(() => import('./admin/pages/AdminEcosystem'))
@@ -250,6 +251,11 @@ function App() {
                 <Route path="gallery" element={
                   <Suspense fallback={<PageSkeleton />}>
                     <AdminGallery />
+                  </Suspense>
+                } />
+                <Route path="home-media" element={
+                  <Suspense fallback={<PageSkeleton />}>
+                    <AdminHomeMedia />
                   </Suspense>
                 } />
                 <Route path="permissions" element={

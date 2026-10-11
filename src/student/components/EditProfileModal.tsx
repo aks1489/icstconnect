@@ -55,12 +55,12 @@ export default function EditProfileModal({ isOpen, onClose }: EditProfileModalPr
                 onClick={onClose}
             ></div>
 
-            <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 sticky top-0 z-10">
-                    <h2 className="text-xl font-bold text-slate-800">Edit Profile</h2>
+            <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-transparent dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/60 sticky top-0 z-10 backdrop-blur-md">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">Edit Profile</h2>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-300 transition-colors"
+                        className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-750 transition-colors"
                     >
                         <X size={16} />
                     </button>

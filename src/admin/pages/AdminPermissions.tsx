@@ -71,6 +71,7 @@ const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
     { key: 'gallery.view', name: 'View Gallery', module: 'Gallery', description: 'Browse institutional photo repository' },
     { key: 'gallery.manage', name: 'Manage Gallery', module: 'Gallery', description: 'Upload albums, tag students, and set layout styles' },
     { key: 'gallery.media.manage', name: 'Manage Media Registry', module: 'Gallery', description: 'Update site-wide master graphic banners' },
+    { key: 'home.media.manage', name: 'Manage Home Page Media', module: 'Gallery', description: 'Update, crop, and configure home page section images' },
 
     // Assessments & Tests
     { key: 'tests.view', name: 'View Tests', module: 'Assessments', description: 'Browse online examination sets' },
@@ -224,15 +225,15 @@ export default function AdminPermissions() {
     return (
         <div className="space-y-6 max-w-7xl mx-auto pb-16">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-indigo-50 text-indigo-700 rounded-xl">
+                        <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 rounded-xl">
                             <IconShield size={24} />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-800">Permissions Matrix</h1>
-                            <p className="text-slate-500 text-sm">
+                            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Permissions Matrix</h1>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm">
                                 Centralized Role-Based Access Control (RBAC) & Capability Governance
                             </p>
                         </div>
@@ -242,7 +243,7 @@ export default function AdminPermissions() {
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button
                         onClick={handleReset}
-                        className="flex items-center gap-2 px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-sm font-medium transition-colors"
                         title="Revert to factory default permissions"
                     >
                         <IconRotate2 size={18} />
@@ -270,7 +271,7 @@ export default function AdminPermissions() {
                             onClick={() => setActiveRole(role)}
                             className={`p-4 rounded-xl border text-left transition-all ${isActive
                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/20'
-                                : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-300'
+                                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-1">
@@ -282,7 +283,7 @@ export default function AdminPermissions() {
                             <div className="text-lg font-bold capitalize">
                                 {role.replace('_', ' ')}
                             </div>
-                            <div className={`text-xs mt-1 ${isActive ? 'text-indigo-100' : 'text-slate-500'}`}>
+                            <div className={`text-xs mt-1 ${isActive ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
                                 {count} permissions active
                             </div>
                         </button>
@@ -291,7 +292,7 @@ export default function AdminPermissions() {
             </div>
 
             {/* Filter & Search Bar */}
-            <div className="flex flex-col sm:flex-row gap-4 bg-white p-4 rounded-xl border border-slate-200">
+            <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
                 <div className="relative flex-1">
                     <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                     <input
@@ -299,7 +300,7 @@ export default function AdminPermissions() {
                         placeholder="Search capabilities by name, key, or scope..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                     />
                 </div>
                 <div className="flex items-center gap-2">
@@ -307,10 +308,10 @@ export default function AdminPermissions() {
                     <select
                         value={selectedModule}
                         onChange={(e) => setSelectedModule(e.target.value)}
-                        className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                     >
                         {modules.map(mod => (
-                            <option key={mod} value={mod}>
+                            <option key={mod} value={mod} className="dark:bg-slate-800">
                                 {mod === 'all' ? 'All Modules' : mod}
                             </option>
                         ))}
@@ -319,8 +320,8 @@ export default function AdminPermissions() {
             </div>
 
             {/* Permissions Matrix Content */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="divide-y divide-slate-100">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="divide-y divide-slate-100 dark:divide-slate-800">
                     {/* Module groups */}
                     {modules.filter(m => m !== 'all').map(mod => {
                         const permsInModule = filteredPermissions.filter(p => p.module === mod)
@@ -332,11 +333,11 @@ export default function AdminPermissions() {
                         return (
                             <div key={mod} className="p-6">
                                 {/* Module Header */}
-                                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800">
                                     <div className="flex items-center gap-2">
-                                        <IconLayersLinked size={20} className="text-indigo-600" />
-                                        <h3 className="font-bold text-slate-800 text-base">{mod} Module</h3>
-                                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                        <IconLayersLinked size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                        <h3 className="font-bold text-slate-800 dark:text-white text-base">{mod} Module</h3>
+                                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                                             {permsInModule.length} privileges
                                         </span>
                                     </div>
@@ -346,14 +347,14 @@ export default function AdminPermissions() {
                                             <button
                                                 onClick={() => handleModuleToggle(mod, true)}
                                                 disabled={allGranted}
-                                                className="text-xs px-2.5 py-1 rounded-md font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-40 transition-colors"
+                                                className="text-xs px-2.5 py-1 rounded-md font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 disabled:opacity-40 transition-colors"
                                             >
                                                 Grant All
                                             </button>
                                             <button
                                                 onClick={() => handleModuleToggle(mod, false)}
                                                 disabled={!someGranted}
-                                                className="text-xs px-2.5 py-1 rounded-md font-medium text-red-700 bg-red-50 hover:bg-red-100 disabled:opacity-40 transition-colors"
+                                                className="text-xs px-2.5 py-1 rounded-md font-medium text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/60 hover:bg-red-100 dark:hover:bg-red-900/60 disabled:opacity-40 transition-colors"
                                             >
                                                 Revoke All
                                             </button>
@@ -373,26 +374,26 @@ export default function AdminPermissions() {
                                                 onClick={() => !isLocked && handleToggle(perm.key)}
                                                 className={`p-4 rounded-xl border transition-all ${isLocked ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'
                                                     } ${granted
-                                                        ? 'bg-indigo-50/50 border-indigo-200 hover:border-indigo-300'
-                                                        : 'bg-white border-slate-200 hover:border-slate-300'
+                                                        ? 'bg-indigo-50/50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-900/60 hover:border-indigo-300 dark:hover:border-indigo-700'
+                                                        : 'bg-white dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                                                     }`}
                                             >
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="font-semibold text-sm text-slate-800 truncate">
+                                                        <p className="font-semibold text-sm text-slate-800 dark:text-white truncate">
                                                             {perm.name}
                                                         </p>
                                                         <p className="font-mono text-xs text-slate-400 truncate mt-0.5">
                                                             {perm.key}
                                                         </p>
-                                                        <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
                                                             {perm.description}
                                                         </p>
                                                     </div>
 
                                                     <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-colors ${granted
                                                         ? 'bg-indigo-600 text-white'
-                                                        : 'bg-slate-100 text-slate-300'
+                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600'
                                                         }`}>
                                                         {granted ? <IconCheck size={16} /> : <IconX size={16} />}
                                                     </div>
@@ -406,7 +407,7 @@ export default function AdminPermissions() {
                     })}
 
                     {filteredPermissions.length === 0 && (
-                        <div className="p-12 text-center text-slate-400">
+                        <div className="p-12 text-center text-slate-400 dark:text-slate-500">
                             No permissions match your search query.
                         </div>
                     )}

@@ -4,6 +4,7 @@ import { useToast } from '../../contexts/ToastContext'
 import { auditService } from '../../services/auditService'
 import { feesService } from '../../services/feesService'
 import { IconX as X, IconUserPlus, IconCopy, IconCheck, IconEye, IconEyeOff, IconRefresh, IconSchool, IconCurrencyRupee, IconMapPin, IconShield } from '@tabler/icons-react'
+import CourseSearchSelect from './CourseSearchSelect'
 
 interface CreateStudentModalProps {
     isOpen: boolean
@@ -408,18 +409,15 @@ export default function CreateStudentModal({ isOpen, onClose, onSuccess }: Creat
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Enrolling Course *</label>
-                                        <select
-                                            required
+                                        <CourseSearchSelect
+                                            courses={courses}
                                             value={formData.course_id}
-                                            onChange={(e) => handleCourseChange(e.target.value)}
-                                            className="w-full px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                        >
-                                            <option value="">Select Course...</option>
-                                            {courses.map(c => (
-                                                <option key={c.id} value={c.id.toString()}>{c.course_name}</option>
-                                            ))}
-                                        </select>
+                                            onChange={(id) => handleCourseChange(id)}
+                                            label="Enrolling Course"
+                                            placeholder="Select Course..."
+                                            compact
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Batch Class *</label>

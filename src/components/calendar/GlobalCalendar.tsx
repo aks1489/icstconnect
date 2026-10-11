@@ -233,32 +233,32 @@ export default function GlobalCalendar() {
     })
 
     return (
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
                         {format(currentWeekStart, 'MMMM yyyy')}
                     </h2>
-                    <p className="text-slate-500 text-sm font-medium">Week of {format(currentWeekStart, 'd')} - {format(endOfWeek(currentWeekStart, { weekStartsOn: 1 }), 'd')}</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Week of {format(currentWeekStart, 'd')} - {format(endOfWeek(currentWeekStart, { weekStartsOn: 1 }), 'd')}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <button onClick={prevWeek} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500">
+                    <button onClick={prevWeek} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-500 dark:text-slate-400">
                         <ChevronLeft size={20} />
                     </button>
-                    <button onClick={resetToday} className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-100 transition-colors">
+                    <button onClick={resetToday} className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl font-bold text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors">
                         Today
                     </button>
-                    <button onClick={nextWeek} className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500">
+                    <button onClick={nextWeek} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-slate-500 dark:text-slate-400">
                         <ChevronRight size={20} />
                     </button>
 
                     {isAdmin && (
-                        <div className="ml-4 pl-4 border-l border-slate-200">
+                        <div className="ml-4 pl-4 border-l border-slate-200 dark:border-slate-700">
                             <button
                                 onClick={() => setIsAddEventOpen(true)}
-                                className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all shadow-lg hover:shadow-indigo-200"
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-600 dark:hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 dark:hover:shadow-none"
                             >
                                 <Plus size={16} />
                                 <span className="hidden md:inline">Add Event</span>
@@ -283,10 +283,10 @@ export default function GlobalCalendar() {
             />
 
             {/* Week Grid */}
-            <div className="grid grid-cols-7 min-h-[500px] divide-x divide-slate-100 relative">
+            <div className="grid grid-cols-7 min-h-[500px] divide-x divide-slate-100 dark:divide-slate-800 relative">
                 {loading && (
                     <div className="absolute inset-0 bg-white/60 dark:bg-slate-900/60 z-10 flex items-center justify-center backdrop-blur-sm">
-                        <Loader2 className="animate-spin text-indigo-600" size={32} />
+                        <Loader2 className="animate-spin text-indigo-600 dark:text-indigo-400" size={32} />
                     </div>
                 )}
 
@@ -298,17 +298,17 @@ export default function GlobalCalendar() {
                     const isTodayDate = isToday(day)
 
                     return (
-                        <div key={dateKey} className="flex flex-col bg-slate-50/30">
+                        <div key={dateKey} className="flex flex-col bg-slate-50/30 dark:bg-slate-900/40">
                             {/* Day Header */}
-                            <div className={`p-4 text-center border-b border-slate-100 ${isTodayDate ? 'bg-indigo-50/50' : ''}`}>
-                                <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+                            <div className={`p-4 text-center border-b border-slate-100 dark:border-slate-800 ${isTodayDate ? 'bg-indigo-50/50 dark:bg-indigo-950/30' : ''}`}>
+                                <span className="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
                                     {format(day, 'EEE')}
                                 </span>
                                 <div className={`
                                     w-10 h-10 rounded-full flex items-center justify-center mx-auto text-lg font-bold transition-all
                                     ${isTodayDate
-                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                                        : 'text-slate-700 bg-white shadow-sm border border-slate-100'}
+                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none'
+                                        : 'text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700'}
                                 `}>
                                     {format(day, 'd')}
                                 </div>
@@ -326,10 +326,10 @@ export default function GlobalCalendar() {
                                             className={`
                                                 p-3 rounded-2xl border mb-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md
                                                 ${event.type === 'holiday'
-                                                    ? 'bg-rose-50 border-rose-100'
+                                                    ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-100 dark:border-rose-900/40'
                                                     : event.type === 'extra_class'
-                                                        ? 'bg-amber-50 border-amber-100'
-                                                        : 'bg-white border-slate-100'
+                                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900/40'
+                                                        : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700'
                                                 }
                                             `}
                                         >
@@ -337,20 +337,20 @@ export default function GlobalCalendar() {
                                             <div className="flex items-start justify-between mb-2">
                                                 <span className={`
                                                     px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide
-                                                    ${event.type === 'holiday' ? 'bg-rose-100 text-rose-600'
-                                                        : event.type === 'extra_class' ? 'bg-amber-100 text-amber-600'
-                                                            : 'bg-indigo-100 text-indigo-600'}
+                                                    ${event.type === 'holiday' ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                                                        : event.type === 'extra_class' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
+                                                            : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'}
                                                 `}>
                                                     {event.type.replace('_', ' ')}
                                                 </span>
                                             </div>
 
-                                            <h4 className="font-bold text-slate-800 text-sm leading-tight mb-1">
+                                            <h4 className="font-bold text-slate-800 dark:text-white text-sm leading-tight mb-1">
                                                 {event.title}
                                             </h4>
 
                                             {event.type !== 'holiday' && (
-                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
                                                     <Clock size={12} className="text-indigo-400" />
                                                     {event.start_time?.slice(0, 5)}
                                                 </div>
@@ -360,10 +360,10 @@ export default function GlobalCalendar() {
                                 </AnimatePresence>
 
                                 {!loading && dayEvents.length === 0 && (
-                                    <div className="h-full flex flex-col items-center justify-center text-slate-300 py-8 opacity-50">
-                                        <div className="w-1 h-1 bg-slate-300 rounded-full mb-2" />
-                                        <div className="w-1 h-1 bg-slate-300 rounded-full mb-2" />
-                                        <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                                    <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-700 py-8 opacity-50">
+                                        <div className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mb-2" />
+                                        <div className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mb-2" />
+                                        <div className="w-1 h-1 bg-slate-300 dark:bg-slate-700 rounded-full" />
                                     </div>
                                 )}
                             </div>

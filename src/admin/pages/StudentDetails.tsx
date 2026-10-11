@@ -444,11 +444,11 @@ export default function StudentDetails() {
             {/* Edit Modal */}
             {isEditOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsEditOpen(false)}></div>
-                    <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                            <h2 className="text-xl font-bold text-slate-800">Edit Student Profile</h2>
-                            <button onClick={() => setIsEditOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEditOpen(false)}></div>
+                    <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-10">
+                            <h2 className="text-xl font-bold text-slate-800 dark:text-white">Edit Student Profile</h2>
+                            <button onClick={() => setIsEditOpen(false)} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                                 <X className="text-xs" size={14} />
                             </button>
                         </div>
@@ -476,7 +476,7 @@ export default function StudentDetails() {
             />
 
             <div className="mb-8">
-                <Link to="/admin/students" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-4 transition-colors">
+                <Link to="/admin/students" className="text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center gap-2 mb-4 transition-colors">
                     <ArrowLeft size={16} />
                     Back to Students
                 </Link>
@@ -484,13 +484,13 @@ export default function StudentDetails() {
                 {/* Batch Transfer Modal */}
                 {isChangeBatchOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsChangeBatchOpen(false)}></div>
-                        <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-6">
-                            <h3 className="font-bold text-lg mb-4 text-slate-800">Switch Class Batch</h3>
-                            <p className="text-sm text-slate-500 mb-4">Select a new batch for this course. Progress will be preserved.</p>
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsChangeBatchOpen(false)}></div>
+                        <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-6">
+                            <h3 className="font-bold text-lg mb-4 text-slate-800 dark:text-white">Switch Class Batch</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Select a new batch for this course. Progress will be preserved.</p>
 
                             <select
-                                className="w-full p-2 border border-slate-200 rounded-xl mb-4 bg-white"
+                                className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-xl mb-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                                 value={selectedTransferClassId}
                                 onChange={e => setSelectedTransferClassId(e.target.value)}
                             >
@@ -501,7 +501,7 @@ export default function StudentDetails() {
                             </select>
 
                             <div className="flex justify-end gap-2">
-                                <button onClick={() => setIsChangeBatchOpen(false)} className="px-4 py-2 text-slate-500 font-bold hover:bg-slate-50 rounded-lg">Cancel</button>
+                                <button onClick={() => setIsChangeBatchOpen(false)} className="px-4 py-2 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">Cancel</button>
                                 <button
                                     onClick={handleBatchTransfer}
                                     disabled={!selectedTransferClassId}
@@ -516,7 +516,7 @@ export default function StudentDetails() {
 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl font-bold overflow-hidden">
+                        <div className="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-2xl font-bold overflow-hidden">
                             {student.avatar_url ? (
                                 <img src={student.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
@@ -524,23 +524,23 @@ export default function StudentDetails() {
                             )}
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-slate-800">{student.full_name}</h1>
-                            <p className="text-slate-500">{student.email}</p>
-                            <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${student.role === 'teacher' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'}`}>
+                            <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{student.full_name}</h1>
+                            <p className="text-slate-500 dark:text-slate-400">{student.email}</p>
+                            <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${student.role === 'teacher' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
                                 {student.role || 'student'}
                             </span>
                             {/* Temporary Password Badge */}
                             {student.temp_password && (
-                                <div className="mt-2 inline-flex flex-col gap-1 items-start bg-amber-50 border border-amber-200 pl-3 pr-4 py-1.5 rounded-lg shadow-sm">
-                                    <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest flex items-center gap-1.5"><KeyRound size={10} /> Temporary Password Active</span>
-                                    <span className="text-sm font-mono font-bold text-slate-800 bg-white px-2 py-0.5 rounded border border-amber-100 select-all tracking-wider">{student.temp_password}</span>
+                                <div className="mt-2 inline-flex flex-col gap-1 items-start bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 pl-3 pr-4 py-1.5 rounded-lg shadow-sm">
+                                    <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest flex items-center gap-1.5"><KeyRound size={10} /> Temporary Password Active</span>
+                                    <span className="text-sm font-mono font-bold text-slate-800 dark:text-white bg-white dark:bg-slate-900 px-2 py-0.5 rounded border border-amber-100 dark:border-amber-900/60 select-all tracking-wider">{student.temp_password}</span>
                                 </div>
                             )}
                         </div>
                     </div>
                     <button
                         onClick={() => setIsEditOpen(true)}
-                        className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-xl font-semibold hover:bg-indigo-100 transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 rounded-xl font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors flex items-center gap-2"
                     >
                         <Pencil size={18} />
                         Edit Profile
@@ -552,22 +552,22 @@ export default function StudentDetails() {
                 {/* Main Content: Enrollments */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Enrollments Card */}
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                            <h2 className="font-bold text-slate-800">Enrolled Classes</h2>
-                            <span className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-semibold">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <h2 className="font-bold text-slate-800 dark:text-white">Enrolled Classes</h2>
+                            <span className="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full text-xs font-semibold">
                                 {enrollments.length} Active
                             </span>
                         </div>
 
                         <div className="p-6 space-y-6">
                             {enrollments.length === 0 ? (
-                                <div className="text-center py-8 text-slate-500">
+                                <div className="text-center py-8 text-slate-500 dark:text-slate-400">
                                     No active enrollments. Assign a course to get started.
                                 </div>
                             ) : (
                                 enrollments.map((enrollment) => (
-                                    <div key={enrollment.course_id} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                    <div key={enrollment.course_id} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-100 dark:border-slate-800 transition-colors">
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${(enrollment.course.color || '').split(' ')[0].replace('text-', 'bg-').replace('600', '100') || 'bg-blue-100'}`}>
@@ -577,8 +577,8 @@ export default function StudentDetails() {
                                                     })()}
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-slate-800">{enrollment.course.course_name}</h3>
-                                                    <p className="text-xs text-slate-500">Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}</p>
+                                                    <h3 className="font-semibold text-slate-800 dark:text-white">{enrollment.course.course_name}</h3>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">Enrolled: {new Date(enrollment.enrolled_at).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                             <button
@@ -592,14 +592,13 @@ export default function StudentDetails() {
 
                                         {/* Class Info & Logic */}
                                         <div className="flex items-center gap-2 mb-4">
-                                            <span className="text-xs font-bold text-slate-500 uppercase bg-slate-100 px-2 py-1 rounded">
+                                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                                                 Batch: {enrollment.class_id ? `ID #${enrollment.class_id}` : 'N/A'}
-                                                {/* Ideally we fetch batch name, but ID proves the link for now */}
                                             </span>
                                             {enrollment.class_id && (
                                                 <button
                                                     onClick={() => openTransferModal(enrollment.course_id, enrollment.class_id!)}
-                                                    className="text-xs text-indigo-600 font-bold hover:underline"
+                                                    className="text-xs text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
                                                 >
                                                     Switch Batch
                                                 </button>
@@ -607,7 +606,7 @@ export default function StudentDetails() {
                                         </div>
 
                                         <div>
-                                            <div className="flex justify-between text-xs font-medium text-slate-600 mb-1">
+                                            <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                                                 <span>Progress</span>
                                                 <span>{enrollment.progress || 0}%</span>
                                             </div>
@@ -617,7 +616,7 @@ export default function StudentDetails() {
                                                 max="100"
                                                 value={enrollment.progress || 0}
                                                 onChange={(e) => handleUpdateProgress(enrollment.course_id, parseInt(e.target.value))}
-                                                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                                                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                                             />
                                         </div>
                                     </div>
@@ -627,33 +626,33 @@ export default function StudentDetails() {
                     </div>
 
                     {/* Personal Details Card */}
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden p-6">
-                        <h2 className="font-bold text-slate-800 mb-4">Personal Details</h2>
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden p-6 transition-colors">
+                        <h2 className="font-bold text-slate-800 dark:text-white mb-4">Personal Details</h2>
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                             <div>
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">Guardian's Name</dt>
-                                <dd className="text-slate-800 font-medium">{student.guardian_name || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Guardian's Name</dt>
+                                <dd className="text-slate-800 dark:text-slate-200 font-medium">{student.guardian_name || '-'}</dd>
                             </div>
                             <div>
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">DOB</dt>
-                                <dd className="text-slate-800 font-medium">{student.dob || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">DOB</dt>
+                                <dd className="text-slate-800 dark:text-slate-200 font-medium">{student.dob || '-'}</dd>
                             </div>
                             <div>
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">Phone</dt>
-                                <dd className="text-slate-800 font-medium">{student.phone || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Phone</dt>
+                                <dd className="text-slate-800 dark:text-slate-200 font-medium">{student.phone || '-'}</dd>
                             </div>
                             <div>
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">Pincode</dt>
-                                <dd className="text-slate-800 font-medium">{student.pincode || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Pincode</dt>
+                                <dd className="text-slate-800 dark:text-slate-200 font-medium">{student.pincode || '-'}</dd>
                             </div>
                             <div className="md:col-span-2">
-                                <dt className="text-xs font-semibold text-slate-500 uppercase">Address</dt>
-                                <dd className="text-slate-800 font-medium">{student.address || '-'}</dd>
+                                <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Address</dt>
+                                <dd className="text-slate-800 dark:text-slate-200 font-medium">{student.address || '-'}</dd>
                             </div>
                             {student.enrollment_center && (
                                 <div className="md:col-span-2">
-                                    <dt className="text-xs font-semibold text-slate-500 uppercase">Enrollment Center</dt>
-                                    <dd className="text-indigo-600 font-medium bg-indigo-50 inline-block px-2 py-0.5 rounded">{student.enrollment_center}</dd>
+                                    <dt className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Enrollment Center</dt>
+                                    <dd className="text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-950/50 inline-block px-2 py-0.5 rounded">{student.enrollment_center}</dd>
                                 </div>
                             )}
                         </dl>
@@ -662,17 +661,17 @@ export default function StudentDetails() {
 
                 {/* Sidebar: Actions */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                        <h2 className="font-bold text-slate-800 mb-4">Enroll in Class</h2>
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 transition-colors">
+                        <h2 className="font-bold text-slate-800 dark:text-white mb-4">Enroll in Class</h2>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Select Course</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Select Course</label>
                                 <div className="relative" ref={dropdownRef}>
                                     <div
                                         onClick={() => setIsCourseDropdownOpen(!isCourseDropdownOpen)}
-                                        className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-indigo-500 bg-white flex items-center justify-between cursor-pointer"
+                                        className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 focus:border-indigo-500 bg-white dark:bg-slate-800 flex items-center justify-between cursor-pointer"
                                     >
-                                        <span className={!selectedCourseId ? "text-slate-500" : "text-slate-900"}>
+                                        <span className={!selectedCourseId ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-white"}>
                                             {selectedCourseId
                                                 ? allCourses.find(c => c.id === Number(selectedCourseId))?.course_name
                                                 : "Choose a course..."}
@@ -681,14 +680,14 @@ export default function StudentDetails() {
                                     </div>
 
                                     {isCourseDropdownOpen && (
-                                        <div className="absolute z-20 mt-2 w-full bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden">
-                                            <div className="p-2 border-b border-slate-100">
-                                                <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg">
+                                        <div className="absolute z-20 mt-2 w-full bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+                                            <div className="p-2 border-b border-slate-100 dark:border-slate-700">
+                                                <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-900 rounded-lg">
                                                     <Search size={14} className="text-slate-400" />
                                                     <input
                                                         type="text"
                                                         placeholder="Search course..."
-                                                        className="bg-transparent border-none outline-none text-sm w-full"
+                                                        className="bg-transparent border-none outline-none text-sm w-full text-slate-900 dark:text-white placeholder-slate-400"
                                                         value={courseSearchTerm}
                                                         onChange={(e) => {
                                                             setCourseSearchTerm(e.target.value)
@@ -734,7 +733,7 @@ export default function StudentDetails() {
                                                                     setIsCourseDropdownOpen(false)
                                                                     setCourseSearchTerm('')
                                                                 }}
-                                                                className={`px-4 py-2 cursor-pointer text-sm transition-colors ${index === highlightedIndex ? 'bg-indigo-50 text-indigo-700 font-medium' : 'hover:bg-slate-50 text-slate-700'
+                                                                className={`px-4 py-2 cursor-pointer text-sm transition-colors ${index === highlightedIndex ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-medium' : 'hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200'
                                                                     }`}
                                                             >
                                                                 {course.course_name}
@@ -749,11 +748,11 @@ export default function StudentDetails() {
 
                             {selectedCourseId && (
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Select Batch</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Select Batch</label>
                                     <select
                                         value={selectedClassId}
                                         onChange={(e) => setSelectedClassId(e.target.value)}
-                                        className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none text-sm"
+                                        className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 outline-none text-sm"
                                     >
                                         <option value="">Choose a batch...</option>
                                         {availableClasses.map(cls => {
@@ -783,16 +782,16 @@ export default function StudentDetails() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-                        <h2 className="font-bold text-slate-800 mb-4">Account Actions</h2>
-                        <button className="w-full py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors mb-3">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 transition-colors">
+                        <h2 className="font-bold text-slate-800 dark:text-white mb-4">Account Actions</h2>
+                        <button className="w-full py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors mb-3">
                             Reset Password
                         </button>
 
                         {student.role !== 'teacher' && (
                             <button
                                 onClick={handleMakeTeacher}
-                                className="w-full py-2.5 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-medium hover:bg-emerald-100 transition-colors mb-3"
+                                className="w-full py-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-emerald-700 dark:text-emerald-400 rounded-xl font-medium hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-colors mb-3"
                             >
                                 Promote to Teacher
                             </button>
@@ -800,7 +799,7 @@ export default function StudentDetails() {
 
                         <button
                             onClick={handleDeleteUser}
-                            className="w-full py-2.5 border border-red-200 bg-red-50 text-red-600 rounded-xl font-medium hover:bg-red-100 transition-colors"
+                            className="w-full py-2.5 border border-red-200 dark:border-red-900/60 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl font-medium hover:bg-red-100 dark:hover:bg-red-900/60 transition-colors"
                         >
                             Delete Account
                         </button>

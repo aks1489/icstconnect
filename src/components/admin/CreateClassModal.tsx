@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { IconX as X, IconCheck as Check } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../contexts/ToastContext'
+import CourseSearchSelect from './CourseSearchSelect'
 
 interface CreateClassModalProps {
     isOpen: boolean
@@ -99,73 +100,67 @@ export default function CreateClassModal({ isOpen, onClose, onSuccess }: CreateC
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
-            <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
-                    <h2 className="text-xl font-bold text-slate-800">Create New Batch</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                        <X size={20} className="text-slate-500" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/60 rounded-t-2xl">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">Create New Batch</h2>
+                    <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+                        <X size={20} className="text-slate-500 dark:text-slate-400" />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Select Course</label>
-                        <select
-                            required
-                            value={selectedCourseId}
-                            onChange={e => handleCourseChange(e.target.value)}
-                            disabled={loadingCourses}
-                            className="w-full p-3 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none bg-white font-medium"
-                        >
-                            <option value="">-- Choose Course --</option>
-                            {courses.map(c => (
-                                <option key={c.id} value={c.id}>{c.course_name}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <CourseSearchSelect
+                        courses={courses}
+                        value={selectedCourseId}
+                        onChange={(id) => handleCourseChange(id)}
+                        disabled={loadingCourses}
+                        label="Select Course"
+                        placeholder="-- Choose Course --"
+                        required
+                    />
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Batch Number</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Batch Number</label>
                             <input
                                 type="number"
                                 required
                                 min="1"
                                 value={batchNumber}
                                 onChange={e => setBatchNumber(e.target.value)}
-                                className="w-full p-3 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none font-medium"
+                                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 outline-none font-medium"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Capacity</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Capacity</label>
                             <input
                                 type="number"
                                 required
                                 min="1"
                                 value={capacity}
                                 onChange={e => setCapacity(parseInt(e.target.value))}
-                                className="w-full p-3 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none font-medium"
+                                className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 outline-none font-medium"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Batch Name</label>
+                        <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Batch Name</label>
                         <input
                             type="text"
                             required
                             value={batchName}
                             onChange={e => setBatchName(e.target.value)}
-                            className="w-full p-3 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none font-medium"
+                            className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 outline-none font-medium"
                         />
-                        <p className="text-xs text-slate-500 mt-1">Auto-generated, but you can edit it.</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Auto-generated, but you can edit it.</p>
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading || !selectedCourseId}
-                        className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 dark:shadow-none flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Creating...' : (
                             <>

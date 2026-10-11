@@ -157,6 +157,13 @@ export const ADMIN_ACTIONS: NavItem[] = [
         description: 'Manage images and layout styles'
     },
     {
+        label: 'Home Page Images',
+        path: '/admin/home-media',
+        icon: Image,
+        color: 'text-purple-600',
+        description: 'Update, crop, and configure homepage section images'
+    },
+    {
         label: 'Permissions Matrix',
         path: '/admin/permissions',
         icon: KeyRound,

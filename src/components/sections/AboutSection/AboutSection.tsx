@@ -1,8 +1,33 @@
-
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { IconRosetteDiscountCheck as BadgeCheck, IconUsers as Users } from '@tabler/icons-react'
+import { mediaService, type SiteMediaItem } from '../../../services/mediaService'
 
 const AboutSection = () => {
+    const [mediaItem, setMediaItem] = useState<SiteMediaItem>(() =>
+        mediaService.getCachedMediaByKey('home.about.feature')
+    )
+
+    useEffect(() => {
+        let isMounted = true
+        mediaService.getMediaByKey('home.about.feature').then((item) => {
+            if (isMounted && item) {
+                setMediaItem(item)
+            }
+        })
+
+        const unsubscribe = mediaService.onMediaChange((items) => {
+            if (isMounted && items['home.about.feature']) {
+                setMediaItem(items['home.about.feature'])
+            }
+        })
+
+        return () => {
+            isMounted = false
+            unsubscribe()
+        }
+    }, [])
+
     return (
         <section className="py-20 lg:py-28 bg-white dark:bg-slate-950 transition-colors duration-300 relative overflow-hidden" id="about">
             <div className="container mx-auto px-4 relative z-10">
@@ -10,14 +35,22 @@ const AboutSection = () => {
                     <div className="w-full lg:w-1/2 relative">
                         <div className="absolute -top-4 -left-4 w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full -z-10"></div>
                         <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-purple-100 dark:bg-purple-900/20 rounded-full -z-10"></div>
-                        <img
-                            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
-                            width={870}
-                            height={580}
-                            loading="lazy"
-                            className="w-full aspect-[3/2] object-cover rounded-3xl shadow-2xl transform hover:scale-[1.02] transition-transform duration-500"
-                            alt="ICST Chowberia modern computer lab classroom with students learning programming"
-                        />
+                        <div className="w-full aspect-[3/2] overflow-hidden rounded-3xl shadow-2xl bg-slate-900">
+                            <img
+                                src={mediaItem.cloudinary_url}
+                                width={mediaItem.recommended_width || 870}
+                                height={mediaItem.recommended_height || 580}
+                                loading="lazy"
+                                className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-500 block"
+                                alt={mediaItem.alt_text}
+                                onError={(e) => {
+                                    const fallback = mediaService.getCachedMediaByKey('home.about.feature')
+                                    if (e.currentTarget.src !== fallback.cloudinary_url) {
+                                        e.currentTarget.src = fallback.cloudinary_url
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                     <div className="w-full lg:w-1/2">
                         <div className="inline-block px-3 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-blue-100 dark:border-blue-900/50">

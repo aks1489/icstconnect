@@ -79,11 +79,11 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
-            <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
-                    <h2 className="text-xl font-bold text-slate-800">Create New Course</h2>
-                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-10">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">Create New Course</h2>
+                    <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                         <X size={16} />
                     </button>
                 </div>
@@ -91,69 +91,69 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Course Title</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Course Title</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.course_name}
                                 onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
                                 placeholder="e.g. Advanced Web Development"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Short Code</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Short Code</label>
                             <input
                                 type="text"
                                 required
                                 maxLength={6}
                                 value={formData.short_code}
                                 onChange={(e) => setFormData({ ...formData, short_code: e.target.value.toUpperCase() })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold uppercase tracking-wide"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-bold uppercase tracking-wide"
                                 placeholder="e.g. AWD"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
                         <textarea
                             rows={3}
                             required
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
                             placeholder="Brief description of the course..."
                         />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Category</label>
                             <select
                                 required
                                 value={formData.category}
                                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
                             >
-                                <option value="Development">Development</option>
-                                <option value="Design">Design</option>
-                                <option value="Marketing">Marketing</option>
-                                <option value="Business">Business</option>
-                                <option value="IT & Software">IT & Software</option>
-                                <option value="Office Productivity">Office Productivity</option>
+                                <option value="Development" className="dark:bg-slate-800">Development</option>
+                                <option value="Design" className="dark:bg-slate-800">Design</option>
+                                <option value="Marketing" className="dark:bg-slate-800">Marketing</option>
+                                <option value="Business" className="dark:bg-slate-800">Business</option>
+                                <option value="IT & Software" className="dark:bg-slate-800">IT & Software</option>
+                                <option value="Office Productivity" className="dark:bg-slate-800">Office Productivity</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Duration</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Duration</label>
                             <select
                                 value={formData.duration}
                                 onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
                             >
                                 {['3 Months', '6 Months', '12 Months', '18 Months', '24 Months'].map(d => (
-                                    <option key={d} value={d}>{d}</option>
+                                    <option key={d} value={d} className="dark:bg-slate-800">{d}</option>
                                 ))}
                             </select>
                         </div>
@@ -162,12 +162,12 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
 
                     {/* Tag Input */}
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Tags <span className="text-slate-400 font-normal text-xs">(Enter to add)</span>
                         </label>
-                        <div className="w-full px-4 py-3 rounded-xl border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all bg-white min-h-[50px] flex flex-wrap gap-2 items-center">
+                        <div className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all bg-white dark:bg-slate-800 min-h-[50px] flex flex-wrap gap-2 items-center">
                             {(formData.tags || []).map((tag, index) => (
-                                <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md text-sm font-medium">
+                                <span key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-md text-sm font-medium">
                                     {tag}
                                     <button
                                         type="button"
@@ -201,14 +201,14 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                                         setFormData({ ...formData, tags: newTags })
                                     }
                                 }}
-                                className="flex-1 min-w-[80px] bg-transparent outline-none text-slate-700 placeholder-slate-400 text-sm"
+                                className="flex-1 min-w-[80px] bg-transparent outline-none text-slate-700 dark:text-slate-200 placeholder-slate-400 text-sm"
                                 placeholder={formData.tags.length ? "" : "Add tags..."}
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Icon</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Icon</label>
                         <div className="grid grid-cols-4 gap-2">
                             {commonIcons.map(({ id, Icon }) => (
                                 <button
@@ -218,8 +218,8 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                                     className={`
                                                 h-10 rounded-lg border transition-all flex items-center justify-center
                                                 ${formData.icon === id
-                                            ? 'bg-slate-800 text-white border-slate-800'
-                                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                                            ? 'bg-slate-800 dark:bg-indigo-600 text-white border-slate-800 dark:border-indigo-600'
+                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
                                         }
                                             `}
                                 >
@@ -230,7 +230,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-3">Theme Color</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Theme Color</label>
                         <div className="flex gap-3 overflow-x-auto pb-2">
                             {colorThemes.map((theme) => (
                                 <button
@@ -240,7 +240,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                                     className={`
                                             w-12 h-12 flex-shrink-0 rounded-xl border-2 transition-all
                                             ${theme.preview}
-                                            ${formData.color === theme.value ? 'border-slate-800 scale-110 shadow-md' : 'border-transparent hover:scale-105'}
+                                            ${formData.color === theme.value ? 'border-slate-800 dark:border-white scale-110 shadow-md' : 'border-transparent hover:scale-105'}
                                         `}
                                     title={theme.label}
                                 />
@@ -252,14 +252,14 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess }: Create
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+                            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-lg shadow-indigo-200"
+                            className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-lg shadow-indigo-200 dark:shadow-none"
                         >
                             {loading ? 'Creating...' : 'Create Course'}
                         </button>

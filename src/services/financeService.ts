@@ -98,14 +98,21 @@ export const financeService = {
     },
 
     async getAllStudentPayments() {
-        // Fetch specific payment types for the grid view
-        const { data, error } = await supabase
-            .from('institution_transactions')
-            .select('*, student:profiles(full_name, id)')
-            .in('category', ['Admission', 'EMI', 'Course Fee'])
-            .order('transaction_date', { ascending: false });
+        // Fetch all transactions linked to a student or marked under student fee categories
+        try {
+            const { data, error } = await supabase
+                .from('institution_transactions')
+                .select('*, student:profiles(full_name, id)')
+                .order('transaction_date', { ascending: false });
 
-        if (error) throw error;
-        return data;
+            if (error) throw error;
+            return (data || []).filter(t => 
+                Boolean(t.student_id) || 
+                ['Admission', 'EMI', 'Course Fee', 'Student Fees', 'Tuition Fee', 'Exam Fee'].includes(t.category)
+            );
+        } catch (error) {
+            console.error('Error fetching student payments:', error);
+            throw error;
+        }
     }
 };
