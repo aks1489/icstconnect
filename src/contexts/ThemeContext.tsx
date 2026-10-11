@@ -49,9 +49,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return theme
     }, [theme, systemPreference])
 
-    // Apply .dark class to root element
+    // Apply .dark class to root element with smooth transition class
     useEffect(() => {
         const root = document.documentElement
+        
+        // Add smooth transition class temporarily
+        root.classList.add('theme-transitioning')
+        
         if (resolvedTheme === 'dark') {
             root.classList.add('dark')
             root.classList.remove('light')
@@ -60,6 +64,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             root.classList.remove('dark')
         }
         root.setAttribute('data-theme', resolvedTheme)
+
+        const timer = setTimeout(() => {
+            root.classList.remove('theme-transitioning')
+        }, 450)
+
+        return () => clearTimeout(timer)
     }, [resolvedTheme])
 
     const setTheme = (newTheme: Theme) => {

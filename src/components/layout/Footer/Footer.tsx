@@ -91,8 +91,19 @@ const Footer: React.FC = () => {
                         </div>
 
                         {/* Google Map */}
-
-
+                        <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-800 shadow-md bg-slate-950/40">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4357.177095850362!2d88.6659443753125!3d22.97858537920462!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f8b70842278311%3A0x18740b054ed687a7!2sINSTITUTE%20OF%20COMPUTER%20SCIENCE%20AND%20TECHNOLOGY%20CHOWBERIA%20(ICST%20Chowberia)!5e1!3m2!1sen!2sin!4v1791739994660!5m2!1sen!2sin"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                allowFullScreen
+                                loading="lazy"
+                                referrerPolicy="strict-origin-when-cross-origin"
+                                title="INSTITUTE OF COMPUTER SCIENCE AND TECHNOLOGY CHOWBERIA (ICST Chowberia) Location Map"
+                                className="w-full h-full block"
+                            />
+                        </div>
                     </div>
                 </div>
 
