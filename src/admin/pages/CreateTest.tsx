@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft, Save, Layout, Clock, Globe, Lock, BookOpen } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconDeviceFloppy as Save, IconLayout as Layout, IconClock as Clock, IconWorld as Globe, IconLock as Lock } from '@tabler/icons-react'
 import QuestionEditor from '../../components/admin/QuestionEditor'
 import type { Test, TestQuestion } from '../../types'
+import { useToast } from '../../contexts/ToastContext'
+import CourseSearchSelect from '../../components/admin/CourseSearchSelect'
 
 export default function CreateTest() {
     const navigate = useNavigate()
+    const { showToast } = useToast()
     const { id } = useParams() // Get ID for edit mode
     const isEditMode = !!id
 
@@ -72,7 +75,7 @@ export default function CreateTest() {
 
             } catch (error) {
                 console.error('Error fetching test:', error)
-                alert('Failed to load test details')
+                showToast('Failed to load test details', 'error')
                 navigate('/admin/tests')
             } finally {
                 setLoading(false)
@@ -83,15 +86,33 @@ export default function CreateTest() {
     }, [id, isEditMode, navigate])
 
     const handleSave = async () => {
-        if (!testData.title) return alert('Please enter a test title')
-        if (!testData.course_id) return alert('Please select a related course')
-        if (questions.length === 0) return alert('Please add at least one question')
+        if (!testData.title) {
+            showToast('Please enter a test title', 'warning')
+            return
+        }
+        if (!testData.course_id) {
+            showToast('Please select a related course', 'warning')
+            return
+        }
+        if (questions.length === 0) {
+            showToast('Please add at least one question', 'warning')
+            return
+        }
 
         // Validate Questions
         for (const q of questions) {
-            if (!q.text) return alert('All questions must have text')
-            if (q.options.some(o => !o.text)) return alert('All options must have text')
-            if (!q.options.some(o => o.is_correct)) return alert('Each question must have one correct answer')
+            if (!q.text) {
+                showToast('All questions must have text', 'warning')
+                return
+            }
+            if (q.options.some(o => !o.text)) {
+                showToast('All options must have text', 'warning')
+                return
+            }
+            if (!q.options.some(o => o.is_correct)) {
+                showToast('Each question must have one correct answer', 'warning')
+                return
+            }
         }
 
         setLoading(true)
@@ -184,33 +205,34 @@ export default function CreateTest() {
 
             if (oError) throw oError
 
+            showToast(isEditMode ? 'Test updated successfully!' : 'Test created successfully!', 'success')
             navigate('/admin/tests')
 
         } catch (error: any) {
             console.error('Error saving test:', error)
-            alert('Failed to save test: ' + error.message)
+            showToast('Failed to save test: ' + error.message, 'error')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-20">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-20 transition-colors">
             {/* Header */}
-            <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+            <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 transition-colors">
                 <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => navigate('/admin/tests')} className="p-2 hover:bg-slate-100 rounded-full text-slate-500">
+                        <button onClick={() => navigate('/admin/tests')} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-500 dark:text-slate-400 transition-colors">
                             <ArrowLeft size={20} />
                         </button>
-                        <h1 className="text-xl font-bold text-slate-800">
+                        <h1 className="text-xl font-bold text-slate-800 dark:text-white">
                             {isEditMode ? 'Edit Test' : 'Create New Test'}
                         </h1>
                     </div>
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center gap-2 disabled:opacity-70"
+                        className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-full hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20 flex items-center gap-2 disabled:opacity-70"
                     >
                         {loading ? 'Saving...' : <><Save size={18} /> {isEditMode ? 'Update' : 'Publish'} Test</>}
                     </button>
@@ -220,80 +242,71 @@ export default function CreateTest() {
             <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
 
                 {/* 1. Test Details Card */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 md:p-8">
-                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 transition-colors">
+                    <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                         <Layout className="text-indigo-500" size={20} /> Test Details
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-semibold text-slate-700">Test Title</label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Test Title</label>
                             <input
                                 type="text"
                                 value={testData.title}
                                 onChange={e => setTestData({ ...testData, title: e.target.value })}
                                 placeholder="e.g. React.js Fundamentals - Level 1"
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-semibold text-lg"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-semibold text-lg"
                             />
                         </div>
 
                         <div className="space-y-2 md:col-span-2">
-                            <label className="text-sm font-semibold text-slate-700">Description</label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Description</label>
                             <textarea
                                 value={testData.description || ''}
                                 onChange={e => setTestData({ ...testData, description: e.target.value })}
                                 rows={3}
                                 placeholder="Brief description of what this test covers..."
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                                <BookOpen size={16} /> Related Course <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                value={testData.course_id || ''}
-                                onChange={e => {
-                                    // Use loose equality to match string value with potential number ID
-                                    const course = courses.find(c => c.id == e.target.value)
-                                    setTestData({
-                                        ...testData,
-                                        course_id: e.target.value,
-                                        course_name: course?.course_name || ''
-                                    })
-                                }}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 hover:border-indigo-300 outline-none transition-all bg-white"
-                            >
-                                <option value="">Select a Course (Required)</option>
-                                {courses.map(course => (
-                                    <option key={course.id} value={course.id}>{course.course_name}</option>
-                                ))}
-                            </select>
-                        </div>
+                        <CourseSearchSelect
+                            courses={courses}
+                            value={testData.course_id || ''}
+                            onChange={(id, course) => {
+                                setTestData({
+                                    ...testData,
+                                    course_id: id,
+                                    course_name: course?.course_name || ''
+                                })
+                            }}
+                            label="Related Course"
+                            placeholder="Select a Course (Required)"
+                            required
+                        />
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                                 <Clock size={16} /> Duration (Minutes)
                             </label>
                             <input
                                 type="number"
                                 value={testData.duration_minutes}
                                 onChange={e => setTestData({ ...testData, duration_minutes: parseInt(e.target.value) || 0 })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none transition-all focus:border-indigo-500"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700">Difficulty</label>
-                            <div className="flex bg-slate-100 p-1 rounded-xl">
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Difficulty</label>
+                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
                                 {['easy', 'medium', 'hard'].map((level) => (
                                     <button
                                         key={level}
                                         onClick={() => setTestData({ ...testData, difficulty: level as any })}
                                         className={`flex-1 py-2 rounded-lg text-sm font-medium capitalize transition-all ${testData.difficulty === level
-                                            ? 'bg-white text-indigo-600 shadow-sm'
-                                            : 'text-slate-500 hover:text-slate-700'
+                                            ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                             }`}
                                     >
                                         {level}
@@ -303,13 +316,13 @@ export default function CreateTest() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700">Access Type</label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Access Type</label>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => setTestData({ ...testData, access_type: 'private' })}
                                     className={`p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${testData.access_type === 'private'
-                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                                        : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400'
+                                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800/50'
                                         }`}
                                 >
                                     <Lock size={20} />
@@ -321,8 +334,8 @@ export default function CreateTest() {
                                 <button
                                     onClick={() => setTestData({ ...testData, access_type: 'public' })}
                                     className={`p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${testData.access_type === 'public'
-                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                                        : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400'
+                                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800/50'
                                         }`}
                                 >
                                     <Globe size={20} />
@@ -338,7 +351,7 @@ export default function CreateTest() {
 
                 {/* 2. Question Editor */}
                 <div>
-                    <h2 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 px-1">
+                    <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2 px-1">
                         <span className="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">Q</span>
                         Test Questions ({questions.length})
                     </h2>

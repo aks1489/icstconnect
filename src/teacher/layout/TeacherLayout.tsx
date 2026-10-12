@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, List, Grid, LogOut } from 'lucide-react'
+import { IconChevronRight as ChevronRight, IconList as List, IconLayoutGrid as Grid, IconLogout as LogOut } from '@tabler/icons-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { TEACHER_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
+import ThemeToggle from '../../components/ui/ThemeToggle'
+import { SEOHead } from '../../components/common/SEOHead'
 
 export default function TeacherLayout() {
-    const { signOut, user, profile } = useAuth()
+    const { signOut, user, profile, hasPerm } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -34,7 +36,13 @@ export default function TeacherLayout() {
     const isActive = (path: string) => location.pathname === path
 
     return (
-        <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
+        <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-inter">
+            <SEOHead
+                title="Teacher Portal - ICST Connect"
+                description="ICST Connect Faculty and Teacher Portal for managing classes, attendance, and examinations."
+                canonical="/teacher"
+                noindex={true}
+            />
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -59,10 +67,12 @@ export default function TeacherLayout() {
                             <img
                                 src={logo}
                                 alt="ICST Logo"
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-emerald-500/10"
                             />
                             <div>
-                                <h1 className="text-lg font-bold tracking-tight">Teacher Portal</h1>
+                                <span className="text-lg font-bold tracking-tight block">Teacher Portal</span>
                                 <p className="text-xs text-slate-400">ICST Connect</p>
                             </div>
                         </div>
@@ -73,7 +83,7 @@ export default function TeacherLayout() {
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Menu
                         </div>
-                        {TEACHER_ACTIONS.map((item) => (
+                        {TEACHER_ACTIONS.filter(item => !item.requiredPermission || hasPerm(item.requiredPermission)).map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}
@@ -131,19 +141,24 @@ export default function TeacherLayout() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Header for Mobile and Desktop Toggle */}
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-20">
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                    >
-                        <List className="text-2xl" size={24} />
-                    </button>
-                    <span className="font-semibold text-slate-700 lg:hidden">Teacher Portal</span>
-                    <div className="w-8 lg:hidden"></div> {/* Spacer for alignment */}
+                <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 z-20 transition-colors">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 lg:hidden cursor-pointer"
+                        >
+                            <List className="text-2xl" size={24} />
+                        </button>
+                        <span className="font-semibold text-slate-700 dark:text-slate-200 lg:hidden">Teacher Portal</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle />
+                    </div>
                 </header>
 
                 {/* Scrollable Page Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 lg:p-8 scroll-smooth">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 lg:p-8 scroll-smooth transition-colors">
                     <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <Outlet />
                     </div>

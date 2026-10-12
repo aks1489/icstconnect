@@ -1,4 +1,4 @@
-import { FileText } from 'lucide-react'
+import { IconFileText as FileText } from '@tabler/icons-react'
 
 export default function Exams() {
     return (

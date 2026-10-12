@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, AlertCircle } from 'lucide-react'
+import { IconCheck as Check, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
+import SEOHead from '../components/common/SEOHead'
 
 export default function ResetPassword() {
     const [password, setPassword] = useState('')
@@ -56,13 +57,14 @@ export default function ResetPassword() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-md w-full space-y-8 text-center">
-                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                        <Check className="text-green-600" size={24} />
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+                <SEOHead title="Password Reset Success | ICST Chowberia" noindex={true} />
+                <div className="max-w-md w-full space-y-8 text-center bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-transparent dark:border-slate-800">
+                    <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-950/40 text-green-600 dark:text-green-400">
+                        <Check size={24} />
                     </div>
-                    <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Password Updated!</h2>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <h2 className="mt-6 text-3xl font-extrabold text-gray-900 dark:text-white">Password Updated!</h2>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-slate-300">
                         Your password has been successfully reset. Redirecting you to home...
                     </p>
                 </div>
@@ -71,13 +73,14 @@ export default function ResetPassword() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-2xl shadow-xl">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+            <SEOHead title="Reset Your Password | ICST Chowberia" noindex={true} />
+            <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl border border-transparent dark:border-slate-800">
                 <div>
-                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
                         Reset Your Password
                     </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
+                    <p className="mt-2 text-center text-sm text-gray-600 dark:text-slate-300">
                         Please enter your new password below.
                     </p>
                 </div>
@@ -91,7 +94,7 @@ export default function ResetPassword() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 placeholder-gray-500 dark:placeholder-slate-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="New Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -105,7 +108,7 @@ export default function ResetPassword() {
                                 type="password"
                                 autoComplete="new-password"
                                 required
-                                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-800/80 placeholder-gray-500 dark:placeholder-slate-400 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Confirm New Password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -114,7 +117,7 @@ export default function ResetPassword() {
                     </div>
 
                     {error && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg border border-red-200">
+                        <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-950/40 p-3 rounded-lg border border-red-200 dark:border-red-900/40">
                             <AlertCircle size={16} />
                             {error}
                         </div>
@@ -124,7 +127,7 @@ export default function ResetPassword() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors shadow-lg shadow-indigo-600/20 dark:shadow-none"
                         >
                             {loading ? 'Updating...' : 'Set New Password'}
                         </button>

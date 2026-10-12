@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { KeyRound, ShieldCheck, AlertCircle } from 'lucide-react'
+import { IconKey as KeyRound, IconShieldCheck as ShieldCheck, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
+import { SEOHead } from '../components/common/SEOHead'
 
 export default function ForcePasswordChange() {
     const { user, profile, refreshProfile } = useAuth()
@@ -69,9 +70,15 @@ export default function ForcePasswordChange() {
     }
 
     return (
-        <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 p-4">
-            <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-                <div className="bg-indigo-600 p-8 text-center relative overflow-hidden">
+        <div className="min-h-[80vh] flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 transition-colors">
+            <SEOHead
+                title="Update Password - ICST Connect Security"
+                description="Secure password update portal for ICST Connect accounts."
+                canonical="/force-password-change"
+                noindex={true}
+            />
+            <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-800">
+                <div className="bg-indigo-600 dark:bg-indigo-700 p-8 text-center relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-4 opacity-10">
                         <KeyRound size={100} />
                     </div>
@@ -86,7 +93,7 @@ export default function ForcePasswordChange() {
 
                 <div className="p-8">
                     {error && (
-                        <div className="mb-6 bg-red-50 text-red-600 p-4 rounded-xl flex items-start gap-3 border border-red-100">
+                        <div className="mb-6 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 p-4 rounded-xl flex items-start gap-3 border border-red-100 dark:border-red-900/40">
                             <AlertCircle className="shrink-0 mt-0.5" size={20} />
                             <p className="text-sm font-medium">{error}</p>
                         </div>
@@ -94,25 +101,25 @@ export default function ForcePasswordChange() {
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1">New Password</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">New Password</label>
                             <input
                                 type="password"
                                 required
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors placeholder:text-slate-400"
                                 placeholder="Enter a strong new password"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-1">Confirm New Password</label>
+                            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">Confirm New Password</label>
                             <input
                                 type="password"
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors placeholder:text-slate-400"
                                 placeholder="Re-type your new password"
                             />
                         </div>
@@ -120,7 +127,7 @@ export default function ForcePasswordChange() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-4"
+                            className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-none disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-4"
                         >
                             {loading ? (
                                 <><div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"/> Updating Security...</>

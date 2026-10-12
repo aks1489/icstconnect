@@ -26,13 +26,13 @@ export default function BentoFlowLayout({ images }: { images: any[] }) {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true, margin: "50px" }}
                         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
-                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group ${getBentoClass(index)}`}
+                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group border border-slate-200/60 dark:border-slate-800/80 ${getBentoClass(index)}`}
                     >
                         <InteractiveImageMarker 
                             src={getOptimizedImageUrl(img.cloudinary_url, 1000)} 
                             alt={img.title || ''} 
                             tags={img.tags || []} 
-                            className="bg-slate-100"
+                            className="bg-slate-100 dark:bg-slate-900"
                         />
                         
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-end p-5 md:p-8">

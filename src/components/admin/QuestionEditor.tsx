@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd'
-import { Plus, Trash2, GripVertical, CheckCircle2, Circle } from 'lucide-react'
+import { IconPlus as Plus, IconTrash as Trash2, IconGripVertical as GripVertical, IconCircleCheck as CheckCircle2, IconCircle as Circle } from '@tabler/icons-react'
 import type { TestQuestion } from '../../types'
 
 interface QuestionEditorProps {
@@ -85,13 +85,13 @@ export default function QuestionEditor({ questions, onChange }: QuestionEditorPr
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
-                                            className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden group hover:shadow-md transition-all"
+                                            className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden group hover:shadow-md transition-all"
                                         >
-                                            <div className="bg-slate-50 p-4 flex items-center gap-4 border-b border-slate-200">
-                                                <div {...provided.dragHandleProps} className="text-slate-400 hover:text-indigo-600 cursor-grab active:cursor-grabbing">
+                                            <div className="bg-slate-50 dark:bg-slate-800/60 p-4 flex items-center gap-4 border-b border-slate-200 dark:border-slate-800">
+                                                <div {...provided.dragHandleProps} className="text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-grab active:cursor-grabbing">
                                                     <GripVertical size={20} />
                                                 </div>
-                                                <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">
                                                     {index + 1}
                                                 </div>
                                                 <input
@@ -99,11 +99,11 @@ export default function QuestionEditor({ questions, onChange }: QuestionEditorPr
                                                     value={question.text}
                                                     onChange={(e) => updateQuestion(index, 'text', e.target.value)}
                                                     placeholder="Enter Question Text..."
-                                                    className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 font-semibold placeholder:text-slate-400"
+                                                    className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 dark:text-white font-semibold placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
                                                 />
                                                 <button
                                                     onClick={() => removeQuestion(index)}
-                                                    className="text-slate-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                                                    className="text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 p-2 rounded-lg transition-colors"
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
@@ -113,12 +113,12 @@ export default function QuestionEditor({ questions, onChange }: QuestionEditorPr
                                                 {question.options.map((option, oIndex) => (
                                                     <div key={option.id} className="relative group/option">
                                                         <div className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${option.is_correct
-                                                            ? 'border-green-500 bg-green-50'
-                                                            : 'border-slate-100 focus-within:border-indigo-200 hover:border-slate-200'
+                                                            ? 'border-green-500 dark:border-emerald-600 bg-green-50 dark:bg-emerald-950/30'
+                                                            : 'border-slate-100 dark:border-slate-800 focus-within:border-indigo-200 dark:focus-within:border-indigo-600/50 hover:border-slate-200 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-800/40'
                                                             }`}>
                                                             <button
                                                                 onClick={() => setCorrectOption(index, oIndex)}
-                                                                className={`shrink-0 transition-colors ${option.is_correct ? 'text-green-600' : 'text-slate-300 hover:text-green-400'}`}
+                                                                className={`shrink-0 transition-colors ${option.is_correct ? 'text-green-600 dark:text-emerald-400' : 'text-slate-300 dark:text-slate-600 hover:text-green-400'}`}
                                                                 title="Mark as correct answer"
                                                             >
                                                                 {option.is_correct ? <CheckCircle2 size={20} /> : <Circle size={20} />}
@@ -128,7 +128,7 @@ export default function QuestionEditor({ questions, onChange }: QuestionEditorPr
                                                                 value={option.text}
                                                                 onChange={(e) => updateOption(index, oIndex, e.target.value)}
                                                                 placeholder={`Option ${oIndex + 1}`}
-                                                                className="flex-1 bg-transparent border-none focus:ring-0 text-slate-700 text-sm placeholder:text-slate-400"
+                                                                className="flex-1 bg-transparent border-none focus:ring-0 text-slate-700 dark:text-slate-200 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none"
                                                             />
                                                         </div>
                                                     </div>
@@ -146,7 +146,7 @@ export default function QuestionEditor({ questions, onChange }: QuestionEditorPr
 
             <button
                 onClick={addQuestion}
-                className="w-full py-4 border-2 border-dashed border-slate-300 rounded-2xl text-slate-500 font-semibold hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl text-slate-500 dark:text-slate-400 font-semibold hover:border-indigo-500 dark:hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all flex items-center justify-center gap-2"
             >
                 <Plus size={20} /> Add New Question
             </button>

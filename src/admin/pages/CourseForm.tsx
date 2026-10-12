@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowLeft } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { getIcon } from '../../utils/iconMapper'
+import { useToast } from '../../contexts/ToastContext'
 
 export default function CourseForm() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const { showToast } = useToast()
     const isEditing = !!id
 
     const [loading, setLoading] = useState(false)
@@ -64,7 +66,7 @@ export default function CourseForm() {
             }
         } catch (error) {
             console.error('Error fetching course:', error)
-            alert('Failed to load course details')
+            showToast('Failed to load course details', 'error')
             navigate('/admin/courses')
         } finally {
             setFetching(false)
@@ -91,10 +93,11 @@ export default function CourseForm() {
                 if (error) throw error
             }
 
+            showToast(isEditing ? 'Course updated successfully!' : 'Course created successfully!', 'success')
             navigate('/admin/courses')
         } catch (error) {
             console.error('Error saving course:', error)
-            alert('Failed to save course')
+            showToast('Failed to save course', 'error')
         } finally {
             setLoading(false)
         }
@@ -117,58 +120,58 @@ export default function CourseForm() {
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                 <div className="p-8 space-y-8">
                     {/* Basic Info */}
                     <div className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Course Title</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Course Title</label>
                             <input
                                 type="text"
                                 required
                                 value={formData.course_name}
                                 onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
                                 placeholder="e.g. Advanced React Patterns"
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">Description</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Description</label>
                             <textarea
                                 rows={4}
                                 required
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
                                 placeholder="What will students learn in this course?"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Duration (Months)</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Duration (Months)</label>
                         <select
                             value={formData.duration_months}
                             onChange={(e) => setFormData({ ...formData, duration_months: parseInt(e.target.value) })}
-                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all font-medium"
                         >
                             {[3, 6, 12, 18, 24].map(months => (
-                                <option key={months} value={months}>{months} Months</option>
+                                <option key={months} value={months} className="dark:bg-slate-800">{months} Months</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="h-px bg-slate-100"></div>
+                    <div className="h-px bg-slate-100 dark:bg-slate-800"></div>
 
                     {/* Tag Management */}
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Tags <span className="text-slate-400 font-normal">(Press Enter or Comma to add)</span>
                         </label>
-                        <div className="w-full px-4 py-3 rounded-xl border border-slate-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all bg-white min-h-[56px] flex flex-wrap gap-2 items-center">
+                        <div className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all bg-white dark:bg-slate-800 min-h-[56px] flex flex-wrap gap-2 items-center">
                             {(formData.tags || []).map((tag, index) => (
-                                <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium group">
+                                <span key={index} className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium group">
                                     {tag}
                                     <button
                                         type="button"
@@ -202,18 +205,18 @@ export default function CourseForm() {
                                         setFormData({ ...formData, tags: newTags })
                                     }
                                 }}
-                                className="flex-1 min-w-[120px] bg-transparent outline-none text-slate-700 placeholder-slate-400"
+                                className="flex-1 min-w-[120px] bg-transparent outline-none text-slate-700 dark:text-slate-200 placeholder-slate-400"
                                 placeholder={formData.tags?.length ? "" : "Add tags e.g. React, Coding, Design..."}
                             />
                         </div>
                     </div>
 
-                    <div className="h-px bg-slate-100"></div>
+                    <div className="h-px bg-slate-100 dark:bg-slate-800"></div>
 
                     {/* Visuals */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-3">Theme Color</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Theme Color</label>
                             <div className="grid grid-cols-4 gap-3">
                                 {colorThemes.map((theme) => (
                                     <button
@@ -223,7 +226,7 @@ export default function CourseForm() {
                                         className={`
                                             h-12 rounded-xl border-2 transition-all
                                             ${theme.preview}
-                                            ${formData.color === theme.value ? 'border-slate-800 scale-110 shadow-md' : 'border-transparent hover:scale-105'}
+                                            ${formData.color === theme.value ? 'border-slate-800 dark:border-white scale-110 shadow-md' : 'border-transparent hover:scale-105'}
                                         `}
                                         title={theme.label}
                                     />
@@ -232,7 +235,7 @@ export default function CourseForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-3">Icon</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Icon</label>
                             <div className="grid grid-cols-6 gap-2">
                                 {commonIcons.map((icon) => {
                                     const Icon = getIcon(icon)
@@ -244,8 +247,8 @@ export default function CourseForm() {
                                             className={`
                                                 h-10 rounded-lg border transition-all flex items-center justify-center
                                                 ${formData.icon === icon
-                                                    ? 'bg-slate-800 text-white border-slate-800'
-                                                    : 'bg-white border-slate-200 text-slate-500 hover:border-slate-400'
+                                                    ? 'bg-slate-800 dark:bg-indigo-600 text-white border-slate-800 dark:border-indigo-600'
+                                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-500'
                                                 }
                                             `}
                                         >
@@ -255,12 +258,12 @@ export default function CourseForm() {
                                 })}
                             </div>
                             <div className="mt-3">
-                                <label className="text-xs font-semibold text-slate-500 uppercase">Or Custom Icon Class</label>
+                                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Or Custom Icon Class</label>
                                 <input
                                     type="text"
                                     value={formData.icon}
                                     onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                                    className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-indigo-500 outline-none"
+                                    className="mt-1 w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:border-indigo-500 outline-none"
                                     placeholder="bi-..."
                                 />
                             </div>
@@ -268,27 +271,27 @@ export default function CourseForm() {
                     </div>
 
                     {/* Preview */}
-                    <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                    <div className="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-6 border border-slate-100 dark:border-slate-800">
                         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Live Preview</label>
-                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm w-full max-w-sm mx-auto overflow-hidden">
-                            <div className={`h-24 ${(formData.color || '').split(' ')[1] || 'bg-slate-100'} p-4 relative`}>
-                                <div className="w-12 h-12 rounded-xl bg-white/90 backdrop-blur-sm shadow-sm flex items-center justify-center absolute -bottom-6 left-6">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm w-full max-w-sm mx-auto overflow-hidden">
+                            <div className={`h-24 ${(formData.color || '').split(' ')[1] || 'bg-slate-100 dark:bg-slate-800'} p-4 relative`}>
+                                <div className="w-12 h-12 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-sm flex items-center justify-center absolute -bottom-6 left-6">
                                     {(() => {
                                         const Icon = getIcon(formData.icon)
-                                        return <Icon className={`text-xl ${(formData.color || '').split(' ')[0] || 'text-slate-600'}`} size={24} />
+                                        return <Icon className={`text-xl ${(formData.color || '').split(' ')[0] || 'text-slate-600 dark:text-slate-300'}`} size={24} />
                                     })()}
                                 </div>
                             </div>
                             <div className="pt-8 p-6">
                                 <div className="mb-2 flex flex-wrap gap-1">
                                     {(formData.tags || []).slice(0, 3).map((tag, i) => (
-                                        <span key={i} className="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded font-medium">{tag}</span>
+                                        <span key={i} className="inline-block px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs rounded font-medium">{tag}</span>
                                     ))}
                                 </div>
-                                <h3 className="text-lg font-bold text-slate-800 mb-2">
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
                                     {formData.course_name || 'Course Title'}
                                 </h3>
-                                <p className="text-slate-500 text-sm line-clamp-2">
+                                <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">
                                     {formData.description || 'Course description will appear here...'}
                                 </p>
                             </div>
@@ -296,17 +299,17 @@ export default function CourseForm() {
                     </div>
                 </div>
 
-                <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
+                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
                     <Link
                         to="/admin/courses"
-                        className="px-6 py-2.5 rounded-xl text-slate-600 font-medium hover:bg-slate-200 transition-colors"
+                        className="px-6 py-2.5 rounded-xl text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                     >
                         Cancel
                     </Link>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-600/20 disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20"
+                        className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-600/20 disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-none"
                     >
                         {loading ? 'Saving...' : (isEditing ? 'Update Course' : 'Publish Course')}
                     </button>

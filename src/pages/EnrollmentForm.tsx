@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import type { FormEvent } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { 
-    CheckCircle2, ArrowRight, BookOpen, MapPin, Phone, MessageSquare, 
-    Info, CreditCard, ChevronDown, CheckCircle, X 
-} from 'lucide-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { IconCircleCheck as CheckCircle2, IconArrowRight as ArrowRight, IconBook2 as BookOpen, IconMapPin as MapPin, IconPhone as Phone, IconMessage as MessageSquare, IconInfoCircle as Info, IconCreditCard as CreditCard, IconChevronDown as ChevronDown, IconCircleCheck as CheckCircle, IconX as X } from '@tabler/icons-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
+import SEOHead from '../components/common/SEOHead'
 import { courseService } from '../services/courseService'
 import { enrollmentService } from '../services/enrollmentService'
 import type { Course } from '../types/course'
@@ -251,7 +249,7 @@ export default function EnrollmentForm() {
     }
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        return <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 transition-colors">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
     }
@@ -260,28 +258,28 @@ export default function EnrollmentForm() {
         const whatsappMsg = encodeURIComponent(`Hi, I just submitted an enrollment application for ${course?.title}. My Reference ID is ${successData.reference_id}. Can you provide more details?`)
         
         return (
-            <div className="min-h-screen pt-24 pb-12 bg-slate-50 flex flex-col items-center justify-center p-4">
-                <div className="bg-white max-w-lg w-full rounded-[2rem] shadow-xl p-8 text-center animate-in zoom-in duration-500">
-                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle className="text-green-500" size={40} />
+            <div className="min-h-screen pt-24 pb-12 bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 transition-colors">
+                <div className="bg-white dark:bg-slate-900 max-w-lg w-full rounded-[2rem] shadow-xl border border-transparent dark:border-slate-800 p-8 text-center animate-in zoom-in duration-500">
+                    <div className="w-20 h-20 bg-green-100 dark:bg-green-950/40 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle className="text-green-500 dark:text-green-400" size={40} />
                     </div>
                     
-                    <h2 className="text-3xl font-extrabold text-slate-900 mb-2">Application Successful!</h2>
-                    <p className="text-slate-600 mb-6">Your application for enrollment is taken successfully. ICST Chowberia officials will contact you soon.</p>
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-2">Application Successful!</h2>
+                    <p className="text-slate-600 dark:text-slate-300 mb-6">Your application for enrollment is taken successfully. ICST Chowberia officials will contact you soon.</p>
                     
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8 text-left">
-                        <p className="text-sm text-slate-500 font-bold uppercase tracking-wider mb-1">Reference ID</p>
-                        <p className="text-2xl font-black text-indigo-600 tracking-wider font-mono">{successData.reference_id}</p>
+                    <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 mb-8 text-left">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider mb-1">Reference ID</p>
+                        <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400 tracking-wider font-mono">{successData.reference_id}</p>
                     </div>
 
                     <div className="space-y-4 mb-8">
-                        <p className="text-sm text-slate-500 font-medium">For any information, reach out directly:</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">For any information, reach out directly:</p>
                         <div className="flex gap-4 justify-center">
-                            <a href={`tel:${CONTACT_PHONE}`} className="flex-1 flex flex-col items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-700 py-4 px-4 rounded-xl transition-colors">
+                            <a href={`tel:${CONTACT_PHONE}`} className="flex-1 flex flex-col items-center justify-center gap-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 py-4 px-4 rounded-xl transition-colors">
                                 <Phone size={24} />
                                 <span className="font-bold text-sm">Call Us</span>
                             </a>
-                            <a href={`https://wa.me/${CONTACT_PHONE.replace('+', '')}?text=${whatsappMsg}`} target="_blank" rel="noreferrer" className="flex-1 flex flex-col items-center justify-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 py-4 px-4 rounded-xl transition-colors">
+                            <a href={`https://wa.me/${CONTACT_PHONE.replace('+', '')}?text=${whatsappMsg}`} target="_blank" rel="noreferrer" className="flex-1 flex flex-col items-center justify-center gap-2 bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 py-4 px-4 rounded-xl transition-colors">
                                 <MessageSquare size={24} />
                                 <span className="font-bold text-sm">WhatsApp</span>
                             </a>
@@ -289,12 +287,12 @@ export default function EnrollmentForm() {
                     </div>
 
                     {/* Footer Address */}
-                    <div className="text-left mt-8 pt-6 border-t border-slate-100">
-                        <h4 className="font-bold text-slate-900 flex items-center gap-2 mb-3">
+                    <div className="text-left mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
                             <MapPin size={18} className="text-red-500" />
                             ICST Chowberia
                         </h4>
-                        <p className="text-sm text-slate-600 mb-4">
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                             Vill- Chowberia, P.O- Chowberia,<br />
                             P.S- Bongaon, Dist- North 24 Parganas,<br />
                             Pin- 743273
@@ -303,7 +301,7 @@ export default function EnrollmentForm() {
                             href="https://maps.google.com/?q=ICST+Chowberia" 
                             target="_blank" 
                             rel="noreferrer"
-                            className="text-indigo-600 font-semibold text-sm hover:underline"
+                            className="text-indigo-600 dark:text-indigo-400 font-semibold text-sm hover:underline"
                         >
                             View on Google Maps →
                         </a>
@@ -311,7 +309,7 @@ export default function EnrollmentForm() {
                     
                     <button 
                         onClick={() => navigate('/courses')}
-                        className="mt-8 w-full block text-center text-slate-500 hover:text-slate-800 font-semibold"
+                        className="mt-8 w-full block text-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white font-semibold transition-colors"
                     >
                         Return to Courses
                     </button>
@@ -324,14 +322,14 @@ export default function EnrollmentForm() {
     const feeInfo = calculateFees()
 
     return (
-        <div className="min-h-screen bg-slate-50 pt-20 pb-20 relative">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pt-20 pb-20 relative transition-colors">
             
             {/* Full-Screen Confirmation Modal */}
             {showConfirmModal && (
-                <div className="fixed inset-0 z-[9999] bg-slate-50 flex flex-col animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-[9999] bg-slate-50 dark:bg-slate-950 flex flex-col animate-in fade-in duration-200">
                     
                     {/* Header */}
-                    <div className="shrink-0 px-6 md:px-12 py-5 border-b border-indigo-700 flex items-center justify-between bg-indigo-600 text-white shadow-sm z-10 w-full">
+                    <div className="shrink-0 px-6 md:px-12 py-5 border-b border-indigo-700 dark:border-indigo-800 flex items-center justify-between bg-indigo-600 dark:bg-indigo-700 text-white shadow-sm z-10 w-full">
                         <h2 className="text-xl font-bold flex items-center gap-2">
                             <BookOpen size={24} /> Review & Confirm Enrollment
                         </h2>
@@ -344,52 +342,52 @@ export default function EnrollmentForm() {
                     {/* Scrollable Body */}
                     <div className="flex-1 overflow-y-auto w-full flex justify-center p-4 md:p-8">
                         <div className="w-full max-w-4xl space-y-6">
-                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="col-span-1 sm:col-span-2 border-b border-slate-100 pb-3 mb-1"><h3 className="font-bold text-slate-800">Student Info</h3></div>
-                                <div><p className="text-xs text-slate-500">Name</p><p className="font-bold text-slate-900">{formData.full_name}</p></div>
-                                <div><p className="text-xs text-slate-500">Guardian</p><p className="font-bold text-slate-900">{formData.guardian_name}</p></div>
-                                <div><p className="text-xs text-slate-500">Phone</p><p className="font-bold text-slate-900">{formData.phone}</p></div>
-                                <div><p className="text-xs text-slate-500">Email</p><p className="font-medium text-slate-900">{formData.email || 'N/A'}</p></div>
-                                <div><p className="text-xs text-slate-500">Gender</p><p className="font-medium text-slate-900">{formData.gender}</p></div>
-                                <div className="col-span-1 sm:col-span-2"><p className="text-xs text-slate-500">Address</p><p className="font-medium text-slate-900">{formData.address}, P.O: {formData.post_office}, {formData.district}, {formData.state} - {formData.pincode}</p></div>
+                            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="col-span-1 sm:col-span-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-1"><h3 className="font-bold text-slate-800 dark:text-white">Student Info</h3></div>
+                                <div><p className="text-xs text-slate-500 dark:text-slate-400">Name</p><p className="font-bold text-slate-900 dark:text-white">{formData.full_name}</p></div>
+                                <div><p className="text-xs text-slate-500 dark:text-slate-400">Guardian</p><p className="font-bold text-slate-900 dark:text-white">{formData.guardian_name}</p></div>
+                                <div><p className="text-xs text-slate-500 dark:text-slate-400">Phone</p><p className="font-bold text-slate-900 dark:text-white">{formData.phone}</p></div>
+                                <div><p className="text-xs text-slate-500 dark:text-slate-400">Email</p><p className="font-medium text-slate-900 dark:text-white">{formData.email || 'N/A'}</p></div>
+                                <div><p className="text-xs text-slate-500 dark:text-slate-400">Gender</p><p className="font-medium text-slate-900 dark:text-white">{formData.gender}</p></div>
+                                <div className="col-span-1 sm:col-span-2"><p className="text-xs text-slate-500 dark:text-slate-400">Address</p><p className="font-medium text-slate-900 dark:text-white">{formData.address}, P.O: {formData.post_office}, {formData.district}, {formData.state} - {formData.pincode}</p></div>
                             </div>
 
-                            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="col-span-1 sm:col-span-2 border-b border-slate-100 pb-3 mb-1"><h3 className="font-bold text-slate-800">Course & Perks</h3></div>
+                            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="col-span-1 sm:col-span-2 border-b border-slate-100 dark:border-slate-800 pb-3 mb-1"><h3 className="font-bold text-slate-800 dark:text-white">Course & Perks</h3></div>
                                 <div className="col-span-1 sm:col-span-2 flex items-center gap-3">
                                     <div className={`w-10 h-10 ${course?.color} rounded-lg flex items-center justify-center`}><BookOpen size={20}/></div>
-                                    <div><p className="font-bold text-slate-900">{course?.title}</p><p className="text-xs text-slate-500">{course?.duration}</p></div>
+                                    <div><p className="font-bold text-slate-900 dark:text-white">{course?.title}</p><p className="text-xs text-slate-500 dark:text-slate-400">{course?.duration}</p></div>
                                 </div>
                                 <div className="col-span-1 sm:col-span-2 mt-2">
-                                    {formData.opt_spoken_english && <span className="inline-flex items-center gap-1 text-xs font-bold bg-green-100 text-green-700 px-3 py-1 rounded-full mr-2 mb-2"><CheckCircle2 size={12}/> Free Spoken English</span>}
-                                    <span className="inline-flex items-center gap-1 text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full"><CheckCircle2 size={12}/> Free Practice Classes</span>
+                                    {formData.opt_spoken_english && <span className="inline-flex items-center gap-1 text-xs font-bold bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-300 px-3 py-1 rounded-full mr-2 mb-2"><CheckCircle2 size={12}/> Free Spoken English</span>}
+                                    <span className="inline-flex items-center gap-1 text-xs font-bold bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full"><CheckCircle2 size={12}/> Free Practice Classes</span>
                                 </div>
                             </div>
 
-                            <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 relative overflow-hidden">
+                            <div className="bg-indigo-50 dark:bg-slate-900 p-6 rounded-2xl border border-indigo-100 dark:border-slate-800 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-10"><CreditCard size={100} /></div>
-                                <h3 className="font-bold text-indigo-900 mb-4 relative z-10">Payment Plan Overview</h3>
+                                <h3 className="font-bold text-indigo-900 dark:text-white mb-4 relative z-10">Payment Plan Overview</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 sm:gap-y-3 relative z-10">
-                                    <div><p className="text-sm text-indigo-600/80">Selected Plan</p><p className="font-black text-indigo-900 capitalize text-lg tracking-wide">{formData.payment_plan.replace('_', ' ')}</p></div>
+                                    <div><p className="text-sm text-indigo-600/80 dark:text-indigo-400">Selected Plan</p><p className="font-black text-indigo-900 dark:text-white capitalize text-lg tracking-wide">{formData.payment_plan.replace('_', ' ')}</p></div>
                                     
                                     {feeInfo ? (
                                         <div className="text-right">
                                             {feeInfo.discount > 0 && formData.payment_plan === 'one_time' ? (
                                                 <>
-                                                    <p className="text-xs text-green-600 font-bold uppercase tracking-wider mb-1 animate-pulse">🎉 10% Instant Discount Applied!</p>
-                                                    <p className="text-sm text-slate-500 line-through">Original: ₹{feeInfo.baseTotal.toLocaleString()}</p>
-                                                    <p className="font-black text-indigo-900 text-3xl">Total: ₹{feeInfo.finalTotal.toLocaleString()}</p>
+                                                    <p className="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider mb-1 animate-pulse">🎉 10% Instant Discount Applied!</p>
+                                                    <p className="text-sm text-slate-500 dark:text-slate-400 line-through">Original: ₹{feeInfo.baseTotal.toLocaleString()}</p>
+                                                    <p className="font-black text-indigo-900 dark:text-white text-3xl">Total: ₹{feeInfo.finalTotal.toLocaleString()}</p>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <p className="text-sm justify-end text-indigo-600/80 mb-1 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                                                    <p className="text-sm justify-end text-indigo-600/80 dark:text-indigo-400 mb-1 flex items-center gap-1.5 font-bold uppercase tracking-wider">
                                                         Total Course Fee
                                                     </p>
-                                                    <p className="font-black text-indigo-900 text-3xl mb-2">₹{feeInfo.baseTotal.toLocaleString()}</p>
+                                                    <p className="font-black text-indigo-900 dark:text-white text-3xl mb-2">₹{feeInfo.baseTotal.toLocaleString()}</p>
                                                     {formData.payment_plan !== 'one_time' && (
-                                                        <div className="inline-flex text-left items-start gap-2 bg-amber-50 rounded-xl p-3 border border-amber-100 max-w-[250px]">
+                                                        <div className="inline-flex text-left items-start gap-2 bg-amber-50 dark:bg-amber-950/40 rounded-xl p-3 border border-amber-100 dark:border-amber-900/40 max-w-[250px]">
                                                             <div className="mt-0.5"><div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div></div>
-                                                            <p className="text-xs text-amber-900 leading-tight">Switch to <strong>One Time</strong> payment plan to instantly unlock a 10% discount (-₹{(feeInfo.baseTotal * 0.10).toLocaleString()})!</p>
+                                                            <p className="text-xs text-amber-900 dark:text-amber-200 leading-tight">Switch to <strong>One Time</strong> payment plan to instantly unlock a 10% discount (-₹{(feeInfo.baseTotal * 0.10).toLocaleString()})!</p>
                                                         </div>
                                                     )}
                                                 </>
@@ -397,7 +395,7 @@ export default function EnrollmentForm() {
                                         </div>
                                     ) : (
                                         <div className="text-right flex items-center sm:justify-end">
-                                            <p className="text-sm font-bold text-indigo-800 bg-white px-3 py-1.5 rounded-full shadow-sm">{course?.price}</p>
+                                            <p className="text-sm font-bold text-indigo-800 dark:text-indigo-300 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full shadow-sm">{course?.price}</p>
                                         </div>
                                     )}
                                 </div>
@@ -406,17 +404,17 @@ export default function EnrollmentForm() {
                             {/* Declaration Box in Scrollable Content */}
                             <label 
                                 ref={declarationRef}
-                                className={`flex items-start gap-4 p-5 md:p-6 bg-white border-2 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all duration-300 transform ${highlightDeclaration ? 'border-red-500 bg-red-50/50 scale-[1.02] shadow-xl ring-4 ring-red-500/20' : 'border-slate-200'}`}
+                                className={`flex items-start gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 border-2 rounded-2xl cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850 transition-all duration-300 transform ${highlightDeclaration ? 'border-red-500 bg-red-50/50 dark:bg-red-950/40 scale-[1.02] shadow-xl ring-4 ring-red-500/20' : 'border-slate-200 dark:border-slate-800'}`}
                             >
                                 <div className="mt-0.5">
                                     <input 
                                         type="checkbox" 
                                         checked={declarationAccepted}
                                         onChange={(e) => setDeclarationAccepted(e.target.checked)}
-                                        className="w-6 h-6 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                                        className="w-6 h-6 rounded text-indigo-600 border-slate-300 dark:border-slate-700 focus:ring-indigo-500 bg-white dark:bg-slate-800"
                                     />
                                 </div>
-                                <p className="text-base font-medium text-slate-800 leading-snug">
+                                <p className="text-base font-medium text-slate-800 dark:text-slate-200 leading-snug">
                                     I hereby declare that all the details provided above are true and correct to the best of my knowledge. I accept the institution's terms for enrollment.
                                 </p>
                             </label>
@@ -424,13 +422,13 @@ export default function EnrollmentForm() {
                     </div>
 
                     {/* Footer / Action Bar */}
-                    <div className="shrink-0 bg-white border-t border-slate-200 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] flex justify-center p-4 md:p-6 w-full z-10">
+                    <div className="shrink-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] dark:shadow-none flex justify-center p-4 md:p-6 w-full z-10">
                         <div className="w-full max-w-4xl">
                             <div className="flex flex-col md:flex-row gap-4">
                                 <button 
                                     onClick={() => setShowConfirmModal(false)}
                                     disabled={submitting}
-                                    className="px-8 py-4 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors"
+                                    className="px-8 py-4 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     Go Back & Edit
                                 </button>
@@ -452,110 +450,137 @@ export default function EnrollmentForm() {
             )}
 
             {/* Sticky Progress Bar */}
-            <div className="fixed top-16 left-0 right-0 z-40 bg-white border-b border-slate-200 shadow-sm py-3 px-4 md:px-8 flex items-center justify-between">
-                <span className="font-bold text-sm text-slate-600">Application Progress</span>
-                <div className="flex-1 max-w-sm mx-4 bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div className="fixed top-16 left-0 right-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm py-3 px-4 md:px-8 flex items-center justify-between transition-colors">
+                <span className="font-bold text-sm text-slate-600 dark:text-slate-300">Application Progress</span>
+                <div className="flex-1 max-w-sm mx-4 bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
                     <div 
                         className="bg-indigo-600 h-full transition-all duration-500 ease-out"
                         style={{ width: `${progress}%` }}
                     ></div>
                 </div>
-                <span className="font-bold text-sm text-indigo-600">{progress}%</span>
+                <span className="font-bold text-sm text-indigo-600 dark:text-indigo-400">{progress}%</span>
             </div>
 
+            <SEOHead
+                title={`Enroll in ${course?.title || 'Computer Course'} | ICST Chowberia Admission`}
+                description={`Online admission application for ${course?.title || 'technical courses'} at ICST Chowberia. Reserve your seat and receive enrollment confirmation.`}
+                canonicalPath={`/enroll/${courseId}`}
+                breadcrumbs={[
+                    { name: 'Home', path: '/' },
+                    { name: 'Courses', path: '/courses' },
+                    ...(course ? [{ name: course.title, path: `/courses/${course.id}` }] : []),
+                    { name: 'Enroll', path: `/enroll/${courseId}` }
+                ]}
+            />
+
             <div className="max-w-3xl mx-auto mt-8 px-4">
+                {/* Breadcrumbs */}
+                <nav aria-label="Breadcrumb" className="mb-6 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <Link to="/" className="hover:text-indigo-600 dark:hover:text-indigo-400 no-underline transition-colors">Home</Link>
+                    <span>/</span>
+                    <Link to="/courses" className="hover:text-indigo-600 dark:hover:text-indigo-400 no-underline transition-colors">Courses</Link>
+                    {course && (
+                        <>
+                            <span>/</span>
+                            <Link to={`/courses/${course.id}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 no-underline transition-colors truncate max-w-[150px]">{course.title}</Link>
+                        </>
+                    )}
+                    <span>/</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-medium">Enrollment</span>
+                </nav>
+
                 <div className="text-center mb-8 animate-in slide-in-from-bottom-4 duration-500">
-                    <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-3">Course Enrollment</h1>
-                    <p className="text-slate-500">Fill out this quick application to reserve your seat.</p>
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-3">Course Enrollment</h1>
+                    <p className="text-slate-500 dark:text-slate-400">Fill out this quick application to reserve your seat.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden">
+                <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200/60 dark:border-slate-800 overflow-hidden">
                     
                     {/* Course Summary Section (Auto-filled) */}
-                    <div className="bg-indigo-50/50 p-6 sm:p-8 border-b border-indigo-100/50">
-                        <h3 className="text-xs font-bold text-indigo-600 tracking-wider uppercase mb-4 flex items-center gap-2">
+                    <div className="bg-indigo-50/50 dark:bg-slate-800/50 p-6 sm:p-8 border-b border-indigo-100/50 dark:border-slate-700">
+                        <h3 className="text-xs font-bold text-indigo-600 dark:text-indigo-400 tracking-wider uppercase mb-4 flex items-center gap-2">
                             <BookOpen size={16} /> Selected Course
                         </h3>
                         {course ? (
                             <div className="flex flex-col sm:flex-row gap-6">
-                                <div className={`w-20 h-20 rounded-2xl ${course.color} flex items-center justify-center shrink-0 shadow-inner`}>
+                                <div className={`w-20 h-20 rounded-2xl ${course.color} dark:!bg-slate-700 flex items-center justify-center shrink-0 shadow-inner`}>
                                     <BookOpen size={32} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xl font-bold text-slate-900 mb-1">{course.title}</h4>
-                                    <p className="text-sm text-slate-600 line-clamp-2 max-w-md">{course.description}</p>
-                                    <div className="flex gap-4 mt-3 text-sm font-semibold text-slate-700">
-                                        <span className="bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">{course.duration}</span>
-                                        <span className="bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100 text-green-700">Fee: {course.price}</span>
+                                    <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{course.title}</h4>
+                                    <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 max-w-md">{course.description}</p>
+                                    <div className="flex gap-4 mt-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                        <span className="bg-white dark:bg-slate-700 px-3 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600">{course.duration}</span>
+                                        <span className="bg-white dark:bg-slate-700 px-3 py-1 rounded-full shadow-sm border border-slate-100 dark:border-slate-600 text-green-700 dark:text-green-400">Fee: {course.price}</span>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-slate-500 italic">No course selected. Please go back.</p>
+                            <p className="text-slate-500 dark:text-slate-400 italic">No course selected. Please go back.</p>
                         )}
                     </div>
 
                     <div className="p-6 sm:p-8 space-y-8">
                         {/* Section 1: Basic Details */}
                         <section>
-                            <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Personal Details</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Personal Details</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div className="space-y-1 sm:col-span-2">
-                                    <label className="text-sm font-bold text-slate-700">Full Name *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Full Name *</label>
                                     <input 
                                         required
                                         type="text" 
                                         name="full_name"
                                         value={formData.full_name}
                                         onChange={handleInputChange}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder:text-slate-400"
                                         placeholder="E.g. John Doe"
                                     />
                                 </div>
                                 <div className="space-y-1 sm:col-span-2">
-                                    <label className="text-sm font-bold text-slate-700">Guardian's Name *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Guardian's Name *</label>
                                     <input 
                                         required
                                         type="text" 
                                         name="guardian_name"
                                         value={formData.guardian_name}
                                         onChange={handleInputChange}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder:text-slate-400"
                                         placeholder="Guardian's Full Name"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">Phone Number *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Phone Number *</label>
                                     <input 
                                         required
                                         type="tel" 
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleInputChange}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder:text-slate-400"
                                         placeholder="10-digit mobile number"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">Email Address *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Email Address *</label>
                                     <input 
                                         required
                                         type="email" 
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder:text-slate-400"
                                         placeholder="your@email.com"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">Gender *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Gender *</label>
                                     <select 
                                         required
                                         name="gender"
                                         value={formData.gender}
                                         onChange={handleInputChange}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none"
                                     >
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
@@ -564,14 +589,14 @@ export default function EnrollmentForm() {
                                     </select>
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">Date of Birth *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Date of Birth *</label>
                                     <input 
                                         required
                                         type="date" 
                                         name="dob"
                                         value={formData.dob}
                                         onChange={handleInputChange}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                                     />
                                 </div>
                             </div>
@@ -579,10 +604,10 @@ export default function EnrollmentForm() {
 
                         {/* Section 2: Address */}
                         <section>
-                            <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">Address Details</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">Address Details</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div className="space-y-1 relative sm:col-span-2">
-                                    <label className="text-sm font-bold text-slate-700">Pincode *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Pincode *</label>
                                     <div className="relative">
                                         <input 
                                             required
@@ -591,7 +616,7 @@ export default function EnrollmentForm() {
                                             maxLength={6}
                                             value={formData.pincode}
                                             onChange={handleInputChange}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                            className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl pl-4 pr-10 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none placeholder:text-slate-400"
                                             placeholder="E.g. 743273"
                                         />
                                         {fetchingPincode && (
@@ -603,34 +628,34 @@ export default function EnrollmentForm() {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">State</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">State</label>
                                     <input 
                                         readOnly
                                         type="text" 
                                         value={formData.state}
-                                        className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 cursor-not-allowed"
+                                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl px-4 py-3 cursor-not-allowed"
                                         placeholder="Auto-filled via Pincode"
                                     />
                                 </div>
                                 <div className="space-y-1">
-                                    <label className="text-sm font-bold text-slate-700">District</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">District</label>
                                     <input 
                                         readOnly
                                         type="text" 
                                         value={formData.district}
-                                        className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 cursor-not-allowed"
+                                        className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl px-4 py-3 cursor-not-allowed"
                                         placeholder="Auto-filled via Pincode"
                                     />
                                 </div>
                                 <div className="space-y-1 sm:col-span-2">
-                                    <label className="text-sm font-bold text-slate-700">Post Office *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Post Office *</label>
                                     <div className="relative">
                                         <select
                                             required
                                             name="post_office"
                                             value={formData.post_office}
                                             onChange={handleInputChange}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none"
+                                            className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none"
                                             disabled={postOffices.length === 0 && !formData.post_office}
                                         >
                                             <option value="">Select Post Office</option>
@@ -646,14 +671,14 @@ export default function EnrollmentForm() {
                                     </div>
                                 </div>
                                 <div className="space-y-1 sm:col-span-2">
-                                    <label className="text-sm font-bold text-slate-700">Address Line *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Address Line *</label>
                                     <textarea 
                                         required
                                         name="address"
                                         value={formData.address}
                                         onChange={handleInputChange}
                                         rows={2}
-                                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none placeholder:text-slate-400"
                                         placeholder="Village, Street, House number..."
                                     />
                                 </div>
@@ -661,14 +686,14 @@ export default function EnrollmentForm() {
                         </section>
 
                         {/* Section 3: Extra Features & Payment */}
-                        <section className="bg-slate-50 -mx-6 sm:-mx-8 px-6 sm:px-8 py-8 border-y border-slate-200 mt-8 mb-4 relative">
-                            <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <CreditCard size={20} className="text-indigo-600"/> Payment & Perks
+                        <section className="bg-slate-50 dark:bg-slate-950/60 -mx-6 sm:-mx-8 px-6 sm:px-8 py-8 border-y border-slate-200 dark:border-slate-800 mt-8 mb-4 relative transition-colors">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <CreditCard size={20} className="text-indigo-600 dark:text-indigo-400"/> Payment & Perks
                             </h3>
 
                             <div className="space-y-6">
                                 {/* Opt In Logic */}
-                                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                                <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                     <div className="flex items-start gap-4">
                                         <div className="mt-1">
                                             <label className="flex items-center justify-center w-6 h-6 border-2 border-indigo-600 rounded cursor-pointer relative">
@@ -684,15 +709,15 @@ export default function EnrollmentForm() {
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
-                                                <h4 className="font-bold text-slate-900 leading-tight">Enroll Free Spoken English Class</h4>
+                                                <h4 className="font-bold text-slate-900 dark:text-white leading-tight">Enroll Free Spoken English Class</h4>
                                                 <button type="button" onClick={() => setShowSpokenEngInfo(!showSpokenEngInfo)} className="text-indigo-500 hover:text-indigo-700">
                                                     <Info size={16} />
                                                 </button>
                                             </div>
-                                            <p className="text-sm text-slate-500 mt-1">Boost your communication skills along with your course.</p>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Boost your communication skills along with your course.</p>
                                             
                                             {showSpokenEngInfo && (
-                                                <div className="mt-3 p-3 bg-indigo-50 text-indigo-900 text-sm rounded-xl border border-indigo-100 animate-in fade-in slide-in-from-top-2">
+                                                <div className="mt-3 p-3 bg-indigo-50 dark:bg-slate-800 text-indigo-900 dark:text-indigo-200 text-sm rounded-xl border border-indigo-100 dark:border-indigo-900/50 animate-in fade-in slide-in-from-top-2">
                                                     Free spoken english classes will be provided from the ICST Chowberia once in a week and students will take that class during same computer course duration.
                                                 </div>
                                             )}
@@ -701,18 +726,18 @@ export default function EnrollmentForm() {
                                 </div>
 
                                 {/* Free Practice Classes Info */}
-                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-2xl border border-blue-100 relative">
+                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-slate-850 p-5 rounded-2xl border border-blue-100 dark:border-slate-800 relative">
                                     <div className="flex items-start gap-3">
-                                        <div className="mt-0.5 shrink-0 text-blue-600"><CheckCircle size={20} /></div>
+                                        <div className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400"><CheckCircle size={20} /></div>
                                         <div>
                                             <div className="flex items-center gap-2">
-                                                <h4 className="font-bold text-slate-900">Includes Free Practice Classes</h4>
-                                                <button type="button" onClick={() => setShowPracticeInfo(!showPracticeInfo)} className="text-blue-500 hover:text-blue-700">
+                                                <h4 className="font-bold text-slate-900 dark:text-white">Includes Free Practice Classes</h4>
+                                                <button type="button" onClick={() => setShowPracticeInfo(!showPracticeInfo)} className="text-blue-500 hover:text-blue-400">
                                                     <Info size={16} />
                                                 </button>
                                             </div>
                                             {showPracticeInfo && (
-                                                <div className="mt-3 p-3 bg-white text-slate-700 text-sm rounded-xl border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-2">
+                                                <div className="mt-3 p-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm rounded-xl border border-blue-100 dark:border-slate-700 shadow-sm animate-in fade-in slide-in-from-top-2">
                                                     Student enrolled in any course will be able to join extra practice sessions Monday to Friday in between 10:00 AM to 01:00 PM by contacting the ICST Chowberia office.
                                                 </div>
                                             )}
@@ -722,7 +747,7 @@ export default function EnrollmentForm() {
 
                                 {/* Payment Installment Form */}
                                 <div>
-                                    <label className="text-sm font-bold text-slate-700 block mb-3">Preferred Payment Plan *</label>
+                                    <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-3">Preferred Payment Plan *</label>
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                         {['monthly', 'quarterly', 'yearly', 'one_time'].map((plan) => (
                                             <label 
@@ -730,8 +755,8 @@ export default function EnrollmentForm() {
                                                 className={`
                                                     cursor-pointer p-4 rounded-xl text-center border-2 transition-all duration-200 shadow-sm
                                                     ${formData.payment_plan === plan 
-                                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 scale-[1.02]' 
-                                                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                                                        ? 'border-indigo-600 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 scale-[1.02]' 
+                                                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700'
                                                     }
                                                 `}
                                             >
@@ -758,7 +783,7 @@ export default function EnrollmentForm() {
                                 disabled={submitting || progress < 100}
                                 className={`
                                     w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all shadow-xl shadow-indigo-600/20
-                                    ${submitting || progress < 100 ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none' : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:-translate-y-1'}
+                                    ${submitting || progress < 100 ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none' : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:-translate-y-1'}
                                 `}
                             >
                                 {submitting ? (
@@ -772,7 +797,7 @@ export default function EnrollmentForm() {
                                     </>
                                 )}
                             </button>
-                            <p className="text-center text-xs text-slate-500 mt-4 font-medium">
+                            <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-4 font-medium">
                                 By submitting this application, you agree to the institution's enrollment policies.
                             </p>
                         </div>

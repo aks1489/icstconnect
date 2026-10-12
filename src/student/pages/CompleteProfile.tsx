@@ -49,9 +49,9 @@ export default function CompleteProfile() {
     if (!user) return null
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-inter">
-            <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-500">
-                <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-8 text-center relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 font-inter transition-colors">
+            <div className="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-transparent dark:border-slate-800 overflow-hidden animate-in fade-in zoom-in duration-500">
+                <div className="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-700 dark:to-violet-800 p-8 text-center relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-full bg-white/10 opacity-30">
                         <div className="absolute -top-10 -left-10 w-40 h-40 bg-white rounded-full blur-3xl opacity-20"></div>
                         <div className="absolute top-10 -right-10 w-40 h-40 bg-pink-400 rounded-full blur-3xl opacity-20"></div>
@@ -84,7 +84,7 @@ export default function CompleteProfile() {
                 </div>
             </div>
 
-            <p className="text-slate-400 text-xs mt-6 text-center">
+            <p className="text-slate-400 dark:text-slate-500 text-xs mt-6 text-center">
                 © {new Date().getFullYear()} ICST Connect. All rights reserved.
             </p>
         </div>

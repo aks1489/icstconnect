@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import type { UserProfile } from '../../types'
 import ImageUpload from './ImageUpload'
-import { Check, AlertTriangle } from 'lucide-react'
+import { IconCheck as Check, IconAlertTriangle as AlertTriangle } from '@tabler/icons-react'
 
 interface ProfileFormProps {
     initialData: Partial<UserProfile>
@@ -164,45 +164,45 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
             {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Full Name <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Name <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         name="full_name"
                         value={formData.full_name}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.full_name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.full_name ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 outline-none transition-all`}
                         placeholder="Student Name"
                     />
                     {fieldErrors.full_name && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.full_name}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Guardian's Name <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Guardian's Name <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         name="guardian_name"
                         value={formData.guardian_name || ''}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.guardian_name ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.guardian_name ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 outline-none transition-all`}
                         placeholder="Guardian's Name"
                     />
                     {fieldErrors.guardian_name && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.guardian_name}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Date of Birth <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Date of Birth <span className="text-red-500">*</span></label>
                     <input
                         type="date"
                         name="dob"
                         value={formData.dob || ''}
                         onChange={handleChange}
-                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.dob ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
+                        className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.dob ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 outline-none transition-all`}
                     />
                     {fieldErrors.dob && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.dob}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Phone Number <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Phone Number <span className="text-red-500">*</span></label>
                     <div className="relative">
                         <span className="absolute left-4 top-2.5 text-slate-400 font-medium">+91</span>
                         <input
@@ -222,7 +222,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                     })
                                 }
                             }}
-                            className={`w-full pl-12 pr-4 py-2.5 rounded-xl border ${fieldErrors.phone ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
+                            className={`w-full pl-12 pr-4 py-2.5 rounded-xl border ${fieldErrors.phone ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 outline-none transition-all`}
                             placeholder="9876543210"
                         />
                     </div>
@@ -231,14 +231,14 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
             </div>
 
             {/* Address Info */}
-            <div className="pt-4 border-t border-slate-100">
-                <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">Address Details</h3>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 uppercase tracking-wider">Address Details</h3>
 
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Pincode with Loader */}
                         <div className="space-y-2 relative">
-                            <label className="text-sm font-semibold text-slate-700">Pincode <span className="text-red-500">*</span></label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Pincode <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="pincode"
@@ -256,7 +256,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                         })
                                     }
                                 }}
-                                className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.pincode ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all`}
+                                className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.pincode ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 outline-none transition-all`}
                                 placeholder="110001"
                             />
                             {fieldErrors.pincode && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.pincode}</p>}
@@ -269,13 +269,13 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
 
                         {/* Post Office Dropdown */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700">Post Office <span className="text-red-500">*</span></label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Post Office <span className="text-red-500">*</span></label>
                             <select
                                 name="post_office"
                                 value={formData.post_office || ''}
                                 onChange={handleChange}
                                 disabled={pincodeLoading || postOffices.length === 0}
-                                className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.post_office ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all disabled:bg-slate-50 disabled:text-slate-400`}
+                                className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.post_office ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 outline-none transition-all disabled:bg-slate-50 dark:disabled:bg-slate-800/50 disabled:text-slate-400 dark:disabled:text-slate-600`}
                             >
                                 <option value="">Select Post Office</option>
                                 {postOffices.map((po, idx) => (
@@ -290,46 +290,46 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2 relative">
-                            <label className="text-sm font-semibold text-slate-700">District</label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">District</label>
                             <input
                                 type="text"
                                 name="district"
                                 readOnly
                                 value={formData.district || ''}
-                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none transition-all"
+                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none transition-all"
                             />
                             {pincodeLoading && (
-                                <div className="absolute right-3 top-[34px] bg-slate-50 pl-2">
-                                    <div className="w-4 h-4 rounded-full bg-slate-200 animate-pulse"></div>
+                                <div className="absolute right-3 top-[34px] bg-slate-50 dark:bg-slate-900 pl-2">
+                                    <div className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                                 </div>
                             )}
                         </div>
 
                         <div className="space-y-2 relative">
-                            <label className="text-sm font-semibold text-slate-700">State</label>
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">State</label>
                             <input
                                 type="text"
                                 name="state"
                                 readOnly
                                 value={formData.state || ''}
-                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none transition-all"
+                                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 focus:outline-none transition-all"
                             />
                             {pincodeLoading && (
-                                <div className="absolute right-3 top-[34px] bg-slate-50 pl-2">
-                                    <div className="w-4 h-4 rounded-full bg-slate-200 animate-pulse"></div>
+                                <div className="absolute right-3 top-[34px] bg-slate-50 dark:bg-slate-900 pl-2">
+                                    <div className="w-4 h-4 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-700">Full Address <span className="text-red-500">*</span></label>
+                        <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Address <span className="text-red-500">*</span></label>
                         <textarea
                             name="address"
                             rows={3}
                             value={formData.address || ''}
                             onChange={handleChange}
-                            className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.address ? 'border-red-300 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-200'} focus:ring-2 outline-none transition-all resize-none`}
+                            className={`w-full px-4 py-2.5 rounded-xl border ${fieldErrors.address ? 'border-red-300 dark:border-red-500/50 focus:border-red-500 focus:ring-red-200' : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 focus:ring-indigo-200 dark:focus:ring-indigo-950/40'} bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 outline-none transition-all resize-none`}
                             placeholder="House No, Street, Locality"
                         />
                         {fieldErrors.address && <p className="text-xs text-red-500 font-medium ml-1 animate-in fade-in slide-in-from-top-1">{fieldErrors.address}</p>}
@@ -338,8 +338,8 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
             </div>
 
             {/* Course Enrollment Info */}
-            <div className="pt-4 border-t border-slate-100">
-                <div className="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div className="bg-indigo-50 dark:bg-indigo-950/40 rounded-xl p-4 border border-indigo-100 dark:border-indigo-900/50">
                     <label className="flex items-start gap-3 cursor-pointer">
                         <div className="relative flex items-center mt-0.5">
                             <input
@@ -353,22 +353,22 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                                         enrollment_center: e.target.checked ? 'ICST Chowberia' : ''
                                     }))
                                 }}
-                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-indigo-300 transition-all checked:border-indigo-600 checked:bg-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                                className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-indigo-300 dark:border-indigo-700 transition-all checked:border-indigo-600 checked:bg-indigo-600 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900/40"
                             />
                             <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                                 <Check size={14} />
                             </div>
                         </div>
                         <div className="text-sm">
-                            <span className="font-bold text-indigo-900 block">I am enrolled at ICST Chowberia Center</span>
-                            <span className="text-indigo-700/80">Check this box if you are attending offline classes at our main center.</span>
+                            <span className="font-bold text-indigo-900 dark:text-indigo-200 block">I am enrolled at ICST Chowberia Center</span>
+                            <span className="text-indigo-700/80 dark:text-indigo-300/80">Check this box if you are attending offline classes at our main center.</span>
                         </div>
                     </label>
                 </div>
             </div>
 
             {error && (
-                <div className="p-4 rounded-xl bg-red-50 text-red-600 border border-red-100 flex items-center gap-3">
+                <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-900/60 flex items-center gap-3">
                     <AlertTriangle size={20} className="shrink-0" />
                     <p className="text-sm font-medium">{error}</p>
                 </div>
@@ -380,7 +380,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                         type="button"
                         onClick={onCancel}
                         disabled={loading}
-                        className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition-all"
+                        className="flex-1 py-3 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                     >
                         Cancel
                     </button>
@@ -388,7 +388,7 @@ export default function ProfileForm({ initialData, onSubmit, isEditing = false, 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-3 px-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all disabled:opacity-70 flex justify-center items-center gap-2"
+                    className="flex-1 py-3 px-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-600/20 transition-all disabled:opacity-70 flex justify-center items-center gap-2"
                 >
                     {loading ? (
                         <>

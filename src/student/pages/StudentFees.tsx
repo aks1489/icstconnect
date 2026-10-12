@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Calendar } from 'lucide-react';
+import { IconCalendar as Calendar } from '@tabler/icons-react';
 import type { Database } from '../../types/supabase';
 import { supabase } from '../../lib/supabase';
 import StudentViewPaymentGrid from '../components/StudentViewPaymentGrid';
@@ -57,7 +57,7 @@ export default function StudentFees() {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading fee details...</div>;
+    if (loading) return <div className="p-8 text-center text-slate-500 dark:text-slate-400">Loading fee details...</div>;
 
     return (
         <div className="p-4 max-w-4xl mx-auto space-y-6">

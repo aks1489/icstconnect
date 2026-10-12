@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { ChevronRight, List, Grid, LogOut } from 'lucide-react'
+import { IconChevronRight as ChevronRight, IconList as List, IconLayoutGrid as Grid, IconLogout as LogOut } from '@tabler/icons-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { ADMIN_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
+import ThemeToggle from '../../components/ui/ThemeToggle'
+import { SEOHead } from '../../components/common/SEOHead'
 
 export default function AdminLayout() {
-    const { signOut } = useAuth()
+    const { signOut, isSuperAdmin, hasPerm } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -36,7 +38,13 @@ export default function AdminLayout() {
     }
 
     return (
-        <div className="flex h-screen bg-slate-50 overflow-hidden font-inter">
+        <div className="flex h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-inter">
+            <SEOHead
+                title="Admin Portal - ICST Connect"
+                description="ICST Connect Administrative Management Dashboard."
+                canonical="/admin"
+                noindex={true}
+            />
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (
                 <div
@@ -61,10 +69,12 @@ export default function AdminLayout() {
                             <img
                                 src={logo}
                                 alt="ICST Logo"
+                                width={40}
+                                height={40}
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-indigo-500/10"
                             />
                             <div>
-                                <h1 className="text-lg font-bold tracking-tight">Admin Portal</h1>
+                                <span className="text-lg font-bold tracking-tight block">Admin Portal</span>
                                 <p className="text-xs text-slate-400">ICST Connect</p>
                             </div>
                         </div>
@@ -75,7 +85,10 @@ export default function AdminLayout() {
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Main Menu
                         </div>
-                        {ADMIN_ACTIONS.map((item) => (
+                        {ADMIN_ACTIONS
+                            .filter(item => (!item.superAdminOnly || isSuperAdmin) && (!item.requiredPermission || hasPerm(item.requiredPermission)))
+                            .map((item) => (
+
                             <Link
                                 key={item.path}
                                 to={item.path}
@@ -88,9 +101,14 @@ export default function AdminLayout() {
                                 `}
                             >
                                 <item.icon className={`text-lg ${isActive(item.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} size={20} />
-                                <span className="font-medium">{item.label}</span>
+                                <span className="font-medium flex-1 truncate">{item.label}</span>
+                                {item.superAdminOnly && (
+                                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                        Root
+                                    </span>
+                                )}
                                 {isActive(item.path) && (
-                                    <ChevronRight className="ml-auto text-xs opacity-50" size={16} />
+                                    <ChevronRight className="ml-auto text-xs opacity-50 shrink-0" size={16} />
                                 )}
                             </Link>
                         ))}
@@ -124,19 +142,24 @@ export default function AdminLayout() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Header for Mobile and Desktop Toggle */}
-                <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 z-20">
-                    <button
-                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        className="p-2 -ml-2 rounded-lg hover:bg-slate-100 text-slate-600"
-                    >
-                        <List className="text-2xl" size={24} />
-                    </button>
-                    <span className="font-semibold text-slate-700 lg:hidden">Admin Panel</span>
-                    <div className="w-8 lg:hidden"></div> {/* Spacer for alignment */}
+                <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 z-20 transition-colors">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                            className="p-2 -ml-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 lg:hidden cursor-pointer"
+                        >
+                            <List className="text-2xl" size={24} />
+                        </button>
+                        <span className="font-semibold text-slate-700 dark:text-slate-200 lg:hidden">Admin Panel</span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle />
+                    </div>
                 </header>
 
                 {/* Scrollable Page Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 p-4 lg:p-8 scroll-smooth">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 lg:p-8 scroll-smooth transition-colors">
                     <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <Outlet />
                     </div>

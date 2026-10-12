@@ -32,13 +32,13 @@ export default function CollageLayout({ images }: { images: any[] }) {
                             type: "spring", 
                             stiffness: 100 
                         }}
-                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group ${getAspectClass(img.id, index)}`}
+                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 group border border-slate-200/60 dark:border-slate-800/80 ${getAspectClass(img.id, index)}`}
                     >
                         <InteractiveImageMarker 
                             src={getOptimizedImageUrl(img.cloudinary_url, 800)} 
                             alt={img.title || ''} 
                             tags={img.tags || []}
-                            className="bg-slate-100" 
+                            className="bg-slate-100 dark:bg-slate-900" 
                         />
                         
                         {/* Elegant overlay on hover for standard collage items */}

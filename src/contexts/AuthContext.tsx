@@ -1,6 +1,9 @@
-import { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+
+import type { AppPermission } from '../types/permissions'
+import { hasPermission } from '../utils/permissions'
 
 interface AuthContextType {
     session: Session | null
@@ -10,8 +13,14 @@ interface AuthContextType {
     signOut: () => Promise<void>
     refreshProfile: () => Promise<void>
     isAdmin: boolean
+    isSuperAdmin: boolean
     isTeacher: boolean
+    isReceptionist: boolean
+    isLabAssistant: boolean
+    isMaintenance: boolean
+    isStaff: boolean
     isProfileComplete: boolean
+    hasPerm: (permission: AppPermission | string) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -21,9 +30,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [profile, setProfile] = useState<any | null>(null)
     const [loading, setLoading] = useState(true)
+    const [permVersion, setPermVersion] = useState(0)
 
     // Using a ref to track the last seen access token to prevent redundant updates
     const accessTokenRef = useRef<string | null>(null)
+
+    // Listen to real-time capability matrix updates
+    useEffect(() => {
+        const handlePermChange = () => {
+            setPermVersion(v => v + 1)
+        }
+        window.addEventListener('icst_permissions_updated', handlePermChange)
+        window.addEventListener('storage', handlePermChange)
+        return () => {
+            window.removeEventListener('icst_permissions_updated', handlePermChange)
+            window.removeEventListener('storage', handlePermChange)
+        }
+    }, [])
+
+    const fetchProfile = useCallback(async (userId: string) => {
+        try {
+            // Removed setLoading(true) to prevent full page loaders on background refreshes
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single()
+
+            if (error) {
+                console.error('Error fetching profile:', error)
+            } else {
+                setProfile(data)
+            }
+        } catch (error) {
+            console.error('Error:', error)
+        }
+    }, [])
 
     useEffect(() => {
         let mounted = true
@@ -75,26 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             mounted = false
             subscription.unsubscribe()
         }
-    }, [])
-
-    const fetchProfile = async (userId: string) => {
-        try {
-            // Removed setLoading(true) to prevent full page loaders on background refreshes
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single()
-
-            if (error) {
-                console.error('Error fetching profile:', error)
-            } else {
-                setProfile(data)
-            }
-        } catch (error) {
-            console.error('Error:', error)
-        }
-    }
+    }, [fetchProfile])
 
     const signOut = async () => {
         await supabase.auth.signOut()
@@ -104,11 +127,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         accessTokenRef.current = null
     }
 
-    const refreshProfile = async () => {
+    const refreshProfile = useCallback(async () => {
         if (user) {
             await fetchProfile(user.id)
         }
-    }
+    }, [user, fetchProfile])
 
     const value = useMemo(() => ({
         session,
@@ -117,10 +140,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         signOut,
         refreshProfile,
-        isAdmin: profile?.role === 'admin',
+        isAdmin: profile?.role === 'admin' || profile?.role === 'super_admin',
+        isSuperAdmin: profile?.role === 'super_admin',
         isTeacher: profile?.role === 'teacher',
-        isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob)
-    }), [session, user, profile, loading])
+        isReceptionist: profile?.role === 'receptionist',
+        isLabAssistant: profile?.role === 'lab_assistant',
+        isMaintenance: profile?.role === 'maintenance',
+        isStaff: ['teacher', 'admin', 'super_admin', 'receptionist', 'lab_assistant', 'maintenance'].includes(profile?.role),
+        isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob),
+        hasPerm: (permission: AppPermission | string) => hasPermission(profile, permission)
+    }), [session, user, profile, loading, refreshProfile, permVersion])
 
     return (
         <AuthContext.Provider value={value}>

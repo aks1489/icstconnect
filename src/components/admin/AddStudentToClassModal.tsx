@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { X, Search, UserPlus, CheckCircle, ArrowLeft } from 'lucide-react'
+import { IconX as X, IconSearch as Search, IconUserPlus as UserPlus, IconCircleCheck as CheckCircle, IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../contexts/ToastContext'
 
@@ -164,27 +164,27 @@ export default function AddStudentToClassModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
 
-            <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
 
                 {/* Header */}
-                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/60">
                     <div className="flex items-center gap-2">
                         {selectedStudent && (
                             <button
                                 onClick={() => setSelectedStudent(null)}
-                                className="mr-2 p-1 hover:bg-slate-200 rounded-full transition-colors"
+                                className="mr-2 p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
                             >
-                                <ArrowLeft size={18} className="text-slate-500" />
+                                <ArrowLeft size={18} className="text-slate-500 dark:text-slate-400" />
                             </button>
                         )}
-                        <h3 className="font-bold text-slate-800">
+                        <h3 className="font-bold text-slate-800 dark:text-white">
                             {selectedStudent ? 'Setup Fee Structure' : 'Add Student to Class'}
                         </h3>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                        <X size={20} className="text-slate-500" />
+                    <button onClick={onClose} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors">
+                        <X size={20} className="text-slate-500 dark:text-slate-400" />
                     </button>
                 </div>
 
@@ -199,7 +199,7 @@ export default function AddStudentToClassModal({
                                     type="text"
                                     placeholder="Search by student name..."
                                     autoFocus
-                                    className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -215,9 +215,9 @@ export default function AddStudentToClassModal({
                                         {filteredStudents.map(student => {
                                             const isAlreadyEnrolled = existingStudentIds.includes(student.id)
                                             return (
-                                                <div key={student.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl border border-transparent hover:border-slate-100 transition-all group">
+                                                <div key={student.id} className="flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-xl border border-transparent hover:border-slate-100 dark:hover:border-slate-800 transition-all group">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-sm overflow-hidden flex-shrink-0">
+                                                        <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm overflow-hidden flex-shrink-0">
                                                             {student.avatar_url ? (
                                                                 <img src={student.avatar_url} alt="" className="w-full h-full object-cover" />
                                                             ) : (
@@ -225,10 +225,10 @@ export default function AddStudentToClassModal({
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-slate-700 text-sm">{student.full_name}</p>
-                                                            <p className="text-xs text-slate-500">{student.email}</p>
+                                                            <p className="font-bold text-slate-700 dark:text-slate-200 text-sm">{student.full_name}</p>
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400">{student.email}</p>
                                                             {isAlreadyEnrolled && (
-                                                                <p className="text-[10px] uppercase font-bold text-emerald-600 mt-1">Already Enrolled</p>
+                                                                <p className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 mt-1">Already Enrolled</p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -236,8 +236,8 @@ export default function AddStudentToClassModal({
                                                         onClick={() => handleSelectStudent(student)}
                                                         disabled={isAlreadyEnrolled}
                                                         className={`p-2 rounded-lg transition-colors ${isAlreadyEnrolled
-                                                            ? 'bg-slate-100 text-slate-400 cursor-default'
-                                                            : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white'
+                                                            ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-default'
+                                                            : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white'
                                                             }`}
                                                     >
                                                         {isAlreadyEnrolled ? <CheckCircle size={18} /> : <UserPlus size={18} />}
@@ -252,74 +252,74 @@ export default function AddStudentToClassModal({
                     ) : (
                         // VIEW 2: FEE FORM
                         <div className="p-6 space-y-6">
-                            <div className="bg-indigo-50 p-4 rounded-xl flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-indigo-600 font-bold shadow-sm">
+                            <div className="bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 p-4 rounded-xl flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shadow-sm">
                                     {selectedStudent.full_name.charAt(0)}
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-indigo-900">{selectedStudent.full_name}</h4>
-                                    <p className="text-xs text-indigo-600">Enrolling in {batchName}</p>
+                                    <h4 className="font-bold text-indigo-900 dark:text-indigo-200">{selectedStudent.full_name}</h4>
+                                    <p className="text-xs text-indigo-600 dark:text-indigo-400">Enrolling in {batchName}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 mb-1">Base Fee (₹)</label>
+                                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Base Fee (₹)</label>
                                     <input
                                         type="number"
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                         value={feeDetails.base_fee}
                                         onChange={e => setFeeDetails({ ...feeDetails, base_fee: Number(e.target.value) })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 mb-1">Admission Fee (₹)</label>
+                                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Admission Fee (₹)</label>
                                     <input
                                         type="number"
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                         value={feeDetails.admission_fee}
                                         onChange={e => setFeeDetails({ ...feeDetails, admission_fee: Number(e.target.value) })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 mb-1">Discount (₹)</label>
+                                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Discount (₹)</label>
                                     <input
                                         type="number"
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                         value={feeDetails.discount}
                                         onChange={e => setFeeDetails({ ...feeDetails, discount: Number(e.target.value) })}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-500 mb-1">Payment Plan</label>
+                                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Payment Plan</label>
                                     <select
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                                        className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
                                         value={feeDetails.payment_plan}
                                         onChange={e => setFeeDetails({ ...feeDetails, payment_plan: e.target.value as any })}
                                     >
-                                        <option value="monthly">Monthly</option>
-                                        <option value="one_time">One Time</option>
+                                        <option value="monthly" className="dark:bg-slate-800">Monthly</option>
+                                        <option value="one_time" className="dark:bg-slate-800">One Time</option>
                                     </select>
                                 </div>
                             </div>
 
                             {feeDetails.payment_plan === 'monthly' && (
-                                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800">
                                     <div className="col-span-1">
-                                        <label className="block text-xs font-bold text-slate-500 mb-1">Monthly Installment (₹)</label>
+                                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Monthly Installment (₹)</label>
                                         <input
                                             type="number"
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                             value={feeDetails.monthly_installment}
                                             onChange={e => setFeeDetails({ ...feeDetails, monthly_installment: Number(e.target.value) })}
                                         />
                                     </div>
                                     <div className="col-span-1">
-                                        <label className="block text-xs font-bold text-slate-500 mb-1">Due Day (of month)</label>
+                                        <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Due Day (of month)</label>
                                         <input
                                             type="number"
                                             min="1" max="31"
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                             value={feeDetails.monthly_due_day}
                                             onChange={e => setFeeDetails({ ...feeDetails, monthly_due_day: Number(e.target.value) })}
                                         />
@@ -327,7 +327,7 @@ export default function AddStudentToClassModal({
                                 </div>
                             )}
 
-                            <div className="flex items-center justify-between p-4 bg-slate-900 text-white rounded-xl shadow-lg">
+                            <div className="flex items-center justify-between p-4 bg-slate-900 dark:bg-slate-950 border border-slate-800 text-white rounded-xl shadow-lg">
                                 <div>
                                     <p className="text-xs text-slate-400 uppercase font-bold">Total Final Fee</p>
                                     <p className="text-2xl font-bold">₹{totalFee.toLocaleString()}</p>
@@ -342,7 +342,7 @@ export default function AddStudentToClassModal({
                             <button
                                 onClick={handleConfirmEnrollment}
                                 disabled={submitting}
-                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {submitting ? 'Enrolling...' : 'Confirm Enrollment & Fees'}
                             </button>

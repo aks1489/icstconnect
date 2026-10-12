@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import {
-    Search,
-    Clock,
-    CheckCircle,
-    XCircle,
-    Calendar,
-    Phone,
-    Trash2,
-    AlertTriangle,
-    X
-} from 'lucide-react';
+import { IconSearch as Search, IconClock as Clock, IconCircleCheck as CheckCircle, IconCircleX as XCircle, IconCalendar as Calendar, IconPhone as Phone, IconTrash as Trash2, IconAlertTriangle as AlertTriangle, IconX as X } from '@tabler/icons-react';
 import { format } from 'date-fns';
+import { useToast } from '../../contexts/ToastContext';
 
 interface Inquiry {
     id: string;
@@ -27,6 +18,7 @@ interface Inquiry {
 }
 
 const DiscountClaims = () => {
+    const { showToast } = useToast();
     const [inquiries, setInquiries] = useState<Inquiry[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
@@ -96,18 +88,19 @@ const DiscountClaims = () => {
             // RLS Check: If no data returned, it means nothing was deleted (permission denied)
             if (!data || data.length === 0) {
                 console.error('Delete operation failed: No records deleted. Check RLS policies.');
-                alert('Permission Denied: Unable to delete record from database.');
+                showToast('Permission Denied: Unable to delete record from database.', 'error');
                 setShowDeleteModal(false);
                 return;
             }
 
             // Update local state only if DB delete was successful
             setInquiries(inquiries.filter(item => item.id !== deleteId));
+            showToast('Record deleted successfully', 'success');
             setShowDeleteModal(false);
             setDeleteId(null);
         } catch (error) {
             console.error('Error deleting inquiry:', error);
-            alert('Failed to delete record: ' + (error as any).message);
+            showToast('Failed to delete record: ' + (error as any).message, 'error');
             setShowDeleteModal(false);
         }
     };
@@ -122,11 +115,11 @@ const DiscountClaims = () => {
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'contacted': return 'bg-blue-100 text-blue-800';
-            case 'admitted': return 'bg-green-100 text-green-800';
-            case 'rejected': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'pending': return 'bg-yellow-100 dark:bg-yellow-950/60 text-yellow-800 dark:text-yellow-400';
+            case 'contacted': return 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-400';
+            case 'admitted': return 'bg-green-100 dark:bg-emerald-950/60 text-green-800 dark:text-emerald-400';
+            case 'rejected': return 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-400';
+            default: return 'bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-slate-300';
         }
     };
 
@@ -134,31 +127,31 @@ const DiscountClaims = () => {
         <div className="space-y-6 relative">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Discount Claims</h1>
-                    <p className="text-slate-500">Manage student discount inquiries</p>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Discount Claims</h1>
+                    <p className="text-slate-500 dark:text-slate-400">Manage student discount inquiries</p>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                     <input
                         type="text"
                         placeholder="Search student name or phone..."
-                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-2 overflows-x-auto">
+                <div className="flex gap-2 overflow-x-auto">
                     {['all', 'pending', 'contacted', 'admitted', 'rejected'].map((status) => (
                         <button
                             key={status}
                             onClick={() => setFilter(status)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium capitalize whitespace-nowrap transition-colors ${filter === status
                                 ? 'bg-indigo-600 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                 }`}
                         >
                             {status}
@@ -168,10 +161,10 @@ const DiscountClaims = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-500">
+                        <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400">
                             <tr>
                                 <th className="px-6 py-4 font-semibold">Student Details</th>
                                 <th className="px-6 py-4 font-semibold">Course Interest</th>
@@ -181,33 +174,33 @@ const DiscountClaims = () => {
                                 <th className="px-6 py-4 font-semibold">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
                                         Loading inquiries...
                                     </td>
                                 </tr>
                             ) : filteredInquiries.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
                                         No inquiries found matching your criteria.
                                     </td>
                                 </tr>
                             ) : (
                                 filteredInquiries.map((inquiry) => (
-                                    <tr key={inquiry.id} className="hover:bg-slate-50 transition-colors">
+                                    <tr key={inquiry.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold shrink-0">
+                                                <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold shrink-0">
                                                     {inquiry.student_name.charAt(0)}
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-slate-900">{inquiry.student_name}</div>
-                                                    <div className="text-xs text-slate-500">G: {inquiry.guardian_name}</div>
-                                                    <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
+                                                    <div className="font-semibold text-slate-900 dark:text-white">{inquiry.student_name}</div>
+                                                    <div className="text-xs text-slate-500 dark:text-slate-400">G: {inquiry.guardian_name}</div>
+                                                    <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-1">
                                                         <Phone size={12} />
-                                                        <a href={`tel:${inquiry.contact_number}`} className="hover:text-indigo-600">
+                                                        <a href={`tel:${inquiry.contact_number}`} className="hover:text-indigo-600 dark:hover:text-indigo-400">
                                                             {inquiry.contact_number}
                                                         </a>
                                                     </div>
@@ -215,25 +208,25 @@ const DiscountClaims = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="font-medium text-slate-900">{inquiry.course}</div>
-                                            <div className="text-xs text-slate-500">Class: {inquiry.class || 'N/A'}</div>
-                                            <div className="text-xs text-slate-500 flex items-center gap-1 mt-1">
+                                            <div className="font-medium text-slate-900 dark:text-white">{inquiry.course}</div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400">Class: {inquiry.class || 'N/A'}</div>
+                                            <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-1">
                                                 <Clock size={12} />
                                                 {inquiry.duration_months} Months
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-100">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-50 dark:bg-emerald-950/50 text-green-700 dark:text-emerald-400 border border-green-100 dark:border-emerald-800/50">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                                                 {inquiry.discount_percentage}% OFF
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 text-slate-600">
+                                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                                                 <Calendar size={14} />
                                                 {format(new Date(inquiry.created_at), 'MMM d, yyyy')}
                                             </div>
-                                            <div className="text-xs text-slate-400 pl-6">
+                                            <div className="text-xs text-slate-400 dark:text-slate-500 pl-6">
                                                 {format(new Date(inquiry.created_at), 'h:mm a')}
                                             </div>
                                         </td>
@@ -253,21 +246,21 @@ const DiscountClaims = () => {
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => updateStatus(inquiry.id, 'admitted')}
-                                                    className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-slate-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-emerald-950/40 rounded-lg transition-colors"
                                                     title="Mark Admitted"
                                                 >
                                                     <CheckCircle size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => updateStatus(inquiry.id, 'rejected')}
-                                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors"
                                                     title="Reject"
                                                 >
                                                     <XCircle size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => confirmDelete(inquiry.id)}
-                                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors"
                                                     title="Delete"
                                                 >
                                                     <Trash2 size={18} />
@@ -287,33 +280,33 @@ const DiscountClaims = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <div
-                        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                         onClick={() => setShowDeleteModal(false)}
                     />
 
                     {/* Modal Content */}
-                    <div className="relative bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full animate-in zoom-in-95 duration-200">
+                    <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-6 max-w-sm w-full animate-in zoom-in-95 duration-200">
                         <button
                             onClick={() => setShowDeleteModal(false)}
-                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                         >
                             <X size={20} />
                         </button>
 
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-4">
+                            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-950/60 flex items-center justify-center text-red-600 dark:text-red-400 mb-4">
                                 <AlertTriangle size={24} />
                             </div>
 
-                            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Inquiry?</h3>
-                            <p className="text-sm text-slate-500 mb-6">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Delete Inquiry?</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
                                 Are you sure you want to delete this record? This action cannot be undone.
                             </p>
 
                             <div className="flex gap-3 w-full">
                                 <button
                                     onClick={() => setShowDeleteModal(false)}
-                                    className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors"
+                                    className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     Cancel
                                 </button>

@@ -43,27 +43,27 @@ export default function InteractiveImageMarker({ src, alt, tags, className = '',
                         >
                             {/* The Marker Dot */}
                             <div className="relative w-5 h-5 cursor-help">
-                                <div className="absolute inset-0 bg-white/30 backdrop-blur-sm rounded-full scale-150 animate-ping opacity-60"></div>
-                                <div className="absolute inset-0 bg-white border-[3px] border-indigo-500 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-125 hover:border-indigo-400">
+                                <div className="absolute inset-0 bg-white/30 dark:bg-indigo-400/30 backdrop-blur-sm rounded-full scale-150 animate-ping opacity-60"></div>
+                                <div className="absolute inset-0 bg-white dark:bg-slate-900 border-[3px] border-indigo-500 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-125 hover:border-indigo-400">
                                     <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
                                 </div>
                             </div>
 
                             {/* The Tooltip (Glassmorphic) */}
                             <div 
-                                className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-max max-w-[220px] bg-white/10 backdrop-blur-md border border-white/20 p-3 rounded-xl shadow-2xl transition-all duration-300 origin-bottom 
+                                className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-max max-w-[220px] bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md border border-white/20 dark:border-slate-700/80 p-3 rounded-xl shadow-2xl transition-all duration-300 origin-bottom 
                                 ${hoveredTag === idx ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
                             >
-                                <span className="block text-white font-bold text-sm tracking-wide shadow-black/50 drop-shadow-md mb-1">
+                                <span className="block text-white font-bold text-sm tracking-wide drop-shadow-sm mb-1">
                                     {tag.label}
                                 </span>
                                 {tag.description && (
-                                    <span className="block text-slate-100 text-[11px] leading-snug drop-shadow-md">
+                                    <span className="block text-slate-300 dark:text-slate-400 text-[11px] leading-snug">
                                         {tag.description}
                                     </span>
                                 )}
                                 {/* Triangle pointer */}
-                                <div className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 bg-white/10 backdrop-blur-md border-b border-r border-white/20 transform rotate-45 -mt-1.5"></div>
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-r border-white/20 dark:border-slate-700/80 transform rotate-45 -mt-1.5"></div>
                             </div>
                         </div>
                     ))}

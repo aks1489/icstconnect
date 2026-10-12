@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, Hash, X } from 'lucide-react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { IconSearch as Search, IconHash as Hash, IconX as X } from '@tabler/icons-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getIcon } from '../utils/iconMapper'
 import CourseDetailsModal from '../components/courses/CourseDetailsModal'
 import Skeleton from '../components/ui/Skeleton'
+import SEOHead from '../components/common/SEOHead'
 import { courseService } from '../services/courseService'
 import type { Course } from '../types/course'
 
@@ -48,6 +49,48 @@ const CoursesPage = () => {
         }
     }, [courseId, courses])
 
+    // SEO Data computations
+    const pageTitle = selectedCourse
+        ? `${selectedCourse.title || selectedCourse.course_name} Syllabus & Details | ICST Chowberia`
+        : 'Computer Courses & Professional IT Diplomas | ICST Chowberia'
+
+    const pageDescription = selectedCourse
+        ? `Enroll in ${selectedCourse.title || selectedCourse.course_name} (${selectedCourse.duration || 'Certified'}) at ICST Chowberia. ${selectedCourse.description ? selectedCourse.description.substring(0, 130) : 'Practical hands-on computer training.'}`
+        : 'Explore certified computer courses at ICST Chowberia: ADCA, DCA, DITA, Python, Java, Full Stack Web Development, Financial Accounting, and Cyber Security.'
+
+    const canonicalPath = selectedCourse ? `/courses/${selectedCourse.id}` : '/courses'
+
+    const breadcrumbs = selectedCourse
+        ? [
+            { name: 'Home', path: '/' },
+            { name: 'Courses', path: '/courses' },
+            { name: selectedCourse.title || selectedCourse.course_name, path: `/courses/${selectedCourse.id}` }
+        ]
+        : [
+            { name: 'Home', path: '/' },
+            { name: 'Courses', path: '/courses' }
+        ]
+
+    const courseSchema = selectedCourse
+        ? {
+            '@context': 'https://schema.org',
+            '@type': 'Course',
+            name: selectedCourse.title || selectedCourse.course_name,
+            description: selectedCourse.description,
+            provider: {
+                '@type': 'EducationalOrganization',
+                name: 'ICST Chowberia',
+                url: 'https://icstconnect.com'
+            },
+            timeRequired: selectedCourse.duration ? `P${selectedCourse.duration.replace(/\D/g, '')}M` : undefined
+        }
+        : {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: 'ICST Chowberia Course Catalog',
+            description: 'Certified diploma and certificate programs in computer technology and software development.'
+        }
+
     // Real-time keyboard search activation
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -91,14 +134,43 @@ const CoursesPage = () => {
     }
 
     return (
-        <div className="pt-24 pb-20 min-h-screen bg-slate-50">
+        <div className="pt-24 pb-20 min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+            <SEOHead
+                title={pageTitle}
+                description={pageDescription}
+                canonicalPath={canonicalPath}
+                breadcrumbs={breadcrumbs}
+                schema={courseSchema}
+            />
+
             <div className="container mx-auto px-4 md:px-6">
+                {/* Visual Breadcrumb Navigation */}
+                <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <Link to="/" className="hover:text-blue-600 dark:hover:text-sky-400 no-underline transition-colors">
+                        Home
+                    </Link>
+                    <span>/</span>
+                    {selectedCourse ? (
+                        <>
+                            <Link to="/courses" className="hover:text-blue-600 dark:hover:text-sky-400 no-underline transition-colors">
+                                Courses
+                            </Link>
+                            <span>/</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-medium truncate max-w-xs">
+                                {selectedCourse.title || selectedCourse.course_name}
+                            </span>
+                        </>
+                    ) : (
+                        <span className="text-slate-800 dark:text-slate-200 font-medium">Courses</span>
+                    )}
+                </nav>
+
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 font-outfit">
+                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 font-outfit transition-colors">
                         Explore Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Courses</span>
                     </h1>
-                    <p className="text-slate-600 max-w-2xl mx-auto text-lg">
+                    <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg transition-colors">
                         Choose from a wide range of industry-relevant courses designed to boost your career.
                     </p>
                 </div>
@@ -107,26 +179,26 @@ const CoursesPage = () => {
                 <div className="max-w-2xl mx-auto mb-10 relative">
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+                            <Search className="h-5 w-5 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-600 transition-colors" />
                         </div>
                         <input
                             id="course-search"
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="block w-full pl-12 pr-12 py-4 bg-white border border-slate-200 rounded-2xl leading-5 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all shadow-sm hover:shadow-md text-lg"
+                            className="block w-full pl-12 pr-12 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl leading-5 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/30 focus:border-blue-400 transition-all shadow-sm hover:shadow-md text-lg"
                             placeholder="Search courses, skills, or keywords..."
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                                className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors cursor-pointer"
                             >
                                 <X size={20} />
                             </button>
                         )}
                     </div>
-                    <div className="mt-2 text-center text-xs text-slate-400">
+                    <div className="mt-2 text-center text-xs text-slate-400 dark:text-slate-500">
                         Press any key to start searching
                     </div>
                 </div>
@@ -137,9 +209,9 @@ const CoursesPage = () => {
                         <button
                             key={filter}
                             onClick={() => setActiveFilter(filter as Duration)}
-                            className={`px-6 py-2.5 rounded-full font-medium transition-all duration-300 ${activeFilter === filter
-                                ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 transform -translate-y-0.5'
-                                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                            className={`px-6 py-2.5 rounded-full font-medium transition-all duration-300 cursor-pointer ${activeFilter === filter
+                                ? 'bg-slate-900 dark:bg-sky-600 text-white shadow-lg shadow-slate-900/20 transform -translate-y-0.5'
+                                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800'
                                 }`}
                         >
                             {filter}
@@ -152,7 +224,7 @@ const CoursesPage = () => {
                     {loading ? (
                         // Skeleton Loading State
                         [1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 h-[450px] flex flex-col">
+                            <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 h-[450px] flex flex-col">
                                 <Skeleton className="w-full h-48" />
                                 <div className="p-6 flex-grow flex flex-col">
                                     <div className="flex justify-between items-start mb-4">
@@ -162,7 +234,7 @@ const CoursesPage = () => {
                                     <Skeleton className="h-8 w-3/4 mb-4" />
                                     <Skeleton className="h-4 w-full mb-2" />
                                     <Skeleton className="h-4 w-5/6 mb-6" />
-                                    <div className="mt-auto pt-6 border-t border-slate-100 flex justify-between items-center">
+                                    <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
                                         <Skeleton className="h-5 w-24" />
                                         <Skeleton className="h-10 w-32 rounded-xl" />
                                     </div>
@@ -171,16 +243,16 @@ const CoursesPage = () => {
                         ))
                     ) : filteredCourses.length === 0 ? (
                         <div className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 flex flex-col items-center justify-center py-20 text-center">
-                            <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-                                <Search className="text-blue-600" size={40} />
+                            <div className="w-24 h-24 bg-blue-50 dark:bg-blue-950/50 rounded-full flex items-center justify-center mb-6">
+                                <Search className="text-blue-600 dark:text-blue-400" size={40} />
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-900 mb-2">No courses found</h3>
-                            <p className="text-slate-500 max-w-md">
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">No courses found</h3>
+                            <p className="text-slate-500 dark:text-slate-400 max-w-md">
                                 We couldn't find any courses matching "{searchQuery}" with the selected filter. Try correcting the spelling or use different keywords.
                             </p>
                             <button
                                 onClick={() => { setSearchQuery(''); setActiveFilter('All'); }}
-                                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer"
                             >
                                 Clear all filters
                             </button>
@@ -190,9 +262,9 @@ const CoursesPage = () => {
                             <div
                                 key={course.id}
                                 onClick={() => handleCourseClick(course)}
-                                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 flex flex-col h-full cursor-pointer"
+                                className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 dark:border-slate-800 flex flex-col h-full cursor-pointer"
                             >
-                                <div className={`h-32 ${course.color} flex items-center justify-center relative overflow-hidden`}>
+                                <div className={`h-32 ${course.color} dark:!bg-slate-800/80 dark:border-b dark:border-slate-800/60 flex items-center justify-center relative overflow-hidden`}>
                                     <div className="absolute inset-0 opacity-10 pattern-dots"></div>
                                     {(() => {
                                         const Icon = getIcon(course.icon)
@@ -203,32 +275,32 @@ const CoursesPage = () => {
                                             />
                                         )
                                     })()}
-                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 shadow-sm">
+                                    <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-slate-800 dark:text-slate-200 shadow-sm border border-transparent dark:border-slate-700/60">
                                         {course.duration}
                                     </div>
                                 </div>
                                 <div className="p-6 flex flex-col flex-grow">
                                     <div className="mb-3 flex flex-wrap gap-1.5">
                                         {course.tags?.slice(0, 3).map((tag, idx) => (
-                                            <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-semibold uppercase tracking-wider">
+                                            <span key={idx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold uppercase tracking-wider">
                                                 <Hash size={10} /> {tag}
                                             </span>
                                         ))}
                                     </div>
-                                    <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                                         {course.title}
                                     </h3>
-                                    <p className="text-slate-500 text-sm mb-4 line-clamp-3 flex-grow">
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-3 flex-grow">
                                         {course.description}
                                     </p>
-                                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
-                                        <span className="text-slate-900 font-bold">{course.price}</span>
+                                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <span className="text-slate-900 dark:text-white font-bold">{course.price}</span>
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation()
                                                 handleCourseClick(course)
                                             }}
-                                            className="text-blue-600 font-semibold text-sm hover:underline"
+                                            className="text-blue-600 dark:text-blue-400 font-semibold text-sm hover:underline cursor-pointer"
                                         >
                                             View Details
                                         </button>

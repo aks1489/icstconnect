@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Plus, Users, Trash2 } from 'lucide-react'
+import { IconArrowLeft as ArrowLeft, IconPlus as Plus, IconUsers as Users, IconTrash as Trash2 } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../contexts/ToastContext'
 
 interface ClassBatch {
     id: number
@@ -19,10 +21,13 @@ interface Course {
 
 export default function ClassManager() {
     const { id } = useParams()
+    const { showToast } = useToast()
     const [course, setCourse] = useState<Course | null>(null)
     const [classes, setClasses] = useState<ClassBatch[]>([])
     const [loading, setLoading] = useState(true)
     const [createLoading, setCreateLoading] = useState(false)
+    const [batchToDelete, setBatchToDelete] = useState<{ id: number; name: string } | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [capacity, setCapacity] = useState(30)
     const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -74,7 +79,7 @@ export default function ClassManager() {
 
         } catch (error) {
             console.error('Error loading data:', error)
-            alert('Failed to load class data')
+            showToast('Failed to load class data', 'error')
         } finally {
             setLoading(false)
         }
@@ -85,53 +90,62 @@ export default function ClassManager() {
         setCreateLoading(true)
 
         try {
-            // Determine next batch number
-            const lastBatch = classes.length > 0 ? classes[classes.length - 1] : null
-            const nextNumber = lastBatch ? lastBatch.batch_number + 1 : 1
+            // Find highest batch number
+            const nextBatchNum = classes.length > 0
+                ? Math.max(...classes.map(c => c.batch_number)) + 1
+                : 1
 
-            // Generate Name
-            const shortCode = course.short_code || course.course_name.substring(0, 3).toUpperCase()
-            const batchName = `${shortCode} Batch ${nextNumber}`
+            const batchName = `${course.short_code || course.course_name} Batch ${nextBatchNum}`
 
             const { error } = await supabase
                 .from('classes')
                 .insert({
-                    course_id: id,
+                    course_id: course.id,
                     batch_name: batchName,
-                    batch_number: nextNumber,
-                    capacity: capacity
+                    batch_number: nextBatchNum,
+                    capacity: Number(capacity)
                 })
 
             if (error) throw error
 
+            showToast('Batch created successfully!', 'success')
             setShowCreateModal(false)
             fetchData()
         } catch (error) {
             console.error('Error creating batch:', error)
-            alert('Failed to create batch')
+            showToast('Failed to create batch', 'error')
         } finally {
             setCreateLoading(false)
         }
     }
 
-    const handleDeleteBatch = async (batchId: number, enrolledCount: number) => {
-        if (enrolledCount > 0) {
-            alert('Cannot delete a batch with enrolled students.')
+    const initiateDeleteBatch = (batch: ClassBatch) => {
+        if (batch.enrolled_count > 0) {
+            showToast('Cannot delete a batch with enrolled students.', 'warning')
             return
         }
-        if (!confirm('Are you sure you want to delete this batch?')) return
+        setBatchToDelete({ id: batch.id, name: batch.batch_name })
+    }
+
+    const executeDeleteBatch = async () => {
+        if (!batchToDelete) return
 
         try {
+            setIsDeleting(true)
             const { error } = await supabase
                 .from('classes')
                 .delete()
-                .eq('id', batchId)
+                .eq('id', batchToDelete.id)
 
             if (error) throw error
+            showToast(`Batch "${batchToDelete.name}" deleted successfully`, 'success')
+            setBatchToDelete(null)
             fetchData()
         } catch (error) {
             console.error('Error deleting batch:', error)
-            alert('Failed to delete batch')
+            showToast('Failed to delete batch', 'error')
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -142,19 +156,19 @@ export default function ClassManager() {
         <div className="max-w-5xl mx-auto pb-20">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-2 transition-colors">
+                    <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center gap-2 mb-2 transition-colors">
                         <ArrowLeft size={16} />
                         Back to Courses
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-800">
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
                         {course.course_name} <span className="text-slate-400 font-normal">Batches</span>
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1">Manage student batches and capacity</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage student batches and capacity</p>
                 </div>
                 <div className="flex gap-2">
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20"
                     >
                         <Plus size={20} />
                         Create New Batch
@@ -169,23 +183,23 @@ export default function ClassManager() {
                     const percentage = Math.round((cls.enrolled_count / cls.capacity) * 100)
 
                     return (
-                        <div key={cls.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 hover:shadow-md transition-shadow">
+                        <div key={cls.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm p-6 hover:shadow-md transition-shadow">
                             <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h3 className="font-bold text-lg text-slate-800">{cls.batch_name}</h3>
-                                    <p className="text-xs text-slate-500">Batch #{cls.batch_number}</p>
+                                    <h3 className="font-bold text-lg text-slate-800 dark:text-white">{cls.batch_name}</h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">Batch #{cls.batch_number}</p>
                                 </div>
-                                <div className={`px-2 py-1 rounded text-xs font-bold ${isFull ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                                <div className={`px-2 py-1 rounded text-xs font-bold ${isFull ? 'bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400' : 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'}`}>
                                     {isFull ? 'FULL' : 'OPEN'}
                                 </div>
                             </div>
 
                             <div className="mb-6">
-                                <div className="flex justify-between text-xs font-medium text-slate-600 mb-1">
+                                <div className="flex justify-between text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                                     <span>Capacity</span>
                                     <span>{cls.enrolled_count} / {cls.capacity}</span>
                                 </div>
-                                <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                     <div
                                         className={`h-full rounded-full ${isFull ? 'bg-red-500' : 'bg-indigo-500'}`}
                                         style={{ width: `${percentage}%` }}
@@ -193,10 +207,10 @@ export default function ClassManager() {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end pt-4 border-t border-slate-50">
+                            <div className="flex justify-end pt-4 border-t border-slate-50 dark:border-slate-800/80">
                                 <button
-                                    onClick={() => handleDeleteBatch(cls.id, cls.enrolled_count)}
-                                    className="text-slate-400 hover:text-red-600 text-sm flex items-center gap-1 transition-colors disabled:opacity-30 disabled:hover:text-slate-400"
+                                    onClick={() => initiateDeleteBatch(cls)}
+                                    className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 text-sm flex items-center gap-1 transition-colors disabled:opacity-30 disabled:hover:text-slate-400"
                                     disabled={cls.enrolled_count > 0}
                                     title={cls.enrolled_count > 0 ? "Cannot delete non-empty batch" : "Delete Batch"}
                                 >
@@ -209,10 +223,10 @@ export default function ClassManager() {
                 })}
 
                 {classes.length === 0 && (
-                    <div className="col-span-full py-12 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                    <div className="col-span-full py-12 text-center text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                         <Users className="text-3xl mb-3 block mx-auto" size={32} />
                         <p>No batches created yet.</p>
-                        <button onClick={() => setShowCreateModal(true)} className="text-indigo-600 font-bold hover:underline mt-2">Create First Batch</button>
+                        <button onClick={() => setShowCreateModal(true)} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline mt-2">Create First Batch</button>
                     </div>
                 )}
             </div>
@@ -220,21 +234,21 @@ export default function ClassManager() {
             {/* Create Modal */}
             {showCreateModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
-                    <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6">
-                        <h3 className="font-bold text-lg text-slate-800 mb-4">Create New Batch</h3>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateModal(false)}></div>
+                    <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-6">
+                        <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-4">Create New Batch</h3>
 
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Batch Capacity</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Batch Capacity</label>
                             <input
                                 type="number"
                                 min="1"
                                 value={capacity}
                                 onChange={(e) => setCapacity(parseInt(e.target.value))}
-                                className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none"
+                                className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none"
                             />
-                            <p className="text-xs text-slate-500 mt-2">
-                                New Batch Name: <span className="font-mono font-bold text-indigo-600">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                New Batch Name: <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">
                                     {course.short_code || course.course_name.substring(0, 3).toUpperCase()} Batch {(classes.length > 0 ? classes[classes.length - 1].batch_number + 1 : 1)}
                                 </span>
                             </p>
@@ -243,7 +257,7 @@ export default function ClassManager() {
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowCreateModal(false)}
-                                className="flex-1 py-2 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
+                                className="flex-1 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
                             >
                                 Cancel
                             </button>
@@ -258,6 +272,18 @@ export default function ClassManager() {
                     </div>
                 </div>
             )}
+
+            <ConfirmDialog
+                open={!!batchToDelete}
+                onOpenChange={(open) => !open && setBatchToDelete(null)}
+                title="Delete Class Batch"
+                description={`Are you sure you want to permanently delete "${batchToDelete?.name}"? This action cannot be undone.`}
+                confirmLabel="Delete Batch"
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={executeDeleteBatch}
+            />
         </div>
     )
 }

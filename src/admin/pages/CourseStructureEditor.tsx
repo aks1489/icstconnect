@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Book, Plus, GripVertical, Pencil, Trash2, X, ArrowLeft } from 'lucide-react'
+import { IconBook as Book, IconPlus as Plus, IconGripVertical as GripVertical, IconPencil as Pencil, IconTrash as Trash2, IconX as X, IconArrowLeft as ArrowLeft } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabase'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import type { DropResult } from '@hello-pangea/dnd'
+import ConfirmDialog from '../../components/ui/ConfirmDialog'
+import { useToast } from '../../contexts/ToastContext'
 
 interface Topic {
     id: number
@@ -22,8 +24,11 @@ interface Module {
 
 export default function CourseStructureEditor() {
     const { id } = useParams()
+    const { showToast } = useToast()
     const [modules, setModules] = useState<Module[]>([])
     const [loading, setLoading] = useState(true)
+    const [itemToDelete, setItemToDelete] = useState<{ type: 'module' | 'topic'; id: number; name: string } | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [courseName, setCourseName] = useState('')
 
     // Edit States
@@ -144,16 +149,17 @@ export default function CourseStructureEditor() {
 
                     if (topicsError) {
                         console.error('Error adding topics:', topicsError)
-                        alert('Module created but failed to save some topics.')
+                        showToast('Module created but failed to save some topics.', 'warning')
                     }
                 }
             }
+            showToast('Module saved successfully!', 'success')
             setShowModuleModal(false)
             setEditingModule(null)
             fetchStructure(true)
         } catch (error) {
             console.error('Error saving module:', error)
-            alert('Failed to save module')
+            showToast('Failed to save module', 'error')
         } finally {
             setIsSaving(false)
         }
@@ -172,13 +178,26 @@ export default function CourseStructureEditor() {
         }
     }
 
-    const handleDeleteModule = async (moduleId: number) => {
-        if (!confirm('Delete this module? All topics will be deleted.')) return
+    const executeDeleteItem = async () => {
+        if (!itemToDelete) return
         try {
-            await supabase.from('course_modules').delete().eq('id', moduleId)
+            setIsDeleting(true)
+            if (itemToDelete.type === 'module') {
+                const { error } = await supabase.from('course_modules').delete().eq('id', itemToDelete.id)
+                if (error) throw error
+                showToast(`Module "${itemToDelete.name}" deleted successfully`, 'success')
+            } else {
+                const { error } = await supabase.from('course_topics').delete().eq('id', itemToDelete.id)
+                if (error) throw error
+                showToast(`Topic "${itemToDelete.name}" deleted successfully`, 'success')
+            }
+            setItemToDelete(null)
             fetchStructure(true)
         } catch (error) {
-            console.error('Error deleting module:', error)
+            console.error('Error deleting item:', error)
+            showToast('Failed to delete item', 'error')
+        } finally {
+            setIsDeleting(false)
         }
     }
 
@@ -212,24 +231,15 @@ export default function CourseStructureEditor() {
                         sort_order: currentTopicsCount
                     })
             }
+            showToast('Topic saved successfully!', 'success')
             setIsTopicModalOpen(false)
             setEditingTopic(null)
             fetchStructure(true)
         } catch (error) {
             console.error('Error saving topic:', error)
-            alert('Failed to save topic')
+            showToast('Failed to save topic', 'error')
         } finally {
             setIsSaving(false)
-        }
-    }
-
-    const handleDeleteTopic = async (topicId: number) => {
-        if (!confirm('Delete this topic?')) return
-        try {
-            await supabase.from('course_topics').delete().eq('id', topicId)
-            fetchStructure(true)
-        } catch (error) {
-            console.error('Error deleting topic:', error)
         }
     }
 
@@ -262,7 +272,7 @@ export default function CourseStructureEditor() {
                 if (error) throw error
             } catch (error) {
                 console.error('Error reordering modules:', error)
-                alert('Failed to save module order.')
+                showToast('Failed to save module order', 'error')
                 fetchStructure(true)
             }
         } else if (type === 'topic') {
@@ -331,7 +341,7 @@ export default function CourseStructureEditor() {
                 if (error) throw error
             } catch (error) {
                 console.error('Error reordering topics:', error)
-                alert('Failed to save topic order.')
+                showToast('Failed to save topic order', 'error')
                 fetchStructure(true)
             }
         }
@@ -354,14 +364,14 @@ export default function CourseStructureEditor() {
         <div className="max-w-5xl mx-auto p-6 md:pb-20">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 flex items-center gap-2 mb-2 transition-colors">
+                    <Link to="/admin/courses" className="text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center gap-2 mb-2 transition-colors">
                         <ArrowLeft size={16} />
                         Back to Courses
                     </Link>
-                    <h1 className="text-2xl font-bold text-slate-800">
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
                         {courseName ? `${courseName} - Structure` : 'Course Structure'}
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1">Drag and drop modules and topics to reorder</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Drag and drop modules and topics to reorder</p>
                 </div>
             </div>
 
@@ -374,19 +384,19 @@ export default function CourseStructureEditor() {
                             className="space-y-6"
                         >
                             {modules.length === 0 ? (
-                                <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-300">
-                                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                                <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 transition-colors">
+                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 dark:text-slate-500">
                                         <Book className="text-2xl" size={32} />
                                     </div>
-                                    <h3 className="text-lg font-medium text-slate-800 mb-2">Structure is empty</h3>
-                                    <p className="text-slate-500 mb-6 max-w-sm mx-auto">Start by creating your first module to organize topics.</p>
+                                    <h3 className="text-lg font-medium text-slate-800 dark:text-white mb-2">Structure is empty</h3>
+                                    <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto">Start by creating your first module to organize topics.</p>
                                     <button
                                         onClick={() => {
                                             setEditingModule(null)
                                             setPendingTopics([''])
                                             setShowModuleModal(true)
                                         }}
-                                        className="text-indigo-600 font-bold hover:text-indigo-700"
+                                        className="text-indigo-600 dark:text-indigo-400 font-bold hover:text-indigo-700 dark:hover:text-indigo-300"
                                     >
                                         Create First Module &rarr;
                                     </button>
@@ -398,32 +408,32 @@ export default function CourseStructureEditor() {
                                             <div
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
-                                                className={`bg-white rounded-2xl border border-slate-200 overflow-hidden transition-all ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-indigo-500 rotate-1 z-50' : 'shadow-sm hover:shadow-md'}`}
+                                                className={`bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all ${snapshot.isDragging ? 'shadow-2xl ring-2 ring-indigo-500 rotate-1 z-50' : 'shadow-sm hover:shadow-md'}`}
                                             >
-                                                <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between gap-4">
+                                                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
                                                     <div className="flex items-center gap-3 flex-1">
                                                         <div
                                                             {...provided.dragHandleProps}
-                                                            className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 cursor-grab active:cursor-grabbing hover:text-indigo-600 hover:border-indigo-200 transition-colors"
+                                                            className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 cursor-grab active:cursor-grabbing hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors"
                                                         >
                                                             <GripVertical size={18} />
                                                         </div>
                                                         <div>
-                                                            <h3 className="font-semibold text-slate-800">{module.title}</h3>
-                                                            {module.description && <p className="text-xs text-slate-500 mt-0.5">{module.description}</p>}
+                                                            <h3 className="font-semibold text-slate-800 dark:text-white">{module.title}</h3>
+                                                            {module.description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{module.description}</p>}
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             onClick={() => initiateEditModule(module)}
-                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-white transition-all flex items-center justify-center"
+                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 transition-all flex items-center justify-center"
                                                             title="Edit Module"
                                                         >
                                                             <Pencil size={16} />
                                                         </button>
                                                         <button
-                                                            onClick={() => handleDeleteModule(module.id)}
-                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-white transition-all flex items-center justify-center"
+                                                            onClick={() => setItemToDelete({ type: 'module', id: module.id, name: module.title })}
+                                                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-white dark:hover:bg-slate-800 transition-all flex items-center justify-center"
                                                             title="Delete Module"
                                                         >
                                                             <Trash2 size={16} />
@@ -438,7 +448,7 @@ export default function CourseStructureEditor() {
                                                             <div
                                                                 ref={provided.innerRef}
                                                                 {...provided.droppableProps}
-                                                                className={`space-y-2 pl-11 min-h-[10px] ${snapshot.isDraggingOver ? 'bg-indigo-50/50 rounded-lg transition-colors ring-2 ring-indigo-100 ring-dashed' : ''}`}
+                                                                className={`space-y-2 pl-11 min-h-[10px] ${snapshot.isDraggingOver ? 'bg-indigo-50/50 dark:bg-indigo-950/40 rounded-lg transition-colors ring-2 ring-indigo-100 dark:ring-indigo-900 ring-dashed' : ''}`}
                                                             >
                                                                 {module.topics && module.topics.length > 0 ? (
                                                                     module.topics.map((topic, tIndex) => (
@@ -448,24 +458,24 @@ export default function CourseStructureEditor() {
                                                                                     ref={provided.innerRef}
                                                                                     {...provided.draggableProps}
                                                                                     {...provided.dragHandleProps}
-                                                                                    className={`flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-dashed border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group ${snapshot.isDragging ? 'shadow-lg ring-2 ring-indigo-500 bg-white z-50' : ''}`}
+                                                                                    className={`flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-700/80 hover:border-indigo-200 dark:hover:border-indigo-600 hover:bg-indigo-50/30 dark:hover:bg-indigo-950/30 transition-all group ${snapshot.isDragging ? 'shadow-lg ring-2 ring-indigo-500 bg-white dark:bg-slate-800 z-50' : ''}`}
                                                                                 >
                                                                                     <div className="flex items-center gap-3">
-                                                                                        <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-medium cursor-grab active:cursor-grabbing ${snapshot.isDragging ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-white border-slate-200 text-slate-500'}`}>
+                                                                                        <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-medium cursor-grab active:cursor-grabbing ${snapshot.isDragging ? 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400'}`}>
                                                                                             {snapshot.isDragging ? <GripVertical size={14} /> : (tIndex + 1)}
                                                                                         </div>
-                                                                                        <span className="text-sm font-medium text-slate-600 group-hover:text-indigo-700">{topic.title}</span>
+                                                                                        <span className="text-sm font-medium text-slate-600 dark:text-slate-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400">{topic.title}</span>
                                                                                     </div>
                                                                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                                                         <button
                                                                                             onClick={() => initiateEditTopic(module.id, topic)}
-                                                                                            className="p-1.5 rounded text-slate-400 hover:text-indigo-600"
+                                                                                            className="p-1.5 rounded text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                                                                                         >
                                                                                             <Pencil size={14} />
                                                                                         </button>
                                                                                         <button
-                                                                                            onClick={() => handleDeleteTopic(topic.id)}
-                                                                                            className="p-1.5 rounded text-slate-400 hover:text-rose-600"
+                                                                                            onClick={() => setItemToDelete({ type: 'topic', id: topic.id, name: topic.title })}
+                                                                                            className="p-1.5 rounded text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
                                                                                         >
                                                                                             <X size={14} />
                                                                                         </button>
@@ -475,7 +485,7 @@ export default function CourseStructureEditor() {
                                                                         </Draggable>
                                                                     ))
                                                                 ) : (
-                                                                    <div className="text-sm text-slate-400 italic py-2">No topics yet. Drag one here or add new.</div>
+                                                                    <div className="text-sm text-slate-400 dark:text-slate-500 italic py-2">No topics yet. Drag one here or add new.</div>
                                                                 )}
                                                                 {provided.placeholder}
 
@@ -485,7 +495,7 @@ export default function CourseStructureEditor() {
                                                                         setActiveModuleId(module.id)
                                                                         setIsTopicModalOpen(true)
                                                                     }}
-                                                                    className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 py-1 px-2 rounded hover:bg-indigo-50 w-fit transition-colors"
+                                                                    className="mt-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 py-1 px-2 rounded hover:bg-indigo-50 dark:hover:bg-indigo-950/40 w-fit transition-colors"
                                                                 >
                                                                     <Plus size={14} />
                                                                     Add Topic
@@ -508,23 +518,23 @@ export default function CourseStructureEditor() {
             {/* Module Modal */}
             {showModuleModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !isSaving && setShowModuleModal(false)}></div>
-                    <div className="relative w-full max-w-md bg-white max-h-[90vh] flex flex-col rounded-2xl shadow-xl overflow-hidden pt-6 pb-2 px-6 animate-in zoom-in-95 duration-200">
-                        <h2 className="text-xl font-bold text-slate-800 mb-4 shrink-0">{editingModule ? 'Edit Module' : 'New Module'}</h2>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !isSaving && setShowModuleModal(false)}></div>
+                    <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col rounded-2xl shadow-xl overflow-hidden pt-6 pb-2 px-6 animate-in zoom-in-95 duration-200">
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4 shrink-0">{editingModule ? 'Edit Module' : 'New Module'}</h2>
                         <form onSubmit={handleSaveModule} className="space-y-4 flex flex-col min-h-0 overflow-y-auto pr-2 pb-4">
                             <div className="shrink-0">
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Module Title</label>
-                                <input name="title" disabled={isSaving} required defaultValue={editingModule?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="e.g. Introduction to React" />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Module Title</label>
+                                <input name="title" disabled={isSaving} required defaultValue={editingModule?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-900" placeholder="e.g. Introduction to React" />
                             </div>
                             <div className="shrink-0">
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
-                                <textarea name="description" disabled={isSaving} rows={2} defaultValue={editingModule?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="Brief overview..." />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description (Optional)</label>
+                                <textarea name="description" disabled={isSaving} rows={2} defaultValue={editingModule?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-900" placeholder="Brief overview..." />
                             </div>
 
                             {/* Topics Section - Only visible when creating a NEW module */}
                             {!editingModule && (
                                 <div className="space-y-2">
-                                    <label className="block text-sm font-medium text-slate-700">Topics</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Topics</label>
                                     <div className="space-y-2">
                                         {pendingTopics.map((topic, index) => (
                                             <input
@@ -534,17 +544,17 @@ export default function CourseStructureEditor() {
                                                 onChange={(e) => handleTopicInputChange(index, e.target.value)}
                                                 onClick={() => handleTopicInputFocus(index)}
                                                 onFocus={() => handleTopicInputFocus(index)}
-                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 text-sm disabled:opacity-50 disabled:bg-slate-50"
+                                                className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 text-sm disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-900"
                                                 placeholder={`Topic ${index + 1}`}
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-xs text-slate-400">Click the last field to add a new topic.</p>
+                                    <p className="text-xs text-slate-400 dark:text-slate-500">Click the last field to add a new topic.</p>
                                 </div>
                             )}
 
                             <div className="flex justify-end gap-3 pt-4 shrink-0 mt-auto">
-                                <button type="button" disabled={isSaving} onClick={() => setShowModuleModal(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg disabled:opacity-50">Cancel</button>
+                                <button type="button" disabled={isSaving} onClick={() => setShowModuleModal(false)} className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg disabled:opacity-50 transition-colors">Cancel</button>
                                 <button type="submit" disabled={isSaving} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                                     {isSaving ? (
                                         <>
@@ -564,20 +574,20 @@ export default function CourseStructureEditor() {
             {/* Topic Modal */}
             {isTopicModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !isSaving && setIsTopicModalOpen(false)}></div>
-                    <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
-                        <h2 className="text-xl font-bold text-slate-800 mb-4">{editingTopic ? 'Edit Topic' : 'New Topic'}</h2>
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !isSaving && setIsTopicModalOpen(false)}></div>
+                    <div className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+                        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">{editingTopic ? 'Edit Topic' : 'New Topic'}</h2>
                         <form onSubmit={handleSaveTopic} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Topic Title</label>
-                                <input name="title" disabled={isSaving} required defaultValue={editingTopic?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="e.g. Components & Props" />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Topic Title</label>
+                                <input name="title" disabled={isSaving} required defaultValue={editingTopic?.title} className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-900" placeholder="e.g. Components & Props" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Description (Optional)</label>
-                                <textarea name="description" disabled={isSaving} rows={3} defaultValue={editingTopic?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50" placeholder="What will be covered?" />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description (Optional)</label>
+                                <textarea name="description" disabled={isSaving} rows={3} defaultValue={editingTopic?.description} className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus:border-indigo-500 disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-900" placeholder="What will be covered?" />
                             </div>
                             <div className="flex justify-end gap-3 pt-4">
-                                <button type="button" disabled={isSaving} onClick={() => setIsTopicModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-50 rounded-lg disabled:opacity-50">Cancel</button>
+                                <button type="button" disabled={isSaving} onClick={() => setIsTopicModalOpen(false)} className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg disabled:opacity-50 transition-colors">Cancel</button>
                                 <button type="submit" disabled={isSaving} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                                     {isSaving ? (
                                         <>
@@ -605,6 +615,22 @@ export default function CourseStructureEditor() {
             >
                 <Plus size={28} />
             </button>
+
+            <ConfirmDialog
+                open={!!itemToDelete}
+                onOpenChange={(open) => !open && setItemToDelete(null)}
+                title={itemToDelete?.type === 'module' ? "Delete Course Module" : "Delete Course Topic"}
+                description={
+                    itemToDelete?.type === 'module'
+                        ? `Are you sure you want to permanently delete "${itemToDelete?.name}"? All topics within this module will also be deleted. This action cannot be undone.`
+                        : `Are you sure you want to delete topic "${itemToDelete?.name}"? This action cannot be undone.`
+                }
+                confirmLabel={itemToDelete?.type === 'module' ? "Delete Module" : "Delete Topic"}
+                cancelLabel="Cancel"
+                variant="danger"
+                isLoading={isDeleting}
+                onConfirm={executeDeleteItem}
+            />
         </div>
     )
 }

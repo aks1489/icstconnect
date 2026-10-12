@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import GlobalCalendar from '../../components/calendar/GlobalCalendar'
-import { CalendarPlus } from 'lucide-react'
+import { IconCalendarPlus as CalendarPlus } from '@tabler/icons-react'
 
 export default function AdminCalendar() {
     const navigate = useNavigate()
@@ -9,8 +9,8 @@ export default function AdminCalendar() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Class Calendar</h1>
-                    <p className="text-slate-500 mt-1">Manage schedules and view upcoming classes.</p>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Class Calendar</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">Manage schedules and view upcoming classes.</p>
                 </div>
                 <button
                     onClick={() => navigate('/admin/schedule')}
