@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import {
     IconShield,
     IconSearch,
@@ -8,9 +9,14 @@ import {
     IconX,
     IconLock,
     IconLayersLinked,
-    IconFilter
+    IconFilter,
+    IconShieldLock,
+    IconCrown
 } from '@tabler/icons-react'
 import { useToast } from '../../contexts/ToastContext'
+import { useAuth } from '../../contexts/AuthContext'
+import SEOHead from '../../components/common/SEOHead'
+import { saveRolePermissions } from '../../utils/permissions'
 
 interface PermissionDefinition {
     key: string
@@ -57,11 +63,16 @@ const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
     { key: 'admissions.enroll', name: 'Direct Enrollment', module: 'Admissions', description: 'Finalize official registration into courses' },
 
     // Finance & Fee Management
+    // Finance & Fee Management
     { key: 'finance.view', name: 'View Financials', module: 'Finance', description: 'Access institution ledger, collections, and dues' },
     { key: 'finance.create', name: 'Record Transaction', module: 'Finance', description: 'Log fee installments, receipts, and vouchers' },
     { key: 'finance.update', name: 'Modify Ledger', module: 'Finance', description: 'Adjust fee waivers, discounts, and corrections' },
     { key: 'finance.delete', name: 'Void Transaction', module: 'Finance', description: 'Delete inaccurate ledger postings' },
     { key: 'finance.export', name: 'Export Balance Sheet', module: 'Finance', description: 'Export accounting ledger sheets and audit exports' },
+
+    // Institutional Payroll & Staff Compensation
+    { key: 'payroll.view', name: 'View Payroll & Payslips', module: 'Finance', description: 'Access institutional salary registers, payment disbursement records, and staff payslips' },
+    { key: 'payroll.manage', name: 'Manage Payroll & Vouchers', module: 'Finance', description: 'Generate monthly payroll, approve salary calculations, and issue vouchers' },
 
     // Scholarships CMS
     { key: 'scholarships.view', name: 'View Scholarships', module: 'Scholarships', description: 'Inspect scholarship settings, rules, and winners' },
@@ -88,7 +99,7 @@ const PERMISSION_DEFINITIONS: PermissionDefinition[] = [
     { key: 'permissions.manage', name: 'Manage Permissions', module: 'System', description: 'Authorize role access control matrices' }
 ]
 
-type RoleName = 'super_admin' | 'admin' | 'teacher' | 'student'
+type RoleName = 'super_admin' | 'admin' | 'teacher' | 'receptionist' | 'lab_assistant' | 'maintenance' | 'student'
 
 const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
     super_admin: PERMISSION_DEFINITIONS.map(p => p.key),
@@ -100,8 +111,10 @@ const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
         'classes.view', 'classes.create', 'classes.update', 'classes.schedule.manage',
         'admissions.view', 'admissions.approve', 'admissions.reject', 'admissions.enroll',
         'finance.view', 'finance.create', 'finance.export',
+        'payroll.view', 'payroll.manage',
         'scholarships.view', 'scholarships.manage',
         'gallery.view', 'gallery.manage',
+        'home.media.manage',
         'tests.view', 'tests.create', 'tests.update', 'tests.publish', 'tests.results.view',
         'external_sites.view', 'external_sites.manage',
         'audit_logs.view'
@@ -111,9 +124,30 @@ const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
         'classes.view', 'classes.schedule.manage',
         'courses.view',
         'students.view',
-        'tests.view', 'tests.create', 'tests.update', 'tests.results.view'
+        'tests.view', 'tests.create', 'tests.update', 'tests.results.view',
+        'payroll.view'
+    ],
+    receptionist: [
+        'dashboard.view',
+        'students.view',
+        'courses.view',
+        'classes.view',
+        'admissions.view', 'admissions.enroll',
+        'payroll.view'
+    ],
+    lab_assistant: [
+        'dashboard.view',
+        'classes.view',
+        'courses.view',
+        'payroll.view'
+    ],
+    maintenance: [
+        'dashboard.view',
+        'classes.view',
+        'payroll.view'
     ],
     student: [
+        'dashboard.view',
         'courses.view',
         'classes.view',
         'tests.view'
@@ -121,6 +155,7 @@ const DEFAULT_ROLE_PERMISSIONS: Record<RoleName, string[]> = {
 }
 
 export default function AdminPermissions() {
+    const { profile, isSuperAdmin } = useAuth()
     const { showToast } = useToast()
 
     const [rolePermissions, setRolePermissions] = useState<Record<RoleName, string[]>>(() => {
@@ -134,6 +169,7 @@ export default function AdminPermissions() {
         }
         return DEFAULT_ROLE_PERMISSIONS
     })
+
 
     const [activeRole, setActiveRole] = useState<RoleName>('admin')
     const [searchTerm, setSearchTerm] = useState('')
@@ -206,7 +242,7 @@ export default function AdminPermissions() {
     const handleSave = () => {
         setIsSaving(true)
         try {
-            localStorage.setItem('icst_role_permissions', JSON.stringify(rolePermissions))
+            saveRolePermissions(rolePermissions)
             showToast(`Role permissions for ${activeRole.toUpperCase()} saved successfully!`, 'success')
         } catch (err: any) {
             showToast('Failed to save permissions: ' + err.message, 'error')
@@ -218,15 +254,66 @@ export default function AdminPermissions() {
     // Reset to defaults
     const handleReset = () => {
         setRolePermissions(DEFAULT_ROLE_PERMISSIONS)
-        localStorage.removeItem('icst_role_permissions')
+        saveRolePermissions(DEFAULT_ROLE_PERMISSIONS)
         showToast('Reset all role permissions to factory defaults.', 'info')
+    }
+
+
+    if (!isSuperAdmin) {
+        return (
+            <div className="min-h-[70vh] flex items-center justify-center p-4">
+                <SEOHead
+                    title="Permissions Matrix Restricted - ICST Connect"
+                    canonical="/admin/permissions"
+                    noindex={true}
+                />
+                <div className="max-w-md w-full p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl text-center space-y-4">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+                        <IconShieldLock size={36} />
+                    </div>
+                    <div className="space-y-1">
+                        <span className="text-[11px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                            Super Administrator Only
+                        </span>
+                        <h2 className="text-xl font-black text-slate-900 dark:text-white">
+                            Permissions Matrix Gate
+                        </h2>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                        Access Restricted: Role-Based Access Control (RBAC) governance and capability matrices are strictly reserved for the <strong>Super Administrator (Owner & Lead Dev)</strong>.
+                    </p>
+                    <p className="text-[11px] text-slate-400 italic">
+                        Signed in role: <span className="font-bold text-slate-700 dark:text-slate-300">{profile?.role || 'Guest'}</span>
+                    </p>
+                    <div className="pt-2">
+                        <Link
+                            to="/admin/dashboard"
+                            className="inline-block px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors shadow-md"
+                        >
+                            Return to Admin Dashboard
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
         <div className="space-y-6 max-w-7xl mx-auto pb-16">
+            <SEOHead
+                title="Permissions Matrix - Super Admin Gateway"
+                canonical="/admin/permissions"
+                noindex={true}
+            />
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-purple-100 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1">
+                            <IconCrown size={13} />
+                            Super Admin Exclusive Control
+                        </span>
+                    </div>
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 rounded-xl">
                             <IconShield size={24} />
@@ -261,35 +348,36 @@ export default function AdminPermissions() {
             </div>
 
             {/* Role Selection Tabs */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {(['super_admin', 'admin', 'teacher', 'student'] as RoleName[]).map((role) => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+                {(['super_admin', 'admin', 'teacher', 'receptionist', 'lab_assistant', 'maintenance', 'student'] as RoleName[]).map((role) => {
                     const isActive = activeRole === role
                     const count = rolePermissions[role]?.length || 0
                     return (
                         <button
                             key={role}
                             onClick={() => setActiveRole(role)}
-                            className={`p-4 rounded-xl border text-left transition-all ${isActive
+                            className={`p-3 rounded-xl border text-left transition-all ${isActive
                                 ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/20'
                                 : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-slate-700'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs uppercase font-bold tracking-wider opacity-80">
-                                    {role === 'super_admin' ? 'Root Authority' : 'Institutional Role'}
+                                <span className="text-[10px] uppercase font-bold tracking-wider opacity-80">
+                                    {role === 'super_admin' ? 'Root' : 'Role'}
                                 </span>
-                                {role === 'super_admin' && <IconLock size={16} />}
+                                {role === 'super_admin' && <IconLock size={14} />}
                             </div>
-                            <div className="text-lg font-bold capitalize">
+                            <div className="text-sm font-bold capitalize truncate">
                                 {role.replace('_', ' ')}
                             </div>
-                            <div className={`text-xs mt-1 ${isActive ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
-                                {count} permissions active
+                            <div className={`text-[11px] mt-1 ${isActive ? 'text-indigo-100' : 'text-slate-500 dark:text-slate-400'}`}>
+                                {count} perms
                             </div>
                         </button>
                     )
                 })}
             </div>
+
 
             {/* Filter & Search Bar */}
             <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800">

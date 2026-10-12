@@ -4,10 +4,13 @@ export interface UserProfile {
     id: string;
     email: string; // Often joined from auth.users but useful to have in type
     full_name: string;
-    role: 'student' | 'teacher' | 'admin' | 'super_admin';
+    role: 'student' | 'teacher' | 'admin' | 'super_admin' | 'receptionist' | 'lab_assistant' | 'maintenance';
     custom_permissions?: string[];
     created_at: string;
     // Extended Profile Fields
+    employee_id?: string;
+    department?: string;
+    designation?: string;
     guardian_name?: string;
     address?: string;
     pincode?: string;

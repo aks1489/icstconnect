@@ -8,7 +8,7 @@ import ThemeToggle from '../../components/ui/ThemeToggle'
 import { SEOHead } from '../../components/common/SEOHead'
 
 export default function TeacherLayout() {
-    const { signOut, user, profile } = useAuth()
+    const { signOut, user, profile, hasPerm } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -83,7 +83,7 @@ export default function TeacherLayout() {
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Menu
                         </div>
-                        {TEACHER_ACTIONS.map((item) => (
+                        {TEACHER_ACTIONS.filter(item => !item.requiredPermission || hasPerm(item.requiredPermission)).map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}

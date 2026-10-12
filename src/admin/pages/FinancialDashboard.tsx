@@ -20,6 +20,7 @@ import StudentPaymentStatus from '../components/StudentPaymentStatus';
 import DetailedExpenditures from '../components/DetailedExpenditures';
 import MonthlyAndYoYReports from '../components/MonthlyAndYoYReports';
 import IncomeTaxAuditExport from '../components/IncomeTaxAuditExport';
+import PayrollManager from '../components/PayrollManager';
 import type { Database } from '../../types/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
@@ -39,7 +40,7 @@ export default function FinancialDashboard() {
     const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
     // Active Tab
-    const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'expenses' | 'monthly' | 'tax'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'expenses' | 'monthly' | 'tax' | 'payroll'>('overview');
 
     // Financial Data State
     const [stats, setStats] = useState({
@@ -330,6 +331,16 @@ export default function FinancialDashboard() {
                     >
                         Income Tax & Audit Export
                     </button>
+
+                    <button
+                        onClick={() => setActiveTab('payroll')}
+                        className={`py-3.5 px-1 border-b-2 font-bold text-sm transition-colors whitespace-nowrap cursor-pointer ${activeTab === 'payroll'
+                            ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400'
+                            : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                            }`}
+                    >
+                        Payroll & Payslips
+                    </button>
                 </nav>
             </div>
 
@@ -517,6 +528,11 @@ export default function FinancialDashboard() {
             {/* TAB 5: INCOME TAX & AUDIT EXPORT */}
             {activeTab === 'tax' && (
                 <IncomeTaxAuditExport transactions={transactions} />
+            )}
+
+            {/* TAB 6: PAYROLL & PAYSLIPS */}
+            {activeTab === 'payroll' && (
+                <PayrollManager />
             )}
 
             {/* Add Transaction Modal */}

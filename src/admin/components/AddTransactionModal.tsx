@@ -97,6 +97,7 @@ export default function AddTransactionModal({
     const [transactionDate, setTransactionDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const [paymentMode, setPaymentMode] = useState<'cash' | 'online' | 'bank_transfer' | 'cheque' | 'other'>('cash');
     const [vendorOrPayee, setVendorOrPayee] = useState('');
+    const [payerType, setPayerType] = useState<'self' | 'other'>('self');
     const [voucherNo, setVoucherNo] = useState('');
     const [description, setDescription] = useState('');
     const [studentId, setStudentId] = useState<string | null>(null);
@@ -105,6 +106,7 @@ export default function AddTransactionModal({
     useEffect(() => {
         if (isOpen) {
             setType(defaultType);
+            setPayerType('self');
             const groups = CATEGORY_MAP[defaultType] || [];
             if (groups.length > 0) {
                 setCategoryGroup(groups[0].label);
@@ -123,6 +125,11 @@ export default function AddTransactionModal({
 
     const handleTypeSwitch = (newType: 'income' | 'expense' | 'asset' | 'liability') => {
         setType(newType);
+        if (newType === 'income') {
+            setPayerType('self');
+        } else {
+            setStudentId(null);
+        }
         const groups = CATEGORY_MAP[newType] || [];
         if (groups.length > 0) {
             setCategoryGroup(groups[0].label);
@@ -309,37 +316,133 @@ export default function AddTransactionModal({
                         </div>
                     </div>
 
-                    {/* Payee / Vendor & Voucher Reference */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                {type === 'expense' ? 'Payee / Vendor / Person' : 'Source / Payer'}
-                            </label>
-                            <input
-                                type="text"
-                                value={vendorOrPayee}
-                                onChange={(e) => setVendorOrPayee(e.target.value)}
-                                placeholder={type === 'expense' ? 'e.g. WBSEDCL, Computer Care, Teacher' : 'e.g. Student, Bank, Grant'}
-                                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:border-indigo-500 outline-none"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                                Voucher / Invoice Ref No.
-                            </label>
-                            <input
-                                type="text"
-                                value={voucherNo}
-                                onChange={(e) => setVoucherNo(e.target.value)}
-                                placeholder="VCH-2026-001"
-                                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono focus:border-indigo-500 outline-none"
-                            />
-                        </div>
-                    </div>
+                    {/* Income Payer Workflow vs Expense/Asset/Liability Payee */}
+                    {type === 'income' ? (
+                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
+                                    Source / Payer Type <span className="text-emerald-500 font-normal">(Auto-selected: Student Self)</span>
+                                </label>
+                                <div className="grid grid-cols-2 gap-2 bg-slate-200/60 dark:bg-slate-800 p-1 rounded-xl">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setPayerType('self');
+                                            setVendorOrPayee('');
+                                        }}
+                                        className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                                            payerType === 'self'
+                                                ? 'bg-emerald-600 text-white shadow-sm'
+                                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                        }`}
+                                    >
+                                        <span>👤</span>
+                                        <span>Student (Self)</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setPayerType('other');
+                                            setStudentId(null);
+                                        }}
+                                        className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                                            payerType === 'other'
+                                                ? 'bg-emerald-600 text-white shadow-sm'
+                                                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                        }`}
+                                    >
+                                        <span>🏢</span>
+                                        <span>Other Payer / Entity</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                    {/* Payment Mode */}
+                            {payerType === 'self' ? (
+                                <div>
+                                    <StudentSearch
+                                        onSelect={(student) => {
+                                            setStudentId(student.id);
+                                            setVendorOrPayee(student.full_name);
+                                        }}
+                                        label="Link Student (Type Name or ID Last 3 Digits)"
+                                        placeholder="Type student name or last 3 digits of ID..."
+                                        required
+                                    />
+                                </div>
+                            ) : (
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        Payer Name / Source Organization <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={vendorOrPayee}
+                                        onChange={(e) => setVendorOrPayee(e.target.value)}
+                                        placeholder="e.g. WB Govt Scholarship, Trust Fund, Sponsor, Bank"
+                                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:border-indigo-500 outline-none"
+                                        required
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        Payee / Vendor / Person <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={vendorOrPayee}
+                                        onChange={(e) => setVendorOrPayee(e.target.value)}
+                                        placeholder={categoryGroup === 'Faculty & Staff Salaries' ? 'Staff / Teacher Name' : 'e.g. WBSEDCL, Computer Care'}
+                                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:border-indigo-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                        Voucher / Invoice Ref No.
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={voucherNo}
+                                        onChange={(e) => setVoucherNo(e.target.value)}
+                                        placeholder="VCH-2026-001"
+                                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono focus:border-indigo-500 outline-none"
+                                    />
+                                </div>
+                            </div>
+
+                            {type === 'expense' && categoryGroup === 'Faculty & Staff Salaries' && (
+                                <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/60 text-xs text-indigo-700 dark:text-indigo-300 flex items-start gap-2">
+                                    <span className="text-base leading-none">ℹ️</span>
+                                    <span>
+                                        <strong>Staff Salary Workflow:</strong> Formal payslip generation, pending salary status, and employee portal downloads are managed under the dedicated <strong>Payroll & Staff</strong> management workflow.
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Voucher Reference (if income) and Payment Mode */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
+                        {type === 'income' ? (
+                            <div>
+                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                                    Voucher / Receipt Ref No.
+                                </label>
+                                <input
+                                    type="text"
+                                    value={voucherNo}
+                                    onChange={(e) => setVoucherNo(e.target.value)}
+                                    placeholder="VCH-2026-001"
+                                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono focus:border-indigo-500 outline-none"
+                                />
+                            </div>
+                        ) : null}
+
+                        <div className={type !== 'income' ? 'col-span-2' : ''}>
                             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                                 Payment Mode <span className="text-red-500">*</span>
                             </label>
@@ -355,16 +458,6 @@ export default function AddTransactionModal({
                                 <option value="other">Other Mode</option>
                             </select>
                         </div>
-
-                        {type === 'income' && (
-                            <div>
-                                <StudentSearch
-                                    onSelect={(student) => setStudentId(student.id)}
-                                    label="Linked Student (Optional)"
-                                    placeholder="Search student..."
-                                />
-                            </div>
-                        )}
                     </div>
 
                     {/* Notes / Description */}

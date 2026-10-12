@@ -6,18 +6,21 @@ import type { NavItem } from '../../config/navigation'
 import { SEOHead } from '../common/SEOHead'
 
 export default function QuickAccess() {
-    const { profile, signOut } = useAuth()
+    const { profile, signOut, isSuperAdmin, hasPerm } = useAuth()
     const navigate = useNavigate()
 
     // Determine actions based on role
-    // Assuming profile.role is available. If not, fallback or infer.
-    // Based on previous files, profile usually has role.
     const role = profile?.role || 'student'
 
     let actions: NavItem[] = []
-    if (role === 'admin') actions = ADMIN_ACTIONS
+    if (role === 'admin' || role === 'super_admin') actions = ADMIN_ACTIONS
     else if (role === 'teacher') actions = TEACHER_ACTIONS
     else actions = STUDENT_ACTIONS
+
+    const allowedActions = actions.filter(
+        action => (!action.superAdminOnly || isSuperAdmin) && (!action.requiredPermission || hasPerm(action.requiredPermission))
+    )
+
 
     const handleLogout = async () => {
         await signOut()
@@ -58,7 +61,7 @@ export default function QuickAccess() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in zoom-in duration-500 delay-100">
 
                     {/* Dynamic Actions */}
-                    {actions.map((action, index) => (
+                    {allowedActions.map((action, index) => (
                         <button
                             key={index}
                             onClick={() => navigate(action.path)}

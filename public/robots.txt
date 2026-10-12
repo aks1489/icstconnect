@@ -3,6 +3,8 @@ Allow: /
 Disallow: /student/
 Disallow: /teacher/
 Disallow: /admin/
+Disallow: /staff/
+Disallow: /super-admin/
 Disallow: /quick-access
 Disallow: /force-password-change
 Disallow: /reset-password
@@ -13,6 +15,8 @@ Allow: /
 Disallow: /student/
 Disallow: /teacher/
 Disallow: /admin/
+Disallow: /staff/
+Disallow: /super-admin/
 Disallow: /quick-access
 Disallow: /force-password-change
 Disallow: /reset-password

@@ -8,7 +8,7 @@ import ThemeToggle from '../../components/ui/ThemeToggle'
 import { SEOHead } from '../../components/common/SEOHead'
 
 export default function AdminLayout() {
-    const { signOut } = useAuth()
+    const { signOut, isSuperAdmin, hasPerm } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -85,7 +85,10 @@ export default function AdminLayout() {
                         <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Main Menu
                         </div>
-                        {ADMIN_ACTIONS.map((item) => (
+                        {ADMIN_ACTIONS
+                            .filter(item => (!item.superAdminOnly || isSuperAdmin) && (!item.requiredPermission || hasPerm(item.requiredPermission)))
+                            .map((item) => (
+
                             <Link
                                 key={item.path}
                                 to={item.path}
@@ -98,9 +101,14 @@ export default function AdminLayout() {
                                 `}
                             >
                                 <item.icon className={`text-lg ${isActive(item.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} size={20} />
-                                <span className="font-medium">{item.label}</span>
+                                <span className="font-medium flex-1 truncate">{item.label}</span>
+                                {item.superAdminOnly && (
+                                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                        Root
+                                    </span>
+                                )}
                                 {isActive(item.path) && (
-                                    <ChevronRight className="ml-auto text-xs opacity-50" size={16} />
+                                    <ChevronRight className="ml-auto text-xs opacity-50 shrink-0" size={16} />
                                 )}
                             </Link>
                         ))}

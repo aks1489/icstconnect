@@ -3,95 +3,123 @@
  * In accordance with Master Engineering Instructions Section 12 & 13
  */
 
-export type UserRole = 'student' | 'teacher' | 'admin' | 'super_admin'
+export type UserRole = 'student' | 'teacher' | 'admin' | 'super_admin' | 'receptionist' | 'lab_assistant' | 'maintenance'
 
 export type AppPermission =
     // Students
-    | 'students:read'
-    | 'students:write'
-    | 'students:delete'
-    // Teachers
-    | 'teachers:read'
-    | 'teachers:write'
-    | 'teachers:delete'
+    | 'students.view' | 'students.create' | 'students.update' | 'students.delete' | 'students.export'
+    | 'students:read' | 'students:write' | 'students:delete'
+    // Teachers / Faculty
+    | 'teachers.view' | 'teachers.create' | 'teachers.update' | 'teachers.delete'
+    | 'teachers:read' | 'teachers:write' | 'teachers:delete'
     // Courses & Curriculum
-    | 'courses:read'
-    | 'courses:write'
-    | 'courses:delete'
+    | 'courses.view' | 'courses.create' | 'courses.update' | 'courses.delete' | 'courses.structure.manage'
+    | 'courses:read' | 'courses:write' | 'courses:delete'
     // Classes & Timetable
-    | 'classes:read'
-    | 'classes:write'
-    | 'classes:delete'
+    | 'classes.view' | 'classes.create' | 'classes.update' | 'classes.delete' | 'classes.schedule.manage'
+    | 'classes:read' | 'classes:write' | 'classes:delete'
     // Financial Balance Sheet & Fees
-    | 'finance:read'
-    | 'finance:write'
-    | 'finance:delete'
+    | 'finance.view' | 'finance.create' | 'finance.update' | 'finance.delete' | 'finance.export'
+    | 'finance:read' | 'finance:write' | 'finance:delete'
+    // Institutional Payroll
+    | 'payroll.view' | 'payroll.manage'
     // Admissions & Applications
-    | 'admissions:read'
-    | 'admissions:write'
+    | 'admissions.view' | 'admissions.approve' | 'admissions.reject' | 'admissions.enroll'
+    | 'admissions:read' | 'admissions:write'
     // Scholarships CMS
-    | 'scholarships:read'
-    | 'scholarships:write'
+    | 'scholarships.view' | 'scholarships.manage'
+    | 'scholarships:read' | 'scholarships:write'
     // Gallery & Media
-    | 'gallery:read'
-    | 'gallery:write'
-    // Online Tests
-    | 'tests:read'
-    | 'tests:write'
-    | 'tests:delete'
+    | 'gallery.view' | 'gallery.manage' | 'gallery.media.manage' | 'home.media.manage'
+    | 'gallery:read' | 'gallery:write'
+    // Online Tests & Assessments
+    | 'tests.view' | 'tests.create' | 'tests.update' | 'tests.delete' | 'tests.publish' | 'tests.results.view'
+    | 'tests:read' | 'tests:write' | 'tests:delete'
     // Audit Logs
+    | 'audit_logs.view'
     | 'audit:read'
     // External Ecosystem & Site Registry
-    | 'ecosystem:read'
-    | 'ecosystem:write'
+    | 'external_sites.view' | 'external_sites.manage'
+    | 'ecosystem:read' | 'ecosystem:write'
     // System Settings & Super Admin Control
-    | 'settings:read'
-    | 'settings:write'
+    | 'dashboard.view'
+    | 'permissions.manage'
+    | 'settings:read' | 'settings:write'
     | 'admins:manage'
+    | (string & {})
 
-export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, AppPermission[]> = {
+export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, string[]> = {
     super_admin: [
-        'students:read', 'students:write', 'students:delete',
-        'teachers:read', 'teachers:write', 'teachers:delete',
-        'courses:read', 'courses:write', 'courses:delete',
-        'classes:read', 'classes:write', 'classes:delete',
-        'finance:read', 'finance:write', 'finance:delete',
-        'admissions:read', 'admissions:write',
-        'scholarships:read', 'scholarships:write',
-        'gallery:read', 'gallery:write',
-        'tests:read', 'tests:write', 'tests:delete',
-        'audit:read',
-        'ecosystem:read', 'ecosystem:write',
-        'settings:read', 'settings:write',
+        'dashboard.view',
+        'students.view', 'students.create', 'students.update', 'students.delete', 'students.export',
+        'teachers.view', 'teachers.create', 'teachers.update', 'teachers.delete',
+        'courses.view', 'courses.create', 'courses.update', 'courses.delete', 'courses.structure.manage',
+        'classes.view', 'classes.create', 'classes.update', 'classes.delete', 'classes.schedule.manage',
+        'admissions.view', 'admissions.approve', 'admissions.reject', 'admissions.enroll',
+        'finance.view', 'finance.create', 'finance.update', 'finance.delete', 'finance.export',
+        'payroll.view', 'payroll.manage',
+        'scholarships.view', 'scholarships.manage',
+        'gallery.view', 'gallery.manage', 'gallery.media.manage', 'home.media.manage',
+        'tests.view', 'tests.create', 'tests.update', 'tests.delete', 'tests.publish', 'tests.results.view',
+        'external_sites.view', 'external_sites.manage',
+        'audit_logs.view',
+        'permissions.manage',
         'admins:manage'
     ],
     admin: [
-        'students:read', 'students:write',
-        'teachers:read', 'teachers:write',
-        'courses:read', 'courses:write',
-        'classes:read', 'classes:write',
-        'finance:read', 'finance:write',
-        'admissions:read', 'admissions:write',
-        'scholarships:read', 'scholarships:write',
-        'gallery:read', 'gallery:write',
-        'tests:read', 'tests:write',
-        'ecosystem:read'
+        'dashboard.view',
+        'students.view', 'students.create', 'students.update', 'students.export',
+        'teachers.view', 'teachers.create', 'teachers.update',
+        'courses.view', 'courses.create', 'courses.update', 'courses.structure.manage',
+        'classes.view', 'classes.create', 'classes.update', 'classes.schedule.manage',
+        'admissions.view', 'admissions.approve', 'admissions.reject', 'admissions.enroll',
+        'finance.view', 'finance.create', 'finance.export',
+        'payroll.view', 'payroll.manage',
+        'scholarships.view', 'scholarships.manage',
+        'gallery.view', 'gallery.manage',
+        'home.media.manage',
+        'tests.view', 'tests.create', 'tests.update', 'tests.publish', 'tests.results.view',
+        'external_sites.view', 'external_sites.manage',
+        'audit_logs.view'
     ],
     teacher: [
-        'classes:read',
-        'courses:read',
-        'students:read',
-        'tests:read', 'tests:write'
+        'dashboard.view',
+        'classes.view', 'classes.schedule.manage',
+        'courses.view',
+        'students.view',
+        'tests.view', 'tests.create', 'tests.update', 'tests.results.view',
+        'payroll.view'
+    ],
+    receptionist: [
+        'dashboard.view',
+        'students.view',
+        'courses.view',
+        'classes.view',
+        'admissions.view', 'admissions.enroll',
+        'payroll.view'
+    ],
+    lab_assistant: [
+        'dashboard.view',
+        'classes.view',
+        'courses.view',
+        'payroll.view'
+    ],
+    maintenance: [
+        'dashboard.view',
+        'classes.view',
+        'payroll.view'
     ],
     student: [
-        'courses:read',
-        'classes:read',
-        'tests:read'
+        'dashboard.view',
+        'courses.view',
+        'classes.view',
+        'tests.view'
     ]
 }
 
 export interface AdminPermissionOverride {
     userId: string
-    grantedPermissions: AppPermission[]
-    revokedPermissions: AppPermission[]
+    grantedPermissions: string[]
+    revokedPermissions: string[]
 }
+

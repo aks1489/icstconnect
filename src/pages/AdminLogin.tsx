@@ -48,7 +48,7 @@ export default function AdminLogin() {
                 .eq('id', data.session.user.id)
                 .single()
 
-            if (profile?.role !== 'admin') {
+            if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
                 throw new Error('Unauthorized access. Admin only.')
             }
 

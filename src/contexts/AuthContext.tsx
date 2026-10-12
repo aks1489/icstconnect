@@ -15,8 +15,12 @@ interface AuthContextType {
     isAdmin: boolean
     isSuperAdmin: boolean
     isTeacher: boolean
+    isReceptionist: boolean
+    isLabAssistant: boolean
+    isMaintenance: boolean
+    isStaff: boolean
     isProfileComplete: boolean
-    hasPerm: (permission: AppPermission) => boolean
+    hasPerm: (permission: AppPermission | string) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -26,9 +30,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [profile, setProfile] = useState<any | null>(null)
     const [loading, setLoading] = useState(true)
+    const [permVersion, setPermVersion] = useState(0)
 
     // Using a ref to track the last seen access token to prevent redundant updates
     const accessTokenRef = useRef<string | null>(null)
+
+    // Listen to real-time capability matrix updates
+    useEffect(() => {
+        const handlePermChange = () => {
+            setPermVersion(v => v + 1)
+        }
+        window.addEventListener('icst_permissions_updated', handlePermChange)
+        window.addEventListener('storage', handlePermChange)
+        return () => {
+            window.removeEventListener('icst_permissions_updated', handlePermChange)
+            window.removeEventListener('storage', handlePermChange)
+        }
+    }, [])
 
     const fetchProfile = useCallback(async (userId: string) => {
         try {
@@ -125,9 +143,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin: profile?.role === 'admin' || profile?.role === 'super_admin',
         isSuperAdmin: profile?.role === 'super_admin',
         isTeacher: profile?.role === 'teacher',
+        isReceptionist: profile?.role === 'receptionist',
+        isLabAssistant: profile?.role === 'lab_assistant',
+        isMaintenance: profile?.role === 'maintenance',
+        isStaff: ['teacher', 'admin', 'super_admin', 'receptionist', 'lab_assistant', 'maintenance'].includes(profile?.role),
         isProfileComplete: !!(profile && profile.full_name && profile.guardian_name && profile.address && profile.pincode && profile.dob),
-        hasPerm: (permission: AppPermission) => hasPermission(profile, permission)
-    }), [session, user, profile, loading, refreshProfile])
+        hasPerm: (permission: AppPermission | string) => hasPermission(profile, permission)
+    }), [session, user, profile, loading, refreshProfile, permVersion])
 
     return (
         <AuthContext.Provider value={value}>

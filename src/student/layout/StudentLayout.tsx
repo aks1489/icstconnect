@@ -11,7 +11,7 @@ import ThemeToggle from '../../components/ui/ThemeToggle'
 import { SEOHead } from '../../components/common/SEOHead'
 
 export default function StudentLayout() {
-    const { profile, signOut, isProfileComplete } = useAuth()
+    const { profile, signOut, isProfileComplete, hasPerm } = useAuth()
     const navigate = useNavigate()
     const location = useLocation()
     const [isEditProfileOpen, setIsEditProfileOpen] = useState(false)
@@ -166,7 +166,7 @@ export default function StudentLayout() {
                         <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-4 px-4">
                             Menu
                         </div>
-                        {STUDENT_ACTIONS.map((item) => (
+                        {STUDENT_ACTIONS.filter(item => !item.requiredPermission || hasPerm(item.requiredPermission)).map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}
