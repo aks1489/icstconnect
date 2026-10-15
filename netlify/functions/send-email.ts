@@ -1,36 +1,65 @@
 import { Handler } from '@netlify/functions';
 import nodemailer from 'nodemailer';
 
-const handler: Handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Content-Type': 'application/json',
+};
+
+const handler: Handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
     return {
-      statusCode: 405,
-      body: 'Method Not Allowed',
+      statusCode: 204,
+      headers,
+      body: '',
     };
   }
 
-  const { to, subject, html } = JSON.parse(event.body || '{}');
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ success: false, error: 'Method Not Allowed' }),
+    };
+  }
+
+  let body: any = {};
+  try {
+    body = JSON.parse(event.body || '{}');
+  } catch {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ success: false, error: 'Invalid JSON body' }),
+    };
+  }
+
+  const { to, subject, html } = body;
 
   if (!to || !subject || !html) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: 'Missing required fields: to, subject, html' }),
+      headers,
+      body: JSON.stringify({ success: false, error: 'Missing required fields: to, subject, html' }),
     };
   }
 
   try {
+    const port = Number(process.env.SMTP_PORT) || 465;
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: Number(process.env.SMTP_PORT) || 465, // Default to 465 for SSL
-      secure: true, // true for 465, false for other ports
+      port,
+      secure: port === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
 
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER, // default to user if FROM not set
+    const info = await transporter.sendMail({
+      from: `"ICST Connect" <${process.env.SMTP_FROM || process.env.SMTP_USER || 'icstconnect@gmail.com'}>`,
       to,
       subject,
       html,
@@ -38,13 +67,15 @@ const handler: Handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Email sent successfully' }),
+      headers,
+      body: JSON.stringify({ success: true, messageId: info.messageId, message: 'Email sent successfully' }),
     };
   } catch (error) {
     console.error('Error sending email:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Failed to send email', error: (error as Error).message }),
+      headers,
+      body: JSON.stringify({ success: false, error: (error as Error).message || 'Failed to send email' }),
     };
   }
 };

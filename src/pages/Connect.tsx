@@ -141,7 +141,7 @@ const Connect = () => {
                     '@context': 'https://schema.org',
                     '@type': 'EducationalOrganization',
                     name: 'Institute of Computer Science and Technology (ICST) Chowberia',
-                    url: 'https://icstconnect.com',
+                    url: 'https://icstconnect.in',
                     sameAs: ['https://www.facebook.com/icstconnect', 'https://www.instagram.com/icstconnect/']
                 }}
             />

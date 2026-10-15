@@ -22,4 +22,4 @@ Disallow: /force-password-change
 Disallow: /reset-password
 Disallow: /online-test/*
 
-Sitemap: https://icstconnect.com/sitemap.xml
+Sitemap: https://icstconnect.in/sitemap.xml

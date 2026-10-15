@@ -7,6 +7,21 @@
   directory = "netlify/functions"
 
 [[redirects]]
+  from = "/api/send-email"
+  to = "/.netlify/functions/send-email"
+  status = 200
+
+[[redirects]]
+  from = "/api/smtp-verify"
+  to = "/.netlify/functions/smtp-verify"
+  status = 200
+
+[[redirects]]
+  from = "/api/create-auth-user"
+  to = "/.netlify/functions/create-auth-user"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

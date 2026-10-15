@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase'
+import { sendEmail } from './emailService'
 import type { EnrollmentApplication } from '../types'
 
 export const enrollmentService = {
@@ -122,7 +123,7 @@ export const enrollmentService = {
             tempPassword = 'ICST@' + Math.floor(100000 + Math.random() * 900000)
 
             try {
-                const response = await fetch('http://localhost:5000/api/create-auth-user', {
+                const response = await fetch('/api/create-auth-user', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -187,34 +188,31 @@ export const enrollmentService = {
 
         // Fire Email
         if (applicationDetails.email) {
-            fetch('http://localhost:5000/api/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: applicationDetails.email,
-                    subject: 'Your ICST Enrollment has been Approved!',
-                    html: `
-                        <div style="font-family: Arial, sans-serif; padding: 20px;">
-                            <h2 style="color: #16a34a;">Enrollment Approved! 🎉</h2>
-                            <p>Dear ${applicationDetails.full_name},</p>
-                            <p>Great news! Your enrollment application (Ref: <strong>${applicationDetails.reference_id}</strong>) has been fully approved.</p>
-                            <p>You have been assigned to your batch. You can now log in to the Student Portal!</p>
-                            
-                            <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 15px; margin: 20px 0;">
-                                <h3 style="margin-top: 0; color: #1e293b;">Your Temporary Login Credentials</h3>
-                                <p style="margin-bottom: 5px;"><strong>Portal Link:</strong> <a href="http://localhost:5173/login">Access Student Portal</a></p>
-                                <p style="margin-bottom: 5px;"><strong>Email:</strong> ${applicationDetails.email || `student_${applicationDetails.phone}@icstchowberia.com`}</p>
-                                <p style="margin-bottom: 0;"><strong>Password:</strong> <span style="font-family: monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${tempPassword || '*(Sent Previously)*'}</span></p>
-                            </div>
-                            
-                            <p style="color: #b91c1c; font-size: 14px;"><em>Security Notice: Upon your first login, you will be strictly required to change this password.</em></p>
-                            <br/>
-                            <p>Thank you,</p>
-                            <p><strong>ICST Connect Admin</strong></p>
+            const portalUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : 'https://icstconnect.in/login'
+            sendEmail({
+                to: applicationDetails.email,
+                subject: 'Your ICST Enrollment has been Approved!',
+                html: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px;">
+                        <h2 style="color: #16a34a;">Enrollment Approved! 🎉</h2>
+                        <p>Dear ${applicationDetails.full_name},</p>
+                        <p>Great news! Your enrollment application (Ref: <strong>${applicationDetails.reference_id}</strong>) has been fully approved.</p>
+                        <p>You have been assigned to your batch. You can now log in to the Student Portal!</p>
+                        
+                        <div style="background-color: #f8fafc; border-left: 4px solid #4f46e5; padding: 15px; margin: 20px 0;">
+                            <h3 style="margin-top: 0; color: #1e293b;">Your Temporary Login Credentials</h3>
+                            <p style="margin-bottom: 5px;"><strong>Portal Link:</strong> <a href="${portalUrl}">Access Student Portal</a></p>
+                            <p style="margin-bottom: 5px;"><strong>Email:</strong> ${applicationDetails.email || `student_${applicationDetails.phone}@icstchowberia.com`}</p>
+                            <p style="margin-bottom: 0;"><strong>Password:</strong> <span style="font-family: monospace; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${tempPassword || '*(Sent Previously)*'}</span></p>
                         </div>
-                    `
-                })
-            }).catch(e => console.error(e))
+                        
+                        <p style="color: #b91c1c; font-size: 14px;"><em>Security Notice: Upon your first login, you will be strictly required to change this password.</em></p>
+                        <br/>
+                        <p>Thank you,</p>
+                        <p><strong>ICST Connect Admin</strong></p>
+                    </div>
+                `
+            }).catch(e => console.error('[Enrollment] Approval email error:', e))
         }
 
         return updatedApp
@@ -230,25 +228,21 @@ export const enrollmentService = {
         if (error) throw new Error(error.message)
 
         if (applicationDetails?.email) {
-            fetch('http://localhost:5000/api/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: applicationDetails.email,
-                    subject: 'Update on your ICST Enrollment',
-                    html: `
-                        <div style="font-family: Arial, sans-serif; padding: 20px;">
-                            <h2 style="color: #dc2626;">Enrollment Update</h2>
-                            <p>Dear ${applicationDetails.full_name},</p>
-                            <p>We have reviewed your application (Ref: <strong>${applicationDetails.reference_id}</strong>), but unfortunately we cannot proceed with your enrollment at this time.</p>
-                            <p>Please contact the office at +91 8158031706 for more details.</p>
-                            <br/>
-                            <p>Thank you,</p>
-                            <p><strong>ICST Connect Admin</strong></p>
-                        </div>
-                    `
-                })
-            }).catch(e => console.error(e))
+            sendEmail({
+                to: applicationDetails.email,
+                subject: 'Update on your ICST Enrollment',
+                html: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px;">
+                        <h2 style="color: #dc2626;">Enrollment Update</h2>
+                        <p>Dear ${applicationDetails.full_name},</p>
+                        <p>We have reviewed your application (Ref: <strong>${applicationDetails.reference_id}</strong>), but unfortunately we cannot proceed with your enrollment at this time.</p>
+                        <p>Please contact the office at +91 8158031706 for more details.</p>
+                        <br/>
+                        <p>Thank you,</p>
+                        <p><strong>ICST Connect Admin</strong></p>
+                    </div>
+                `
+            }).catch(e => console.error('[Enrollment] Rejection email error:', e))
         }
 
         return true

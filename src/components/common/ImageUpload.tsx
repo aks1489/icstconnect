@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
-import { IconUser as User, IconCrop as Crop, IconUpload as Upload } from '@tabler/icons-react'
+import { IconUser as User, IconCrop as Crop, IconUpload as Upload, IconSparkles as Sparkles } from '@tabler/icons-react'
 import { useToast } from '../../contexts/ToastContext'
 import ImageCropModal from './ImageCropModal'
+import AvatarPickerModal from './AvatarPickerModal'
 import { getCroppedImg, type PixelCrop } from '../../utils/imageCropUtils'
 
 interface ImageUploadProps {
@@ -18,6 +19,7 @@ export default function ImageUpload({ currentImageUrl, onUploadComplete, userId,
     const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null)
     const [rawImageSrc, setRawImageSrc] = useState<string>('')
     const [isCropModalOpen, setIsCropModalOpen] = useState(false)
+    const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,19 +143,30 @@ export default function ImageUpload({ currentImageUrl, onUploadComplete, userId,
                 )}
             </div>
 
-            {/* Upload Button & Text to the right of DP */}
-            <div className="space-y-1">
-                <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploading}
-                    className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
-                >
-                    <Upload size={14} className={uploading ? 'animate-bounce' : ''} />
-                    <span>{uploading ? 'Optimizing...' : 'Upload Photo'}</span>
-                </button>
+            {/* Upload & Choose Avatar Buttons */}
+            <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs rounded-xl border border-indigo-200 dark:border-indigo-800 flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50 shadow-2xs"
+                    >
+                        <Upload size={14} className={uploading ? 'animate-bounce' : ''} />
+                        <span>{uploading ? 'Optimizing...' : 'Upload Photo'}</span>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => setIsAvatarPickerOpen(true)}
+                        className="px-3.5 py-2 bg-gradient-to-r from-violet-50 to-indigo-50 hover:from-violet-100 hover:to-indigo-100 dark:from-violet-950/40 dark:to-indigo-950/40 text-violet-700 dark:text-violet-300 font-semibold text-xs rounded-xl border border-violet-200 dark:border-violet-800/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                    >
+                        <Sparkles size={14} />
+                        <span>Choose Avatar</span>
+                    </button>
+                </div>
                 <p className="text-[11px] text-slate-400 dark:text-slate-500">
-                    Square DP (1:1). Compressed to WebP in background.
+                    Upload your picture or choose a creative avatar.
                 </p>
             </div>
 
@@ -163,6 +176,18 @@ export default function ImageUpload({ currentImageUrl, onUploadComplete, userId,
                 accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
+            />
+
+            {/* Avatar Picker Modal */}
+            <AvatarPickerModal
+                isOpen={isAvatarPickerOpen}
+                onClose={() => setIsAvatarPickerOpen(false)}
+                currentAvatarUrl={previewUrl}
+                onAvatarSelect={(newUrl) => {
+                    setPreviewUrl(newUrl)
+                    onUploadComplete(newUrl)
+                }}
+                autoSaveToProfile={false}
             />
 
             {/* Crop Modal */}
