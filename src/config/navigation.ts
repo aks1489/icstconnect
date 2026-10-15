@@ -17,32 +17,28 @@ export const STUDENT_ACTIONS: NavItem[] = [
         path: '/student/dashboard',
         icon: LayoutDashboard,
         color: 'text-indigo-600',
-        description: 'View your progress and enrolled courses',
-        requiredPermission: 'dashboard.view'
+        description: 'View your progress and enrolled courses'
     },
     {
         label: 'My Calendar',
         path: '/student/calendar',
         icon: Calendar,
         color: 'text-emerald-600',
-        description: 'Check upcoming classes and events',
-        requiredPermission: 'classes.view'
+        description: 'Check upcoming classes and events'
     },
     {
         label: 'Offline Classes',
         path: '/student/offline-classes',
         icon: Building2,
         color: 'text-amber-600',
-        description: 'Schedule and details for physical classes',
-        requiredPermission: 'classes.view'
+        description: 'Schedule and details for physical classes'
     },
     {
         label: 'Online Tests',
         path: '/student/tests',
         icon: Laptop,
         color: 'text-blue-600',
-        description: 'Take practice exams and view results',
-        requiredPermission: 'tests.view'
+        description: 'Take practice exams and view results'
     },
     {
         label: 'My Fees',
@@ -102,6 +98,8 @@ export const ADMIN_ACTIONS: NavItem[] = [
         path: '/admin/dashboard',
         icon: Shield,
         color: 'text-slate-800',
+
+
         description: 'System overview and controls',
         requiredPermission: 'dashboard.view'
     },

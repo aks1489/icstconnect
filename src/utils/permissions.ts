@@ -57,7 +57,26 @@ export const getActiveRolePermissions = (): Record<string, string[]> => {
         if (saved) {
             const parsed = JSON.parse(saved)
             if (parsed && typeof parsed === 'object') {
-                return { ...ROLE_DEFAULT_PERMISSIONS, ...parsed }
+                const matrix = { ...ROLE_DEFAULT_PERMISSIONS, ...parsed }
+                // Ensure student role always has core student capabilities and is not corrupted by stale cache
+                if (Array.isArray(matrix.student)) {
+                    const requiredStudentPerms = ['dashboard.view', 'courses.view', 'classes.view', 'tests.view']
+                    let healed = false
+                    for (const p of requiredStudentPerms) {
+                        if (!matrix.student.includes(p)) {
+                            matrix.student.push(p)
+                            healed = true
+                        }
+                    }
+                    if (healed) {
+                        try {
+                            localStorage.setItem('icst_role_permissions', JSON.stringify(matrix))
+                        } catch {}
+                    }
+                } else {
+                    matrix.student = [...ROLE_DEFAULT_PERMISSIONS.student]
+                }
+                return matrix
             }
         }
     } catch (err) {
@@ -105,6 +124,14 @@ export const hasPermission = (
         }
         if (profile.custom_permissions.includes(normalized) || profile.custom_permissions.includes(permission)) {
             return true // Explicit user-level grant
+        }
+    }
+
+    // Student role inherently has core student portal capabilities unless explicitly revoked above
+    if (profile.role === 'student') {
+        const studentCore = ['dashboard.view', 'courses.view', 'classes.view', 'tests.view']
+        if (studentCore.includes(normalized) || studentCore.includes(permission)) {
+            return true
         }
     }
 

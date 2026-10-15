@@ -80,7 +80,7 @@ const CoursesPage = () => {
             provider: {
                 '@type': 'EducationalOrganization',
                 name: 'ICST Chowberia',
-                url: 'https://icstconnect.com'
+                url: 'https://icstconnect.in'
             },
             timeRequired: selectedCourse.duration ? `P${selectedCourse.duration.replace(/\D/g, '')}M` : undefined
         }

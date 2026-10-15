@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-const BASE_URL = (import.meta.env.VITE_SITE_URL || 'https://icstconnect.com').replace(/\/$/, '')
+const BASE_URL = (import.meta.env.VITE_SITE_URL || 'https://icstconnect.in').replace(/\/$/, '')
 const DEFAULT_IMAGE = `${BASE_URL}/logo.png`
 
 export interface BreadcrumbItem {

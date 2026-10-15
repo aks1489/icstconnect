@@ -7,6 +7,7 @@ import { useToast } from '../contexts/ToastContext'
 import SEOHead from '../components/common/SEOHead'
 import { courseService } from '../services/courseService'
 import { enrollmentService } from '../services/enrollmentService'
+import { sendEmail } from '../services/emailService'
 import type { Course } from '../types/course'
 
 // Whatsapp Phone number for ICST Chowberia
@@ -210,28 +211,24 @@ export default function EnrollmentForm() {
                 opt_spoken_english: formData.opt_spoken_english
             })
 
-            // Fire off background email directly to our new Express relay API
+            // Fire off background email directly to email service
             if (formData.email) {
-                fetch('http://localhost:5000/api/send-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        to: formData.email,
-                        subject: `Enrollment Application Submitted - ${course?.title}`,
-                        html: `
-                            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                                <h2>Application Received!</h2>
-                                <p>Dear ${formData.full_name},</p>
-                                <p>Your application for <strong>${course?.title}</strong> is safely submitted.</p>
-                                <hr />
-                                <h3>Reference ID: <span style="color: #4f46e5; font-family: monospace;">${app.reference_id}</span></h3>
-                                <br />
-                                <h4>ICST Chowberia Contact Info</h4>
-                                <p>Phone: +91 8158031706</p>
-                                <p>Address: Vill- Chowberia, P.O- Chowberia, P.S- Bongaon, Dist- North 24 Parganas, Pin- 743273</p>
-                            </div>
-                        `
-                    })
+                sendEmail({
+                    to: formData.email,
+                    subject: `Enrollment Application Submitted - ${course?.title}`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; padding: 20px;">
+                            <h2>Application Received!</h2>
+                            <p>Dear ${formData.full_name},</p>
+                            <p>Your application for <strong>${course?.title}</strong> is safely submitted.</p>
+                            <hr />
+                            <h3>Reference ID: <span style="color: #4f46e5; font-family: monospace;">${app.reference_id}</span></h3>
+                            <br />
+                            <h4>ICST Chowberia Contact Info</h4>
+                            <p>Phone: +91 8158031706</p>
+                            <p>Address: Vill- Chowberia, P.O- Chowberia, P.S- Bongaon, Dist- North 24 Parganas, Pin- 743273</p>
+                        </div>
+                    `
                 }).catch(err => console.error("Email API failed:", err)) // Silent fail for UX
             }
 

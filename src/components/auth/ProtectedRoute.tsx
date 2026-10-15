@@ -117,11 +117,11 @@ export default function ProtectedRoute({
                     </p>
                     <div className="pt-2">
                         <Link
-                            to={getRoleHome()}
+                            to={getRoleHome() === location.pathname ? '/quick-access' : getRoleHome()}
                             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors shadow-md"
                         >
                             <IconArrowLeft size={16} />
-                            Return to Safe Dashboard
+                            {getRoleHome() === location.pathname ? 'Return to Safe Hub' : 'Return to Safe Dashboard'}
                         </Link>
                     </div>
                 </div>

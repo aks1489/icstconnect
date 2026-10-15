@@ -15,13 +15,34 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 465,
-    secure: true, // Typically true for 465, false for 587
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+const getTransporter = () => {
+    const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465
+    return nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port,
+        secure: port === 465,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    })
+}
+
+// SMTP Health & Connection verification
+app.all('/api/smtp-verify', async (req, res) => {
+    try {
+        const transporter = getTransporter()
+        await transporter.verify()
+        res.status(200).json({
+            success: true,
+            message: 'SMTP connection verified successfully',
+            host: process.env.SMTP_HOST || 'smtp.gmail.com',
+            port: process.env.SMTP_PORT || '465',
+            user: process.env.SMTP_USER
+        })
+    } catch (error) {
+        console.error('SMTP verify error:', error)
+        res.status(500).json({ success: false, error: error.message || 'SMTP connection failed' })
     }
 })
 
@@ -30,11 +51,13 @@ app.post('/api/send-email', async (req, res) => {
         const { to, subject, html } = req.body
 
         if (!to || !subject || !html) {
-            return res.status(400).json({ error: 'Missing required fields' })
+            return res.status(400).json({ success: false, error: 'Missing required fields: to, subject, html' })
         }
 
+        const transporter = getTransporter()
+        const senderAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'icstconnect@gmail.com'
         const info = await transporter.sendMail({
-            from: `"ICST Connect" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+            from: `"ICST Connect" <${senderAddress}>`,
             to,
             subject,
             html
@@ -44,7 +67,7 @@ app.post('/api/send-email', async (req, res) => {
         res.status(200).json({ success: true, messageId: info.messageId })
     } catch (error) {
         console.error('Error sending email: ', error)
-        res.status(500).json({ error: 'Internal Server Error', details: error.message })
+        res.status(500).json({ success: false, error: error.message || 'Failed to send email' })
     }
 })
 
@@ -53,7 +76,7 @@ app.post('/api/create-auth-user', async (req, res) => {
         const { email, password, full_name } = req.body
 
         if (!email || !password) {
-            return res.status(400).json({ error: 'Missing email or password' })
+            return res.status(400).json({ success: false, error: 'Missing email or password' })
         }
 
         // Executing signUp on the backend avoids signing out the frontend admin!
@@ -69,13 +92,13 @@ app.post('/api/create-auth-user', async (req, res) => {
 
         if (error) {
             console.error('Supabase Auth error:', error)
-            return res.status(400).json({ error: error.message })
+            return res.status(400).json({ success: false, error: error.message })
         }
 
         res.status(200).json({ success: true, user: data.user })
     } catch (error) {
         console.error('Error creating user: ', error)
-        res.status(500).json({ error: 'Internal Server Error', details: error.message })
+        res.status(500).json({ success: false, error: error.message || 'Server error creating user' })
     }
 })
 

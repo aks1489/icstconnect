@@ -212,31 +212,11 @@ function App() {
                 </ProtectedRoute>
               }>
                 <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={
-                  <ProtectedRoute requiredPermission="dashboard.view">
-                    <StudentDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="offline-classes" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <OfflineClasses />
-                  </ProtectedRoute>
-                } />
-                <Route path="calendar" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <StudentCalendar />
-                  </ProtectedRoute>
-                } />
-                <Route path="tests" element={
-                  <ProtectedRoute requiredPermission="tests.view">
-                    <OnlineTest isStudentPortal />
-                  </ProtectedRoute>
-                } />
-                <Route path="tests/:testId" element={
-                  <ProtectedRoute requiredPermission="tests.view">
-                    <TestPlayer />
-                  </ProtectedRoute>
-                } />
+                <Route path="dashboard" element={<StudentDashboard />} />
+                <Route path="offline-classes" element={<OfflineClasses />} />
+                <Route path="calendar" element={<StudentCalendar />} />
+                <Route path="tests" element={<OnlineTest isStudentPortal />} />
+                <Route path="tests/:testId" element={<TestPlayer />} />
                 <Route path="fees" element={<StudentFeesPage />} />
                 <Route path="complete-profile" element={<CompleteProfile />} />
               </Route>

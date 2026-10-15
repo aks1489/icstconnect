@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useNavigate, Link } from 'react-router-dom'
 import { IconX as X, IconUserCircle as UserCircle, IconUserPlus as UserPlus, IconCheck as Check, IconShieldCheck as ShieldCheck, IconKey as Key, IconMail as Mail, IconLock as Lock, IconAlertCircle as AlertCircle, IconCircleCheck as CheckCircle, IconUser as User } from '@tabler/icons-react'
+import { sendEmail } from '../../services/emailService'
 
 interface AuthModalProps {
     isOpen: boolean
@@ -21,7 +22,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [verificationSuccess, setVerificationSuccess] = useState(false)
+    const [resendCooldown, setResendCooldown] = useState(0)
     const navigate = useNavigate()
+
+    // Countdown timer for OTP resend cooldown
+    useEffect(() => {
+        if (resendCooldown <= 0) return
+        const timer = setInterval(() => {
+            setResendCooldown(prev => Math.max(0, prev - 1))
+        }, 1000)
+        return () => clearInterval(timer)
+    }, [resendCooldown])
 
     // Reset state when modal opens/closes or mode changes
     useEffect(() => {
@@ -32,6 +43,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setVerificationSuccess(false)
         setOtpCode('')
         setOtpType(null)
+        setResendCooldown(0)
     }, [isOpen, isLogin])
 
     if (!isOpen) return null
@@ -101,6 +113,64 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             navigate('/quick-access')
         }
         onClose()
+    }
+
+    const handleResendOtp = async () => {
+        if (resendCooldown > 0 || loading) return
+        setLoading(true)
+        setError(null)
+        try {
+            if (otpType === 'signup') {
+                const newOtp = Math.floor(1000 + Math.random() * 9000).toString()
+                setLocalOtpTracker(newOtp)
+
+                const emailResult = await sendEmail({
+                    to: email,
+                    subject: 'Verify your ICST Connect Account',
+                    html: `
+                        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
+                                <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">ICST Connect</h1>
+                                <p style="margin: 6px 0 0 0; font-size: 13px; opacity: 0.9;">Institute of Computer Science & Technology</p>
+                            </div>
+                            <div style="padding: 28px 24px;">
+                                <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 18px; font-weight: 700;">Account Verification Code</h2>
+                                <p style="margin: 0 0 16px 0; color: #475569; font-size: 14px; line-height: 1.5;">Hi <strong>${fullName || 'Student'}</strong>,</p>
+                                <p style="margin: 0 0 20px 0; color: #475569; font-size: 14px; line-height: 1.5;">Here is your verification code to join ICST Connect:</p>
+                                
+                                <div style="text-align: center; margin: 24px 0;">
+                                    <div style="display: inline-block; font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #4f46e5; background: #f1f5f9; padding: 14px 28px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: monospace;">
+                                        ${newOtp}
+                                    </div>
+                                </div>
+                                <p style="margin: 20px 0 0 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                                    Enter this code in the portal to securely create your account.
+                                </p>
+                            </div>
+                            <div style="background: #f8fafc; padding: 16px 24px; text-align: center; border-top: 1px solid #e2e8f0;">
+                                <p style="margin: 0; font-size: 11px; color: #94a3b8;">ICST Chowberia • Vill & P.O. Chowberia, North 24 Parganas, WB 743273</p>
+                            </div>
+                        </div>
+                    `
+                })
+
+                if (!emailResult.success) {
+                    throw new Error(emailResult.error || 'Failed to resend verification code')
+                }
+
+                setResendCooldown(30)
+                setError(`A fresh code has been sent to ${email}!`)
+            } else if (otpType === 'recovery') {
+                const { error } = await supabase.auth.resetPasswordForEmail(email)
+                if (error) throw error
+                setResendCooldown(30)
+                setError(`Password reset code resent to ${email}!`)
+            }
+        } catch (err: any) {
+            setError(err.message || 'Failed to resend code')
+        } finally {
+            setLoading(false)
+        }
     }
 
     const checkUserExists = async (email: string): Promise<boolean> => {
@@ -197,24 +267,42 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 const newOtp = Math.floor(1000 + Math.random() * 9000).toString() // Generate 4 digit code
                 setLocalOtpTracker(newOtp)
 
-                fetch('http://localhost:5000/api/send-email', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        to: email,
-                        subject: 'Verify your ICST Connect Account',
-                        html: `
-                            <div style="font-family: Arial, sans-serif; padding: 20px;">
-                                <h2>Account Verification</h2>
-                                <p>Hi ${fullName},</p>
-                                <p>Your 4-digit verification code to join ICST Connect is:</p>
-                                <h1 style="font-size: 32px; letter-spacing: 5px; color: #4f46e5; background: #f8fafc; padding: 10px 20px; border-radius: 8px; display: inline-block;">${newOtp}</h1>
-                                <p>Enter this code in the portal to securely create your account.</p>
+                const emailResult = await sendEmail({
+                    to: email,
+                    subject: 'Verify your ICST Connect Account',
+                    html: `
+                        <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <div style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); padding: 28px 24px; text-align: center; color: #ffffff;">
+                                <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">ICST Connect</h1>
+                                <p style="margin: 6px 0 0 0; font-size: 13px; opacity: 0.9;">Institute of Computer Science & Technology</p>
                             </div>
-                        `
-                    })
-                }).catch(err => console.error("OTP Email failed:", err))
+                            <div style="padding: 28px 24px;">
+                                <h2 style="margin: 0 0 12px 0; color: #0f172a; font-size: 18px; font-weight: 700;">Account Verification</h2>
+                                <p style="margin: 0 0 16px 0; color: #475569; font-size: 14px; line-height: 1.5;">Hi <strong>${fullName}</strong>,</p>
+                                <p style="margin: 0 0 20px 0; color: #475569; font-size: 14px; line-height: 1.5;">Your 4-digit verification code to join ICST Connect is:</p>
+                                
+                                <div style="text-align: center; margin: 24px 0;">
+                                    <div style="display: inline-block; font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #4f46e5; background: #f1f5f9; padding: 14px 28px; border-radius: 12px; border: 1px solid #e2e8f0; font-family: monospace;">
+                                        ${newOtp}
+                                    </div>
+                                </div>
+                                
+                                <p style="margin: 20px 0 0 0; color: #64748b; font-size: 12px; line-height: 1.5;">
+                                    Enter this code in the portal to securely create your account.
+                                </p>
+                            </div>
+                            <div style="background: #f8fafc; padding: 16px 24px; text-align: center; border-top: 1px solid #e2e8f0;">
+                                <p style="margin: 0; font-size: 11px; color: #94a3b8;">ICST Chowberia • Vill & P.O. Chowberia, North 24 Parganas, WB 743273</p>
+                            </div>
+                        </div>
+                    `
+                })
 
+                if (!emailResult.success) {
+                    throw new Error(`Failed to deliver verification code: ${emailResult.error || 'Please check email address and try again'}`)
+                }
+
+                setResendCooldown(30)
                 setOtpType('signup')
                 setShowOtpInput(true)
                 setError('Verification code sent! Please check your email inbox.')
@@ -268,6 +356,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                 setOtpCode={setOtpCode}
                                 onCancel={() => setShowOtpInput(false)}
                                 otpType={otpType}
+                                onResend={handleResendOtp}
+                                resendCooldown={resendCooldown}
+                                loading={loading}
                             />
                         ) : isForgotPassword ? (
                             <ForgotPasswordInputs
@@ -398,7 +489,25 @@ const SuccessView = ({ otpType, onNavigate }: { otpType: string | null, onNaviga
     </div>
 )
 
-const OtpInput = ({ email, otpCode, setOtpCode, onCancel, otpType }: { email: string, otpCode: string, setOtpCode: (c: string) => void, onCancel: () => void, otpType: string | null }) => (
+const OtpInput = ({
+    email,
+    otpCode,
+    setOtpCode,
+    onCancel,
+    otpType,
+    onResend,
+    resendCooldown,
+    loading
+}: {
+    email: string
+    otpCode: string
+    setOtpCode: (c: string) => void
+    onCancel: () => void
+    otpType: string | null
+    onResend: () => void
+    resendCooldown: number
+    loading: boolean
+}) => (
     <div className="space-y-4 animate-in fade-in zoom-in duration-300">
         <div className="text-center mb-6">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-50 dark:bg-indigo-950/60 mb-3 border border-indigo-100 dark:border-indigo-800">
@@ -423,13 +532,23 @@ const OtpInput = ({ email, otpCode, setOtpCode, onCancel, otpType }: { email: st
             />
         </div>
 
-        <button
-            type="button"
-            onClick={onCancel}
-            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium block text-center cursor-pointer"
-        >
-            Wrong email? Go back
-        </button>
+        <div className="flex items-center justify-between text-xs pt-1 px-1">
+            <button
+                type="button"
+                onClick={onCancel}
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium cursor-pointer"
+            >
+                Wrong email? Go back
+            </button>
+            <button
+                type="button"
+                disabled={resendCooldown > 0 || loading}
+                onClick={onResend}
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-bold disabled:text-slate-400 dark:disabled:text-slate-600 disabled:cursor-not-allowed cursor-pointer"
+            >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
+            </button>
+        </div>
     </div>
 )
 

@@ -21,8 +21,8 @@ const Home = () => {
                     '@type': 'EducationalOrganization',
                     name: 'Institute of Computer Science and Technology (ICST) Chowberia',
                     alternateName: 'ICST Chowberia',
-                    url: 'https://icstconnect.com',
-                    logo: 'https://icstconnect.com/logo.png',
+                    url: 'https://icstconnect.in',
+                    logo: 'https://icstconnect.in/logo.png',
                     description: 'Premier institute providing computer education, IT diplomas, coding courses, and government-recognized certifications in Chowberia, West Bengal.',
                     address: {
                         '@type': 'PostalAddress',
