@@ -5,6 +5,7 @@ import { apiDevPlugin } from './vite-api-plugin'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), apiDevPlugin()],
+  server: { host: true, port: 5173 },
   build: {
     rollupOptions: {
       output: {
