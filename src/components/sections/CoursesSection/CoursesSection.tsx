@@ -4,14 +4,11 @@ import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/
 import { motion } from 'framer-motion'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
-import CourseDetailsModal from '../../courses/CourseDetailsModal'
 import type { Course } from '../../../types/course'
 
 const CoursesSection = () => {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
-    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
 
     useEffect(() => {
         const fetchAndFilterCourses = async () => {
@@ -54,11 +51,6 @@ const CoursesSection = () => {
 
         fetchAndFilterCourses()
     }, [])
-
-    const handleCourseClick = (course: Course) => {
-        setSelectedCourse(course)
-        setIsModalOpen(true)
-    }
 
     const getIconType = (title: string): any => {
         const t = title.toLowerCase()
@@ -168,8 +160,8 @@ const CoursesSection = () => {
                                                 View Details
                                             </span>
                                         </div>
-                                    </div>
-                                )
+                                    </Link>
+                                );
                             })}
                         </motion.div>
                     </div>
@@ -188,12 +180,6 @@ const CoursesSection = () => {
                 </div>
             </div>
 
-            {/* Course Details Modal */}
-            <CourseDetailsModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                course={selectedCourse}
-            />
         </section>
     )
 }

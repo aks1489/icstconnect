@@ -125,10 +125,6 @@ const CoursesPage = () => {
         })
     }, [activeFilter, courses, searchQuery])
 
-    const handleCourseClick = (course: Course) => {
-        navigate(`/courses/${course.id}`)
-    }
-
     const handleCloseModal = () => {
         navigate('/courses')
     }
