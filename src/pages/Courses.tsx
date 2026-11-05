@@ -119,9 +119,12 @@ const CoursesPage = () => {
 
             const matchesTitle = course.title.toLowerCase().includes(query)
             const matchesDesc = course.description.toLowerCase().includes(query)
+            const matchesCategory = course.category?.toLowerCase().includes(query)
             const matchesTags = course.tags?.some(tag => tag.toLowerCase().includes(query))
+            const matchesSyllabus = course.syllabus?.some(s => s.toLowerCase().includes(query))
+            const matchesQueries = course.searchQueries?.some(q => q.toLowerCase().includes(query))
 
-            return matchesDuration && (matchesTitle || matchesDesc || matchesTags)
+            return matchesDuration && (matchesTitle || matchesDesc || matchesCategory || matchesTags || matchesSyllabus || matchesQueries)
         })
     }, [activeFilter, courses, searchQuery])
 

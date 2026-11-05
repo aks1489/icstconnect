@@ -8,6 +8,16 @@ const __dirname = path.dirname(__filename)
 const rootDir = path.resolve(__dirname, '..')
 const distDir = path.join(rootDir, 'dist')
 
+let courseCatalog = {}
+try {
+  const catalogPath = path.join(__dirname, 'course-seo-catalog.json')
+  if (fs.existsSync(catalogPath)) {
+    courseCatalog = JSON.parse(fs.readFileSync(catalogPath, 'utf-8'))
+  }
+} catch (e) {
+  console.warn('[Prerender] Could not load course-seo-catalog.json:', e.message)
+}
+
 const BASE_URL = process.env.VITE_SITE_URL || 'https://icstconnect.in'
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://kuqzarcfinpejnjicudr.supabase.co'
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_8ztuOu77hriT0hGjwkjn5A_SfGVMV5g'
@@ -392,12 +402,21 @@ function renderSemanticArticle(route, context) {
           'Module 5: Final Examination, Viva & Government Certification'
         ]
 
+    const careerPathways = (course.careerPathways && course.careerPathways.length > 0)
+      ? course.careerPathways
+      : [
+          'Software Assistant & Developer roles',
+          'Information Technology & Systems Support Specialist',
+          'Computer Operator & Office Automation Executive',
+          'Independent Technology Consultant & Freelancer'
+        ]
+
     return `
     <article style="max-width: 1200px; margin: 24px auto; padding: 0 16px; font-family: system-ui, -apple-system, sans-serif;">
       <header style="margin-bottom: 24px;">
         <span style="display: inline-block; background: #eff6ff; color: #1d4ed8; padding: 4px 12px; border-radius: 9999px; font-size: 13px; font-weight: 600; margin-bottom: 10px;">${course.category || 'Professional IT Course'}</span>
         <h1 style="font-size: 32px; font-weight: 800; color: #0f172a; margin: 0 0 12px 0;">${course.course_name} - Course Syllabus, Fees &amp; Certification</h1>
-        <p style="font-size: 18px; color: #475569; line-height: 1.6; margin: 0;">${course.description || `Certified training program in ${course.course_name} with practical laboratory projects and personal mentorship at ICST Chowberia.`}</p>
+        <p style="font-size: 18px; color: #475569; line-height: 1.6; margin: 0;">${course.description || `Certified training program in ${course.course_name} with practical laboratory projects and personal mentorship at ICST Chowberia near Bongaon.`}</p>
       </header>
 
       <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 24px 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
@@ -411,7 +430,7 @@ function renderSemanticArticle(route, context) {
         </div>
         <div>
           <strong style="color: #64748b; font-size: 12px; text-transform: uppercase;">Certification</strong>
-          <p style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 4px 0 0 0;">Government Recognized Diploma</p>
+          <p style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 4px 0 0 0;">${course.credential || 'Government Recognized Diploma'}</p>
         </div>
         <div>
           <strong style="color: #64748b; font-size: 12px; text-transform: uppercase;">Course Fee</strong>
@@ -419,22 +438,37 @@ function renderSemanticArticle(route, context) {
         </div>
       </section>
 
+      ${course.prerequisites ? `
+      <section style="margin: 28px 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 8px;">Eligibility &amp; Course Prerequisites</h2>
+        <p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0 0 10px 0;"><strong>Prerequisites:</strong> ${course.prerequisites}</p>
+        ${course.competencies ? `<p style="font-size: 15px; color: #475569; line-height: 1.6; margin: 0;"><strong>Key Competencies Covered:</strong> ${course.competencies}</p>` : ''}
+      </section>` : ''}
+
       <section style="margin: 32px 0;">
         <h2 style="font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Curriculum &amp; Detailed Syllabus Modules</h2>
-        <p style="font-size: 15px; color: #475569; line-height: 1.6;">The curriculum for ${course.course_name} at ICST Chowberia is structured to balance conceptual clarity with hands-on computer lab assignments. Over 70% of class time is dedicated to individual computer practicals.</p>
+        <p style="font-size: 15px; color: #475569; line-height: 1.6;">The curriculum for ${course.course_name} at ICST Chowberia is structured to balance conceptual clarity with hands-on computer lab assignments. Over 70% of class time is dedicated to individual workstation practicals and project development.</p>
         <ul style="margin: 16px 0 0 0; padding-left: 20px; line-height: 1.8; color: #334155; font-size: 15px;">
           ${syllabusList.map(item => `<li><strong>${item}</strong></li>`).join('\n')}
         </ul>
       </section>
 
       <section style="margin: 32px 0;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Career Pathways &amp; Job Roles</h2>
-        <p style="font-size: 15px; color: #475569; line-height: 1.6;">Completing ${course.course_name} validates your computational knowledge and qualifies you for technical roles across private enterprise and public organizations.</p>
+        <h2 style="font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px;">Career Pathways &amp; Employment Opportunities</h2>
+        <p style="font-size: 15px; color: #475569; line-height: 1.6;">Completing ${course.course_name} validates your technical proficiency and prepares you for employment opportunities in private enterprise, government exams, and remote freelance markets:</p>
         <ul style="margin: 12px 0 0 0; padding-left: 20px; line-height: 1.8; color: #334155; font-size: 15px;">
-          <li>Software Assistant and Junior Developer roles</li>
-          <li>Information Technology &amp; Systems Administrator</li>
-          <li>Computer Operator and Office Automation Executive</li>
-          <li>Independent Technology Consultant &amp; Freelancer</li>
+          ${careerPathways.map(role => `<li><strong>${role}</strong></li>`).join('\n')}
+        </ul>
+      </section>
+
+      <section style="margin: 32px 0; background: #f1f5f9; border-radius: 12px; padding: 22px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0; margin-bottom: 12px;">Why Study at ICST Chowberia, Bongaon?</h2>
+        <ul style="padding-left: 20px; line-height: 1.8; color: #334155; font-size: 15px; margin: 0;">
+          <li><strong>100% Practical Lab Training:</strong> Individual dedicated computer workstation for every student during every class.</li>
+          <li><strong>Free Extra Practice Lab:</strong> Daily lab practice available Monday to Friday from 10:00 AM to 1:00 PM at zero extra charge.</li>
+          <li><strong>Government Recognized Certification:</strong> ISO 9001:2015 certified diplomas valid for employment registration and corporate jobs.</li>
+          <li><strong>Expert Faculty Mentorship:</strong> Direct 1-on-1 problem-solving and software project guidance.</li>
+          <li><strong>Local Access:</strong> Located centrally at Chowberia, easily accessible from Bongaon, Gaighata, Gopalnagar, and North 24 Parganas.</li>
         </ul>
       </section>
 
@@ -713,23 +747,81 @@ export async function prerender() {
 
   for (const course of courses) {
     if (!course.id || course.id === 69) continue // exclude dummy test courses
+    const meta = courseCatalog[course.id] || {}
+
+    const enrichedDesc = (course.description && course.description.length > 120)
+      ? course.description
+      : (meta.description || course.description || `Certified computer training in ${course.course_name} at ICST Chowberia, Bongaon. Practical laboratory sessions, expert faculty mentorship, and government recognized certification.`)
+
+    const enrichedSyllabus = (course.syllabus && course.syllabus.length > 0)
+      ? course.syllabus
+      : (meta.syllabus || [
+          'Module 1: Computing Fundamentals & Hardware Overview',
+          'Module 2: Core Programming Logic & Flowcharts',
+          'Module 3: Hands-on Practical Lab Implementation',
+          'Module 4: Real-world Software Project Development',
+          'Module 5: Final Examination, Viva & Government Certification'
+        ])
+
+    const credential = meta.credential || 'Government Recognized Diploma / Certificate (ICST Certified)'
+    const prerequisites = meta.prerequisites || 'Secondary School (10th pass) or basic computer literacy'
+    const competencies = meta.competencies || 'Hands-on practical computing, software tools, and digital problem solving'
+    const careerPathways = meta.careerPathways || [
+      'Junior Technical Specialist',
+      'Computer Operator and Office Automation Executive',
+      'Information Technology Assistant',
+      'Independent Technology Consultant & Freelancer'
+    ]
+
+    const fullCourse = {
+      ...course,
+      description: enrichedDesc,
+      syllabus: enrichedSyllabus,
+      credential,
+      prerequisites,
+      competencies,
+      careerPathways
+    }
+
     const courseUrl = `/courses/${course.id}`
+
+    // Meta description between 120 and 160 characters
+    let metaDesc = enrichedDesc
+    if (metaDesc.length > 158) {
+      metaDesc = `${metaDesc.substring(0, 155)}...`
+    }
 
     allRoutes.push({
       path: courseUrl,
       title: `${course.course_name} Course Details & Syllabus | ICST Chowberia`,
-      description: `Enroll in ${course.course_name} (${course.duration || 'Flexible'}) at ICST Chowberia. ${course.description?.substring(0, 100) || 'Comprehensive computer training with certified diploma.'}`,
-      h1: `${course.course_name} - Course Syllabus & Certification`,
+      description: metaDesc,
+      h1: `${course.course_name} - Course Syllabus, Fees & Certification`,
       shortTitle: course.course_name,
       parent: { url: '/courses', name: 'Courses' },
-      course,
+      course: fullCourse,
       schema: {
         '@context': 'https://schema.org',
         '@type': 'Course',
         name: course.course_name,
-        description: course.description || `${course.course_name} training program at ICST Chowberia.`,
+        courseCode: course.short_code || undefined,
+        description: enrichedDesc,
+        inLanguage: 'en-IN',
         provider: defaultOrgSchema,
-        timeRequired: course.duration ? `P${course.duration.replace(/\D/g, '')}M` : undefined
+        educationalCredentialAwarded: credential,
+        occupationalCredentialAwarded: credential,
+        coursePrerequisites: prerequisites,
+        competencyRequired: competencies,
+        timeRequired: course.duration ? `P${course.duration.replace(/\D/g, '')}M` : undefined,
+        hasCourseInstance: {
+          '@type': 'CourseInstance',
+          courseMode: 'In-Person Classroom & Practical Lab',
+          courseWorkload: `${course.duration || '6 Months'} hands-on laboratory training`,
+          location: {
+            '@type': 'Place',
+            name: 'ICST Chowberia Campus',
+            address: defaultOrgSchema.address
+          }
+        }
       }
     })
   }

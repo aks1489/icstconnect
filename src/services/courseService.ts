@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import type { Course, Module } from '../types/course'
+import { getEnrichedCourseData, COURSE_ENRICHMENT_CATALOG } from '../data/courseEnrichment'
 
 // Icon mapping helper
 const getCourseStyle = (title: string): { icon: string, color: string } => {
@@ -35,12 +36,26 @@ const generateTags = (title: string, desc: string): string[] => {
         { key: 'css', tag: 'CSS' },
         { key: 'web', tag: 'Web Dev' },
         { key: 'c++', tag: 'C++' },
+        { key: 'c#', tag: 'C#' },
+        { key: 'c ', tag: 'C Language' },
         { key: 'office', tag: 'MS Office' },
         { key: 'excel', tag: 'Excel' },
         { key: 'tally', tag: 'Tally' },
         { key: 'accounting', tag: 'Accounting' },
+        { key: 'gst', tag: 'GST' },
         { key: 'hardware', tag: 'Hardware' },
         { key: 'network', tag: 'Networking' },
+        { key: 'cyber', tag: 'Cyber Security' },
+        { key: 'ethical hacking', tag: 'Ethical Hacking' },
+        { key: 'data entry', tag: 'Data Entry' },
+        { key: 'typing', tag: 'Typing' },
+        { key: 'dtp', tag: 'DTP' },
+        { key: 'photoshop', tag: 'Photoshop' },
+        { key: 'dita', tag: 'DITA' },
+        { key: 'adca', tag: 'ADCA' },
+        { key: 'dca', tag: 'DCA' },
+        { key: 'kids', tag: 'Kids Coding' },
+        { key: 'school', tag: 'School Computer' },
         { key: 'diploma', tag: 'Diploma' },
         { key: 'design', tag: 'Design' }
     ]
@@ -61,21 +76,23 @@ export const courseService = {
 
         if (error) throw error
 
-        // Map Supabase data to UI compatible format
+        // Map Supabase data to UI compatible format, applying SEO enrichment
         return (data || []).map((course: any) => {
-            const style = getCourseStyle(course.course_name)
-            // Use existing tags or generate them if empty/null
-            const tags = (course.tags && course.tags.length > 0)
-                ? course.tags
-                : generateTags(course.course_name, course.description || '')
+            const enriched = getEnrichedCourseData(course)
+            const style = getCourseStyle(enriched.course_name)
+
+            // Resolve rich tags from database, enrichment catalog, or generator
+            const tags = (enriched.tags && enriched.tags.length > 0)
+                ? enriched.tags
+                : (COURSE_ENRICHMENT_CATALOG[enriched.id]?.tags || generateTags(enriched.course_name, enriched.description || ''))
 
             return {
-                ...course,
-                title: course.course_name,
-                description: course.description || (course.syllabus && course.syllabus.length > 0 ? course.syllabus.join(', ') : 'No description available'),
+                ...enriched,
+                title: enriched.course_name,
+                description: enriched.description || (enriched.syllabus && enriched.syllabus.length > 0 ? enriched.syllabus.join(', ') : 'No description available'),
                 icon: style.icon,
                 color: style.color,
-                price: course.fees?.total ? `₹${course.fees.total}` : 'Contact for Price',
+                price: enriched.fees?.total ? `₹${enriched.fees.total}` : 'Contact for Price',
                 tags: tags
             }
         }) as Course[]
@@ -95,18 +112,19 @@ export const courseService = {
 
         if (!data) return null
 
-        const style = getCourseStyle(data.course_name)
-        const tags = (data.tags && data.tags.length > 0)
-            ? data.tags
-            : generateTags(data.course_name, data.description || '')
+        const enriched = getEnrichedCourseData(data)
+        const style = getCourseStyle(enriched.course_name)
+        const tags = (enriched.tags && enriched.tags.length > 0)
+            ? enriched.tags
+            : (COURSE_ENRICHMENT_CATALOG[enriched.id]?.tags || generateTags(enriched.course_name, enriched.description || ''))
 
         return {
-            ...data,
-            title: data.course_name,
-            description: data.description || (data.syllabus && data.syllabus.length > 0 ? data.syllabus.join(', ') : 'No description available'),
+            ...enriched,
+            title: enriched.course_name,
+            description: enriched.description || (enriched.syllabus && enriched.syllabus.length > 0 ? enriched.syllabus.join(', ') : 'No description available'),
             icon: style.icon,
             color: style.color,
-            price: data.fees?.total ? `₹${data.fees.total}` : 'Contact for Price',
+            price: enriched.fees?.total ? `₹${enriched.fees.total}` : 'Contact for Price',
             tags: tags
         } as Course
     },
