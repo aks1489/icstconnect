@@ -60,20 +60,15 @@ export async function generateSitemap() {
     )
     .join('\n')
 
-  const dynamicCourseUrls = courses
-    .filter((c) => c.id && c.id !== 69) // exclude dummy test courses
+  const validCourses = courses.filter((c) => c.id && c.id !== 69) // exclude dummy test courses
+
+  const dynamicCourseUrls = validCourses
     .map(
       (c) => `  <url>
     <loc>${BASE_URL}/courses/${c.id}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>${BASE_URL}/enroll/${c.id}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>`
     )
     .join('\n')
@@ -89,7 +84,7 @@ ${dynamicCourseUrls}
   const publicDir = path.join(rootDir, 'public')
   if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true })
   fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemapContent, 'utf-8')
-  console.log(`[Sitemap] Generated public/sitemap.xml with ${staticRoutes.length + courses.length * 2} URLs`)
+  console.log(`[Sitemap] Generated public/sitemap.xml with ${staticRoutes.length + validCourses.length} canonical URLs (pruned thin enroll forms)`)
 
   // Also write to dist/sitemap.xml if dist directory exists
   const distDir = path.join(rootDir, 'dist')

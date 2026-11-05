@@ -17,9 +17,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({
             ref={ref}
             className={`
                 rounded-2xl border border-slate-200/80 bg-white p-6 text-slate-900 transition-all duration-200
-                dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100
-                ${elevated ? 'shadow-md dark:shadow-slate-950/40' : 'shadow-xs'}
-                ${interactive ? 'hover:border-slate-300 hover:shadow-md cursor-pointer dark:hover:border-slate-700' : ''}
+                dark:border-slate-800 dark:bg-[#0F2440] dark:text-slate-100
+                ${elevated ? 'shadow-md dark:shadow-black/40' : 'shadow-xs'}
+                ${interactive ? 'hover:border-slate-300 hover:shadow-md cursor-pointer dark:hover:border-cyan-500/40 dark:hover:shadow-[0_0_20px_-5px_rgba(6,182,212,0.15)]' : ''}
                 ${className}
             `}
             {...props}
@@ -36,7 +36,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ cla
 )
 
 export const CardTitle: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({ className = '', ...props }) => (
-    <h3 className={`text-lg font-bold leading-none tracking-tight text-slate-900 dark:text-slate-100 ${className}`} {...props} />
+    <h3 className={`text-lg font-bold leading-none tracking-tight text-slate-900 dark:text-white ${className}`} {...props} />
 )
 
 export const CardDescription: React.FC<React.HTMLAttributes<HTMLParagraphElement>> = ({ className = '', ...props }) => (

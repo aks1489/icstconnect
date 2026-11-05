@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
+Allow: /online-test$
+Allow: /online-test
 Disallow: /student/
 Disallow: /teacher/
 Disallow: /admin/
@@ -8,10 +10,13 @@ Disallow: /super-admin/
 Disallow: /quick-access
 Disallow: /force-password-change
 Disallow: /reset-password
-Disallow: /online-test/*
+Disallow: /online-test/session/
+Disallow: /online-test/session/*
 
 User-agent: Googlebot
 Allow: /
+Allow: /online-test$
+Allow: /online-test
 Disallow: /student/
 Disallow: /teacher/
 Disallow: /admin/
@@ -20,6 +25,7 @@ Disallow: /super-admin/
 Disallow: /quick-access
 Disallow: /force-password-change
 Disallow: /reset-password
-Disallow: /online-test/*
+Disallow: /online-test/session/
+Disallow: /online-test/session/*
 
 Sitemap: https://icstconnect.in/sitemap.xml

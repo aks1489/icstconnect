@@ -1,7 +1,7 @@
 import React from 'react'
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-    variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral'
+    variant?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'tech' | 'navy'
     size?: 'sm' | 'md'
     dot?: boolean
 }
@@ -20,7 +20,9 @@ export const Badge: React.FC<BadgeProps> = ({
     }
 
     const variantStyles = {
-        primary: 'bg-[#2572AB]/10 text-[#1E5E91] border-[#2572AB]/20 dark:bg-[#4C96C2]/15 dark:text-[#78A5C5] dark:border-[#4C96C2]/30',
+        primary: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800/80',
+        tech: 'bg-cyan-500/10 text-cyan-700 border-cyan-500/30 shadow-xs dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-400/40',
+        navy: 'bg-[#0A192F]/10 text-[#0A192F] border-[#0A192F]/20 dark:bg-slate-800/80 dark:text-slate-200 dark:border-slate-700',
         success: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
         warning: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
         danger: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800',
@@ -29,7 +31,9 @@ export const Badge: React.FC<BadgeProps> = ({
     }
 
     const dotColors = {
-        primary: 'bg-[#2572AB]',
+        primary: 'bg-[#2563EB]',
+        tech: 'bg-[#06B6D4]',
+        navy: 'bg-[#0A192F] dark:bg-sky-400',
         success: 'bg-emerald-500',
         warning: 'bg-amber-500',
         danger: 'bg-rose-500',

@@ -52,7 +52,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
     return (
         <>
             <nav
-                className="fixed top-0 left-0 right-0 z-[1040] bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/80 shadow-sm py-3 transition-all duration-300"
+                className="fixed top-0 left-0 right-0 z-[1040] bg-white/90 dark:bg-[#0A192F]/90 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/80 shadow-xs py-3 transition-all duration-300"
             >
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-center justify-between">
@@ -63,10 +63,10 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 alt="ICST Chowberia Official Institute Logo"
                                 width={40}
                                 height={40}
-                                className="w-10 h-10 rounded-xl object-cover shadow-lg group-hover:shadow-slate-500/30 transition-all duration-300"
+                                className="w-10 h-10 rounded-xl object-cover shadow-md group-hover:shadow-blue-500/20 transition-all duration-300"
                             />
                             <div className="flex flex-col">
-                                <span className="font-bold text-lg leading-none tracking-tight transition-colors duration-300 text-slate-900 dark:text-white">ICST</span>
+                                <span className="font-bold text-lg leading-none tracking-tight transition-colors duration-300 text-[#0A192F] dark:text-white">ICST</span>
                                 <span className="text-[0.65rem] font-medium tracking-wider uppercase transition-colors duration-300 text-slate-500 dark:text-slate-400">Chowberia</span>
                             </div>
                         </Link>
@@ -81,7 +81,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                             className={`text-sm font-medium transition-colors relative group py-2 no-underline whitespace-nowrap ${getLinkClasses(location.pathname === link.href)}`}
                                         >
                                             {link.name}
-                                            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full bg-slate-900 dark:bg-sky-400 ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
+                                            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full bg-[#2563EB] dark:bg-[#38BDF8] ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
                                                 }`}></span>
                                         </Link>
                                     </li>
@@ -93,7 +93,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                             {user ? (
                                 <Link
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
-                                    className="px-5 py-2 rounded-full bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline"
+                                    className="px-5 py-2 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline"
                                 >
                                     <LayoutDashboard size={18} />
                                     <span>Dashboard</span>
@@ -102,7 +102,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 !isRestrictedAuthPage && (
                                     <button
                                         onClick={onLoginClick}
-                                        className="px-5 py-2 rounded-full text-sm font-medium hover:shadow-lg transition-all duration-300 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap bg-slate-900 dark:bg-sky-600 text-white hover:bg-slate-800 dark:hover:bg-sky-500 hover:shadow-slate-900/20"
+                                        className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap bg-[#0A192F] hover:bg-[#0F2440] text-white dark:bg-[#2563EB] dark:hover:bg-[#1D4ED8] shadow-sm hover:shadow-md cursor-pointer"
                                     >
                                         <User size={18} />
                                         <span>Login</span>
@@ -115,8 +115,9 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
 
                         {/* Mobile Menu Button */}
                         <button
-                            className="lg:hidden text-2xl focus:outline-none transition-colors duration-300 text-slate-800 dark:text-slate-200"
+                            className="lg:hidden text-2xl focus:outline-none transition-colors duration-300 text-slate-800 dark:text-slate-200 cursor-pointer"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            aria-label="Toggle Navigation Menu"
                         >
                             {isMobileMenuOpen ? <X /> : <Menu />}
                         </button>
@@ -126,14 +127,14 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                 {/* Mobile Menu Backdrop */}
                 {isMobileMenuOpen && (
                     <div 
-                        className="fixed inset-0 top-[57px] bg-slate-950/60 backdrop-blur-xs z-[-1] lg:hidden animate-in fade-in duration-200"
+                        className="fixed inset-0 top-[57px] bg-[#0A192F]/60 backdrop-blur-xs z-[-1] lg:hidden animate-in fade-in duration-200"
                         onClick={() => setIsMobileMenuOpen(false)}
                     />
                 )}
 
                 {/* Mobile Menu Dropdown */}
                 <div 
-                    className={`lg:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 shadow-2xl transition-all duration-300 overflow-hidden ${
+                    className={`lg:hidden absolute top-full left-0 right-0 bg-white/95 dark:bg-[#0A192F]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800 shadow-2xl transition-all duration-300 overflow-hidden ${
                         isMobileMenuOpen 
                             ? 'max-h-[460px] opacity-100 translate-y-0 pointer-events-auto' 
                             : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'
@@ -151,15 +152,15 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                         to={link.href}
                                         className={`flex flex-col items-center justify-center p-2 rounded-xl transition-all duration-200 no-underline group active:scale-95 ${
                                             isActive
-                                                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                                                : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white border border-slate-200/50 dark:border-slate-700/60'
+                                                ? 'bg-[#2563EB] text-white shadow-md shadow-blue-500/25'
+                                                : 'bg-slate-50 dark:bg-[#0F2440]/80 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#162E52] hover:text-slate-900 dark:hover:text-white border border-slate-200/50 dark:border-slate-700/60'
                                         }`}
                                         onClick={() => setIsMobileMenuOpen(false)}
                                     >
                                         <div className={`w-7 h-7 rounded-lg flex items-center justify-center mb-1 transition-transform group-hover:scale-110 ${
                                             isActive
                                                 ? 'bg-white/20 text-white'
-                                                : 'bg-white dark:bg-slate-900/70 text-slate-600 dark:text-slate-400 shadow-xs'
+                                                : 'bg-white dark:bg-[#0A192F]/80 text-slate-600 dark:text-slate-400 shadow-xs'
                                         }`}>
                                             <Icon size={16} />
                                         </div>
@@ -178,7 +179,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                             {user ? (
                                 <Link
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
-                                    className="flex-1 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 no-underline shadow-sm"
+                                    className="flex-1 py-2 px-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 no-underline shadow-sm"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
                                     <LayoutDashboard size={16} />
@@ -188,10 +189,10 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 !isRestrictedAuthPage && (
                                     <button
                                         onClick={() => {
-                                            onLoginClick();
+                                             onLoginClick();
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        className="flex-1 py-2 px-3 rounded-xl bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                                        className="flex-1 py-2 px-3 rounded-xl bg-[#0A192F] hover:bg-[#0F2440] dark:bg-[#2563EB] dark:hover:bg-[#1D4ED8] text-white font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
                                     >
                                         <User size={16} />
                                         <span>Login / Sign Up</span>
@@ -216,7 +217,7 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
 
     return (
         <div className="lg:hidden">
-            <nav className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 w-full z-[1030] pb-[env(safe-area-inset-bottom)]">
+            <nav className="bg-white/90 dark:bg-[#0A192F]/90 backdrop-blur-md border-t border-slate-200/70 dark:border-slate-800 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] fixed bottom-0 left-0 right-0 w-full z-[1030] pb-[env(safe-area-inset-bottom)]">
                 <div className="w-full h-full">
                     <div className="flex justify-evenly items-center w-full h-full py-3">
                         <Link to="/" className="no-underline text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 active:text-slate-800 dark:active:text-slate-100 flex flex-col items-center gap-1 transition-colors group">
@@ -235,7 +236,7 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                             {user ? (
                                 <Link
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
-                                    className="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all"
+                                    className="w-12 h-12 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-lg shadow-blue-600/30 hover:bg-[#1D4ED8] hover:scale-105 active:scale-95 transition-all"
                                 >
                                     <LayoutDashboard size={24} />
                                 </Link>
@@ -243,7 +244,8 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                                 !isRestrictedAuthPage ? (
                                     <button
                                         onClick={onLoginClick}
-                                        className="w-12 h-12 rounded-full bg-slate-900 dark:bg-sky-600 text-white flex items-center justify-center shadow-lg shadow-slate-900/30 hover:scale-105 active:scale-95 transition-all"
+                                        className="w-12 h-12 rounded-full bg-[#0A192F] dark:bg-[#2563EB] text-white flex items-center justify-center shadow-lg shadow-slate-900/30 dark:shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                        aria-label="Login"
                                     >
                                         <User size={24} />
                                     </button>

@@ -259,10 +259,10 @@ const CoursesPage = () => {
                         </div>
                     ) : (
                         filteredCourses.map((course) => (
-                            <div
+                            <Link
                                 key={course.id}
-                                onClick={() => handleCourseClick(course)}
-                                className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 dark:border-slate-800 flex flex-col h-full cursor-pointer"
+                                to={`/courses/${course.id}`}
+                                className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100 dark:border-slate-800 flex flex-col h-full cursor-pointer no-underline text-inherit"
                             >
                                 <div className={`h-32 ${course.color} dark:!bg-slate-800/80 dark:border-b dark:border-slate-800/60 flex items-center justify-center relative overflow-hidden`}>
                                     <div className="absolute inset-0 opacity-10 pattern-dots"></div>
@@ -295,18 +295,12 @@ const CoursesPage = () => {
                                     </p>
                                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
                                         <span className="text-slate-900 dark:text-white font-bold">{course.price}</span>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleCourseClick(course)
-                                            }}
-                                            className="text-blue-600 dark:text-blue-400 font-semibold text-sm hover:underline cursor-pointer"
-                                        >
-                                            View Details
-                                        </button>
+                                        <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm group-hover:underline inline-flex items-center gap-1">
+                                            View Details →
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))
                     )}
                 </div>

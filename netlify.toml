@@ -6,6 +6,33 @@
   node_bundler = "esbuild"
   directory = "netlify/functions"
 
+# 1. Canonical Domain Redirection (301 Permanent)
+[[redirects]]
+  from = "https://www.icstconnect.in/*"
+  to = "https://icstconnect.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.icstconnect.in/*"
+  to = "https://icstconnect.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://icstconnect.in/*"
+  to = "https://icstconnect.in/:splat"
+  status = 301
+  force = true
+
+# 2. Legacy Route Redirections (301 Permanent)
+[[redirects]]
+  from = "/login"
+  to = "/"
+  status = 301
+  force = true
+
+# 3. Serverless API Function Rewrites (200 Proxy)
 [[redirects]]
   from = "/api/send-email"
   to = "/.netlify/functions/send-email"
@@ -21,6 +48,7 @@
   to = "/.netlify/functions/create-auth-user"
   status = 200
 
+# 4. Single Page Application (SPA) Fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
