@@ -516,17 +516,17 @@ html.dark .gradient-text-tech,
 }
 
 /* ==============================================================================
-   FUTURISTIC CIRCUIT SYSTEM MOUSE CURSOR
-   Uses Futuristic_Circuit_Cursor_Icon from icons folder
-   Hotspot calibrated to arrow tip (2px from left, 0px from top)
+   LOADING BLUE SYSTEM MOUSE CURSOR
+   Uses LoadingBlue (.ani, .cur, and high-DPI 32-bit PNG)
+   Hotspot calibrated to arrow tip (1px from left, 1px from top)
    ============================================================================== */
 :root,
 html,
 body {
-    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, auto;
+    cursor: url('/LoadingBlue.ani') 1 1, url('/LoadingBlue.cur') 1 1, url('/icons/cursor-32.png') 1 1, url('/cursor.png') 1 1, auto;
 }
 
-/* Interactive elements default to futuristic cursor pointer */
+/* Interactive elements default to LoadingBlue cursor pointer */
 a,
 button,
 [role="button"],
@@ -536,12 +536,12 @@ input[type="button"],
 input[type="reset"],
 select,
 summary {
-    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, pointer !important;
+    cursor: url('/LoadingBlue.ani') 1 1, url('/LoadingBlue.cur') 1 1, url('/icons/cursor-32.png') 1 1, url('/cursor.png') 1 1, pointer !important;
 }
 
 /* Default cursor elements */
 .cursor-default {
-    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, default !important;
+    cursor: url('/LoadingBlue.ani') 1 1, url('/LoadingBlue.cur') 1 1, url('/icons/cursor-32.png') 1 1, url('/cursor.png') 1 1, default !important;
 }
 
 /* Text editing elements maintain native I-beam cursor */
