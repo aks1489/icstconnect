@@ -2,6 +2,7 @@ export interface SendEmailPayload {
     to: string;
     subject: string;
     html: string;
+    text?: string;
 }
 
 export interface SendEmailResult {
@@ -26,14 +27,14 @@ export interface SmtpVerifyResult {
  * - Vite dev server API middleware (in local dev & LAN)
  * - Netlify serverless function (in production)
  */
-export const sendEmail = async ({ to, subject, html }: SendEmailPayload): Promise<SendEmailResult> => {
+export const sendEmail = async ({ to, subject, html, text }: SendEmailPayload): Promise<SendEmailResult> => {
     try {
         const response = await fetch('/api/send-email', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ to, subject, html }),
+            body: JSON.stringify({ to, subject, html, text }),
         });
 
         const data = await response.json().catch(() => ({}));

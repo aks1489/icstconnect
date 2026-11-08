@@ -154,3 +154,4 @@ if (primaryRgba) {
 }
 
 console.log(`Successfully extracted ${frameIdx} frames and updated public/icons/ and public/`);
+
