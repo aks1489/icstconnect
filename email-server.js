@@ -46,9 +46,31 @@ app.all('/api/smtp-verify', async (req, res) => {
     }
 })
 
+function htmlToPlainText(html) {
+    if (!html) return ''
+    return html
+        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<\/h[1-6]>/gi, '\n\n')
+        .replace(/<\/p>/gi, '\n\n')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/li>/gi, '\n')
+        .replace(/<li[^>]*>/gi, '• ')
+        .replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '$2 ($1)')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/\n\s*\n\s*\n/g, '\n\n')
+        .trim()
+}
+
 app.post('/api/send-email', async (req, res) => {
     try {
-        const { to, subject, html } = req.body
+        const { to, subject, html, text } = req.body
 
         if (!to || !subject || !html) {
             return res.status(400).json({ success: false, error: 'Missing required fields: to, subject, html' })
@@ -56,11 +78,21 @@ app.post('/api/send-email', async (req, res) => {
 
         const transporter = getTransporter()
         const senderAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'icstconnect@gmail.com'
+        const plainText = text || htmlToPlainText(html)
+
         const info = await transporter.sendMail({
             from: `"ICST Connect" <${senderAddress}>`,
             to,
+            replyTo: senderAddress,
             subject,
-            html
+            text: plainText,
+            html,
+            headers: {
+                'X-Mailer': 'ICST Connect Mailer',
+                'X-Entity-Ref-ID': `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+                'List-Unsubscribe': `<mailto:${senderAddress}?subject=Unsubscribe>`,
+                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            }
         })
 
         console.log('Message sent: %s', info.messageId)

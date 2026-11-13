@@ -1,7 +1,7 @@
 import React from 'react'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+    variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'navy' | 'techCyan' | 'glass'
     size?: 'sm' | 'md' | 'lg'
     isLoading?: boolean
     leftIcon?: React.ReactNode
@@ -28,11 +28,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     }
 
     const variantStyles = {
-        primary: 'bg-[#2572AB] hover:bg-[#1E5E91] active:bg-[#184F7B] text-white shadow-sm hover:shadow focus-visible:ring-[#2572AB] dark:bg-[#2572AB] dark:hover:bg-[#1E5E91]',
+        primary: 'bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-[#1E40AF] text-white shadow-sm hover:shadow-md focus-visible:ring-[#2563EB] dark:bg-[#2563EB] dark:hover:bg-[#1D4ED8] dark:active:bg-[#1E40AF]',
         secondary: 'bg-slate-100 hover:bg-slate-200 text-slate-800 focus-visible:ring-slate-400 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100',
-        outline: 'border border-slate-300 hover:border-[#2572AB] hover:bg-slate-50 text-slate-700 focus-visible:ring-[#2572AB] dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800/60',
+        outline: 'border border-slate-300 hover:border-[#2563EB] hover:bg-blue-50/50 text-slate-700 focus-visible:ring-[#2563EB] dark:border-slate-700 dark:text-slate-200 dark:hover:border-sky-400 dark:hover:bg-blue-950/30',
         ghost: 'bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 focus-visible:ring-slate-400 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white',
-        danger: 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-sm focus-visible:ring-rose-500'
+        danger: 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-sm focus-visible:ring-rose-500',
+        navy: 'bg-[#0A192F] hover:bg-[#0F2440] active:bg-[#060D17] text-white shadow-sm hover:shadow focus-visible:ring-[#0A192F] dark:bg-[#0F2440] dark:hover:bg-[#162E52] dark:border dark:border-slate-700',
+        techCyan: 'bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-[#0A192F] font-semibold shadow-glow-cyan border border-white/25 active:scale-[0.99] focus-visible:ring-cyan-400',
+        glass: 'bg-white/70 hover:bg-white/90 text-slate-800 border border-slate-200/80 backdrop-blur-md shadow-xs hover:border-cyan-500/40 dark:bg-slate-900/60 dark:hover:bg-slate-900/80 dark:text-slate-100 dark:border-slate-700/80 dark:hover:border-sky-400/50 focus-visible:ring-sky-400'
     }
 
     return (

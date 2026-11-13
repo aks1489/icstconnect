@@ -269,6 +269,7 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
 
                                     <Link
                                         to={`${basePath}/${test.id}`}
+                                        rel={isStudentPortal ? undefined : "nofollow"}
                                         className="mt-6 w-full py-3.5 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 transition-all shadow-lg shadow-slate-200 dark:shadow-none group-hover:shadow-indigo-200 dark:group-hover:shadow-none"
                                     >
                                         Start Challenge <ArrowRight size={16} />

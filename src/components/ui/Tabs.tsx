@@ -40,7 +40,7 @@ export const TabsList: React.FC<TabsListProps> = ({ children, className = '', ..
     return (
         <div
             role="tablist"
-            className={`inline-flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 ${className}`}
+            className={`inline-flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-[#0A192F] border border-slate-200/80 dark:border-slate-800 ${className}`}
             {...props}
         >
             {children}
@@ -79,10 +79,10 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
             className={`
                 inline-flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 select-none
                 ${isActive
-                    ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-slate-100'
+                    ? 'bg-white text-slate-900 shadow-xs dark:bg-[#0F2440] dark:text-white dark:shadow-md'
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
                 }
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2572AB]
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] dark:focus-visible:ring-[#38BDF8]
                 ${className}
             `}
             {...props}

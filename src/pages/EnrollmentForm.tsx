@@ -462,6 +462,7 @@ export default function EnrollmentForm() {
                 title={`Enroll in ${course?.title || 'Computer Course'} | ICST Chowberia Admission`}
                 description={`Online admission application for ${course?.title || 'technical courses'} at ICST Chowberia. Reserve your seat and receive enrollment confirmation.`}
                 canonicalPath={`/enroll/${courseId}`}
+                robots="noindex, follow"
                 breadcrumbs={[
                     { name: 'Home', path: '/' },
                     { name: 'Courses', path: '/courses' },

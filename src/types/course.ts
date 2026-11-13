@@ -18,6 +18,11 @@ export interface Course {
     tags: string[]
     title: string // Computed for compatibility
     price: string // Computed for compatibility
+    credential?: string
+    prerequisites?: string
+    competencies?: string
+    careerPathways?: string[]
+    searchQueries?: string[]
 }
 
 export interface Topic {

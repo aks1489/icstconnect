@@ -5,10 +5,11 @@ import { IconBrandFacebook as Facebook, IconBrandInstagram as Instagram, IconMap
 
 const Footer: React.FC = () => {
     return (
-        <footer className="bg-slate-900 text-slate-300 py-12 lg:py-16 relative overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5 pointer-events-none">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+        <footer className="bg-[#0A192F] text-slate-300 py-12 lg:py-16 relative overflow-hidden border-t border-slate-800/80">
+            {/* Background Tech Glow Pattern */}
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle,_rgba(6,182,212,0.15)_0%,_transparent_70%)]"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[radial-gradient(circle,_rgba(37,99,235,0.15)_0%,_transparent_70%)]"></div>
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -16,7 +17,7 @@ const Footer: React.FC = () => {
                     {/* Brand Column */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white text-xl font-bold">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-blue-500/20">
                                 I
                             </div>
                             <div className="flex flex-col">
@@ -28,10 +29,10 @@ const Footer: React.FC = () => {
                             Empowering students with cutting-edge computer science education and technical skills for a brighter future.
                         </p>
                         <div className="flex gap-4 pt-2">
-                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all" aria-label="Facebook">
                                 <Facebook size={18} />
                             </motion.a>
-                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all">
+                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all" aria-label="Instagram">
                                 <Instagram size={18} />
                             </motion.a>
                         </div>
@@ -72,26 +73,26 @@ const Footer: React.FC = () => {
                             <h3 className="text-white font-bold mb-6">Contact Us</h3>
                             <ul className="space-y-4 text-sm">
                                 <li className="flex items-start gap-3">
-                                    <MapPin size={18} className="mt-1 text-slate-400" />
+                                    <MapPin size={18} className="mt-1 text-slate-400 shrink-0" />
                                     <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors no-underline">Chowberia, West Bengal, India, 743290</a>
                                 </li>
                                 <li className="flex items-center gap-3">
-                                    <Mail size={18} className="text-slate-400" />
+                                    <Mail size={18} className="text-slate-400 shrink-0" />
                                     <a href="mailto:icstconnect@gmail.com" className="hover:text-white transition-colors no-underline">icstconnect@gmail.com</a>
                                 </li>
                                 <li className="flex items-center gap-3">
-                                    <Phone size={18} className="text-slate-400" />
+                                    <Phone size={18} className="text-slate-400 shrink-0" />
                                     <a href="tel:+918158031706" className="hover:text-white transition-colors no-underline">+91 8158031706</a>
                                 </li>
                                 <li className="flex items-center gap-3">
-                                    <MapPin size={18} className="text-slate-400" />
-                                    <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 transition-colors no-underline font-medium">Find us on Google Maps!</a>
+                                    <MapPin size={18} className="text-slate-400 shrink-0" />
+                                    <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 transition-colors no-underline font-medium">Find us on Google Maps!</a>
                                 </li>
                             </ul>
                         </div>
 
                         {/* Google Map */}
-                        <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-800 shadow-md bg-slate-950/40">
+                        <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-800 shadow-md bg-[#0F2440]/60">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4357.177095850362!2d88.6659443753125!3d22.97858537920462!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f8b70842278311%3A0x18740b054ed687a7!2sINSTITUTE%20OF%20COMPUTER%20SCIENCE%20AND%20TECHNOLOGY%20CHOWBERIA%20(ICST%20Chowberia)!5e1!3m2!1sen!2sin!4v1791739994660!5m2!1sen!2sin"
                                 width="100%"

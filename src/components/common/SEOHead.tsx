@@ -14,6 +14,7 @@ export interface SEOHeadProps {
   canonicalPath?: string
   canonical?: string
   noindex?: boolean
+  robots?: string
   schema?: Record<string, any> | Record<string, any>[]
   ogType?: string
   ogImage?: string
@@ -26,6 +27,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
   canonicalPath = '',
   canonical,
   noindex = false,
+  robots,
   schema,
   ogType = 'website',
   ogImage = DEFAULT_IMAGE,
@@ -50,7 +52,8 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
     }
 
     // 2. Robots Directive
-    setMetaTag('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow')
+    const robotsDirective = robots ? robots : (noindex ? 'noindex, nofollow' : 'index, follow')
+    setMetaTag('name', 'robots', robotsDirective)
 
     // 3. Meta Description (Target 120-160 chars)
     if (description) {
@@ -124,7 +127,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
       const cleanupScript = document.getElementById(scriptId)
       if (cleanupScript) cleanupScript.remove()
     }
-  }, [title, description, canonicalPath, noindex, schema, ogType, ogImage, breadcrumbs])
+  }, [title, description, canonicalPath, noindex, robots, schema, ogType, ogImage, breadcrumbs])
 
   return null
 }

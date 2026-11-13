@@ -65,6 +65,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
         root.setAttribute('data-theme', resolvedTheme)
 
+        // Dynamically update mobile browser theme-color meta tag
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#0A192F' : '#FFFFFF')
+        }
+
         const timer = setTimeout(() => {
             root.classList.remove('theme-transitioning')
         }, 450)

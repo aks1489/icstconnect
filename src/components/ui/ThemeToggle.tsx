@@ -71,7 +71,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showLa
         if (resolvedTheme === 'dark') {
             return (
                 <span className={`inline-flex transition-transform duration-500 ${isRotating ? '-rotate-90 scale-110' : '-rotate-12 group-hover:rotate-0 group-hover:scale-110'}`}>
-                    <IconMoon size={18} className="text-indigo-400" />
+                    <IconMoon size={18} className="text-cyan-400" />
                 </span>
             )
         }
@@ -92,7 +92,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showLa
         <button
             type="button"
             onClick={cycleTheme}
-            className={`group inline-flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 backdrop-blur-md transition-all shadow-sm active:scale-95 hover:shadow cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 ${className}`}
+            className={`group inline-flex items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#0F2440]/80 hover:bg-slate-100 dark:hover:bg-[#162E52] text-slate-700 dark:text-slate-200 backdrop-blur-md transition-all shadow-xs active:scale-95 hover:shadow cursor-pointer focus-visible:ring-2 focus-visible:ring-[#2563EB] dark:focus-visible:ring-[#38BDF8] ${className}`}
             title={`Current: ${getLabel()} (Click to toggle)`}
             aria-label={`Toggle Theme: currently ${getLabel()}`}
         >

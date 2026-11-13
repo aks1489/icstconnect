@@ -1,0 +1,15 @@
+# Canonical Domain Redirections
+https://www.icstconnect.in/* https://icstconnect.in/:splat 301!
+http://www.icstconnect.in/* https://icstconnect.in/:splat 301!
+http://icstconnect.in/* https://icstconnect.in/:splat 301!
+
+# Legacy Route Redirections
+/login / 301!
+
+# Netlify Functions Rewrites
+/api/send-email /.netlify/functions/send-email 200
+/api/smtp-verify /.netlify/functions/smtp-verify 200
+/api/create-auth-user /.netlify/functions/create-auth-user 200
+
+# SPA Fallback
+/* /index.html 200

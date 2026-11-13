@@ -4,14 +4,11 @@ import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/
 import { motion } from 'framer-motion'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
-import CourseDetailsModal from '../../courses/CourseDetailsModal'
 import type { Course } from '../../../types/course'
 
 const CoursesSection = () => {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
-    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
 
     useEffect(() => {
         const fetchAndFilterCourses = async () => {
@@ -54,11 +51,6 @@ const CoursesSection = () => {
 
         fetchAndFilterCourses()
     }, [])
-
-    const handleCourseClick = (course: Course) => {
-        setSelectedCourse(course)
-        setIsModalOpen(true)
-    }
 
     const getIconType = (title: string): any => {
         const t = title.toLowerCase()
@@ -137,10 +129,10 @@ const CoursesSection = () => {
                                 const key = `${course.id}-${index}`;
 
                                 return (
-                                    <div
+                                    <Link
                                         key={key}
-                                        onClick={() => handleCourseClick(course)}
-                                        className="w-[240px] md:w-[280px] flex-shrink-0 group relative bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-800 hover:border-blue-100 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 flex flex-col items-center text-center cursor-pointer select-none"
+                                        to={`/courses/${course.id}`}
+                                        className="w-[240px] md:w-[280px] flex-shrink-0 group relative bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-800 hover:border-blue-100 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 flex flex-col items-center text-center cursor-pointer select-none no-underline text-inherit"
                                     >
                                         <div className={`w-14 h-14 md:w-16 md:h-16 mb-4 relative flex items-center justify-center`}>
                                             <div className={`absolute inset-0 bg-${color}-50 dark:bg-${color}-950/40 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300`}></div>
@@ -168,8 +160,8 @@ const CoursesSection = () => {
                                                 View Details
                                             </span>
                                         </div>
-                                    </div>
-                                )
+                                    </Link>
+                                );
                             })}
                         </motion.div>
                     </div>
@@ -188,12 +180,6 @@ const CoursesSection = () => {
                 </div>
             </div>
 
-            {/* Course Details Modal */}
-            <CourseDetailsModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                course={selectedCourse}
-            />
         </section>
     )
 }

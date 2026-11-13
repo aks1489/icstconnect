@@ -3,84 +3,219 @@
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
+    /* Typography */
     --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --color-primary: #2572ab;
-    --color-accent: #4c96c2;
-    --color-primary-light: #78a5c5;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* Brand Foundation Scales */
+    --color-navy-50: #F0F5FA;
+    --color-navy-100: #E2ECF5;
+    --color-navy-200: #C5D9EB;
+    --color-navy-300: #97BCDC;
+    --color-navy-400: #6399C8;
+    --color-navy-500: #3D7AB0;
+    --color-navy-600: #2A5F8E;
+    --color-navy-700: #204C73;
+    --color-navy-800: #193C5C;
+    --color-navy-900: #0F2B42;
+    --color-navy-950: #0A192F;
+
+    --color-royal-50: #EFF6FF;
+    --color-royal-100: #DBEAFE;
+    --color-royal-200: #BFDBFE;
+    --color-royal-300: #93C5FD;
+    --color-royal-400: #60A5FA;
+    --color-royal-500: #3B82F6;
+    --color-royal-600: #2563EB;
+    --color-royal-700: #1D4ED8;
+    --color-royal-800: #1E40AF;
+    --color-royal-900: #1E3A8A;
+    --color-royal-950: #172554;
+
+    --color-cyan-tech: #06B6D4;
+    --color-cyan-400: #22D3EE;
+    --color-sky-tech: #38BDF8;
+    --color-sky-500: #0EA5E9;
+    --color-sky-600: #0284C7;
+    --color-sky-700: #0369A1;
+
+    /* Semantic Color Utilities mapped to dynamic theme CSS variables */
+    --color-primary: var(--brand-primary);
+    --color-primary-hover: var(--brand-primary-hover);
+    --color-primary-active: var(--brand-primary-active);
+    --color-primary-soft: var(--brand-primary-soft);
+
+    --color-accent: var(--brand-accent);
+    --color-accent-hover: var(--brand-accent-hover);
+
+    --color-surface: var(--surface);
+    --color-surface-subtle: var(--surface-subtle);
+    --color-surface-elevated: var(--surface-elevated);
+    --color-surface-glass: var(--surface-glass);
+    --color-surface-overlay: var(--surface-overlay);
+
+    --color-foreground: var(--foreground);
+    --color-foreground-muted: var(--foreground-muted);
+    --color-foreground-subtle: var(--foreground-subtle);
+    --color-foreground-inverse: var(--foreground-inverse);
+
+    --color-border: var(--border);
+    --color-border-subtle: var(--border-subtle);
+    --color-border-brand: var(--border-brand);
+    --color-border-cyan: var(--border-cyan);
+
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-danger: var(--danger);
+    --color-info: var(--info);
+
+    /* Shadows & Luminous Glows */
+    --shadow-glow-cyan: 0 0 20px -3px rgba(6, 182, 212, 0.45);
+    --shadow-glow-cyan-lg: 0 0 35px -5px rgba(6, 182, 212, 0.55);
+    --shadow-glow-royal: 0 0 25px -4px rgba(37, 99, 235, 0.45);
+    --shadow-glass: var(--glass-shadow);
 }
 
 /* ==============================================================================
-   SEMANTIC BRAND & DESIGN TOKENS (LIGHT / DARK SYSTEM)
-   Derived strictly from official ICST Logo (upgrade.md Section 4)
+   SEMANTIC DESIGN TOKENS - DUAL PALETTE ARCHITECTURE (LIGHT / DARK)
+   Tailored for ICST Connect: Deep Navy, Royal Blue, Tech Cyan, Off-White, Charcoal
    ============================================================================== */
 
 :root,
 html.light,
 [data-theme="light"] {
     color-scheme: light;
-    --brand-primary: #2572AB;
-    --brand-primary-strong: #1E5E91;
-    --brand-primary-soft: #EAF4FB;
-    --brand-charcoal: #474747;
-    --brand-muted-blue: #78A5C5;
-    --brand-navy: #234D68;
-    --brand-cyan: #4C96C2;
 
-    --surface: #FFFFFF;
-    --surface-subtle: #F5F8FA;
-    --surface-elevated: #FFFFFF;
-    --surface-glass: rgba(255, 255, 255, 0.75);
+    /* --- BRAND PILLARS --- */
+    --brand-navy: #0A192F;
+    --brand-primary: #2563EB;              /* Royal Blue 600 */
+    --brand-primary-hover: #1D4ED8;        /* Royal Blue 700 */
+    --brand-primary-active: #1E40AF;       /* Royal Blue 800 */
+    --brand-primary-soft: #EFF6FF;         /* Light Royal Tint */
     
-    --foreground: #262626;
-    --foreground-muted: #66717A;
-    --border: #DCE5EA;
-    --border-subtle: #EDF3F7;
+    --brand-accent: #0A192F;               /* Institutional Deep Navy anchor in light */
+    --brand-accent-hover: #0F2440;
+    
+    --brand-cyan: #06B6D4;                 /* Tech Cyan 500 */
+    --brand-cyan-glow: #0EA5E9;            /* Sky 500 */
+    --brand-cyan-accessible: #0284C7;      /* Sky 600 - WCAG AA compliant on white */
+    --brand-cyan-soft: rgba(6, 182, 212, 0.10);
+    
+    --brand-charcoal: #0F172A;             /* Slate 900 */
 
-    --success: #2E7D5B;
-    --warning: #B7791F;
-    --danger: #C44747;
-    --info: #3578A8;
+    /* --- SURFACES & CANVAS --- */
+    --surface: #FFFFFF;                    /* Pure Crisp White */
+    --surface-subtle: #F8FAFC;             /* Slate 50 Soft Canvas */
+    --surface-elevated: #FFFFFF;           /* Card Surface */
+    --surface-glass: rgba(255, 255, 255, 0.85);
+    --surface-overlay: rgba(15, 23, 42, 0.60);
+    --surface-nav: rgba(255, 255, 255, 0.85);
 
-    /* Glass Tokens */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-highlight: rgba(255, 255, 255, 0.8);
-    --glass-shadow: 0 8px 32px 0 rgba(35, 77, 104, 0.08);
+    /* --- TYPOGRAPHY & FOREGROUND --- */
+    --foreground: #0F172A;                 /* Dark Charcoal / Slate 900 (17.8:1 AAA) */
+    --foreground-muted: #475569;           /* Charcoal / Slate 600 (5.3:1 AA) */
+    --foreground-subtle: #64748B;          /* Slate 500 (4.0:1 UI) */
+    --foreground-inverse: #FFFFFF;         /* White text on dark elements */
+    --foreground-on-accent: #FFFFFF;       /* White text on royal blue buttons */
+    --foreground-on-cyan: #0A192F;         /* Deep Navy text on tech cyan (7.3:1 AAA) */
+
+    /* --- BORDERS & SEPARATORS --- */
+    --border: #E2E8F0;                     /* Slate 200 standard border */
+    --border-subtle: #F1F5F9;              /* Slate 100 soft separator */
+    --border-brand: #2563EB;               /* Royal Blue focus / active */
+    --border-cyan: #0891B2;                /* Cyan 600 high contrast */
+    --border-glass: rgba(226, 232, 240, 0.80);
+    --focus-ring: #2563EB;
+
+    /* --- STATUS ACCENTS --- */
+    --success: #059669;                    /* Emerald 600 */
+    --success-soft: #ECFDF5;
+    --warning: #D97706;                    /* Amber 600 */
+    --warning-soft: #FFFBEB;
+    --danger: #DC2626;                     /* Red 600 */
+    --danger-soft: #FEF2F2;
+    --info: #0284C7;                       /* Sky 600 */
+    --info-soft: #F0F9FF;
+
+    /* --- GLASSMORPHISM & SHADOWS --- */
+    --glass-bg: rgba(255, 255, 255, 0.80);
+    --glass-border: rgba(226, 232, 240, 0.80);
+    --glass-highlight: rgba(255, 255, 255, 0.90);
+    --glass-shadow: 0 10px 30px -10px rgba(10, 25, 47, 0.08), 0 4px 12px -2px rgba(10, 25, 47, 0.04);
     --glass-blur: 16px;
+    --glass-blur-sm: 8px;
+    --glass-blur-lg: 24px;
+
+    --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    --elevated-shadow: 0 20px 35px -10px rgba(15, 23, 42, 0.10), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
 }
 
 html.dark,
 [data-theme="dark"] {
     color-scheme: dark;
-    --brand-primary: #4C96C2;
-    --brand-primary-strong: #78A5C5;
-    --brand-primary-soft: #182C3D;
-    --brand-charcoal: #A3AFB8;
-    --brand-muted-blue: #78A5C5;
-    --brand-navy: #0F1F2C;
-    --brand-cyan: #4C96C2;
 
-    --surface: #0F1C26;
-    --surface-subtle: #162734;
-    --surface-elevated: #1D3242;
-    --surface-glass: rgba(15, 28, 38, 0.8);
+    /* --- BRAND PILLARS --- */
+    --brand-navy: #0A192F;                 /* Cosmic Navy base */
+    --brand-primary: #3B82F6;              /* Luminous Royal Blue 500 */
+    --brand-primary-hover: #2563EB;        /* Royal Blue 600 */
+    --brand-primary-active: #1D4ED8;       /* Royal Blue 700 */
+    --brand-primary-soft: rgba(59, 130, 246, 0.15);
     
-    --foreground: #F0F4F8;
-    --foreground-muted: #9BB0C1;
-    --border: #2A4356;
-    --border-subtle: #1D3242;
+    --brand-accent: #38BDF8;               /* Electric Tech Sky / Cyan in dark mode */
+    --brand-accent-hover: #0EA5E9;
+    
+    --brand-cyan: #06B6D4;                 /* Tech Cyan 500 */
+    --brand-cyan-glow: #38BDF8;            /* Sky 400 Luminous */
+    --brand-cyan-accessible: #38BDF8;      /* Sky 400 - WCAG AAA on navy */
+    --brand-cyan-soft: rgba(6, 182, 212, 0.18);
+    
+    --brand-charcoal: #E2E8F0;             /* In dark mode, lightened charcoal */
 
-    --success: #3E9D73;
-    --warning: #D8942E;
-    --danger: #DC5A5A;
-    --info: #4C96C2;
+    /* --- SURFACES & CANVAS --- */
+    --surface: #0A192F;                    /* Deep Cosmic Navy Base */
+    --surface-subtle: #0B1E38;             /* Slightly elevated canvas */
+    --surface-elevated: #0F2440;           /* Tech Navy Elevated Card */
+    --surface-glass: rgba(15, 36, 64, 0.75);
+    --surface-overlay: rgba(6, 13, 23, 0.80);
+    --surface-nav: rgba(10, 25, 47, 0.85);
 
-    /* Glass Tokens */
-    --glass-bg: rgba(15, 28, 38, 0.75);
+    /* --- TYPOGRAPHY & FOREGROUND --- */
+    --foreground: #F8FAFC;                 /* Crisp Off-White (17.5:1 AAA on #0A192F) */
+    --foreground-muted: #94A3B8;           /* Slate 400 (6.8:1 AA) */
+    --foreground-subtle: #64748B;          /* Slate 500 (3.8:1 UI/Icons) */
+    --foreground-inverse: #0A192F;         /* Dark text on light elements */
+    --foreground-on-accent: #FFFFFF;       /* White text on royal blue buttons */
+    --foreground-on-cyan: #0A192F;         /* Dark Navy text on tech cyan (7.3:1 AAA) */
+
+    /* --- BORDERS & SEPARATORS --- */
+    --border: #1E293B;                     /* Slate 800 dark border */
+    --border-subtle: #162E52;              /* Tech navy subtle divider */
+    --border-brand: #3B82F6;               /* Luminous Royal focus ring */
+    --border-cyan: rgba(6, 182, 212, 0.40); /* Tech cyan edge highlight */
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --focus-ring: #38BDF8;
+
+    /* --- STATUS ACCENTS --- */
+    --success: #10B981;                    /* Emerald 500 */
+    --success-soft: rgba(16, 185, 129, 0.15);
+    --warning: #F59E0B;                    /* Amber 500 */
+    --warning-soft: rgba(245, 158, 11, 0.15);
+    --danger: #EF4444;                     /* Red 500 */
+    --danger-soft: rgba(239, 68, 68, 0.15);
+    --info: #38BDF8;                       /* Sky 400 */
+    --info-soft: rgba(56, 189, 248, 0.15);
+
+    /* --- GLASSMORPHISM & SHADOWS --- */
+    --glass-bg: rgba(15, 36, 64, 0.70);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-highlight: rgba(255, 255, 255, 0.05);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    --glass-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.50);
     --glass-blur: 16px;
+    --glass-blur-sm: 8px;
+    --glass-blur-lg: 24px;
+
+    --card-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.40);
+    --elevated-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.60), 0 0 25px -5px rgba(6, 182, 212, 0.12);
 }
 
 :root {
@@ -100,12 +235,14 @@ html.dark,
     }
 
     body {
-        @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100;
+        background-color: var(--surface-subtle);
+        color: var(--foreground);
+        transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     /* Accessible Focus Rings */
     :focus-visible {
-        outline: 2px solid var(--brand-accent);
+        outline: 2px solid var(--focus-ring);
         outline-offset: 2px;
     }
 }
@@ -163,33 +300,189 @@ html.theme-transitioning *::after {
 }
 
 /* ==============================================================================
-   MODERN GLASSMORPHISM SURFACES
+   MODERN GLASSMORPHISM SURFACES & UTILITY CLASSES
    ============================================================================== */
 
-.glass-panel {
+/* Fixed Glass Navigation Bar */
+.glass-nav {
+    background: var(--surface-nav);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid var(--border-glass);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    will-change: transform, backdrop-filter;
+    transform: translateZ(0);
+}
+
+/* Base Glass Card */
+.glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    will-change: transform, backdrop-filter;
+    border-radius: 1rem;
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow;
     transform: translateZ(0);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-card {
+.glass-card:hover {
+    border-color: rgba(6, 182, 212, 0.40);
+    transform: translateY(-2px) translateZ(0);
+    box-shadow: var(--glass-shadow), 0 0 20px -4px rgba(6, 182, 212, 0.20);
+}
+
+/* Static Glass Panel (Modals, Dropdowns, Sidebars) */
+.glass-panel {
     background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(var(--glass-blur-lg));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg));
     border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: var(--elevated-shadow);
+    border-radius: 1.25rem;
     will-change: transform;
     transform: translateZ(0);
 }
 
-.glass-card:hover {
-    border-color: var(--brand-accent);
-    transform: translateY(-2px) translateZ(0);
+/* ==============================================================================
+   BUTTON DESIGN TOKENS & UTILITIES
+   ============================================================================== */
+
+/* Base Button Primitive */
+.btn-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    border-radius: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    outline: none;
+    position: relative;
+    white-space: nowrap;
+}
+
+.btn-base:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.btn-base:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Primary CTA Button: Royal Blue */
+.btn-primary {
+    background-color: var(--brand-primary);
+    color: var(--foreground-on-accent);
+    box-shadow: 0 2px 10px -1px rgba(37, 99, 235, 0.35);
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-primary-hover);
+    box-shadow: 0 4px 18px -2px rgba(37, 99, 235, 0.50);
+    transform: translateY(-1px) translateZ(0);
+}
+
+.btn-primary:active {
+    background-color: var(--brand-primary-active);
+    transform: translateY(0) translateZ(0);
+}
+
+/* Tech Cyan CTA Button */
+.btn-tech-cyan {
+    background: linear-gradient(135deg, #06B6D4 0%, #0EA5E9 100%);
+    color: var(--foreground-on-cyan);
+    font-weight: 600;
+    box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.btn-tech-cyan:hover {
+    background: linear-gradient(135deg, #22D3EE 0%, #38BDF8 100%);
+    box-shadow: 0 0 28px -2px rgba(6, 182, 212, 0.65);
+    transform: translateY(-1px) translateZ(0);
+}
+
+.btn-tech-cyan:active {
+    transform: translateY(0) translateZ(0);
+}
+
+/* ==============================================================================
+   BADGES, GRADIENTS & LUMINOUS GLOW UTILITIES
+   ============================================================================== */
+
+/* Brand Badge */
+.badge-brand {
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    background-color: var(--brand-primary-soft);
+    color: var(--brand-primary);
+    border: 1px solid rgba(37, 99, 235, 0.20);
+}
+
+/* Tech Cyan Badge */
+.badge-tech {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    background-color: var(--brand-cyan-soft);
+    color: var(--brand-cyan-accessible);
+    border: 1px solid rgba(6, 182, 212, 0.30);
+    box-shadow: 0 0 12px -3px rgba(6, 182, 212, 0.25);
+}
+
+/* Brand Gradient Hero (Navy -> Royal -> Cyan) */
+.gradient-brand {
+    background: linear-gradient(135deg, #0A192F 0%, #1E3A8A 50%, #2563EB 100%);
+}
+
+/* Subtle Gradient for Cards / Highlights */
+.gradient-brand-subtle {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-subtle) 100%);
+}
+
+/* Tech Energy Gradient Text */
+.gradient-text-tech {
+    background: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+html.dark .gradient-text-tech,
+[data-theme="dark"] .gradient-text-tech {
+    background: linear-gradient(135deg, #38BDF8 0%, #22D3EE 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Glow Utilities */
+.glow-cyan {
+    box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.45);
+}
+
+.glow-cyan-lg {
+    box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.60);
+}
+
+.glow-royal {
+    box-shadow: 0 0 25px -4px rgba(37, 99, 235, 0.45);
 }
 
 /* Reduced Motion Override */
@@ -223,17 +516,17 @@ html.theme-transitioning *::after {
 }
 
 /* ==============================================================================
-   FUTURISTIC CIRCUIT SYSTEM MOUSE CURSOR
-   Uses Futuristic_Circuit_Cursor_Icon from icons folder
-   Hotspot calibrated to arrow tip (2px from left, 0px from top)
+   LOADING BLUE SYSTEM MOUSE CURSOR
+   Uses LoadingBlue (.ani, .cur, and high-DPI 32-bit PNG)
+   Hotspot calibrated to arrow tip (1px from left, 1px from top)
    ============================================================================== */
 :root,
 html,
 body {
-    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, auto;
+    cursor: url('/LoadingBlue.ani') 1 1, url('/LoadingBlue.cur') 1 1, url('/icons/cursor-32.png') 1 1, url('/cursor.png') 1 1, auto;
 }
 
-/* Interactive elements default to futuristic cursor pointer */
+/* Interactive elements default to LoadingBlue cursor pointer */
 a,
 button,
 [role="button"],
@@ -243,12 +536,12 @@ input[type="button"],
 input[type="reset"],
 select,
 summary {
-    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, pointer !important;
+    cursor: url('/LoadingBlue.ani') 1 1, url('/LoadingBlue.cur') 1 1, url('/icons/cursor-32.png') 1 1, url('/cursor.png') 1 1, pointer !important;
 }
 
 /* Default cursor elements */
 .cursor-default {
-    cursor: url('/icons/cursor-32.png') 2 0, url('/cursor.png') 2 0, default !important;
+    cursor: url('/LoadingBlue.ani') 1 1, url('/LoadingBlue.cur') 1 1, url('/icons/cursor-32.png') 1 1, url('/cursor.png') 1 1, default !important;
 }
 
 /* Text editing elements maintain native I-beam cursor */

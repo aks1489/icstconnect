@@ -161,7 +161,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 setResendCooldown(30)
                 setError(`A fresh code has been sent to ${email}!`)
             } else if (otpType === 'recovery') {
-                const { error } = await supabase.auth.resetPasswordForEmail(email)
+                const redirectUrl = typeof window !== 'undefined'
+                    ? `${window.location.origin}/reset-password`
+                    : 'https://icstconnect.in/reset-password'
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: redirectUrl
+                })
                 if (error) throw error
                 setResendCooldown(30)
                 setError(`Password reset code resent to ${email}!`)
@@ -204,13 +209,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         try {
             if (isForgotPassword) {
-                const { error } = await supabase.auth.resetPasswordForEmail(email)
+                const redirectUrl = typeof window !== 'undefined'
+                    ? `${window.location.origin}/reset-password`
+                    : 'https://icstconnect.in/reset-password'
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: redirectUrl
+                })
                 if (error) throw error
 
                 // Switch to OTP mode
                 setOtpType('recovery')
                 setShowOtpInput(true)
-                setError('Code sent! Please check your email and enter the code below.')
+                setError('Verification code sent! Please check your email inbox (and Spam folder) for your 6-digit OTP code.')
 
             } else if (isLogin) {
                 // ... login logic ...
@@ -515,7 +525,11 @@ const OtpInput = ({
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">Enter Verification Code</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                We sent a verification code to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span>
+                {otpType === 'recovery' ? (
+                    <>Enter the 6-digit code sent to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span> (or click the reset link in your email).</>
+                ) : (
+                    <>We sent a verification code to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span></>
+                )}
             </p>
         </div>
 

@@ -57,12 +57,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
                         w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-colors
                         placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-offset-1
                         disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed
-                        dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-offset-slate-950
+                        dark:bg-[#0A192F] dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:ring-offset-slate-950
                         ${leftElement ? 'pl-10' : ''}
                         ${rightElement ? 'pr-10' : ''}
                         ${hasError
                             ? 'border-rose-300 text-rose-900 focus:border-rose-500 focus:ring-rose-500/20 dark:border-rose-700 dark:text-rose-100'
-                            : 'border-slate-300 hover:border-slate-400 focus:border-[#2572AB] focus:ring-[#2572AB]/20 dark:border-slate-700 dark:hover:border-slate-600 dark:focus:border-[#4C96C2]'
+                            : 'border-slate-300 hover:border-slate-400 focus:border-[#2563EB] focus:ring-[#2563EB]/20 dark:border-slate-700 dark:hover:border-slate-600 dark:focus:border-[#38BDF8] dark:focus:ring-[#38BDF8]/20'
                         }
                         ${className}
                     `}
