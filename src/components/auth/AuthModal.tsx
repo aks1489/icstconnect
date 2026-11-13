@@ -526,9 +526,9 @@ const OtpInput = ({
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">Enter Verification Code</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                 {otpType === 'recovery' ? (
-                    <>Enter the 6-digit code sent to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span> (or click the reset link in your email).</>
+                    <>Enter the 6-digit OTP code sent to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span>.</>
                 ) : (
-                    <>We sent a verification code to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span></>
+                    <>We sent a verification code to <span className="font-semibold text-slate-700 dark:text-slate-200">{email}</span>.</>
                 )}
             </p>
         </div>
