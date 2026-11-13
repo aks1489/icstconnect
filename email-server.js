@@ -53,7 +53,7 @@ function htmlToPlainText(html) {
         .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<\/h[1-6]>/gi, '\n\n')
         .replace(/<\/p>/gi, '\n\n')
-        .replace(/<br\s*[\/]?>/gi, '\n')
+        .replace(/<br\s*\/?>/gi, '\n')
         .replace(/<\/li>/gi, '\n')
         .replace(/<li[^>]*>/gi, '• ')
         .replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '$2 ($1)')
