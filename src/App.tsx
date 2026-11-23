@@ -73,6 +73,7 @@ const AdminHomeMedia = lazy(() => import('./admin/pages/AdminHomeMedia'))
 const AdminPermissions = lazy(() => import('./admin/pages/AdminPermissions'))
 const AdminAuditLogs = lazy(() => import('./admin/pages/AdminAuditLogs'))
 const AdminEcosystem = lazy(() => import('./admin/pages/AdminEcosystem'))
+const AdminMailbox = lazy(() => import('./admin/pages/AdminMailbox'))
 
 // Teacher Imports (Lazy-loaded)
 const TeacherLayout = lazy(() => import('./teacher/layout/TeacherLayout'))
@@ -137,6 +138,13 @@ function App() {
       <Route path="dashboard" element={
         <ProtectedRoute requiredPermission="dashboard.view">
           <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="mailbox" element={
+        <ProtectedRoute requiredPermission="dashboard.view">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminMailbox />
+          </Suspense>
         </ProtectedRoute>
       } />
       <Route path="students" element={

@@ -32,6 +32,30 @@ export function apiDevPlugin(): Plugin {
           return raw ? JSON.parse(raw) : {}
         }
 
+        // Mailbox Relay to local email-server.js
+        if (url?.startsWith('/api/mailbox/')) {
+          try {
+            const body = req.method !== 'GET' && req.method !== 'HEAD' ? await readJsonBody() : undefined
+            const targetUrl = `http://127.0.0.1:5000${req.url}`
+            const proxyRes = await fetch(targetUrl, {
+              method: req.method,
+              headers: { 'Content-Type': 'application/json' },
+              body: body ? JSON.stringify(body) : undefined
+            })
+            const data = await proxyRes.text()
+            res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = proxyRes.status
+            res.end(data)
+          } catch (err: any) {
+            res.setHeader('Access-Control-Allow-Origin', '*')
+            res.setHeader('Content-Type', 'application/json')
+            res.statusCode = 502
+            res.end(JSON.stringify({ success: false, error: 'Email Relay Server is not running. Start with npm run email or npm run dev:all' }))
+          }
+          return
+        }
+
         // 1. SMTP Connection Verification
         if ((req.method === 'GET' || req.method === 'POST') && url === '/api/smtp-verify') {
           res.setHeader('Access-Control-Allow-Origin', '*')

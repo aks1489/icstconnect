@@ -1,4 +1,4 @@
-import { IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconCalendarPlus as CalendarPlus, IconPresentation as Presentation, IconFileText as FileText, IconShield as Shield, IconUsers as Users, IconUserCog as UserCog, IconBooks as Library, IconLayoutGrid as LayoutGrid, IconCalendarEvent as CalendarDays, IconPhoto as Image, IconSchool as GraduationCap, IconKey as KeyRound, IconHistory as History, IconWorld as Globe, IconReceipt as Receipt, IconShieldLock as ShieldLock } from '@tabler/icons-react'
+import { IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconCalendarPlus as CalendarPlus, IconPresentation as Presentation, IconFileText as FileText, IconShield as Shield, IconUsers as Users, IconUserCog as UserCog, IconBooks as Library, IconLayoutGrid as LayoutGrid, IconCalendarEvent as CalendarDays, IconPhoto as Image, IconSchool as GraduationCap, IconKey as KeyRound, IconHistory as History, IconWorld as Globe, IconReceipt as Receipt, IconShieldLock as ShieldLock, IconMail as Mail } from '@tabler/icons-react'
 
 export interface NavItem {
     label: string
@@ -98,9 +98,15 @@ export const ADMIN_ACTIONS: NavItem[] = [
         path: '/admin/dashboard',
         icon: Shield,
         color: 'text-slate-800',
-
-
         description: 'System overview and controls',
+        requiredPermission: 'dashboard.view'
+    },
+    {
+        label: 'Institution Mailbox',
+        path: '/admin/mailbox',
+        icon: Mail,
+        color: 'text-blue-600',
+        description: 'Read, send & reply from info@icstconnect.in',
         requiredPermission: 'dashboard.view'
     },
     {
