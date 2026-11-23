@@ -234,7 +234,9 @@ function App() {
       } />
       <Route path="discount-claims" element={
         <ProtectedRoute requiredPermission="finance.view">
-          <DiscountClaims />
+          <Suspense fallback={<PageSkeleton />}>
+            <DiscountClaims />
+          </Suspense>
         </ProtectedRoute>
       } />
       <Route path="enrollments" element={

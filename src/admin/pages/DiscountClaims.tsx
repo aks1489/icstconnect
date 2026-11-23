@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { IconSearch as Search, IconClock as Clock, IconCircleCheck as CheckCircle, IconCircleX as XCircle, IconCalendar as Calendar, IconPhone as Phone, IconTrash as Trash2, IconAlertTriangle as AlertTriangle, IconX as X } from '@tabler/icons-react';
+import {
+    IconSearch as Search,
+    IconClock as Clock,
+    IconCircleCheck as CheckCircle,
+    IconCircleX as XCircle,
+    IconCalendar as Calendar,
+    IconPhone as Phone,
+    IconTrash as Trash2,
+    IconAlertTriangle as AlertTriangle,
+    IconX as X,
+    IconRefresh as Refresh,
+    IconDiscount as Discount
+} from '@tabler/icons-react';
 import { format } from 'date-fns';
 import { useToast } from '../../contexts/ToastContext';
+import { SEOHead } from '../../components/common/SEOHead';
 
 interface Inquiry {
     id: string;
@@ -123,13 +136,92 @@ const DiscountClaims = () => {
         }
     };
 
+    const stats = {
+        total: inquiries.length,
+        pending: inquiries.filter(i => i.status === 'pending').length,
+        contacted: inquiries.filter(i => i.status === 'contacted').length,
+        admitted: inquiries.filter(i => i.status === 'admitted').length,
+        rejected: inquiries.filter(i => i.status === 'rejected').length
+    };
+
     return (
         <div className="space-y-6 relative">
+            <SEOHead
+                title="Discount Claims - Admin Portal"
+                description="Manage prospective student discount voucher inquiries, claims, and enrollment status."
+                canonical="/admin/discount-claims"
+                noindex={true}
+            />
+
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Discount Claims</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Manage student discount inquiries</p>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <Discount className="text-amber-500" size={28} />
+                        Discount Claims
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400">
+                        Manage student course discount voucher inquiries and enrollment conversions
+                    </p>
                 </div>
+                <button
+                    onClick={fetchInquiries}
+                    className="self-start md:self-auto flex items-center gap-2 px-3.5 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-semibold transition-colors shadow-sm cursor-pointer"
+                    title="Refresh inquiries"
+                >
+                    <Refresh size={16} />
+                    <span>Refresh</span>
+                </button>
+            </div>
+
+            {/* Quick KPI Stat Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <button
+                    onClick={() => setFilter('all')}
+                    className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                        filter === 'all'
+                            ? 'bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-700 shadow-sm'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                    }`}
+                >
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total Claims</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{stats.total}</p>
+                </button>
+
+                <button
+                    onClick={() => setFilter('pending')}
+                    className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                        filter === 'pending'
+                            ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700 shadow-sm'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-200'
+                    }`}
+                >
+                    <p className="text-xs font-medium text-amber-600 dark:text-amber-400 font-semibold">Pending Action</p>
+                    <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">{stats.pending}</p>
+                </button>
+
+                <button
+                    onClick={() => setFilter('contacted')}
+                    className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                        filter === 'contacted'
+                            ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 shadow-sm'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-200'
+                    }`}
+                >
+                    <p className="text-xs font-medium text-blue-600 dark:text-blue-400 font-semibold">Contacted</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">{stats.contacted}</p>
+                </button>
+
+                <button
+                    onClick={() => setFilter('admitted')}
+                    className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                        filter === 'admitted'
+                            ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700 shadow-sm'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-200'
+                    }`}
+                >
+                    <p className="text-xs font-medium text-emerald-600 dark:text-emerald-400 font-semibold">Admitted</p>
+                    <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{stats.admitted}</p>
+                </button>
             </div>
 
             {/* Filters */}

@@ -1,4 +1,4 @@
-import { IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconCalendarPlus as CalendarPlus, IconPresentation as Presentation, IconFileText as FileText, IconShield as Shield, IconUsers as Users, IconUserCog as UserCog, IconBooks as Library, IconLayoutGrid as LayoutGrid, IconCalendarEvent as CalendarDays, IconPhoto as Image, IconSchool as GraduationCap, IconKey as KeyRound, IconHistory as History, IconWorld as Globe, IconReceipt as Receipt, IconShieldLock as ShieldLock, IconMail as Mail } from '@tabler/icons-react'
+import { IconLayoutDashboard as LayoutDashboard, IconCalendar as Calendar, IconBuildingCommunity as Building2, IconDeviceLaptop as Laptop, IconCalendarPlus as CalendarPlus, IconPresentation as Presentation, IconFileText as FileText, IconShield as Shield, IconUsers as Users, IconUserCog as UserCog, IconBooks as Library, IconLayoutGrid as LayoutGrid, IconCalendarEvent as CalendarDays, IconPhoto as Image, IconSchool as GraduationCap, IconKey as KeyRound, IconHistory as History, IconWorld as Globe, IconReceipt as Receipt, IconShieldLock as ShieldLock, IconMail as Mail, IconDiscount as Discount } from '@tabler/icons-react'
 
 export interface NavItem {
     label: string
@@ -163,6 +163,14 @@ export const ADMIN_ACTIONS: NavItem[] = [
         icon: Building2,
         color: 'text-emerald-600',
         description: 'Balance sheet and transactions',
+        requiredPermission: 'finance.view'
+    },
+    {
+        label: 'Discount Claims',
+        path: '/admin/discount-claims',
+        icon: Discount,
+        color: 'text-amber-500',
+        description: 'Review and manage student discount inquiries',
         requiredPermission: 'finance.view'
     },
     {

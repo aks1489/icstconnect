@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
     IconDownload as Download,
     IconPlus as Plus,
@@ -11,7 +12,8 @@ import {
     IconReceipt as Receipt,
     IconRefresh as Refresh,
     IconSearch as Search,
-    IconScale as Scale
+    IconScale as Scale,
+    IconDiscount as Discount
 } from '@tabler/icons-react';
 import { financeService } from '../../services/financeService';
 import { supabase } from '../../lib/supabase';
@@ -24,6 +26,7 @@ import PayrollManager from '../components/PayrollManager';
 import type { Database } from '../../types/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { resolveAdminPath } from '../../utils/subdomain';
 
 type Transaction = Database['public']['Tables']['institution_transactions']['Row'];
 
@@ -175,11 +178,20 @@ export default function FinancialDashboard() {
                 <div className="flex items-center gap-2.5 flex-wrap">
                     <button
                         onClick={fetchData}
-                        className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         title="Refresh data"
                     >
                         <Refresh size={18} />
                     </button>
+
+                    <Link
+                        to={resolveAdminPath('/admin/discount-claims')}
+                        className="flex items-center gap-2 px-3.5 py-2.5 border border-amber-200 dark:border-amber-800/60 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/50 text-xs font-semibold transition-colors shadow-sm"
+                        title="Review student discount inquiries"
+                    >
+                        <Discount size={16} className="text-amber-500" />
+                        <span>Discount Claims</span>
+                    </Link>
 
                     <button
                         onClick={handleExportCSV}
