@@ -3,8 +3,18 @@ https://www.icstconnect.in/* https://icstconnect.in/:splat 301!
 http://www.icstconnect.in/* https://icstconnect.in/:splat 301!
 http://icstconnect.in/* https://icstconnect.in/:splat 301!
 
-# Legacy Route Redirections
-/login / 301!
+# Admin Subdomain Redirection in Production
+https://icstconnect.in/admin https://admin.icstconnect.in/ 301!
+https://icstconnect.in/admin/* https://admin.icstconnect.in/:splat 301!
+https://www.icstconnect.in/admin https://admin.icstconnect.in/ 301!
+https://www.icstconnect.in/admin/* https://admin.icstconnect.in/:splat 301!
+http://admin.icstconnect.in/* https://admin.icstconnect.in/:splat 301!
+
+# Legacy Route Redirections (Scoped to main domain to protect admin subdomain login)
+https://icstconnect.in/login https://icstconnect.in/ 301!
+https://www.icstconnect.in/login https://icstconnect.in/ 301!
+http://icstconnect.in/login https://icstconnect.in/ 301!
+http://www.icstconnect.in/login https://icstconnect.in/ 301!
 
 # Netlify Functions Rewrites
 /api/send-email /.netlify/functions/send-email 200

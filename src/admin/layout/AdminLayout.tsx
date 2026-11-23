@@ -6,6 +6,7 @@ import { ADMIN_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
 import ThemeToggle from '../../components/ui/ThemeToggle'
 import { SEOHead } from '../../components/common/SEOHead'
+import { isAdminSubdomain, resolveAdminPath } from '../../utils/subdomain'
 
 export default function AdminLayout() {
     const { signOut, isSuperAdmin, hasPerm } = useAuth()
@@ -28,9 +29,11 @@ export default function AdminLayout() {
         return () => window.removeEventListener('resize', handleResize)
     }, [])
 
+    const onAdminSubdomain = isAdminSubdomain()
+
     const handleSignOut = async () => {
         await signOut()
-        navigate('/login')
+        navigate(onAdminSubdomain ? '/login' : '/admin/login')
     }
 
     const isActive = (path: string) => {
@@ -42,7 +45,7 @@ export default function AdminLayout() {
             <SEOHead
                 title="Admin Portal - ICST Connect"
                 description="ICST Connect Administrative Management Dashboard."
-                canonical="/admin"
+                canonical={onAdminSubdomain ? (location.pathname || '/') : '/admin'}
                 noindex={true}
             />
             {/* Mobile Sidebar Overlay */}
@@ -65,7 +68,7 @@ export default function AdminLayout() {
                 <div className="w-72 flex flex-col h-full">
                     {/* Logo Area */}
                     <div className="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-950 shrink-0">
-                        <div className="flex items-center gap-3">
+                        <Link to={onAdminSubdomain ? '/dashboard' : '/admin/dashboard'} className="flex items-center gap-3">
                             <img
                                 src={logo}
                                 alt="ICST Logo"
@@ -74,10 +77,10 @@ export default function AdminLayout() {
                                 className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-indigo-500/10"
                             />
                             <div>
-                                <span className="text-lg font-bold tracking-tight block">Admin Portal</span>
+                                <span className="text-lg font-bold tracking-tight block text-white">Admin Portal</span>
                                 <p className="text-xs text-slate-400">ICST Connect</p>
                             </div>
-                        </div>
+                        </Link>
                     </div>
 
                     {/* Navigation */}
@@ -87,31 +90,34 @@ export default function AdminLayout() {
                         </div>
                         {ADMIN_ACTIONS
                             .filter(item => (!item.superAdminOnly || isSuperAdmin) && (!item.requiredPermission || hasPerm(item.requiredPermission)))
-                            .map((item) => (
-
-                            <Link
-                                key={item.path}
-                                to={item.path}
-                                className={`
-                                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
-                                    ${isActive(item.path)
-                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 translate-x-1'
-                                        : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:translate-x-1'
-                                    }
-                                `}
-                            >
-                                <item.icon className={`text-lg ${isActive(item.path) ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} size={20} />
-                                <span className="font-medium flex-1 truncate">{item.label}</span>
-                                {item.superAdminOnly && (
-                                    <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                                        Root
-                                    </span>
-                                )}
-                                {isActive(item.path) && (
-                                    <ChevronRight className="ml-auto text-xs opacity-50 shrink-0" size={16} />
-                                )}
-                            </Link>
-                        ))}
+                            .map((item) => {
+                                const targetPath = resolveAdminPath(item.path)
+                                const isItemActive = isActive(targetPath)
+                                return (
+                                    <Link
+                                        key={item.path}
+                                        to={targetPath}
+                                        className={`
+                                            flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                                            ${isItemActive
+                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 translate-x-1'
+                                                : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:translate-x-1'
+                                            }
+                                        `}
+                                    >
+                                        <item.icon className={`text-lg ${isItemActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} size={20} />
+                                        <span className="font-medium flex-1 truncate">{item.label}</span>
+                                        {item.superAdminOnly && (
+                                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                                Root
+                                            </span>
+                                        )}
+                                        {isItemActive && (
+                                            <ChevronRight className="ml-auto text-xs opacity-50 shrink-0" size={16} />
+                                        )}
+                                    </Link>
+                                )
+                            })}
                     </nav>
 
                     {/* User Profile / Logout */}

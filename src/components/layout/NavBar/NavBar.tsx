@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { 
     IconHome as Home, 
     IconBook as Book, 
@@ -221,15 +220,15 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                 <div className="w-full h-full">
                     <div className="flex justify-evenly items-center w-full h-full py-3">
                         <Link to="/" className="no-underline text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 active:text-slate-800 dark:active:text-slate-100 flex flex-col items-center gap-1 transition-colors group">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                            <div className="hover:scale-110 active:scale-90 transition-transform duration-200">
                                 <Home size={24} />
-                            </motion.div>
+                            </div>
                             <span className="text-[10px] font-medium">Home</span>
                         </Link>
                         <Link to="/courses" className="no-underline text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 active:text-slate-800 dark:active:text-slate-100 flex flex-col items-center gap-1 transition-colors group">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                            <div className="hover:scale-110 active:scale-90 transition-transform duration-200">
                                 <Book size={24} />
-                            </motion.div>
+                            </div>
                             <span className="text-[10px] font-medium">Courses</span>
                         </Link>
                         <div className="relative -top-5">
@@ -255,15 +254,15 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                             )}
                         </div>
                         <Link to="/gallery" className="no-underline text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 active:text-slate-800 dark:active:text-slate-100 flex flex-col items-center gap-1 transition-colors group">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                            <div className="hover:scale-110 active:scale-90 transition-transform duration-200">
                                 <ImageIcon size={24} />
-                            </motion.div>
+                            </div>
                             <span className="text-[10px] font-medium">Gallery</span>
                         </Link>
                         <Link to="/about" className="no-underline text-slate-400 dark:text-slate-500 hover:text-slate-800 dark:hover:text-slate-100 active:text-slate-800 dark:active:text-slate-100 flex flex-col items-center gap-1 transition-colors group">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                            <div className="hover:scale-110 active:scale-90 transition-transform duration-200">
                                 <Info size={24} />
-                            </motion.div>
+                            </div>
                             <span className="text-[10px] font-medium">About</span>
                         </Link>
                     </div>

@@ -1,10 +1,11 @@
-import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { animate, stagger } from 'animejs'
 import InteractiveImageMarker from '../InteractiveImageMarker'
 import { getOptimizedImageUrl } from '../../../lib/cloudinary'
 
 export default function Scatter3DLayout({ images }: { images: any[] }) {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // Randomize positions, rotations, and sizes
     const getTransformProps = (id: string, index: number) => {
@@ -24,6 +25,23 @@ export default function Scatter3DLayout({ images }: { images: any[] }) {
         };
     };
 
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const cards = container.querySelectorAll<HTMLElement>('.scatter-card');
+        if (cards.length > 0) {
+            animate(cards, {
+                opacity: [0, 1],
+                scale: [0.7, 1],
+                translateY: [80, 0],
+                duration: 600,
+                delay: stagger(70),
+                ease: 'outBack(1.4)'
+            });
+        }
+    }, [images]);
+
     if (images.length === 0) return null;
 
     return (
@@ -36,42 +54,34 @@ export default function Scatter3DLayout({ images }: { images: any[] }) {
                 Interactive Scatter View
             </p>
 
-            <div className="relative w-full h-full transform-style-3d p-20 flex flex-wrap justify-center items-center gap-8 overflow-y-auto custom-scrollbar-hide">
+            <div ref={containerRef} className="relative w-full h-full transform-style-3d p-20 flex flex-wrap justify-center items-center gap-8 overflow-y-auto custom-scrollbar-hide">
                 {images.map((img, index) => {
                     const isHovered = hoveredId === img.id;
                     const isOtherHovered = hoveredId !== null && !isHovered;
+                    const transform = getTransformProps(img.id, index);
                     
                     return (
-                        <motion.div
+                        <div
                             key={img.id}
-                            initial={{ opacity: 0, scale: 0, y: 100 }}
-                            animate={{ opacity: isOtherHovered ? 0.3 : 1, y: 0, scale: 1 }}
-                            transition={{ 
-                                delay: index * 0.1, 
-                                type: "spring", 
-                                stiffness: 200, 
-                                damping: 20 
-                            }}
                             onMouseEnter={() => setHoveredId(img.id)}
                             onMouseLeave={() => setHoveredId(null)}
-                            className="relative flex-none"
+                            className="scatter-card relative flex-none"
                             style={{ 
+                                opacity: isOtherHovered ? 0.3 : 1,
                                 zIndex: isHovered ? 50 : index,
                                 filter: isOtherHovered ? 'grayscale(100%) blur(4px)' : 'none',
-                                transition: 'filter 0.4s ease, z-index 0s'
+                                transition: 'filter 0.4s ease, opacity 0.4s ease, z-index 0s'
                             }}
                         >
-                            <motion.div
-                                animate={isHovered ? {
-                                    scale: 1.2,
-                                    rotate: 0,
-                                    y: -20,
-                                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
-                                } : {
-                                    scale: 1,
-                                    rotate: getTransformProps(img.id, index).rotation,
-                                    y: 0,
-                                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+                            <div
+                                style={{
+                                    transform: isHovered 
+                                        ? 'scale(1.2) translateY(-20px) rotate(0deg)' 
+                                        : `scale(1) translateY(0) rotate(${transform.rotation}deg)`,
+                                    boxShadow: isHovered 
+                                        ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)' 
+                                        : '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                                    transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease'
                                 }}
                                 className="w-48 md:w-64 aspect-[3/4] rounded-2xl overflow-hidden bg-slate-800 border-4 border-white dark:border-slate-700 cursor-pointer"
                             >
@@ -85,8 +95,8 @@ export default function Scatter3DLayout({ images }: { images: any[] }) {
                                         <p className="text-white text-xs font-bold">{img.title}</p>
                                     </div>
                                 )}
-                            </motion.div>
-                        </motion.div>
+                            </div>
+                        </div>
                     )
                 })}
             </div>

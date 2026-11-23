@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { IconShield as Shield, IconMail as Mail, IconLock as Lock, IconAlertCircle as AlertCircle } from '@tabler/icons-react'
 import { supabase } from '../lib/supabase'
 import SEOHead from '../components/common/SEOHead'
+import { useAuth } from '../contexts/AuthContext'
+import { isAdminSubdomain } from '../utils/subdomain'
 
 export default function AdminLogin() {
     const [email, setEmail] = useState('')
@@ -11,8 +13,17 @@ export default function AdminLogin() {
     const [error, setError] = useState<string | null>(null)
     const navigate = useNavigate()
     const location = useLocation()
+    const { user, isAdmin, isSuperAdmin } = useAuth()
 
-    const from = location.state?.from?.pathname || '/admin/dashboard'
+    const defaultFrom = isAdminSubdomain() ? '/dashboard' : '/admin/dashboard'
+    const from = location.state?.from?.pathname || defaultFrom
+
+    // If already authenticated as admin, proceed directly to destination
+    useEffect(() => {
+        if (user && (isAdmin || isSuperAdmin)) {
+            navigate(from, { replace: true })
+        }
+    }, [user, isAdmin, isSuperAdmin, from, navigate])
 
     // Check for error in URL params
     try {
@@ -62,8 +73,13 @@ export default function AdminLogin() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-            <SEOHead title="Admin Portal Sign In" noindex={true} />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden font-inter">
+            <SEOHead
+                title="Admin Portal Sign In"
+                description="Secure administrative management portal sign in for ICST Connect."
+                canonical={isAdminSubdomain() ? '/login' : '/admin/login'}
+                noindex={true}
+            />
             {/* Background Accents */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
                 <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
@@ -75,9 +91,9 @@ export default function AdminLogin() {
                     <div className="mx-auto h-16 w-16 bg-white/10 rounded-full flex items-center justify-center mb-6 ring-4 ring-white/5">
                         <Shield className="text-3xl text-white" size={32} />
                     </div>
-                    <h2 className="text-center text-3xl font-bold text-white tracking-tight">
+                    <h1 className="text-center text-3xl font-bold text-white tracking-tight">
                         Admin Portal
-                    </h2>
+                    </h1>
                     <p className="mt-2 text-center text-sm text-slate-300">
                         Secure Access Only
                     </p>

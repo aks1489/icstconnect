@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { IconRotate as RotateCcw, IconCircleCheck as CheckCircle2, IconCircleX as XCircle } from '@tabler/icons-react';
-import { motion } from 'framer-motion';
 import useTypingEngine from './useTypingEngine';
 
 // Levels in seconds
@@ -84,9 +83,8 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
       {state === 'waiting' && <div className="h-[44px] mb-8" />}
 
       {state === 'finished' ? (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+        <div 
+          style={{ animation: 'typingFadeInUp 0.3s ease-out forwards' }}
           className="flex flex-col items-center justify-center w-full mt-4 bg-white dark:bg-slate-900 p-10 sm:p-12 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800"
         >
           {/* Success / Fail Banner */}
@@ -136,7 +134,7 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
             <RotateCcw size={18} />
             Try Again
           </button>
-        </motion.div>
+        </div>
       ) : (
         <>
           {/* 3-line view container */}
@@ -144,10 +142,9 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
             className="relative w-full overflow-hidden" 
             style={{ height: 'calc(3 * 3rem)' }} // Approx 3 lines of text given our line-height/font-size
           >
-             <motion.div 
-               className="text-2xl sm:text-3xl leading-relaxed sm:leading-[3rem] font-mono relative w-full select-none"
-               animate={{ y: `-${activeLineIndex > 1 ? (activeLineIndex - 1) * 3 : 0}rem` }}
-               transition={{ type: "tween", ease: "easeInOut", duration: 0.2 }}
+             <div 
+               className="text-2xl sm:text-3xl leading-relaxed sm:leading-[3rem] font-mono relative w-full select-none transition-transform duration-200 ease-in-out"
+               style={{ transform: `translateY(-${activeLineIndex > 1 ? (activeLineIndex - 1) * 3 : 0}rem)` }}
              >
               {words.split('').map((char: string, index: number) => {
                 let colorClass = 'text-slate-400 dark:text-slate-600'; // default untyped color
@@ -173,9 +170,8 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
                   >
                     {/* Caret */}
                     {isActive && (
-                       <motion.span 
-                          animate={{ opacity: [1, 0] }}
-                          transition={{ repeat: Infinity, duration: 0.8 }}
+                       <span 
+                          style={{ animation: 'cursorBlink 0.8s ease-in-out infinite' }}
                           className="absolute left-0 top-[10%] bottom-[10%] w-[3px] bg-indigo-600 dark:bg-indigo-400 rounded-full"
                        />
                     )}
@@ -191,14 +187,13 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
               
               {/* Caret at the very end */}
               {typed.length === words.length && (
-                <motion.span 
+                <span 
                   ref={activeCharRef}
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ repeat: Infinity, duration: 0.8 }}
+                  style={{ animation: 'cursorBlink 0.8s ease-in-out infinite' }}
                   className="absolute w-[3px] h-[80%] top-[10%] bg-indigo-600 dark:bg-indigo-400 rounded-full"
                 />
               )}
-             </motion.div>
+             </div>
           </div>
 
           <div className="mt-16 flex justify-center">
@@ -216,6 +211,17 @@ export default function TypingTest({ duration, onComplete }: TypingTestProps) {
           </div>
         </>
       )}
+
+      <style>{`
+        @keyframes typingFadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cursorBlink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }

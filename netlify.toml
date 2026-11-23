@@ -25,14 +25,51 @@
   status = 301
   force = true
 
-# 2. Legacy Route Redirections (301 Permanent)
+# 2. Admin Subdomain Redirection in Production (301 Permanent)
 [[redirects]]
-  from = "/login"
-  to = "/"
+  from = "https://icstconnect.in/admin"
+  to = "https://admin.icstconnect.in/"
   status = 301
   force = true
 
-# 3. Serverless API Function Rewrites (200 Proxy)
+[[redirects]]
+  from = "https://icstconnect.in/admin/*"
+  to = "https://admin.icstconnect.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.icstconnect.in/admin"
+  to = "https://admin.icstconnect.in/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.icstconnect.in/admin/*"
+  to = "https://admin.icstconnect.in/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://admin.icstconnect.in/*"
+  to = "https://admin.icstconnect.in/:splat"
+  status = 301
+  force = true
+
+# 3. Legacy Route Redirections (301 Permanent - Scoped to main domain)
+[[redirects]]
+  from = "https://icstconnect.in/login"
+  to = "https://icstconnect.in/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.icstconnect.in/login"
+  to = "https://icstconnect.in/"
+  status = 301
+  force = true
+
+# 4. Serverless API Function Rewrites (200 Proxy)
 [[redirects]]
   from = "/api/send-email"
   to = "/.netlify/functions/send-email"
@@ -48,7 +85,7 @@
   to = "/.netlify/functions/create-auth-user"
   status = 200
 
-# 4. Single Page Application (SPA) Fallback
+# 5. Single Page Application (SPA) Fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"

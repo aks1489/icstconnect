@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { IconChevronRight as ChevronRight, IconList as List, IconChevronDown as ChevronDown, IconPencil as Pencil, IconKey as Key, IconLayoutGrid as Grid, IconLogout as LogOut, IconAlertCircle as AlertCircle, IconHome as Home, IconBook as Book, IconPhoto as ImageIcon, IconDeviceDesktop as MonitorPlay, IconKeyboard as Keyboard, IconSparkles as Sparkles } from '@tabler/icons-react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../contexts/AuthContext'
 import { STUDENT_ACTIONS } from '../../config/navigation'
 import logo from '../../assets/logo.jpg'
@@ -90,44 +89,30 @@ export default function StudentLayout() {
             />
 
             {/* Incomplete Profile Alert */}
-            <AnimatePresence>
-                {showProfileAlert && (
-                    <div className="fixed top-6 left-0 right-0 z-[100] flex justify-center pointer-events-none">
-                        <motion.div
-                            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                            className="bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-xl shadow-orange-500/30 rounded-full px-6 py-3 flex items-center gap-3 pointer-events-auto"
+            {showProfileAlert && (
+                <div className="fixed top-6 left-0 right-0 z-[100] flex justify-center pointer-events-none animate-in fade-in slide-in-from-top-6 duration-300">
+                    <div
+                        className="bg-gradient-to-r from-rose-500 to-orange-500 text-white shadow-xl shadow-orange-500/30 rounded-full px-6 py-3 flex items-center gap-3 pointer-events-auto"
+                    >
+                        <div
+                            className="bg-white/20 p-1.5 rounded-full backdrop-blur-sm animate-pulse"
                         >
-                            <motion.div
-                                animate={{
-                                    rotate: [0, 15, -15, 0],
-                                    scale: [1, 1.1, 1]
-                                }}
-                                transition={{
-                                    repeat: Infinity,
-                                    duration: 2,
-                                    ease: "easeInOut"
-                                }}
-                                className="bg-white/20 p-1.5 rounded-full backdrop-blur-sm"
-                            >
-                                <AlertCircle size={20} strokeWidth={2.5} className="text-white" />
-                            </motion.div>
-                            <div>
-                                <h3 className="text-sm font-bold text-white leading-tight">Action Required</h3>
-                                <p className="text-xs text-white/90 font-medium">Please complete your profile to continue</p>
-                            </div>
-                            <button
-                                onClick={() => setShowProfileAlert(false)}
-                                className="ml-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-                            >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
-                            </button>
-                        </motion.div>
+                            <AlertCircle size={20} strokeWidth={2.5} className="text-white" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white leading-tight">Action Required</h3>
+                            <p className="text-xs text-white/90 font-medium">Please complete your profile to continue</p>
+                        </div>
+                        <button
+                            onClick={() => setShowProfileAlert(false)}
+                            className="ml-2 w-6 h-6 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                            aria-label="Dismiss alert"
+                        >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 18 18" /></svg>
+                        </button>
                     </div>
-                )}
-            </AnimatePresence>
+                </div>
+            )}
 
             {/* Mobile Sidebar Overlay */}
             {isSidebarOpen && (

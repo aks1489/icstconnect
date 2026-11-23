@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useAnimation, AnimatePresence, useInView, useMotionValue, useTransform, useSpring } from 'framer-motion';
 
 // Using Devicon CDN for high-quality original logos
 // Static data defined outside component to prevent recreation
@@ -24,33 +23,54 @@ const APPS = [
     { name: "MS PowerPoint", desc: "Presentation software", url: "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_powerpoint.svg" }
 ];
 
+interface SpawnedApp {
+    id: number;
+    name: string;
+    desc: string;
+    url: string;
+    xEnd: number;
+    yEnd: number;
+}
+
 const InteractiveRobot = () => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const isInView = useInView(containerRef, { amount: 0.1, once: false }); // Only active when visible
+    const [isInView, setIsInView] = useState(true);
 
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
-    const [spawnedIcons, setSpawnedIcons] = useState<any[]>([]);
-    const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
+    const [pupilPos, setPupilPos] = useState({ x: 0, y: 0 });
+    const [headRotation, setHeadRotation] = useState(0);
+
+    const [spawnedIcons, setSpawnedIcons] = useState<SpawnedApp[]>([]);
+    const [hoveredIcon, setHoveredIcon] = useState<number | null>(null);
     const [isInteracting, setIsInteracting] = useState(false);
 
-    const bodyControls = useAnimation();
-    const rightArmControls = useAnimation();
-
-    // Optimized Mouse Handler with Throttling
+    // Observe container visibility to pause animations and listeners when offscreen
     useEffect(() => {
-        if (!isInView) return; // Disconnect listener if off-screen
+        if (!containerRef.current) return;
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsInView(entry.isIntersecting);
+            },
+            { threshold: 0.1 }
+        );
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
+
+    // Optimized Mouse Handler with Throttling via rAF
+    useEffect(() => {
+        if (!isInView) return;
 
         let animationFrameId: number;
 
         const handleMouseMove = (e: MouseEvent) => {
-            // throttle via rAF
             cancelAnimationFrame(animationFrameId);
             animationFrameId = requestAnimationFrame(() => {
-                const x = (e.clientX / window.innerWidth) * 2 - 1;
-                const y = (e.clientY / window.innerHeight) * 2 - 1;
-                mouseX.set(x);
-                mouseY.set(y);
+                const rawX = (e.clientX / window.innerWidth) * 2 - 1;
+                const rawY = (e.clientY / window.innerHeight) * 2 - 1;
+                const clampedX = Math.max(-1, Math.min(1, rawX));
+                const clampedY = Math.max(-1, Math.min(1, rawY));
+                setPupilPos({ x: clampedX * 8, y: clampedY * 8 });
+                setHeadRotation(clampedX * 5);
             });
         };
 
@@ -59,20 +79,18 @@ const InteractiveRobot = () => {
             window.removeEventListener('mousemove', handleMouseMove);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [isInView]); // Re-bind only when visibility changes
+    }, [isInView]);
 
-    // Use ref to manage timeout cleanup for rapid clicking
-    const timeoutRef = useRef<any>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleClick = useCallback(() => {
-        // No lock - allow rapid clicking ("no delay")
         setIsInteracting(true);
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
         // 1. Immediate Data Update
         const shuffled = [...APPS].sort(() => 0.5 - Math.random());
         const selected = shuffled.slice(0, 3);
-        const newIcons = selected.map((app, i) => ({
+        const newIcons: SpawnedApp[] = selected.map((app, i) => ({
             id: Date.now() + i + Math.random(),
             ...app,
             xEnd: (i - 1) * 110 + (Math.random() * 20 - 10),
@@ -81,75 +99,25 @@ const InteractiveRobot = () => {
 
         setSpawnedIcons(newIcons);
 
-        // 2. Fire Animations Immediately (Concurrent)
-        // Hand: Dig in (130) then throw (-45) in one fast fluid motion
-        rightArmControls.start({
-            rotate: [130, -45],
-            zIndex: 30,
-            transition: { duration: 0.4, ease: "backOut" }
-        });
-
-        bodyControls.start({
-            y: [0, 10, -20, 0],
-            scale: [1, 1.05, 0.95, 1],
-            transition: { duration: 0.4, ease: "backOut" }
-        });
-
-        // 3. Reset Interaction State after animation finishes
+        // 2. Reset Interaction State after animation finishes
         timeoutRef.current = setTimeout(() => {
             setIsInteracting(false);
-            if (isInView) {
-                // Return to idle loop
-                bodyControls.start({
-                    y: [0, -15, 0],
-                    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-                });
-            }
-        }, 500); // Match animation duration roughly
-    }, [isInView, bodyControls, rightArmControls]);
+        }, 450);
+    }, []);
 
-    // Cleanup animations when out of view to save resources
-    useEffect(() => {
-        if (isInView) {
-            bodyControls.start({
-                y: [0, -15, 0],
-                transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
-            });
-        } else {
-            bodyControls.stop();
+    // Hand tracking angle calculation
+    let targetArmRotation = -10;
+    let targetArmZIndex = 10;
+
+    if (isInteracting) {
+        targetArmZIndex = 30;
+    } else if (hoveredIcon !== null) {
+        const targetIcon = spawnedIcons.find(icon => icon.id === hoveredIcon);
+        if (targetIcon) {
+            targetArmRotation = targetIcon.xEnd * -0.35;
+            targetArmZIndex = 15;
         }
-    }, [isInView, bodyControls]);
-
-    // Hand Tracking Logic
-    useEffect(() => {
-        if (!isInView) return;
-
-        if (!isInteracting) {
-            if (hoveredIcon) {
-                const targetIcon = spawnedIcons.find(icon => icon.id === hoveredIcon);
-                if (targetIcon) {
-                    const targetRotation = targetIcon.xEnd * -0.35;
-                    rightArmControls.start({
-                        rotate: targetRotation,
-                        zIndex: 15,
-                        transition: { type: "spring", damping: 15, stiffness: 120 }
-                    });
-                }
-            } else {
-                rightArmControls.start({
-                    rotate: -10,
-                    zIndex: 10,
-                    transition: { type: "spring", damping: 20, stiffness: 100 }
-                });
-            }
-        }
-    }, [isInteracting, rightArmControls, hoveredIcon, spawnedIcons, isInView]);
-
-    const pupilX = useTransform(mouseX, x => x * 8);
-    const pupilY = useTransform(mouseY, y => y * 8);
-
-    const smoothMouseX = useSpring(mouseX, { damping: 25, stiffness: 200, mass: 0.5 });
-    const headRotation = useTransform(smoothMouseX, x => x * 5);
+    }
 
     return (
         <div
@@ -157,153 +125,209 @@ const InteractiveRobot = () => {
             className="relative w-full max-w-sm lg:max-w-md mx-auto min-h-[500px] bg-white dark:bg-slate-900/90 rounded-[2.5rem] shadow-[0_20px_50px_rgba(8,112,184,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-slate-100 dark:border-slate-800 flex items-center justify-center p-6 overflow-visible backdrop-blur-sm"
         >
             {/* Decorative clean background element */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/50 dark:from-blue-950/20 to-transparent rounded-[2.5rem] pointer-events-none"></div>
+            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-blue-50/50 dark:from-blue-950/20 to-transparent rounded-[2.5rem] pointer-events-none" />
 
             <div className="flex items-center justify-center w-full h-full min-h-[400px]">
                 <div className="relative w-64 h-96 flex justify-center items-end pb-10">
 
                     {/* Floating Icons Container */}
                     <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40 w-0 h-0 overflow-visible">
-                        <AnimatePresence>
-                            {spawnedIcons.map((item, index) => (
-                                <motion.div
-                                    key={item.id}
-                                    layoutId={item.id} // Optimization: Framer motion needs this for shared layout transitions, but unique ID ensures no conflict
-                                    initial={{ scale: 0, y: 50, x: 0, opacity: 0 }}
-                                    animate={{
-                                        scale: 1,
-                                        y: item.yEnd,
-                                        x: item.xEnd,
-                                        opacity: 1,
-                                    }}
-                                    exit={{ scale: 0, opacity: 0, y: -50, transition: { duration: 0.2 } }}
-                                    transition={{
-                                        duration: 0.6,
-                                        type: "spring",
-                                        bounce: 0.4,
-                                        delay: index * 0.05
-                                    }}
-                                    className="absolute pointer-events-auto"
-                                    style={{ top: 0, left: 0 }}
-                                    onMouseEnter={() => setHoveredIcon(item.id)}
-                                    onMouseLeave={() => setHoveredIcon(null)}
-                                >
-                                    <motion.div
-                                        className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center p-3 relative shadow-lg border border-slate-200 dark:border-slate-700"
-                                        whileHover={{
-                                            scale: 1.2,
-                                            boxShadow: "0 0 20px rgba(59, 130, 246, 0.6)",
-                                            borderColor: "#3b82f6",
-                                            zIndex: 50
-                                        }}
-                                    >
-                                        <img src={item.url} alt={item.name} className="w-full h-full object-contain" width={64} height={64} loading="lazy" />
+                        {spawnedIcons.map((item, index) => (
+                            <div
+                                key={item.id}
+                                className="absolute pointer-events-auto"
+                                style={{
+                                    top: 0,
+                                    left: 0,
+                                    '--x-end': `${item.xEnd}px`,
+                                    '--y-end': `${item.yEnd}px`,
+                                    animation: `robotSpawnIcon 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${index * 50}ms both`
+                                } as React.CSSProperties}
+                                onMouseEnter={() => setHoveredIcon(item.id)}
+                                onMouseLeave={() => setHoveredIcon(null)}
+                            >
+                                <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center p-3 relative shadow-lg border border-slate-200 dark:border-slate-700 transition-all duration-200 hover:scale-120 hover:border-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:z-50 cursor-pointer">
+                                    <img
+                                        src={item.url}
+                                        alt={item.name}
+                                        className="w-full h-full object-contain"
+                                        width={64}
+                                        height={64}
+                                        loading="lazy"
+                                    />
 
-                                        <AnimatePresence>
-                                            {hoveredIcon === item.id && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                                    exit={{ opacity: 0, y: 10, scale: 0.8 }}
-                                                    className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 bg-slate-900 text-white p-3 rounded-xl shadow-xl z-[60] text-center pointer-events-none"
-                                                >
-                                                    <div className="font-bold text-sm mb-1">{item.name}</div>
-                                                    <div className="text-[10px] text-slate-300 leading-tight">{item.desc}</div>
-                                                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </motion.div>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+                                    {hoveredIcon === item.id && (
+                                        <div
+                                            className="absolute -top-20 left-1/2 -translate-x-1/2 w-48 bg-slate-900 text-white p-3 rounded-xl shadow-xl z-[60] text-center pointer-events-none"
+                                            style={{ animation: 'robotTooltipIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
+                                        >
+                                            <div className="font-bold text-sm mb-1">{item.name}</div>
+                                            <div className="text-[10px] text-slate-300 leading-tight">{item.desc}</div>
+                                            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45" />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
                     </div>
 
                     {/* Shadow */}
-                    <motion.div
-                        animate={isInView ? { scale: [1, 0.8, 1], opacity: [0.2, 0.4, 0.2] } : {}} // Only animate if in view
-                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    <div
+                        style={{
+                            animation: isInView ? 'robotShadow 3s ease-in-out infinite' : 'none'
+                        }}
                         className="absolute bottom-0 w-32 h-6 bg-black/20 rounded-full blur-md"
                     />
 
                     {/* Robot */}
-                    <motion.div
-                        animate={bodyControls}
+                    <div
                         onClick={handleClick}
+                        style={{
+                            animation: isInteracting
+                                ? 'robotClickJump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
+                                : (isInView ? 'robotFloat 3s ease-in-out infinite' : 'none')
+                        }}
                         className="relative z-10 flex flex-col items-center cursor-pointer select-none active:scale-95 transition-transform"
                     >
                         {/* Head */}
-                        <motion.div
-                            style={{ rotate: headRotation }}
-                            className="w-40 h-32 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-3xl relative p-4 shadow-xl border-4 border-white z-20"
+                        <div
+                            style={{
+                                transform: `rotate(${headRotation}deg)`
+                            }}
+                            className="w-40 h-32 bg-gradient-to-tr from-blue-500 to-cyan-400 rounded-3xl relative p-4 shadow-xl border-4 border-white z-20 transition-transform duration-150 ease-out"
                         >
-                            <motion.div
-                                animate={isInView ? { rotate: [0, 5, -5, 0] } : {}}
-                                transition={{ duration: 4, repeat: Infinity }}
+                            {/* Antenna */}
+                            <div
+                                style={{
+                                    animation: isInView ? 'robotAntenna 4s ease-in-out infinite' : 'none'
+                                }}
                                 className="absolute -top-10 left-1/2 -translate-x-1/2 flex flex-col items-center"
                             >
-                                <div className="w-1.5 h-6 bg-slate-400 rounded-full"></div>
-                                <div className="w-5 h-5 bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.6)] animate-pulse border-2 border-white/50"></div>
-                            </motion.div>
+                                <div className="w-1.5 h-6 bg-slate-400 rounded-full" />
+                                <div className="w-5 h-5 bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.6)] animate-pulse border-2 border-white/50" />
+                            </div>
 
                             {/* Eyes */}
                             <div className="flex justify-between items-center h-full px-4 pt-2">
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-inner relative overflow-hidden ring-4 ring-black/5">
-                                    <motion.div style={{ x: pupilX, y: pupilY }} className="w-5 h-5 bg-slate-900 rounded-full" />
-                                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-50"></div>
+                                    <div
+                                        style={{
+                                            transform: `translate3d(${pupilPos.x}px, ${pupilPos.y}px, 0)`
+                                        }}
+                                        className="w-5 h-5 bg-slate-900 rounded-full transition-transform duration-75 ease-out"
+                                    />
+                                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-50" />
                                 </div>
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-inner relative overflow-hidden ring-4 ring-black/5">
-                                    <motion.div style={{ x: pupilX, y: pupilY }} className="w-5 h-5 bg-slate-900 rounded-full" />
-                                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-50"></div>
+                                    <div
+                                        style={{
+                                            transform: `translate3d(${pupilPos.x}px, ${pupilPos.y}px, 0)`
+                                        }}
+                                        className="w-5 h-5 bg-slate-900 rounded-full transition-transform duration-75 ease-out"
+                                    />
+                                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-50" />
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
 
                         {/* Body */}
                         <div className="w-28 h-32 bg-slate-100 dark:bg-slate-800 rounded-b-[3rem] rounded-t-xl -mt-5 pt-6 pb-2 relative z-10 shadow-lg border-2 border-slate-200 dark:border-slate-700 flex flex-col items-center">
                             <div className="absolute bottom-0 w-24 h-20 bg-white dark:bg-slate-900 rounded-b-[3rem] rounded-t-lg border-t-2 border-slate-100 dark:border-slate-750 shadow-sm flex items-center justify-center overflow-hidden z-0">
-                                <motion.div className="flex flex-col items-center justify-center p-2">
+                                <div className="flex flex-col items-center justify-center p-2">
                                     <div className="text-xs font-black text-blue-600 dark:text-blue-400 leading-none tracking-tighter">ICST</div>
-                                    <div className="w-8 h-[1px] bg-slate-200 dark:bg-slate-700 my-0.5"></div>
+                                    <div className="w-8 h-[1px] bg-slate-200 dark:bg-slate-700 my-0.5" />
                                     <div className="text-[5px] font-bold text-slate-400 uppercase tracking-wide leading-none">Chowberia</div>
-                                </motion.div>
+                                </div>
                             </div>
 
-                            <motion.div
+                            {/* Left Arm */}
+                            <div
+                                style={{
+                                    animation: isInView ? 'robotLeftArm 3s ease-in-out infinite' : 'none'
+                                }}
                                 className="absolute top-8 -left-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -z-10 origin-top-right border-2 border-white dark:border-slate-800"
-                                animate={isInView ? { rotate: [0, 5, 0] } : {}}
-                                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                             />
 
-                            <motion.div
-                                animate={rightArmControls}
-                                initial={{ rotate: -10 }}
-                                className="absolute top-8 -right-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full origin-top-left border-2 border-white dark:border-slate-800 shadow-md cursor-pointer"
+                            {/* Right Arm */}
+                            <div
+                                style={{
+                                    zIndex: targetArmZIndex,
+                                    transform: !isInteracting ? `rotate(${targetArmRotation}deg)` : undefined,
+                                    animation: isInteracting ? 'robotArmThrow 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards' : 'none'
+                                }}
+                                className="absolute top-8 -right-8 w-8 h-20 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full origin-top-left border-2 border-white dark:border-slate-800 shadow-md cursor-pointer transition-transform duration-300 ease-out"
                             >
                                 <div className="absolute bottom-0 w-8 h-8 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 flex justify-center">
-                                    <AnimatePresence>
-                                        {hoveredIcon && !isInteracting && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 12, opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                className="absolute -bottom-2 w-3 h-4 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 origin-top"
-                                            />
-                                        )}
-                                    </AnimatePresence>
+                                    <div
+                                        className={`absolute -bottom-2 w-3 h-4 bg-blue-500 rounded-full border-2 border-white dark:border-slate-800 origin-top transition-all duration-200 ${
+                                            hoveredIcon !== null && !isInteracting ? 'h-3 opacity-100' : 'h-0 opacity-0 pointer-events-none'
+                                        }`}
+                                    />
                                 </div>
-                            </motion.div>
+                            </div>
                         </div>
 
                         {/* Legs */}
                         <div className="flex gap-4 -mt-4">
-                            <div className="w-8 h-12 bg-slate-200 dark:bg-slate-700 rounded-b-xl border-2 border-slate-300 dark:border-slate-600"></div>
-                            <div className="w-8 h-12 bg-slate-200 dark:bg-slate-700 rounded-b-xl border-2 border-slate-300 dark:border-slate-600"></div>
+                            <div className="w-8 h-12 bg-slate-200 dark:bg-slate-700 rounded-b-xl border-2 border-slate-300 dark:border-slate-600" />
+                            <div className="w-8 h-12 bg-slate-200 dark:bg-slate-700 rounded-b-xl border-2 border-slate-300 dark:border-slate-600" />
                         </div>
 
-                    </motion.div>
+                    </div>
                 </div>
             </div>
+
+            <style>{`
+                @keyframes robotFloat {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-15px); }
+                }
+                @keyframes robotShadow {
+                    0%, 100% { transform: scale(1); opacity: 0.2; }
+                    50% { transform: scale(0.8); opacity: 0.4; }
+                }
+                @keyframes robotClickJump {
+                    0% { transform: translateY(0) scale(1); }
+                    25% { transform: translateY(10px) scale(1.05); }
+                    65% { transform: translateY(-20px) scale(0.95); }
+                    100% { transform: translateY(0) scale(1); }
+                }
+                @keyframes robotArmThrow {
+                    0% { transform: rotate(-10deg); }
+                    30% { transform: rotate(130deg); }
+                    75% { transform: rotate(-45deg); }
+                    100% { transform: rotate(-10deg); }
+                }
+                @keyframes robotLeftArm {
+                    0%, 100% { transform: rotate(0deg); }
+                    50% { transform: rotate(5deg); }
+                }
+                @keyframes robotAntenna {
+                    0%, 100% { transform: rotate(0deg); }
+                    33% { transform: rotate(5deg); }
+                    66% { transform: rotate(-5deg); }
+                }
+                @keyframes robotSpawnIcon {
+                    0% {
+                        opacity: 0;
+                        transform: translate3d(0, 50px, 0) scale(0);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translate3d(var(--x-end, 0), var(--y-end, 0), 0) scale(1);
+                    }
+                }
+                @keyframes robotTooltipIn {
+                    0% {
+                        opacity: 0;
+                        transform: translate(-50%, 10px) scale(0.8);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translate(-50%, 0) scale(1);
+                    }
+                }
+            `}</style>
         </div>
     );
 };

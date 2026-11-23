@@ -11,7 +11,6 @@ import {
     addDays
 } from 'date-fns'
 import { IconChevronLeft as ChevronLeft, IconChevronRight as ChevronRight, IconPlus as Plus, IconClock as Clock, IconLoader2 as Loader2 } from '@tabler/icons-react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { useToast } from '../../contexts/ToastContext'
@@ -43,8 +42,6 @@ interface ClassSchedule {
         color?: string
     }
 }
-
-
 
 export default function GlobalCalendar() {
     const { user, isAdmin, isTeacher } = useAuth()
@@ -316,48 +313,44 @@ export default function GlobalCalendar() {
 
                             {/* Events Container */}
                             <div className="flex-1 p-2 space-y-2 overflow-y-auto">
-                                <AnimatePresence>
-                                    {dayEvents.map((event) => (
-                                        <motion.div
-                                            key={event.id}
-                                            onClick={() => setSelectedEvent(event)}
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            className={`
-                                                p-3 rounded-2xl border mb-2 cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md
-                                                ${event.type === 'holiday'
-                                                    ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-100 dark:border-rose-900/40'
-                                                    : event.type === 'extra_class'
-                                                        ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900/40'
-                                                        : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700'
-                                                }
-                                            `}
-                                        >
-                                            {/* Status Dot */}
-                                            <div className="flex items-start justify-between mb-2">
-                                                <span className={`
-                                                    px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide
-                                                    ${event.type === 'holiday' ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
-                                                        : event.type === 'extra_class' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
-                                                            : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'}
-                                                `}>
-                                                    {event.type.replace('_', ' ')}
-                                                </span>
+                                {dayEvents.map((event) => (
+                                    <div
+                                        key={event.id}
+                                        onClick={() => setSelectedEvent(event)}
+                                        className={`
+                                            p-3 rounded-2xl border mb-2 cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-md animate-in fade-in duration-150
+                                            ${event.type === 'holiday'
+                                                ? 'bg-rose-50 dark:bg-rose-950/40 border-rose-100 dark:border-rose-900/40'
+                                                : event.type === 'extra_class'
+                                                    ? 'bg-amber-50 dark:bg-amber-950/40 border-amber-100 dark:border-amber-900/40'
+                                                    : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700'
+                                            }
+                                        `}
+                                    >
+                                        {/* Status Dot */}
+                                        <div className="flex items-start justify-between mb-2">
+                                            <span className={`
+                                                px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide
+                                                ${event.type === 'holiday' ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                                                    : event.type === 'extra_class' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
+                                                        : 'bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400'}
+                                            `}>
+                                                {event.type.replace('_', ' ')}
+                                            </span>
+                                        </div>
+
+                                        <h4 className="font-bold text-slate-800 dark:text-white text-sm leading-tight mb-1">
+                                            {event.title}
+                                        </h4>
+
+                                        {event.type !== 'holiday' && (
+                                            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                                                <Clock size={12} className="text-indigo-400" />
+                                                {event.start_time?.slice(0, 5)}
                                             </div>
-
-                                            <h4 className="font-bold text-slate-800 dark:text-white text-sm leading-tight mb-1">
-                                                {event.title}
-                                            </h4>
-
-                                            {event.type !== 'holiday' && (
-                                                <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                                                    <Clock size={12} className="text-indigo-400" />
-                                                    {event.start_time?.slice(0, 5)}
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
+                                        )}
+                                    </div>
+                                ))}
 
                                 {!loading && dayEvents.length === 0 && (
                                     <div className="h-full flex flex-col items-center justify-center text-slate-300 dark:text-slate-700 py-8 opacity-50">

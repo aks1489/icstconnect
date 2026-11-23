@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { animate } from 'animejs'
 import InteractiveImageMarker from '../InteractiveImageMarker'
 import { getOptimizedImageUrl } from '../../../lib/cloudinary'
 
@@ -7,6 +7,7 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
     const [viewMode, setViewMode] = useState<'events' | 'story'>('events');
     const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
     const [expandedImage, setExpandedImage] = useState<any | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     // EVENTS VIEW: Group by event name
     const events = useMemo(() => {
@@ -60,8 +61,58 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
         }
     };
 
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        if (typeof IntersectionObserver === 'undefined') {
+            const items = container.querySelectorAll<HTMLElement>('.curve-reveal');
+            items.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target as HTMLElement;
+                    const direction = el.dataset.direction;
+                    const isScale = el.dataset.scale === 'true';
+
+                    if (isScale) {
+                        animate(el, {
+                            opacity: [0, 1],
+                            scale: [0.9, 1],
+                            duration: 600,
+                            ease: 'outCubic'
+                        });
+                    } else if (direction) {
+                        const xOffset = direction === 'left' ? -40 : 40;
+                        animate(el, {
+                            opacity: [0, 1],
+                            translateX: [xOffset, 0],
+                            duration: 650,
+                            ease: 'outCubic'
+                        });
+                    } else {
+                        animate(el, {
+                            opacity: [0, 1],
+                            duration: 500,
+                            ease: 'outCubic'
+                        });
+                    }
+                    observer.unobserve(el);
+                }
+            });
+        }, { rootMargin: '-40px' });
+
+        const items = container.querySelectorAll('.curve-reveal');
+        items.forEach(item => observer.observe(item));
+
+        return () => observer.disconnect();
+    }, [viewMode, selectedEvent, events, storyImages]);
+
     return (
-        <div className="relative min-h-[60vh] pt-12 pb-20 px-4 max-w-6xl mx-auto overflow-hidden">
+        <div ref={containerRef} className="relative min-h-[60vh] pt-12 pb-20 px-4 max-w-6xl mx-auto overflow-hidden">
             
             {/* View Mode Toggle */}
             <div className="flex justify-center mb-20 relative z-20">
@@ -96,117 +147,108 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                     const isSelected = selectedEvent === event.name;
 
                     return (
-                        <motion.div layout key={event.name} className="relative w-full scroll-mt-24" id={`event-${event.name.replace(/\s+/g, '-')}`}>
-                            <AnimatePresence mode="wait">
-                                {!isSelected ? (
-                                    <motion.div 
-                                        key="collapsed"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className={`flex flex-col md:flex-row items-center gap-8 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+                        <div key={event.name} className="relative w-full scroll-mt-24" id={`event-${event.name.replace(/\s+/g, '-')}`}>
+                            {!isSelected ? (
+                                <div 
+                                    key="collapsed"
+                                    className={`flex flex-col md:flex-row items-center gap-8 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} animate-in fade-in duration-300`}
+                                >
+                                    <div 
+                                        data-direction={isLeft ? 'left' : 'right'}
+                                        style={{ opacity: 0, transform: `translateX(${isLeft ? -40 : 40}px)` }}
+                                        className={`curve-reveal w-full md:w-1/2 flex flex-col ${isLeft ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center`}
                                     >
-                                        <motion.div 
-                                            initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
-                                            whileInView={{ opacity: 1, x: 0 }}
-                                            viewport={{ once: true, margin: "-100px" }}
-                                            className={`w-full md:w-1/2 flex flex-col ${isLeft ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center`}
-                                        >
-                                            <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{event.name}</h3>
-                                            {event.cover.event_date && (
-                                                <p className="text-indigo-600 dark:text-indigo-400 font-medium font-mono text-sm mb-4">
-                                                    {new Date(event.cover.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                                </p>
-                                            )}
-                                            <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-                                                {event.cover.description || 'Explore the moments captured during this amazing event.'}
+                                        <h3 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{event.name}</h3>
+                                        {event.cover.event_date && (
+                                            <p className="text-indigo-600 dark:text-indigo-400 font-medium font-mono text-sm mb-4">
+                                                {new Date(event.cover.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                                             </p>
-                                            <button 
-                                                onClick={() => {
-                                                    setSelectedEvent(event.name);
-                                                    setTimeout(() => {
-                                                        const el = document.getElementById(`event-${event.name.replace(/\s+/g, '-')}`);
-                                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                    }, 100);
-                                                }}
-                                                className="mt-6 px-6 py-2 bg-slate-900 dark:bg-indigo-600 text-white rounded-full text-sm font-semibold hover:bg-slate-700 dark:hover:bg-indigo-500 transition-colors shadow-lg shadow-slate-900/20 dark:shadow-indigo-900/30"
-                                            >
-                                                View Gallery ({event.others.length + 1} photos)
-                                            </button>
-                                        </motion.div>
+                                        )}
+                                        <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+                                            {event.cover.description || 'Explore the moments captured during this amazing event.'}
+                                        </p>
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedEvent(event.name);
+                                                setTimeout(() => {
+                                                    const el = document.getElementById(`event-${event.name.replace(/\s+/g, '-')}`);
+                                                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }, 100);
+                                            }}
+                                            className="mt-6 px-6 py-2 bg-slate-900 dark:bg-indigo-600 text-white rounded-full text-sm font-semibold hover:bg-slate-700 dark:hover:bg-indigo-500 transition-colors shadow-lg shadow-slate-900/20 dark:shadow-indigo-900/30"
+                                        >
+                                            View Gallery ({event.others.length + 1} photos)
+                                        </button>
+                                    </div>
 
-                                        <div className="w-full md:w-1/2 flex justify-center perspective-1000 mt-8 md:mt-0 px-4 md:px-0">
-                                            <motion.div 
-                                                className="relative w-[90%] sm:w-full max-w-md aspect-[4/3] mx-auto cursor-pointer group"
-                                                onClick={() => {
-                                                    setSelectedEvent(event.name);
-                                                    setTimeout(() => {
-                                                        const el = document.getElementById(`event-${event.name.replace(/\s+/g, '-')}`);
-                                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                    }, 100);
-                                                }}
-                                            >
-                                                {event.others.slice(0, 3).map((_, i) => (
-                                                    <div 
-                                                        key={i}
-                                                        className="absolute inset-0 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 transition-transform duration-500 group-hover:-translate-y-2"
-                                                        style={{
-                                                            transform: `rotate(${(i + 1) * 4 * (isLeft ? 1 : -1)}deg) translateX(${(i + 1) * 10}px)`,
-                                                            zIndex: 10 - i
-                                                        }}
-                                                    ></div>
-                                                ))}
-                                                <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-700 transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-2">
-                                                    <img src={getOptimizedImageUrl(event.cover.cloudinary_url, 800)} alt={event.name} className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                                                        <span className="text-white font-bold text-lg drop-shadow-md">{event.cover.title || 'Cover Photo'}</span>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div 
-                                        key="expanded"
-                                        initial={{ opacity: 0, y: 30 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: 20 }}
-                                        className="w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 max-h-[75vh] overflow-y-auto custom-scrollbar relative"
-                                    >
-                                        <div className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-6 md:px-10 pt-6 md:pt-10 pb-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
-                                            <div>
-                                                <h4 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{event.name}</h4>
-                                                <p className="text-sm text-slate-500 dark:text-slate-400">{event.others.length + 1} photos • Click any thumbnail to view full details</p>
-                                            </div>
-                                            <button 
-                                                onClick={() => {
-                                                    setSelectedEvent(null);
-                                                    setTimeout(() => {
-                                                        const el = document.getElementById(`event-${event.name.replace(/\s+/g, '-')}`);
-                                                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                                    }, 100);
-                                                }} 
-                                                className="self-start md:self-auto text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-5 py-2 rounded-full text-sm shadow-sm transition-colors"
-                                            >
-                                                Collapse Gallery
-                                            </button>
-                                        </div>
-                                        
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[160px] grid-flow-dense mt-4 px-6 md:px-10 pb-10">
-                                            {[event.cover, ...event.others].map((img, idx) => (
+                                    <div className="w-full md:w-1/2 flex justify-center perspective-1000 mt-8 md:mt-0 px-4 md:px-0">
+                                        <div 
+                                            className="relative w-[90%] sm:w-full max-w-md aspect-[4/3] mx-auto cursor-pointer group"
+                                            onClick={() => {
+                                                setSelectedEvent(event.name);
+                                                setTimeout(() => {
+                                                    const el = document.getElementById(`event-${event.name.replace(/\s+/g, '-')}`);
+                                                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                }, 100);
+                                            }}
+                                        >
+                                            {event.others.slice(0, 3).map((_, i) => (
                                                 <div 
-                                                    key={img.id} 
-                                                    className={`rounded-xl overflow-hidden shadow-sm cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all bg-slate-100 dark:bg-slate-800 ${getAspectClass(img.id, idx)}`}
-                                                    onClick={() => setExpandedImage(img)}
-                                                >
-                                                    <img src={getOptimizedImageUrl(img.cloudinary_url, 600)} alt="Thumbnail" className="w-full h-full object-cover" />
-                                                </div>
+                                                    key={i}
+                                                    className="absolute inset-0 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 transition-transform duration-500 group-hover:-translate-y-2"
+                                                    style={{
+                                                        transform: `rotate(${(i + 1) * 4 * (isLeft ? 1 : -1)}deg) translateX(${(i + 1) * 10}px)`,
+                                                        zIndex: 10 - i
+                                                    }}
+                                                ></div>
                                             ))}
+                                            <div className="absolute inset-0 z-20 rounded-2xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-700 transition-transform duration-500 group-hover:scale-105 group-hover:-translate-y-2">
+                                                <img src={getOptimizedImageUrl(event.cover.cloudinary_url, 800)} alt={event.name} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                                                    <span className="text-white font-bold text-lg drop-shadow-md">{event.cover.title || 'Cover Photo'}</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div 
+                                    key="expanded"
+                                    className="w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 max-h-[75vh] overflow-y-auto custom-scrollbar relative animate-in fade-in slide-in-from-bottom-4 duration-300"
+                                >
+                                    <div className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-6 md:px-10 pt-6 md:pt-10 pb-4 border-b border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                        <div>
+                                            <h4 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">{event.name}</h4>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">{event.others.length + 1} photos • Click any thumbnail to view full details</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => {
+                                                setSelectedEvent(null);
+                                                setTimeout(() => {
+                                                    const el = document.getElementById(`event-${event.name.replace(/\s+/g, '-')}`);
+                                                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                }, 100);
+                                            }} 
+                                            className="self-start md:self-auto text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-5 py-2 rounded-full text-sm shadow-sm transition-colors"
+                                        >
+                                            Collapse Gallery
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[160px] grid-flow-dense mt-4 px-6 md:px-10 pb-10">
+                                        {[event.cover, ...event.others].map((img, idx) => (
+                                            <div 
+                                                key={img.id} 
+                                                className={`rounded-xl overflow-hidden shadow-sm cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all bg-slate-100 dark:bg-slate-800 ${getAspectClass(img.id, idx)}`}
+                                                onClick={() => setExpandedImage(img)}
+                                            >
+                                                <img src={getOptimizedImageUrl(img.cloudinary_url, 600)} alt="Thumbnail" className="w-full h-full object-cover" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     );
                 })}
                 {viewMode === 'events' && events.standalone.length > 0 && (
@@ -214,16 +256,15 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                         <h3 className="text-2xl font-bold text-center mb-12 text-slate-400 dark:text-slate-500">Other Moments</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {events.standalone.map(img => (
-                                <motion.div 
+                                <div 
                                     key={img.id}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    className="rounded-xl overflow-hidden aspect-[4/3] md:aspect-square shadow-md hover:shadow-xl transition-shadow cursor-pointer bg-slate-100 dark:bg-slate-800"
+                                    data-scale="true"
+                                    style={{ opacity: 0, transform: 'scale(0.9)' }}
+                                    className="curve-reveal rounded-xl overflow-hidden aspect-[4/3] md:aspect-square shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer bg-slate-100 dark:bg-slate-800"
                                     onClick={() => setExpandedImage(img)}
                                 >
                                     <img src={getOptimizedImageUrl(img.cloudinary_url, 400)} alt="Thumbnail" className="w-full h-full object-cover" />
-                                </motion.div>
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -234,17 +275,15 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                     const isLeft = index % 2 === 0;
 
                     return (
-                        <motion.div 
-                            layout 
+                        <div 
                             key={img.id} 
                             className={`flex flex-col md:flex-row items-center gap-8 ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} relative z-20`}
                         >
                             {/* Text Info */}
-                            <motion.div 
-                                initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                className={`w-full md:w-1/2 flex flex-col ${isLeft ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center`}
+                            <div 
+                                data-direction={isLeft ? 'left' : 'right'}
+                                style={{ opacity: 0, transform: `translateX(${isLeft ? -40 : 40}px)` }}
+                                className={`curve-reveal w-full md:w-1/2 flex flex-col ${isLeft ? 'md:items-end md:text-right' : 'md:items-start md:text-left'} text-center`}
                             >
                                 {img.event_name && (
                                     <div className={`flex w-full mb-3 ${isLeft ? 'md:justify-end justify-center' : 'md:justify-start justify-center'}`}>
@@ -266,11 +305,11 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                         {img.description}
                                     </p>
                                 )}
-                            </motion.div>
+                            </div>
 
                             {/* Single Image Frame */}
                             <div className="w-full md:w-1/2 flex justify-center perspective-1000 mt-6 md:mt-0 px-4 md:px-0">
-                                <motion.div 
+                                <div 
                                     className="relative w-[90%] sm:w-[80%] md:w-[90%] max-w-md aspect-[4/3] mx-auto cursor-pointer group"
                                     onClick={() => setExpandedImage(img)}
                                 >
@@ -281,9 +320,9 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
                                             <span className="text-white text-sm font-bold uppercase tracking-widest border-2 border-white/50 px-6 py-2 rounded-full">Explore Picture</span>
                                         </div>
                                     </div>
-                                </motion.div>
+                                </div>
                             </div>
-                        </motion.div>
+                        </div>
                     );
                 })}
 
@@ -291,9 +330,9 @@ export default function CurveRoadLayout({ images }: { images: any[] }) {
 
             {/* Lightbox Overlay for Expanded Image Details */}
             {expandedImage && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in duration-200">
                     <div className="absolute inset-0 bg-slate-900/80 dark:bg-black/80 backdrop-blur-md" onClick={() => setExpandedImage(null)}></div>
-                    <div className="relative w-full max-w-6xl bg-white dark:bg-slate-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-slate-200 dark:border-slate-800">
+                    <div className="relative w-full max-w-6xl bg-white dark:bg-slate-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col md:flex-row max-h-[90vh] border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
                         <button 
                             onClick={() => setExpandedImage(null)} 
                             className="absolute top-4 right-4 z-50 p-2 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors shadow-sm"

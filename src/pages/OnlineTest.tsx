@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { IconClock as Clock, IconHelpCircle as HelpCircle, IconArrowRight as ArrowRight, IconLock as Lock, IconWorld as Globe, IconBook2 as BookOpen } from '@tabler/icons-react'
-import { motion } from 'framer-motion'
 import SEOHead from '../components/common/SEOHead'
 import type { Test } from '../types'
 
@@ -86,19 +85,6 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
         return true
     })
 
-    const container = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: { staggerChildren: 0.1 }
-        }
-    }
-
-    const item = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-    }
-
     return (
         <div className={`min-h-screen ${isStudentPortal ? 'bg-transparent' : 'bg-slate-50 dark:bg-slate-950 pt-24 pb-20'} text-slate-900 dark:text-slate-100 transition-colors`}>
             <SEOHead
@@ -153,11 +139,7 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                     </div>
                 ) : (
                     // --- Public Header ---
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-center mb-16"
-                    >
+                    <div className="text-center mb-16 animate-in fade-in slide-in-from-top-4 duration-500">
                         <span className="inline-block py-1 px-3 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 text-sm font-bold mb-4 border border-indigo-100 dark:border-indigo-900/50">
                             Assessment Zone
                         </span>
@@ -183,7 +165,7 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                                 </button>
                             ))}
                         </div>
-                    </motion.div>
+                    </div>
                 )}
 
                 {loading ? (
@@ -208,18 +190,13 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                         <p className="text-slate-500 dark:text-slate-400 mt-2">Try changing filters or come back later.</p>
                     </div>
                 ) : (
-                    <motion.div
-                        variants={container}
-                        initial="hidden"
-                        animate="show"
+                    <div
                         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                     >
                         {filteredTests.map((test) => (
-                            <motion.div
+                            <div
                                 key={test.id}
-                                variants={item}
-                                whileHover={{ y: -8, transition: { duration: 0.2 } }}
-                                className="bg-white dark:bg-slate-900 rounded-3xl p-1 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-xl hover:shadow-indigo-500/10 transition-all group flex flex-col h-full"
+                                className="bg-white dark:bg-slate-900 rounded-3xl p-1 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-2 transition-all duration-200 group flex flex-col h-full"
                             >
                                 <div className="p-7 flex flex-col h-full">
                                     <div className="flex items-start justify-between mb-6">
@@ -270,14 +247,14 @@ const OnlineTest = ({ isStudentPortal = false }: OnlineTestProps) => {
                                     <Link
                                         to={`${basePath}/${test.id}`}
                                         rel={isStudentPortal ? undefined : "nofollow"}
-                                        className="mt-6 w-full py-3.5 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 transition-all shadow-lg shadow-slate-200 dark:shadow-none group-hover:shadow-indigo-200 dark:group-hover:shadow-none"
+                                        className="mt-6 w-full py-3.5 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-bold text-sm flex items-center justify-center gap-2 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-slate-200 dark:shadow-none group-hover:shadow-indigo-200 dark:group-hover:shadow-none"
                                     >
                                         Start Challenge <ArrowRight size={16} />
                                     </Link>
                                 </div>
-                            </motion.div>
+                            </div>
                         ))}
-                    </motion.div>
+                    </div>
                 )}
             </div>
         </div>

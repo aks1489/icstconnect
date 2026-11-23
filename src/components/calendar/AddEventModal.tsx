@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { IconX as X, IconCheck as Check } from '@tabler/icons-react'
-import { motion } from 'framer-motion'
 import { supabase } from '../../lib/supabase'
 import { useToast } from '../../contexts/ToastContext'
 import CourseSearchSelect from '../admin/CourseSearchSelect'
@@ -19,7 +18,6 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
     const [date, setDate] = useState('')
     const [startTime, setStartTime] = useState('10:00')
 
-
     // Selection for Extra Class
     const [courses, setCourses] = useState<any[]>([])
     const [selectedCourseId, setSelectedCourseId] = useState('')
@@ -27,6 +25,15 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
     const [selectedClassId, setSelectedClassId] = useState('')
 
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (!isOpen) return
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose()
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen, onClose])
 
     useEffect(() => {
         if (isOpen && eventType === 'extra_class') {
@@ -98,12 +105,13 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]"
+            <div
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+                onClick={onClose}
+                aria-hidden="true"
+            />
+            <div
+                className="relative w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 z-10"
             >
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/60 rounded-t-2xl">
                     <h2 className="text-xl font-bold text-slate-800 dark:text-white">Add Calendar Event</h2>
@@ -233,7 +241,7 @@ export default function AddEventModal({ isOpen, onClose, onSuccess }: AddEventMo
                         )}
                     </button>
                 </form>
-            </motion.div>
+            </div>
         </div>
     )
 }

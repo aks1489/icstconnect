@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/icons-react'
-import { motion } from 'framer-motion'
+import { animate } from 'animejs'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
 import type { Course } from '../../../types/course'
@@ -9,6 +9,20 @@ import type { Course } from '../../../types/course'
 const CoursesSection = () => {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
+    const marqueeRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (!marqueeRef.current || loading || courses.length === 0) return
+        const anim = animate(marqueeRef.current, {
+            translateX: ['0%', '-50%'],
+            duration: 80000,
+            ease: 'linear',
+            loop: true
+        })
+        return () => {
+            anim.pause()
+        }
+    }, [loading, courses])
 
     useEffect(() => {
         const fetchAndFilterCourses = async () => {
@@ -112,16 +126,9 @@ const CoursesSection = () => {
                         <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 z-20 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
                         <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 z-20 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
 
-                        <motion.div
+                        <div
+                            ref={marqueeRef}
                             className="flex gap-5 md:gap-8 w-fit"
-                            initial={{ x: 0 }}
-                            animate={{ x: "-50%" }}
-                            transition={{
-                                duration: 80,
-                                ease: "linear",
-                                repeat: Infinity,
-                                repeatType: "loop"
-                            }}
                             style={{ willChange: 'transform' }}
                         >
                             {marqueeCourses.map((course, index) => {
@@ -163,7 +170,7 @@ const CoursesSection = () => {
                                     </Link>
                                 );
                             })}
-                        </motion.div>
+                        </div>
                     </div>
                 )}
 

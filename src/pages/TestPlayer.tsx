@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { IconClock as Clock, IconArrowLeft as ArrowLeft, IconArrowRight as ArrowRight, IconLoader2 as Loader2 } from '@tabler/icons-react'
-import { motion } from 'framer-motion'
 import SEOHead from '../components/common/SEOHead'
 import { useToast } from '../contexts/ToastContext'
 import type { Test, TestQuestion } from '../types'
@@ -216,10 +215,8 @@ const TestPlayer = () => {
                     title="Assessment Result | ICST Chowberia"
                     noindex={true}
                 />
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl p-8 max-w-md w-full text-center border border-slate-100 dark:border-slate-800"
+                <div
+                    className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl p-8 max-w-md w-full text-center border border-slate-100 dark:border-slate-800 animate-in fade-in zoom-in-95 duration-300"
                 >
                     <div className="w-24 h-24 rounded-full bg-slate-50 dark:bg-slate-800 mx-auto mb-6 flex items-center justify-center shadow-inner">
                         <span className={`text-4xl font-bold ${color}`}>{percentage}%</span>
@@ -246,7 +243,7 @@ const TestPlayer = () => {
                     >
                         Back to Tests
                     </Link>
-                </motion.div>
+                </div>
             </div>
         )
     }
@@ -277,21 +274,16 @@ const TestPlayer = () => {
 
                 {/* Progress Bar */}
                 <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full mb-8 overflow-hidden">
-                    <motion.div
-                        className="h-full bg-indigo-600 dark:bg-indigo-500"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        transition={{ duration: 0.5 }}
+                    <div
+                        className="h-full bg-indigo-600 dark:bg-indigo-500 transition-all duration-500 ease-out"
+                        style={{ width: `${progress}%` }}
                     />
                 </div>
 
                 {/* Question Card */}
-                <motion.div
+                <div
                     key={currentQuestion.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/60 dark:shadow-none p-6 md:p-10 mb-8 border border-slate-100 dark:border-slate-800"
+                    className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/60 dark:shadow-none p-6 md:p-10 mb-8 border border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-right-4 duration-300"
                 >
                     <h3 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-white mb-8 leading-snug">
                         {currentQuestion.text}
@@ -320,7 +312,7 @@ const TestPlayer = () => {
                             )
                         })}
                     </div>
-                </motion.div>
+                </div>
 
                 {/* Navigation */}
                 <div className="flex items-center justify-between">

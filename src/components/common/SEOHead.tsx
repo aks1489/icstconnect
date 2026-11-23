@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { isAdminSubdomain } from '../../utils/subdomain'
 
 const BASE_URL = (import.meta.env.VITE_SITE_URL || 'https://icstconnect.in').replace(/\/$/, '')
 const DEFAULT_IMAGE = `${BASE_URL}/logo.png`
@@ -62,7 +63,8 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
 
     // 4. Canonical URL
     const cleanPath = activeCanonicalPath.startsWith('/') ? activeCanonicalPath : `/${activeCanonicalPath}`
-    const canonicalUrl = `${BASE_URL}${cleanPath === '/' ? '' : cleanPath}`
+    const effectiveBase = isAdminSubdomain() ? 'https://admin.icstconnect.in' : BASE_URL
+    const canonicalUrl = `${effectiveBase}${cleanPath === '/' ? '' : cleanPath}`
 
     let linkCanonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
     if (!linkCanonical) {

@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import { Suspense, lazy, useState } from 'react'
 import { IconAlertCircle as AlertCircle, IconX as X } from '@tabler/icons-react'
 import MainLayout from './components/layout/MainLayout'
+import { isAdminSubdomain, isMainProductionDomain } from './utils/subdomain'
+import AdminDomainRedirect from './components/admin/AdminDomainRedirect'
+import AdminBackwardsCompatRedirect from './components/admin/AdminBackwardsCompatRedirect'
 
 import PageSkeleton from './components/ui/PageSkeleton'
 
@@ -125,6 +128,164 @@ import AppErrorBoundary from './components/ui/AppErrorBoundary'
 import ScrollToTop from './components/common/ScrollToTop'
 
 function App() {
+  const onAdminSubdomain = isAdminSubdomain()
+  const inMainProduction = isMainProductionDomain()
+
+  const renderAdminChildRoutes = () => (
+    <>
+      <Route index element={<Navigate to="dashboard" replace />} />
+      <Route path="dashboard" element={
+        <ProtectedRoute requiredPermission="dashboard.view">
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="students" element={
+        <ProtectedRoute requiredPermission="students.view">
+          <ManageStudents />
+        </ProtectedRoute>
+      } />
+      <Route path="students/:id" element={
+        <ProtectedRoute requiredPermission="students.view">
+          <StudentDetails />
+        </ProtectedRoute>
+      } />
+      <Route path="courses" element={
+        <ProtectedRoute requiredPermission="courses.view">
+          <AdminCourses />
+        </ProtectedRoute>
+      } />
+      <Route path="courses/new" element={
+        <ProtectedRoute requiredPermission="courses.create">
+          <CourseForm />
+        </ProtectedRoute>
+      } />
+      <Route path="courses/:id/edit" element={
+        <ProtectedRoute requiredPermission="courses.update">
+          <CourseForm />
+        </ProtectedRoute>
+      } />
+      <Route path="courses/:id/structure" element={
+        <ProtectedRoute requiredPermission="courses.structure.manage">
+          <CourseStructureEditor />
+        </ProtectedRoute>
+      } />
+      <Route path="courses/:id/classes" element={
+        <ProtectedRoute requiredPermission="courses.view">
+          <ClassManager />
+        </ProtectedRoute>
+      } />
+      <Route path="classes" element={
+        <ProtectedRoute requiredPermission="classes.view">
+          <AdminClasses />
+        </ProtectedRoute>
+      } />
+      <Route path="classes/:id" element={
+        <ProtectedRoute requiredPermission="classes.view">
+          <AdminClassDetails />
+        </ProtectedRoute>
+      } />
+      <Route path="calendar" element={
+        <ProtectedRoute requiredPermission="classes.schedule.manage">
+          <AdminCalendar />
+        </ProtectedRoute>
+      } />
+      <Route path="schedule" element={
+        <ProtectedRoute requiredPermission="classes.schedule.manage">
+          <ScheduleClass />
+        </ProtectedRoute>
+      } />
+      <Route path="teachers" element={
+        <ProtectedRoute requiredPermission="teachers.view">
+          <AdminTeachers />
+        </ProtectedRoute>
+      } />
+      <Route path="teachers/:id" element={
+        <ProtectedRoute requiredPermission="teachers.view">
+          <TeacherDetails />
+        </ProtectedRoute>
+      } />
+      <Route path="tests" element={
+        <ProtectedRoute requiredPermission="tests.view">
+          <AdminTests />
+        </ProtectedRoute>
+      } />
+      <Route path="tests/new" element={
+        <ProtectedRoute requiredPermission="tests.create">
+          <CreateTest />
+        </ProtectedRoute>
+      } />
+      <Route path="tests/:id/edit" element={
+        <ProtectedRoute requiredPermission="tests.update">
+          <CreateTest />
+        </ProtectedRoute>
+      } />
+      <Route path="finance" element={
+        <ProtectedRoute requiredPermission="finance.view">
+          <AdminFinance />
+        </ProtectedRoute>
+      } />
+      <Route path="discount-claims" element={
+        <ProtectedRoute requiredPermission="finance.view">
+          <DiscountClaims />
+        </ProtectedRoute>
+      } />
+      <Route path="enrollments" element={
+        <ProtectedRoute requiredPermission="admissions.view">
+          <EnrollmentApplications />
+        </ProtectedRoute>
+      } />
+      <Route path="scholarships" element={
+        <ProtectedRoute requiredPermission="scholarships.view">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminScholarships />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="gallery" element={
+        <ProtectedRoute requiredPermission="gallery.view">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminGallery />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="home-media" element={
+        <ProtectedRoute requiredPermission="home.media.manage">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminHomeMedia />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="permissions" element={
+        <ProtectedRoute requireSuperAdmin requiredPermission="permissions.manage">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminPermissions />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="audit-logs" element={
+        <ProtectedRoute requiredPermission="audit_logs.view">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminAuditLogs />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="ecosystem" element={
+        <ProtectedRoute requiredPermission="external_sites.view">
+          <Suspense fallback={<PageSkeleton />}>
+            <AdminEcosystem />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="management-accounts" element={
+        <ProtectedRoute requireSuperAdmin requiredPermission="admins.manage">
+          <Suspense fallback={<PageSkeleton />}>
+            <SuperAdminAccountManager />
+          </Suspense>
+        </ProtectedRoute>
+      } />
+    </>
+  )
+
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -136,361 +297,267 @@ function App() {
               <ToastContainer />
 
               <Suspense fallback={<PageSkeleton />}>
-              <Routes>
-                {/* Public Routes with MainLayout */}
-                <Route element={
-                  <AppErrorBoundary fallbackTitle="Public Portal Error">
-                    <MainLayout><Outlet /></MainLayout>
-                  </AppErrorBoundary>
-                }>
-                <Route path="/" element={<Home />} />
-                <Route path="/courses/:courseId?" element={<CoursesPage />} />
-                <Route path="/enroll/:courseId" element={
-                  <Suspense fallback={<PageSkeleton />}>
-                    <EnrollmentForm />
-                  </Suspense>
-                } />
+                {onAdminSubdomain ? (
+                  <Routes>
+                    {/* Admin Subdomain Root Portal Layout with direct subpaths */}
+                    <Route
+                      element={
+                        <ProtectedRoute requireAdmin>
+                          <AppErrorBoundary fallbackTitle="Admin Portal Unavailable">
+                            <AdminLayout />
+                          </AppErrorBoundary>
+                        </ProtectedRoute>
+                      }
+                    >
+                      {renderAdminChildRoutes()}
+                    </Route>
 
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/scholarships" element={
-                  <Suspense fallback={<PageSkeleton />}>
-                    <ScholarshipsPage />
-                  </Suspense>
-                } />
+                    {/* Admin Subdomain Authentication & Security Routes */}
+                    <Route path="/login" element={<AdminLogin />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+                    <Route path="/force-password-change" element={
+                      <ProtectedRoute>
+                        <ForcePasswordChange />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/quick-access" element={
+                      <ProtectedRoute>
+                        <div className="animate-in fade-in duration-300">
+                          <QuickAccess />
+                        </div>
+                      </ProtectedRoute>
+                    } />
 
-                <Route path="/online-test" element={
-                  <Suspense fallback={<PageSkeleton />}>
-                    <OnlineTest />
-                  </Suspense>
-                } />
+                    {/* Backwards-Compatibility for legacy /admin and /admin/* paths */}
+                    <Route path="/admin/login" element={<Navigate to="/login" replace />} />
+                    <Route path="/admin" element={<Navigate to="/" replace />} />
+                    <Route path="/admin/*" element={<AdminBackwardsCompatRedirect />} />
+                    <Route path="/super-admin/accounts" element={<Navigate to="/management-accounts" replace />} />
+                    <Route path="/super-admin/*" element={<Navigate to="/management-accounts" replace />} />
 
-                <Route path="/online-test/:testId" element={
-                  <Suspense fallback={<PageSkeleton />}>
-                    <TestPlayer />
-                  </Suspense>
-                } />
+                    {/* Subdomain 404 Fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                ) : (
+                  <Routes>
+                    {/* Public Routes with MainLayout */}
+                    <Route element={
+                      <AppErrorBoundary fallbackTitle="Public Portal Error">
+                        <MainLayout><Outlet /></MainLayout>
+                      </AppErrorBoundary>
+                    }>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/courses/:courseId?" element={<CoursesPage />} />
+                      <Route path="/enroll/:courseId" element={
+                        <Suspense fallback={<PageSkeleton />}>
+                          <EnrollmentForm />
+                        </Suspense>
+                      } />
 
-                {/* Security Flow */}
-                <Route path="/force-password-change" element={
-                  <ProtectedRoute>
-                    <ForcePasswordChange />
-                  </ProtectedRoute>
-                } />
+                      <Route path="/notifications" element={<Notifications />} />
+                      <Route path="/gallery" element={<Gallery />} />
+                      <Route path="/scholarships" element={
+                        <Suspense fallback={<PageSkeleton />}>
+                          <ScholarshipsPage />
+                        </Suspense>
+                      } />
 
-                <Route path="/about" element={<AboutUs />} />
-                <Route path="/login" element={<Navigate to="/" replace />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/teacher/login" element={<TeacherLogin />} />
-                <Route path="/staff/login" element={<StaffLogin />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+                      <Route path="/online-test" element={
+                        <Suspense fallback={<PageSkeleton />}>
+                          <OnlineTest />
+                        </Suspense>
+                      } />
 
-                {/* Dedicated 404 Not Found Route */}
-                <Route path="*" element={<NotFound />} />
-              </Route>
+                      <Route path="/online-test/:testId" element={
+                        <Suspense fallback={<PageSkeleton />}>
+                          <TestPlayer />
+                        </Suspense>
+                      } />
 
-              {/* Standalone Typing Practice Page */}
-              <Route path="/typing-practice" element={
-                <Suspense fallback={<PageSkeleton />}>
-                  <TypingPractice />
-                </Suspense>
-              } />
+                      {/* Security Flow */}
+                      <Route path="/force-password-change" element={
+                        <ProtectedRoute>
+                          <ForcePasswordChange />
+                        </ProtectedRoute>
+                      } />
 
-              {/* Quick Access - Protected but Shared */}
-              <Route path="/quick-access" element={
-                <ProtectedRoute>
-                  <div className="animate-in fade-in duration-300">
-                    <QuickAccess />
-                  </div>
-                </ProtectedRoute>
-              } />
-              <Route path="/student" element={
-                <ProtectedRoute requireStudent>
-                  <AppErrorBoundary fallbackTitle="Student Portal Unavailable">
-                    <StudentLayout />
-                  </AppErrorBoundary>
-                </ProtectedRoute>
-              }>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<StudentDashboard />} />
-                <Route path="offline-classes" element={<OfflineClasses />} />
-                <Route path="calendar" element={<StudentCalendar />} />
-                <Route path="tests" element={<OnlineTest isStudentPortal />} />
-                <Route path="tests/:testId" element={<TestPlayer />} />
-                <Route path="fees" element={<StudentFeesPage />} />
-                <Route path="complete-profile" element={<CompleteProfile />} />
-              </Route>
+                      <Route path="/about" element={<AboutUs />} />
+                      <Route path="/login" element={<Navigate to="/" replace />} />
+                      <Route path="/teacher/login" element={<TeacherLogin />} />
+                      <Route path="/staff/login" element={<StaffLogin />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
 
-              {/* Standalone Connect Page */}
-              <Route path="/connect" element={<Connect />} />
+                      {/* Dedicated 404 Not Found Route */}
+                      <Route path="*" element={<NotFound />} />
+                    </Route>
 
-              {/* Admin Routes - Independent Layout */}
-              <Route path="/admin" element={
-                <ProtectedRoute requireAdmin>
-                  <AppErrorBoundary fallbackTitle="Admin Portal Unavailable">
-                    <AdminLayout />
-                  </AppErrorBoundary>
-                </ProtectedRoute>
-              }>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={
-                  <ProtectedRoute requiredPermission="dashboard.view">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="students" element={
-                  <ProtectedRoute requiredPermission="students.view">
-                    <ManageStudents />
-                  </ProtectedRoute>
-                } />
-                <Route path="students/:id" element={
-                  <ProtectedRoute requiredPermission="students.view">
-                    <StudentDetails />
-                  </ProtectedRoute>
-                } />
-                <Route path="courses" element={
-                  <ProtectedRoute requiredPermission="courses.view">
-                    <AdminCourses />
-                  </ProtectedRoute>
-                } />
-                <Route path="courses/new" element={
-                  <ProtectedRoute requiredPermission="courses.create">
-                    <CourseForm />
-                  </ProtectedRoute>
-                } />
-                <Route path="courses/:id/edit" element={
-                  <ProtectedRoute requiredPermission="courses.update">
-                    <CourseForm />
-                  </ProtectedRoute>
-                } />
-                <Route path="courses/:id/structure" element={
-                  <ProtectedRoute requiredPermission="courses.structure.manage">
-                    <CourseStructureEditor />
-                  </ProtectedRoute>
-                } />
-                <Route path="courses/:id/classes" element={
-                  <ProtectedRoute requiredPermission="courses.view">
-                    <ClassManager />
-                  </ProtectedRoute>
-                } />
-                <Route path="classes" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <AdminClasses />
-                  </ProtectedRoute>
-                } />
-                <Route path="classes/:id" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <AdminClassDetails />
-                  </ProtectedRoute>
-                } />
-                <Route path="calendar" element={
-                  <ProtectedRoute requiredPermission="classes.schedule.manage">
-                    <AdminCalendar />
-                  </ProtectedRoute>
-                } />
-                <Route path="schedule" element={
-                  <ProtectedRoute requiredPermission="classes.schedule.manage">
-                    <ScheduleClass />
-                  </ProtectedRoute>
-                } />
-                <Route path="teachers" element={
-                  <ProtectedRoute requiredPermission="teachers.view">
-                    <AdminTeachers />
-                  </ProtectedRoute>
-                } />
-                <Route path="teachers/:id" element={
-                  <ProtectedRoute requiredPermission="teachers.view">
-                    <TeacherDetails />
-                  </ProtectedRoute>
-                } />
-                <Route path="tests" element={
-                  <ProtectedRoute requiredPermission="tests.view">
-                    <AdminTests />
-                  </ProtectedRoute>
-                } />
-                <Route path="tests/new" element={
-                  <ProtectedRoute requiredPermission="tests.create">
-                    <CreateTest />
-                  </ProtectedRoute>
-                } />
-                <Route path="tests/:id/edit" element={
-                  <ProtectedRoute requiredPermission="tests.update">
-                    <CreateTest />
-                  </ProtectedRoute>
-                } />
-                <Route path="finance" element={
-                  <ProtectedRoute requiredPermission="finance.view">
-                    <AdminFinance />
-                  </ProtectedRoute>
-                } />
-                <Route path="discount-claims" element={
-                  <ProtectedRoute requiredPermission="finance.view">
-                    <DiscountClaims />
-                  </ProtectedRoute>
-                } />
-                <Route path="enrollments" element={
-                  <ProtectedRoute requiredPermission="admissions.view">
-                    <EnrollmentApplications />
-                  </ProtectedRoute>
-                } />
-                <Route path="scholarships" element={
-                  <ProtectedRoute requiredPermission="scholarships.view">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AdminScholarships />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                <Route path="gallery" element={
-                  <ProtectedRoute requiredPermission="gallery.view">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AdminGallery />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                <Route path="home-media" element={
-                  <ProtectedRoute requiredPermission="home.media.manage">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AdminHomeMedia />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                <Route path="permissions" element={
-                  <ProtectedRoute requireSuperAdmin requiredPermission="permissions.manage">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AdminPermissions />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                <Route path="audit-logs" element={
-                  <ProtectedRoute requiredPermission="audit_logs.view">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AdminAuditLogs />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                <Route path="ecosystem" element={
-                  <ProtectedRoute requiredPermission="external_sites.view">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <AdminEcosystem />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-                <Route path="management-accounts" element={
-                  <ProtectedRoute requireSuperAdmin requiredPermission="admins.manage">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <SuperAdminAccountManager />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-              </Route>
+                    {/* Standalone Typing Practice Page */}
+                    <Route path="/typing-practice" element={
+                      <Suspense fallback={<PageSkeleton />}>
+                        <TypingPractice />
+                      </Suspense>
+                    } />
 
-              {/* Teacher Routes - Independent Layout */}
-              <Route path="/teacher" element={
-                <ProtectedRoute requireTeacher>
-                  <AppErrorBoundary fallbackTitle="Teacher Portal Unavailable">
-                    <TeacherLayout />
-                  </AppErrorBoundary>
-                </ProtectedRoute>
-              }>
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={
-                  <ProtectedRoute requiredPermission="dashboard.view">
-                    <TeacherDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="calendar" element={
-                  <ProtectedRoute requiredPermission="classes.schedule.manage">
-                    <TeacherCalendar />
-                  </ProtectedRoute>
-                } />
-                <Route path="active-classes" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <ActiveClasses />
-                  </ProtectedRoute>
-                } />
-                <Route path="classes/:courseId" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <ManageClass />
-                  </ProtectedRoute>
-                } />
-                <Route path="classes/:studentId/:courseId" element={
-                  <ProtectedRoute requiredPermission="classes.view">
-                    <StudentProgressTracker />
-                  </ProtectedRoute>
-                } />
-                <Route path="exams" element={
-                  <ProtectedRoute requiredPermission="tests.view">
-                    <TeacherExams />
-                  </ProtectedRoute>
-                } />
-                <Route path="payslips" element={
-                  <ProtectedRoute requiredPermission="payroll.view">
-                    <Suspense fallback={<PageSkeleton />}>
-                      <MyPayslips />
-                    </Suspense>
-                  </ProtectedRoute>
-                } />
-              </Route>
+                    {/* Quick Access - Protected but Shared */}
+                    <Route path="/quick-access" element={
+                      <ProtectedRoute>
+                        <div className="animate-in fade-in duration-300">
+                          <QuickAccess />
+                        </div>
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/student" element={
+                      <ProtectedRoute requireStudent>
+                        <AppErrorBoundary fallbackTitle="Student Portal Unavailable">
+                          <StudentLayout />
+                        </AppErrorBoundary>
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<Navigate to="dashboard" replace />} />
+                      <Route path="dashboard" element={<StudentDashboard />} />
+                      <Route path="offline-classes" element={<OfflineClasses />} />
+                      <Route path="calendar" element={<StudentCalendar />} />
+                      <Route path="tests" element={<OnlineTest isStudentPortal />} />
+                      <Route path="tests/:testId" element={<TestPlayer />} />
+                      <Route path="fees" element={<StudentFeesPage />} />
+                      <Route path="complete-profile" element={<CompleteProfile />} />
+                    </Route>
 
-              {/* Multi-Role Staff Routes - Independent Layout */}
-              <Route path="/staff" element={
-                <ProtectedRoute requireStaff>
-                  <AppErrorBoundary fallbackTitle="Staff Portal Unavailable">
-                    <StaffLayout />
-                  </AppErrorBoundary>
-                </ProtectedRoute>
-              }>
-                <Route index element={<Navigate to="reception" replace />} />
-                <Route path="reception" element={
-                  <ProtectedRoute requiredPermission="dashboard.view">
-                    <ReceptionDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="reception/payslips" element={
-                  <ProtectedRoute requiredPermission="payroll.view">
-                    <MyPayslips />
-                  </ProtectedRoute>
-                } />
-                <Route path="lab" element={
-                  <ProtectedRoute requiredPermission="dashboard.view">
-                    <LabDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="lab/payslips" element={
-                  <ProtectedRoute requiredPermission="payroll.view">
-                    <MyPayslips />
-                  </ProtectedRoute>
-                } />
-                <Route path="maintenance" element={
-                  <ProtectedRoute requiredPermission="dashboard.view">
-                    <MaintenanceDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="maintenance/payslips" element={
-                  <ProtectedRoute requiredPermission="payroll.view">
-                    <MyPayslips />
-                  </ProtectedRoute>
-                } />
-                <Route path="payslips" element={
-                  <ProtectedRoute requiredPermission="payroll.view">
-                    <MyPayslips />
-                  </ProtectedRoute>
-                } />
-              </Route>
+                    {/* Standalone Connect Page */}
+                    <Route path="/connect" element={<Connect />} />
 
+                    {/* Admin Routes on Main Domain */}
+                    {inMainProduction ? (
+                      <>
+                        <Route path="/admin/login" element={<AdminDomainRedirect />} />
+                        <Route path="/admin" element={<AdminDomainRedirect />} />
+                        <Route path="/admin/*" element={<AdminDomainRedirect />} />
+                        <Route path="/super-admin/*" element={<AdminDomainRedirect />} />
+                      </>
+                    ) : (
+                      <>
+                        <Route path="/admin/login" element={<AdminLogin />} />
+                        <Route path="/admin" element={
+                          <ProtectedRoute requireAdmin>
+                            <AppErrorBoundary fallbackTitle="Admin Portal Unavailable">
+                              <AdminLayout />
+                            </AppErrorBoundary>
+                          </ProtectedRoute>
+                        }>
+                          {renderAdminChildRoutes()}
+                        </Route>
+                        <Route path="/super-admin/accounts" element={<Navigate to="/admin/management-accounts" replace />} />
+                        <Route path="/super-admin/*" element={<Navigate to="/admin/management-accounts" replace />} />
+                      </>
+                    )}
 
-              {/* Super Admin Direct Gateway */}
-              <Route path="/super-admin/accounts" element={<Navigate to="/admin/management-accounts" replace />} />
+                    {/* Teacher Routes - Independent Layout */}
+                    <Route path="/teacher" element={
+                      <ProtectedRoute requireTeacher>
+                        <AppErrorBoundary fallbackTitle="Teacher Portal Unavailable">
+                          <TeacherLayout />
+                        </AppErrorBoundary>
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<Navigate to="dashboard" replace />} />
+                      <Route path="dashboard" element={
+                        <ProtectedRoute requiredPermission="dashboard.view">
+                          <TeacherDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="calendar" element={
+                        <ProtectedRoute requiredPermission="classes.schedule.manage">
+                          <TeacherCalendar />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="active-classes" element={
+                        <ProtectedRoute requiredPermission="classes.view">
+                          <ActiveClasses />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="classes/:courseId" element={
+                        <ProtectedRoute requiredPermission="classes.view">
+                          <ManageClass />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="classes/:studentId/:courseId" element={
+                        <ProtectedRoute requiredPermission="classes.view">
+                          <StudentProgressTracker />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="exams" element={
+                        <ProtectedRoute requiredPermission="tests.view">
+                          <TeacherExams />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="payslips" element={
+                        <ProtectedRoute requiredPermission="payroll.view">
+                          <Suspense fallback={<PageSkeleton />}>
+                            <MyPayslips />
+                          </Suspense>
+                        </ProtectedRoute>
+                      } />
+                    </Route>
 
-              {/* Global 404 Catch-All Route */}
-              <Route path="*" element={
-                <MainLayout>
-                  <NotFound />
-                </MainLayout>
-              } />
+                    {/* Multi-Role Staff Routes - Independent Layout */}
+                    <Route path="/staff" element={
+                      <ProtectedRoute requireStaff>
+                        <AppErrorBoundary fallbackTitle="Staff Portal Unavailable">
+                          <StaffLayout />
+                        </AppErrorBoundary>
+                      </ProtectedRoute>
+                    }>
+                      <Route index element={<Navigate to="reception" replace />} />
+                      <Route path="reception" element={
+                        <ProtectedRoute requiredPermission="dashboard.view">
+                          <ReceptionDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="reception/payslips" element={
+                        <ProtectedRoute requiredPermission="payroll.view">
+                          <MyPayslips />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="lab" element={
+                        <ProtectedRoute requiredPermission="dashboard.view">
+                          <LabDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="lab/payslips" element={
+                        <ProtectedRoute requiredPermission="payroll.view">
+                          <MyPayslips />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="maintenance" element={
+                        <ProtectedRoute requiredPermission="dashboard.view">
+                          <MaintenanceDashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="maintenance/payslips" element={
+                        <ProtectedRoute requiredPermission="payroll.view">
+                          <MyPayslips />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="payslips" element={
+                        <ProtectedRoute requiredPermission="payroll.view">
+                          <MyPayslips />
+                        </ProtectedRoute>
+                      } />
+                    </Route>
 
-            </Routes>
-          </Suspense>
+                    {/* Super Admin Direct Gateway */}
+                    <Route path="/super-admin/accounts" element={<Navigate to="/admin/management-accounts" replace />} />
+
+                    {/* Global 404 Catch-All Route */}
+                    <Route path="*" element={
+                      <MainLayout>
+                        <NotFound />
+                      </MainLayout>
+                    } />
+
+                  </Routes>
+                )}
+              </Suspense>
           </AppErrorBoundary>
         </Router>
         </ToastProvider>

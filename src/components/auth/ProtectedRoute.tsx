@@ -2,6 +2,7 @@ import { Navigate, useLocation, Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { IconShieldLock, IconArrowLeft } from '@tabler/icons-react'
 import SEOHead from '../common/SEOHead'
+import { isAdminSubdomain } from '../../utils/subdomain'
 
 interface ProtectedRouteProps {
     children: React.ReactNode
@@ -38,7 +39,8 @@ export default function ProtectedRoute({
     if (!user) {
         // Redirect to login but save the attempted location
         if (requireSuperAdmin || requireAdmin) {
-            return <Navigate to="/admin/login" state={{ from: location }} replace />
+            const loginPath = isAdminSubdomain() ? '/login' : '/admin/login'
+            return <Navigate to={loginPath} state={{ from: location }} replace />
         }
         if (requireTeacher) {
             return <Navigate to="/teacher/login" state={{ from: location }} replace />
@@ -56,7 +58,9 @@ export default function ProtectedRoute({
     // Role-based destination resolver for unauthorized attempts
     const getRoleHome = () => {
         const role = profile?.role
-        if (role === 'admin' || role === 'super_admin') return '/admin/dashboard'
+        if (role === 'admin' || role === 'super_admin') {
+            return isAdminSubdomain() ? '/dashboard' : '/admin/dashboard'
+        }
         if (role === 'teacher') return '/teacher/dashboard'
         if (role === 'receptionist') return '/staff/reception'
         if (role === 'lab_assistant') return '/staff/lab'
@@ -65,7 +69,7 @@ export default function ProtectedRoute({
     }
 
     if (requireSuperAdmin && !isSuperAdmin) {
-        return <Navigate to="/admin/dashboard" replace />
+        return <Navigate to={isAdminSubdomain() ? '/dashboard' : '/admin/dashboard'} replace />
     }
 
     if (requireAdmin && !isAdmin) {

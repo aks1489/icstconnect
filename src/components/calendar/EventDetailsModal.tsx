@@ -1,5 +1,5 @@
+import { useEffect } from 'react'
 import { IconX as X, IconCalendar as Calendar, IconClock as Clock, IconBook2 as BookOpen, IconInfoCircle as Info } from '@tabler/icons-react'
-import { motion } from 'framer-motion'
 
 interface CalendarEvent {
     id: string
@@ -21,6 +21,15 @@ interface EventDetailsModalProps {
 }
 
 export default function EventDetailsModal({ isOpen, onClose, event, onDelete }: EventDetailsModalProps) {
+    useEffect(() => {
+        if (!isOpen) return
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose()
+        }
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [isOpen, onClose])
+
     if (!isOpen || !event) return null
 
     // Helper to format duration
@@ -43,12 +52,13 @@ export default function EventDetailsModal({ isOpen, onClose, event, onDelete }: 
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            <div
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+                onClick={onClose}
+                aria-hidden="true"
+            />
+            <div
+                className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 z-10"
             >
                 {/* Header with Dynamic Color */}
                 <div className={`p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start 
@@ -139,7 +149,7 @@ export default function EventDetailsModal({ isOpen, onClose, event, onDelete }: 
                         Close
                     </button>
                 </div>
-            </motion.div>
+            </div>
         </div>
     )
 }

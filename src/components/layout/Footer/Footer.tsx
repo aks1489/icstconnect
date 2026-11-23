@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { IconBrandFacebook as Facebook, IconBrandInstagram as Instagram, IconMapPin as MapPin, IconMail as Mail, IconPhone as Phone } from '@tabler/icons-react'
 
 const Footer: React.FC = () => {
@@ -29,12 +28,12 @@ const Footer: React.FC = () => {
                             Empowering students with cutting-edge computer science education and technical skills for a brighter future.
                         </p>
                         <div className="flex gap-4 pt-2">
-                            <motion.a whileHover={{ scale: 1.1, rotate: 10 }} href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all" aria-label="Facebook">
+                            <a href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all hover:scale-110 hover:rotate-6 active:scale-95" aria-label="Facebook">
                                 <Facebook size={18} />
-                            </motion.a>
-                            <motion.a whileHover={{ scale: 1.1, rotate: -10 }} href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all" aria-label="Instagram">
+                            </a>
+                            <a href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all hover:scale-110 hover:-rotate-6 active:scale-95" aria-label="Instagram">
                                 <Instagram size={18} />
-                            </motion.a>
+                            </a>
                         </div>
                     </div>
 

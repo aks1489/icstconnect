@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { animate } from 'animejs'
 import InteractiveImageMarker from '../InteractiveImageMarker'
 import { getOptimizedImageUrl } from '../../../lib/cloudinary'
 
 export default function BentoFlowLayout({ images }: { images: any[] }) {
+    const containerRef = useRef<HTMLDivElement>(null);
     
     // Assign sizes cyclically to create a bento box look
     const getBentoClass = (index: number) => {
@@ -16,17 +18,51 @@ export default function BentoFlowLayout({ images }: { images: any[] }) {
         return pattern[index % pattern.length];
     };
 
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        if (typeof IntersectionObserver === 'undefined') {
+            const items = container.querySelectorAll<HTMLElement>('.bento-item');
+            items.forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
+            });
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target as HTMLElement;
+                    const delay = (Number(el.dataset.index || 0) % 5) * 50;
+                    animate(el, {
+                        opacity: [0, 1],
+                        scale: [0.95, 1],
+                        duration: 600,
+                        delay,
+                        ease: 'outCubic'
+                    });
+                    observer.unobserve(el);
+                }
+            });
+        }, { rootMargin: '50px' });
+
+        const items = container.querySelectorAll('.bento-item');
+        items.forEach(item => observer.observe(item));
+
+        return () => observer.disconnect();
+    }, [images]);
+
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 py-8">
+        <div ref={containerRef} className="w-full max-w-7xl mx-auto px-4 py-8">
             <div className="grid grid-cols-12 auto-rows-[180px] md:auto-rows-[250px] lg:auto-rows-[300px] gap-4 md:gap-6 grid-flow-dense">
                 {images.map((img, index) => (
-                    <motion.div
+                    <div
                         key={img.id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true, margin: "50px" }}
-                        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
-                        className={`relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group border border-slate-200/60 dark:border-slate-800/80 ${getBentoClass(index)}`}
+                        data-index={index}
+                        style={{ opacity: 0, transform: 'scale(0.95)' }}
+                        className={`bento-item relative w-full h-full rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 group border border-slate-200/60 dark:border-slate-800/80 ${getBentoClass(index)}`}
                     >
                         <InteractiveImageMarker 
                             src={getOptimizedImageUrl(img.cloudinary_url, 1000)} 
@@ -49,7 +85,7 @@ export default function BentoFlowLayout({ images }: { images: any[] }) {
                                 )}
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 ))}
             </div>
         </div>

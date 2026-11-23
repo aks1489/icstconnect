@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
 import { IconAtom as Atom, IconBox as Box, IconFileCode2 as FileCode2, IconWind as Wind, IconArrowRight as ArrowRight, IconPlayerPlay as PlayCircle } from '@tabler/icons-react'
 import InteractiveRobot from '../../common/InteractiveRobot'
 
@@ -31,15 +30,12 @@ const HeroSection = () => {
         <section className="relative pt-28 pb-12 md:pt-32 md:pb-24 lg:pt-36 bg-slate-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
             {/* Background Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <motion.div
-                    animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
-                    transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-                    className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200/30 dark:bg-blue-600/10 rounded-full blur-3xl"
+                <div
+                    className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200/30 dark:bg-blue-600/10 rounded-full blur-3xl animate-pulse"
                 />
-                <motion.div
-                    animate={{ x: [0, -30, 0], y: [0, 50, 0] }}
-                    transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
-                    className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/30 dark:bg-purple-600/10 rounded-full blur-3xl"
+                <div
+                    className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/30 dark:bg-purple-600/10 rounded-full blur-3xl animate-pulse"
+                    style={{ animationDelay: '2s' }}
                 />
             </div>
 
@@ -47,20 +43,14 @@ const HeroSection = () => {
                 <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
                     {/* Left Side: Text Content */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1"
+                    <div
+                        className="w-full lg:w-1/2 text-center lg:text-left order-2 lg:order-1 animate-in fade-in slide-in-from-left-6 duration-700"
                     >
-                        <motion.div
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.2 }}
+                        <div
                             className="inline-block px-4 py-1.5 bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-full text-sm font-semibold mb-6 border border-blue-100 dark:border-blue-900/50 shadow-sm"
                         >
                             🚀 Start your journey today
-                        </motion.div>
+                        </div>
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-slate-900 dark:text-white leading-tight transition-colors">
                             Master <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">Modern</span> Technologies
                         </h1>
@@ -69,26 +59,20 @@ const HeroSection = () => {
                         </p>
 
                         <div className="flex items-center justify-center lg:justify-start p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 mb-10 max-w-md mx-auto lg:mx-0 transform hover:-translate-y-1 transition-all duration-300">
-                            <AnimatePresence mode='wait'>
-                                <motion.div
-                                    key={currentTech.name}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="flex items-center gap-5 w-full"
-                                >
-                                    <div className="w-16 h-16 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center shadow-inner transition-colors">
-                                        <currentTech.icon size={40} style={{ color: currentTech.color }} />
-                                    </div>
-                                    <div className="flex flex-col text-left">
-                                        <span className="text-sm text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">Learning</span>
-                                        <span className="text-3xl font-bold" style={{ color: currentTech.color }}>
-                                            {currentTech.name}
-                                        </span>
-                                    </div>
-                                </motion.div>
-                            </AnimatePresence>
+                            <div
+                                key={currentTech.name}
+                                className="flex items-center gap-5 w-full animate-in fade-in slide-in-from-bottom-2 duration-300"
+                            >
+                                <div className="w-16 h-16 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center shadow-inner transition-colors">
+                                    <currentTech.icon size={40} style={{ color: currentTech.color }} />
+                                </div>
+                                <div className="flex flex-col text-left">
+                                    <span className="text-sm text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">Learning</span>
+                                    <span className="text-3xl font-bold" style={{ color: currentTech.color }}>
+                                        {currentTech.name}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -99,17 +83,14 @@ const HeroSection = () => {
                                 <PlayCircle /> Watch Demo
                             </button>
                         </div>
-                    </motion.div>
+                    </div>
 
                     {/* Right Side: Interactive Robot */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8 }}
-                        className="w-full lg:w-1/2 order-1 lg:order-2 flex justify-center"
+                    <div
+                        className="w-full lg:w-1/2 order-1 lg:order-2 flex justify-center animate-in fade-in zoom-in-95 duration-700"
                     >
                         <InteractiveRobot />
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </section>

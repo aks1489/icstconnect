@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { animate } from 'animejs'
 import { supabase } from '../lib/supabase'
 import Skeleton from '../components/ui/Skeleton'
 import SEOHead from '../components/common/SEOHead'
@@ -35,9 +35,43 @@ export default function Gallery() {
     const [activeCategoryId, setActiveCategoryId] = useState<string>('all');
     const [loading, setLoading] = useState(true);
 
-    const { scrollYProgress } = useScroll();
-    const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 200]);
-    const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+    const heroBgRef = useRef<HTMLDivElement>(null);
+    const heroContentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (heroContentRef.current) {
+            animate(heroContentRef.current, {
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                delay: 200,
+                ease: 'outCubic'
+            });
+        }
+    }, []);
+
+    useEffect(() => {
+        let ticking = false;
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    if (heroBgRef.current) {
+                        const scrollY = window.scrollY;
+                        const progress = Math.min(1, Math.max(0, scrollY / 400));
+                        const y = progress * 200;
+                        const opacity = Math.max(0, 1 - progress / 0.6);
+                        heroBgRef.current.style.transform = `translate3d(0, ${y}px, 0)`;
+                        heroBgRef.current.style.opacity = `${opacity}`;
+                    }
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -93,9 +127,9 @@ export default function Gallery() {
             <div className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-slate-900 dark:bg-slate-950">
                 
                 {/* Parallax Background */}
-                <motion.div 
-                    style={{ y: heroY, opacity: heroOpacity }}
-                    className="absolute inset-0 pointer-events-none"
+                <div 
+                    ref={heroBgRef}
+                    className="absolute inset-0 pointer-events-none will-change-transform"
                 >
                     {images.length > 0 && activeCategoryId === 'all' && (
                         <div className="absolute inset-0 grid grid-cols-4 md:grid-cols-6 gap-2 opacity-30 transform scale-110 -rotate-6 blur-[2px]">
@@ -114,7 +148,7 @@ export default function Gallery() {
                         </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 dark:from-slate-950 via-slate-900/60 dark:via-slate-950/70 to-transparent"></div>
-                </motion.div>
+                </div>
 
                 {/* Content */}
                 <div className="relative z-10 text-center px-4 max-w-4xl mx-auto mt-20">
@@ -125,18 +159,14 @@ export default function Gallery() {
                         <span className="text-white font-medium">Gallery</span>
                     </nav>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
+                    <div ref={heroContentRef} style={{ opacity: 0 }}>
                         <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6">
                             Campus Life & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Event Gallery</span>
                         </h1>
                         <p className="text-slate-300 text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto">
                             Immerse yourself in the moments that define our vibrant community. Explore interactive stories, events, and campus life.
                         </p>
-                    </motion.div>
+                    </div>
 
                     {/* Filter Pills */}
                     <div className="flex flex-wrap justify-center gap-3">
