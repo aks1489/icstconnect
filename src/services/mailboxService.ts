@@ -127,26 +127,38 @@ export const sendMailboxMessage = async (payload: SendMailboxPayload): Promise<{
 
 export const updateMailAction = async (
     messageId: string,
-    action: 'read' | 'star' | 'trash' | 'restore',
+    action: 'read' | 'star' | 'trash' | 'restore' | 'delete_permanent' | 'empty_trash',
     value?: boolean
 ): Promise<{ success: boolean; error?: string }> => {
-    const updateData: Record<string, any> = {};
-    if (action === 'read') updateData.is_read = value !== false;
-    if (action === 'star') updateData.is_starred = value !== false;
-    if (action === 'trash') updateData.folder = 'trash';
-    if (action === 'restore') updateData.folder = 'inbox';
-
-    // Update in Supabase immediately for snappy UI
+    // 1. Direct Supabase operation
     try {
-        await supabase
-            .from('institution_emails')
-            .update(updateData)
-            .eq('message_id', messageId);
+        if (action === 'delete_permanent') {
+            await supabase
+                .from('institution_emails')
+                .delete()
+                .eq('message_id', messageId);
+        } else if (action === 'empty_trash') {
+            await supabase
+                .from('institution_emails')
+                .delete()
+                .eq('folder', 'trash');
+        } else {
+            const updateData: Record<string, any> = {};
+            if (action === 'read') updateData.is_read = value !== false;
+            if (action === 'star') updateData.is_starred = value !== false;
+            if (action === 'trash') updateData.folder = 'trash';
+            if (action === 'restore') updateData.folder = 'inbox';
+
+            await supabase
+                .from('institution_emails')
+                .update(updateData)
+                .eq('message_id', messageId);
+        }
     } catch (dbErr) {
         console.warn('[mailboxService] Direct update warning:', dbErr);
     }
 
-    // Secondary sync with backend memory if available
+    // 2. Secondary sync with backend server
     try {
         const res = await fetch('/api/mailbox/action', {
             method: 'POST',
@@ -157,4 +169,63 @@ export const updateMailAction = async (
     } catch {
         return { success: true };
     }
+};
+
+export const batchMailAction = async (
+    messageIds: string[],
+    action: 'read' | 'star' | 'trash' | 'restore' | 'delete_permanent',
+    value?: boolean
+): Promise<{ success: boolean; error?: string }> => {
+    if (!messageIds || messageIds.length === 0) return { success: true };
+    // 1. Direct Supabase batch execution
+    try {
+        if (action === 'delete_permanent') {
+            await supabase
+                .from('institution_emails')
+                .delete()
+                .in('message_id', messageIds);
+        } else {
+            const updateData: Record<string, any> = {};
+            if (action === 'read') updateData.is_read = value !== false;
+            if (action === 'star') updateData.is_starred = value !== false;
+            if (action === 'trash') updateData.folder = 'trash';
+            if (action === 'restore') updateData.folder = 'inbox';
+
+            await supabase
+                .from('institution_emails')
+                .update(updateData)
+                .in('message_id', messageIds);
+        }
+    } catch (dbErr) {
+        console.warn('[mailboxService] batch direct update warning:', dbErr);
+    }
+
+    // 2. Parallel individual sync for server fallback
+    try {
+        await Promise.allSettled(messageIds.map(id => updateMailAction(id, action, value)));
+    } catch {
+        // Fallback gracefully
+    }
+    return { success: true };
+};
+
+/**
+ * Real-time Postgres subscription to institution_emails table.
+ * Automatically notifies callback when any email arrives, changes folder, or updates read/star state.
+ */
+export const subscribeToMailboxChanges = (onUpdate: (payload: any) => void) => {
+    const channel = supabase
+        .channel('institution_emails_realtime_' + Math.random().toString(36).substring(2, 7))
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'institution_emails' },
+            (payload) => {
+                onUpdate(payload);
+            }
+        )
+        .subscribe();
+
+    return () => {
+        supabase.removeChannel(channel);
+    };
 };

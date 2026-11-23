@@ -86,6 +86,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/mailbox/action"
+  to = "/.netlify/functions/mailbox-action"
+  status = 200
+
+[[redirects]]
   from = "/api/smtp-verify"
   to = "/.netlify/functions/smtp-verify"
   status = 200

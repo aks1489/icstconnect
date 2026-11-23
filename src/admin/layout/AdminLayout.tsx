@@ -165,11 +165,17 @@ export default function AdminLayout() {
                 </header>
 
                 {/* Scrollable Page Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 lg:p-8 scroll-smooth transition-colors">
-                    <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {location.pathname.endsWith('/mailbox') || location.pathname.includes('/mailbox') ? (
+                    <main className="flex-1 overflow-hidden bg-slate-50 dark:bg-slate-950 h-full w-full">
                         <Outlet />
-                    </div>
-                </main>
+                    </main>
+                ) : (
+                    <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 lg:p-8 scroll-smooth transition-colors">
+                        <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <Outlet />
+                        </div>
+                    </main>
+                )}
             </div>
         </div>
     )

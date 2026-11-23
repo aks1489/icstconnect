@@ -1,7 +1,14 @@
 import type { Plugin } from 'vite'
-import nodemailer from 'nodemailer'
-import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+import {
+  getTransporter,
+  getSupabaseClient,
+  performImapSync,
+  getMailboxMessages,
+  sendMailboxEmail,
+  updateMessageAction,
+  startBackgroundSync
+} from './server/mailboxEngine.js'
 
 dotenv.config()
 
@@ -9,6 +16,9 @@ export function apiDevPlugin(): Plugin {
   return {
     name: 'api-dev-plugin',
     configureServer(server) {
+      // Start background mailbox sync inside Vite dev server
+      startBackgroundSync(120000)
+
       server.middlewares.use(async (req, res, next) => {
         const url = req.url?.split('?')[0]
 
@@ -32,160 +42,122 @@ export function apiDevPlugin(): Plugin {
           return raw ? JSON.parse(raw) : {}
         }
 
-        // Mailbox Relay to local email-server.js
-        if (url?.startsWith('/api/mailbox/')) {
+        const sendJsonResponse = (status: number, data: any) => {
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = status
+          res.end(JSON.stringify(data))
+        }
+
+        // ==============================================================================
+        // 1. MAILBOX ACTIONS (Read, Star, Trash, Restore, Delete Permanent, Empty Trash)
+        // ==============================================================================
+        if (req.method === 'POST' && url === '/api/mailbox/action') {
           try {
-            const body = req.method !== 'GET' && req.method !== 'HEAD' ? await readJsonBody() : undefined
-            const targetUrl = `http://127.0.0.1:5000${req.url}`
-            const proxyRes = await fetch(targetUrl, {
-              method: req.method,
-              headers: { 'Content-Type': 'application/json' },
-              body: body ? JSON.stringify(body) : undefined
-            })
-            const data = await proxyRes.text()
-            res.setHeader('Access-Control-Allow-Origin', '*')
-            res.setHeader('Content-Type', 'application/json')
-            res.statusCode = proxyRes.status
-            res.end(data)
+            const body = await readJsonBody()
+            const result = await updateMessageAction(body)
+            sendJsonResponse(200, result)
           } catch (err: any) {
-            res.setHeader('Access-Control-Allow-Origin', '*')
-            res.setHeader('Content-Type', 'application/json')
-            res.statusCode = 502
-            res.end(JSON.stringify({ success: false, error: 'Email Relay Server is not running. Start with npm run email or npm run dev:all' }))
+            console.error('[Vite Mailbox Action] Error:', err.message)
+            sendJsonResponse(500, { success: false, error: err.message || 'Action failed' })
           }
           return
         }
 
-        // 1. SMTP Connection Verification
-        if ((req.method === 'GET' || req.method === 'POST') && url === '/api/smtp-verify') {
-          res.setHeader('Access-Control-Allow-Origin', '*')
-          res.setHeader('Content-Type', 'application/json')
+        // ==============================================================================
+        // 2. MAILBOX SYNC (IMAP Inbound & Reverse Sync)
+        // ==============================================================================
+        if ((req.method === 'GET' || req.method === 'POST') && url === '/api/mailbox/sync') {
           try {
-            const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465
-            const transporter = nodemailer.createTransport({
-              host: process.env.SMTP_HOST || 'smtp.gmail.com',
-              port,
-              secure: port === 465,
-              auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
-              }
+            const result = await performImapSync()
+            sendJsonResponse(200, {
+              success: true,
+              message: `Mailbox synchronized. ${result.syncedCount || 0} messages processed.`,
+              syncedCount: result.syncedCount,
+              lastSyncTimestamp: result.lastSyncTimestamp
             })
+          } catch (err: any) {
+            console.error('[Vite Mailbox Sync] Error:', err.message)
+            sendJsonResponse(500, { success: false, error: err.message || 'Failed to sync mailbox' })
+          }
+          return
+        }
 
+        // ==============================================================================
+        // 3. MAILBOX MESSAGES LIST
+        // ==============================================================================
+        if (req.method === 'GET' && url === '/api/mailbox/messages') {
+          try {
+            const parsedUrl = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`)
+            const folder = parsedUrl.searchParams.get('folder') || 'inbox'
+            const search = parsedUrl.searchParams.get('search') || ''
+            const data = await getMailboxMessages(folder, search)
+            sendJsonResponse(200, data)
+          } catch (err: any) {
+            console.error('[Vite Mailbox Messages] Error:', err.message)
+            sendJsonResponse(500, { success: false, error: err.message || 'Failed to fetch messages' })
+          }
+          return
+        }
+
+        // ==============================================================================
+        // 4. SEND EMAIL & DIRECT REPLY (Mailbox & Legacy)
+        // ==============================================================================
+        if (req.method === 'POST' && (url === '/api/mailbox/send' || url === '/api/send-email')) {
+          try {
+            const body = await readJsonBody()
+            const result = await sendMailboxEmail(body)
+            sendJsonResponse(200, result)
+          } catch (err: any) {
+            console.error('[Vite Send Email] Error:', err.message)
+            sendJsonResponse(500, { success: false, error: err.message || 'Failed to send email' })
+          }
+          return
+        }
+
+        // ==============================================================================
+        // 5. SMTP HEALTH & VERIFICATION
+        // ==============================================================================
+        if ((req.method === 'GET' || req.method === 'POST') && url === '/api/smtp-verify') {
+          try {
+            const transporter = getTransporter()
             await transporter.verify()
-            res.statusCode = 200
-            res.end(JSON.stringify({
+            sendJsonResponse(200, {
               success: true,
               message: 'SMTP connection verified successfully',
               host: process.env.SMTP_HOST || 'smtp.gmail.com',
-              port,
+              port: process.env.SMTP_PORT || 465,
               user: process.env.SMTP_USER
-            }))
+            })
           } catch (err: any) {
-            console.error('[SMTP Verify] Error:', err)
-            res.statusCode = 500
-            res.end(JSON.stringify({
+            console.error('[Vite SMTP Verify] Error:', err.message)
+            sendJsonResponse(500, {
               success: false,
               error: err.message || 'SMTP connection failed'
-            }))
+            })
           }
           return
         }
 
-        // 2. Send Email
-        if (req.method === 'POST' && url === '/api/send-email') {
-          res.setHeader('Access-Control-Allow-Origin', '*')
-          res.setHeader('Content-Type', 'application/json')
-          try {
-            const body = await readJsonBody()
-            const { to, subject, html, text } = body
-
-            if (!to || !subject || !html) {
-              res.statusCode = 400
-              res.end(JSON.stringify({ success: false, error: 'Missing required fields: to, subject, html' }))
-              return
-            }
-
-            const plainText = text || html
-              .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-              .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-              .replace(/<\/h[1-6]>/gi, '\n\n')
-              .replace(/<\/p>/gi, '\n\n')
-              .replace(/<br\s*\/?>/gi, '\n')
-              .replace(/<\/li>/gi, '\n')
-              .replace(/<li[^>]*>/gi, '• ')
-              .replace(/<a\s+(?:[^>]*?\s+)?href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '$2 ($1)')
-              .replace(/<[^>]+>/g, '')
-              .replace(/&nbsp;/g, ' ')
-              .replace(/&amp;/g, '&')
-              .replace(/&lt;/g, '<')
-              .replace(/&gt;/g, '>')
-              .replace(/&quot;/g, '"')
-              .replace(/&#39;/g, "'")
-              .replace(/\n\s*\n\s*\n/g, '\n\n')
-              .trim()
-
-            const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 465
-            const transporter = nodemailer.createTransport({
-              host: process.env.SMTP_HOST || 'smtp.gmail.com',
-              port,
-              secure: port === 465,
-              auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
-              }
-            })
-
-            const senderAddress = process.env.SMTP_FROM || process.env.SMTP_USER || 'icstconnect@gmail.com'
-            const info = await transporter.sendMail({
-              from: `"ICST Connect" <${senderAddress}>`,
-              to,
-              replyTo: senderAddress,
-              subject,
-              text: plainText,
-              html,
-              headers: {
-                'X-Mailer': 'ICST Connect Mailer',
-                'X-Entity-Ref-ID': `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-                'List-Unsubscribe': `<mailto:${senderAddress}?subject=Unsubscribe>`,
-                'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-              }
-            })
-
-            console.log(`[SMTP Relay] Email successfully delivered to: ${to} (MessageId: ${info.messageId})`)
-            res.statusCode = 200
-            res.end(JSON.stringify({ success: true, messageId: info.messageId }))
-          } catch (err: any) {
-            console.error('[SMTP Relay] Error dispatching email:', err)
-            res.statusCode = 500
-            res.end(JSON.stringify({ success: false, error: err.message || 'Failed to send email' }))
-          }
-          return
-        }
-
-        // 3. Create Auth User
+        // ==============================================================================
+        // 6. CREATE AUTH USER
+        // ==============================================================================
         if (req.method === 'POST' && url === '/api/create-auth-user') {
-          res.setHeader('Access-Control-Allow-Origin', '*')
-          res.setHeader('Content-Type', 'application/json')
           try {
             const body = await readJsonBody()
             const { email, password, full_name } = body
 
             if (!email || !password) {
-              res.statusCode = 400
-              res.end(JSON.stringify({ success: false, error: 'Missing email or password' }))
+              sendJsonResponse(400, { success: false, error: 'Missing email or password' })
               return
             }
 
-            const supabaseUrl = process.env.VITE_SUPABASE_URL
-            const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY
-            if (!supabaseUrl || !supabaseAnonKey) {
-              res.statusCode = 500
-              res.end(JSON.stringify({ success: false, error: 'Supabase URL or Key not set in environment' }))
+            const supabase = getSupabaseClient()
+            if (!supabase) {
+              sendJsonResponse(500, { success: false, error: 'Supabase client not initialized' })
               return
             }
 
-            const supabase = createClient(supabaseUrl, supabaseAnonKey)
             const { data, error } = await supabase.auth.signUp({
               email,
               password,
@@ -197,19 +169,16 @@ export function apiDevPlugin(): Plugin {
             })
 
             if (error) {
-              console.error('[Auth Relay] Supabase Auth error:', error.message)
-              res.statusCode = 400
-              res.end(JSON.stringify({ success: false, error: error.message }))
+              console.error('[Vite Auth] Supabase Auth error:', error.message)
+              sendJsonResponse(400, { success: false, error: error.message })
               return
             }
 
-            console.log(`[Auth Relay] Auth user provisioned: ${email} (ID: ${data.user?.id})`)
-            res.statusCode = 200
-            res.end(JSON.stringify({ success: true, user: data.user }))
+            console.log(`[Vite Auth] Auth user provisioned: ${email} (ID: ${data.user?.id})`)
+            sendJsonResponse(200, { success: true, user: data.user })
           } catch (err: any) {
-            console.error('[Auth Relay] Server error creating user:', err)
-            res.statusCode = 500
-            res.end(JSON.stringify({ success: false, error: err.message || 'Server error creating user' }))
+            console.error('[Vite Auth] Server error creating user:', err.message)
+            sendJsonResponse(500, { success: false, error: err.message || 'Server error creating user' })
           }
           return
         }

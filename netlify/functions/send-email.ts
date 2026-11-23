@@ -76,14 +76,21 @@ const handler: Handler = async (event) => {
     const isTransactional = /code|otp|verify|verification|password|reset|security|alert/i.test(subject);
     const senderName = isTransactional ? 'ICST Connect Security' : 'ICST Chowberia';
 
-    const emailHeaders: Record<string, string> = {
-      'X-Mailer': 'ICST Connect Mailer',
-      'X-Entity-Ref-ID': `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      'List-Unsubscribe': `<mailto:${senderAddress}?subject=Unsubscribe>`,
-      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-    };
-    if (inReplyTo) emailHeaders['In-Reply-To'] = inReplyTo;
-    if (references) emailHeaders['References'] = references;
+    // Direct 1-to-1 institutional headers (Prevents landing in Gmail Forums/Promotions category)
+    const emailHeaders: Record<string, string> = {};
+    if (inReplyTo) {
+      emailHeaders['In-Reply-To'] = inReplyTo.trim();
+      emailHeaders['References'] = (references ? `${references} ` : '') + inReplyTo.trim();
+    } else if (references) {
+      emailHeaders['References'] = references.trim();
+    }
+
+    if (isTransactional) {
+      emailHeaders['X-Priority'] = '1';
+      emailHeaders['X-MSMail-Priority'] = 'High';
+      emailHeaders['Importance'] = 'high';
+      emailHeaders['Priority'] = 'urgent';
+    }
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',

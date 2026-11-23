@@ -10,6 +10,8 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
+const normId = (id: string) => (id || '').replace(/^<|>$/g, '').trim().toLowerCase();
+
 function htmlToPlainText(html?: string): string {
   if (!html) return '';
   return html
@@ -30,6 +32,15 @@ function htmlToPlainText(html?: string): string {
     .replace(/&#39;/g, "'")
     .replace(/\n\s*\n\s*\n/g, '\n\n')
     .trim();
+}
+
+async function getTrashMailbox(client: ImapFlow): Promise<string> {
+  try {
+    const mailboxes = await client.list();
+    const trash = mailboxes.find((m) => m.specialUse === '\\Trash');
+    if (trash) return trash.path;
+  } catch {}
+  return '[Gmail]/Bin';
 }
 
 const handler: Handler = async (event) => {
@@ -58,6 +69,28 @@ const handler: Handler = async (event) => {
     };
   }
 
+  // Pre-load existing folders so sync NEVER reverts trashed/starred messages back to inbox
+  const existingMap = new Map<string, string>();
+  const supabaseInboxRows: Array<{ message_id: string; folder: string }> = [];
+  if (supabase) {
+    try {
+      const { data: existingRows } = await supabase
+        .from('institution_emails')
+        .select('message_id, folder');
+      if (existingRows) {
+        existingRows.forEach((r) => {
+          existingMap.set(r.message_id, r.folder);
+          existingMap.set(normId(r.message_id), r.folder);
+          if (r.folder === 'inbox') {
+            supabaseInboxRows.push(r);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('[mailbox-sync] Supabase pre-load warning:', e);
+    }
+  }
+
   const client = new ImapFlow({
     host: imapHost,
     port: imapPort,
@@ -71,8 +104,10 @@ const handler: Handler = async (event) => {
 
   try {
     await client.connect();
+    const trashFolder = await getTrashMailbox(client);
     const lock = await client.getMailboxLock('INBOX');
     let syncedCount = 0;
+    const gmailInboxIds = new Set<string>();
 
     try {
       const mailboxStatus = client.mailbox;
@@ -81,7 +116,7 @@ const handler: Handler = async (event) => {
         : 0;
 
       if (totalMessages > 0) {
-        const fetchRange = `${Math.max(1, totalMessages - 29)}:*`;
+        const fetchRange = `${Math.max(1, totalMessages - 49)}:*`;
         const messagesStream = client.fetch(fetchRange, {
           envelope: true,
           source: true,
@@ -92,7 +127,30 @@ const handler: Handler = async (event) => {
         for await (const msg of messagesStream) {
           try {
             const parsed = await simpleParser(msg.source);
-            const messageId = parsed.messageId || `msg-${msg.uid}-${Date.now()}`;
+            const messageId = parsed.messageId || msg.envelope?.messageId || `msg-${msg.uid}`;
+            const currentNormId = normId(messageId);
+            const envNormId = normId(msg.envelope?.messageId || '');
+
+            gmailInboxIds.add(currentNormId);
+            if (envNormId) gmailInboxIds.add(envNormId);
+            gmailInboxIds.add(String(msg.uid));
+
+            let targetFolder = 'inbox';
+            if (existingMap.has(messageId)) {
+              targetFolder = existingMap.get(messageId)!;
+            } else if (existingMap.has(currentNormId)) {
+              targetFolder = existingMap.get(currentNormId)!;
+            }
+
+            // If message is in Trash in DB, move it to Gmail Bin/Trash on IMAP and never upsert as inbox
+            if (targetFolder === 'trash') {
+              try {
+                await client.messageMove(String(msg.uid), trashFolder, { uid: true });
+                console.log(`[sync] Moved trashed message UID ${msg.uid} to ${trashFolder}`);
+              } catch {}
+              continue;
+            }
+
             const fromAddress = parsed.from?.value?.[0]?.address || 'unknown@domain.com';
             const fromName = parsed.from?.value?.[0]?.name || fromAddress.split('@')[0];
             const toAddress = Array.isArray(parsed.to)
@@ -109,7 +167,7 @@ const handler: Handler = async (event) => {
             const emailRecord = {
               message_id: messageId,
               in_reply_to: parsed.inReplyTo || null,
-              folder: 'inbox',
+              folder: targetFolder,
               from_name: fromName,
               from_email: fromAddress,
               to_email: toAddress,
@@ -124,7 +182,7 @@ const handler: Handler = async (event) => {
                 size: att.size,
               })),
               is_read: isRead,
-              is_starred: false,
+              is_starred: targetFolder === 'starred',
               received_at: receivedAt.toISOString(),
             };
 
@@ -142,6 +200,24 @@ const handler: Handler = async (event) => {
       }
     } finally {
       lock.release();
+    }
+
+    // Reverse sync check for Netlify function
+    const missingFromInbox = supabaseInboxRows.filter((r) => {
+      const nid = normId(r.message_id);
+      return !gmailInboxIds.has(nid) && !gmailInboxIds.has(r.message_id);
+    });
+
+    if (missingFromInbox.length > 0 && supabase) {
+      console.log(`[Netlify reverse-sync] ${missingFromInbox.length} messages missing from Gmail INBOX`);
+      for (const missing of missingFromInbox) {
+        try {
+          await supabase
+            .from('institution_emails')
+            .update({ folder: 'trash' })
+            .eq('message_id', missing.message_id);
+        } catch {}
+      }
     }
 
     await client.logout();

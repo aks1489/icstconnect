@@ -20,6 +20,7 @@ http://www.icstconnect.in/login https://icstconnect.in/ 301!
 /api/send-email /.netlify/functions/send-email 200
 /api/mailbox/send /.netlify/functions/send-email 200
 /api/mailbox/sync /.netlify/functions/mailbox-sync 200
+/api/mailbox/action /.netlify/functions/mailbox-action 200
 /api/smtp-verify /.netlify/functions/smtp-verify 200
 /api/create-auth-user /.netlify/functions/create-auth-user 200
 
