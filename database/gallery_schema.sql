@@ -20,11 +20,24 @@ CREATE POLICY "Allow public read access on gallery_categories"
     ON public.gallery_categories FOR SELECT 
     USING (true);
 
--- Allow Admin Write Access to Categories (Assuming typical Role 'admin', adjust if needed)
+-- Allow Admin & Super Admin Write Access to Categories
 CREATE POLICY "Allow admin write access on gallery_categories" 
     ON public.gallery_categories FOR ALL 
     TO authenticated
-    USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    );
 
 -- Insert Default Categories
 INSERT INTO public.gallery_categories (name, layout_style) VALUES
@@ -57,8 +70,21 @@ CREATE POLICY "Allow public read access on gallery_images"
     ON public.gallery_images FOR SELECT 
     USING (true);
 
--- Allow Admin Write Access to Images
+-- Allow Admin & Super Admin Write Access to Images
 CREATE POLICY "Allow admin write access on gallery_images" 
     ON public.gallery_images FOR ALL 
     TO authenticated
-    USING (auth.uid() IN (SELECT id FROM public.profiles WHERE role = 'admin'));
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    );

@@ -1,10 +1,67 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { supabase } from '../../lib/supabase'
 import { uploadToCloudinary, getOptimizedImageUrl } from '../../lib/cloudinary'
-import { IconPlus as Plus, IconPhoto as ImageIcon, IconTrash as Trash2, IconFolderPlus as FolderPlus, IconCircleCheck as CheckCircle2, IconEdit as Edit2, IconX as X, IconDeviceFloppy as Save } from '@tabler/icons-react'
+import {
+    IconPlus as Plus,
+    IconPhoto as ImageIcon,
+    IconTrash as Trash2,
+    IconFolderPlus as FolderPlus,
+    IconCircleCheck as CheckCircle2,
+    IconEdit as Edit2,
+    IconX as X,
+    IconDeviceFloppy as Save,
+    IconCopy as Copy,
+    IconExternalLink as ExternalLink,
+    IconAlertTriangle as AlertTriangle
+} from '@tabler/icons-react'
 import ImageTagger, { type ImageTag } from '../../components/admin/ImageTagger'
 import { useToast } from '../../contexts/ToastContext'
 import ConfirmDialog from '../../components/ui/ConfirmDialog'
+
+const GALLERY_RLS_FIX_SQL = `-- Run in Supabase SQL Editor (Dashboard > SQL Editor > New Query > Paste & Run)
+ALTER TABLE public.gallery_categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.gallery_images ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow admin write access on gallery_categories" ON public.gallery_categories;
+DROP POLICY IF EXISTS "Allow admin write access on gallery_images" ON public.gallery_images;
+DROP POLICY IF EXISTS "Allow admin and super_admin write access on gallery_categories" ON public.gallery_categories;
+DROP POLICY IF EXISTS "Allow admin and super_admin write access on gallery_images" ON public.gallery_images;
+
+CREATE POLICY "Allow admin and super_admin write access on gallery_categories" 
+    ON public.gallery_categories FOR ALL 
+    TO authenticated
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    );
+
+CREATE POLICY "Allow admin and super_admin write access on gallery_images" 
+    ON public.gallery_images FOR ALL 
+    TO authenticated
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    )
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.profiles 
+            WHERE profiles.id = auth.uid() 
+            AND profiles.role IN ('admin', 'super_admin')
+        )
+    );`;
 
 interface Category {
     id: string;
@@ -48,6 +105,8 @@ export default function AdminGallery() {
     const [isUploading, setIsUploading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [showRlsModal, setShowRlsModal] = useState(false);
+    const [copiedSql, setCopiedSql] = useState(false);
     
     // Shared Form Fields (used for Upload & Edit)
     const [uploadCategories, setUploadCategories] = useState<string[]>([]);
@@ -110,6 +169,10 @@ export default function AdminGallery() {
             setNewCatName('');
             showToast('Category created successfully!', 'success');
         } catch (error: any) {
+            const isRls = error?.message?.toLowerCase().includes('row-level security') || error?.message?.toLowerCase().includes('violates');
+            if (isRls) {
+                setShowRlsModal(true);
+            }
             showToast('Failed to create category: ' + error.message, 'error');
         }
     };
@@ -175,6 +238,10 @@ export default function AdminGallery() {
             showToast('Image uploaded successfully!', 'success');
 
         } catch (error: any) {
+            const isRls = error?.message?.toLowerCase().includes('row-level security') || error?.message?.toLowerCase().includes('violates');
+            if (isRls) {
+                setShowRlsModal(true);
+            }
             showToast('Upload failed: ' + error.message, 'error');
         } finally {
             setIsUploading(false);
@@ -240,6 +307,10 @@ export default function AdminGallery() {
             resetFormFields();
             showToast('Image metadata updated!', 'success');
         } catch (error: any) {
+            const isRls = error?.message?.toLowerCase().includes('row-level security') || error?.message?.toLowerCase().includes('violates');
+            if (isRls) {
+                setShowRlsModal(true);
+            }
             showToast('Save failed: ' + error.message, 'error');
         } finally {
             setIsSavingEdit(false);
@@ -613,6 +684,83 @@ export default function AdminGallery() {
                     onConfirm={confirmModal.action}
                     onCancel={() => setConfirmModal(null)}
                 />
+            )}
+
+            {/* RLS Policy Help Modal */}
+            {showRlsModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 max-w-xl w-full shadow-2xl relative space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                                    <AlertTriangle size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                                        Supabase Row-Level Security (RLS) Policy Fix
+                                    </h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        Action required in Supabase SQL Editor
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowRlsModal(false)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="text-xs text-slate-600 dark:text-slate-300 space-y-2">
+                            <p>
+                                The current database security policy on <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-mono">gallery_images</code> only permits users with <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">role = 'admin'</code>. Because your user account has role <code className="px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono">super_admin</code>, Postgres rejected the row insert.
+                            </p>
+                            <p>
+                                Execute the query below in your <strong>Supabase SQL Editor</strong> to enable write permissions for both <code className="font-mono">admin</code> and <code className="font-mono">super_admin</code> roles:
+                            </p>
+                        </div>
+
+                        <div className="relative">
+                            <pre className="p-3 rounded-xl bg-slate-950 text-emerald-400 text-[11px] font-mono overflow-x-auto max-h-48 border border-slate-800">
+                                {GALLERY_RLS_FIX_SQL}
+                            </pre>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                            <a
+                                href="https://supabase.com/dashboard/project/kuqzarcfinpejnjicudr/sql/new"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-1.5 text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold"
+                            >
+                                <span>Open Supabase SQL Editor</span>
+                                <ExternalLink size={14} />
+                            </a>
+
+                            <div className="flex items-center gap-2 w-full sm:w-auto">
+                                <button
+                                    onClick={() => setShowRlsModal(false)}
+                                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-1 sm:flex-none cursor-pointer"
+                                >
+                                    Dismiss
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(GALLERY_RLS_FIX_SQL);
+                                        setCopiedSql(true);
+                                        showToast('SQL fix copied to clipboard!', 'success');
+                                        setTimeout(() => setCopiedSql(false), 2500);
+                                    }}
+                                    className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm flex items-center justify-center gap-1.5 flex-1 sm:flex-none cursor-pointer"
+                                >
+                                    <Copy size={14} />
+                                    <span>{copiedSql ? 'Copied!' : 'Copy SQL Fix'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     )
