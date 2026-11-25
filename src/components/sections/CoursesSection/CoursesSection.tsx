@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { IconSparkles as Sparkles, IconArrowRight as ArrowRight, IconPlayerPause as Pause, IconPlayerPlay as Play } from '@tabler/icons-react'
+import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/icons-react'
 import { animate } from 'animejs'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
@@ -252,7 +252,7 @@ const CoursesSection = () => {
         [courses]
     )
 
-    const renderCourseCard = (course: Course, index: number, key: string, gridMode = false) => {
+    const renderCourseCard = (course: Course, index: number, key: string) => {
         const style = getCardAccent(index)
         const iconType = getIconType(course.course_name)
         const isCurrentlyZoomed = hoveredPopup?.cardKey === key && !hoveredPopup.closing
@@ -263,7 +263,7 @@ const CoursesSection = () => {
                 to={`/courses/${course.id}`}
                 onPointerEnter={(e) => handleCardPointerEnter(e, key, course, style, iconType)}
                 onPointerMove={(e) => handleCardPointerEnter(e, key, course, style, iconType)}
-                className={`${gridMode ? 'w-full' : 'w-[255px] md:w-[290px] flex-shrink-0'} h-[244px] group relative bg-[#FFFFFF]/72 hover:bg-[#FFFFFF]/88 backdrop-blur-md rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.12)] border border-white/90 ring-1 ring-slate-200/70 ${style.hoverBorder} transition-all duration-300 ${isCurrentlyZoomed ? 'scale-[0.98] opacity-55' : 'hover:scale-[1.03]'} flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
+                className={`w-[255px] md:w-[290px] flex-shrink-0 h-[244px] group relative bg-[#FFFFFF]/72 hover:bg-[#FFFFFF]/88 backdrop-blur-md rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.12)] border border-white/90 ring-1 ring-slate-200/70 ${style.hoverBorder} transition-all duration-300 ${isCurrentlyZoomed ? 'scale-[0.98] opacity-55' : 'hover:scale-[1.03]'} flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
             >
                 <div
                     className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"
@@ -337,9 +337,9 @@ const CoursesSection = () => {
                             </p>
                         </div>
 
-                        {/* Interactive Track Tabs + Marquee Control */}
+                        {/* Interactive Track Tabs */}
                         {!loading && courses.length > 0 && (
-                            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2">
+                            <div className="flex flex-wrap items-center justify-center lg:justify-end">
                                 <div className="inline-flex p-1 rounded-xl bg-[#FFFFFF]/70 backdrop-blur-md border border-white/85 ring-1 ring-slate-200/70 shadow-xs" role="tablist" aria-label="Filter courses by track">
                                     {([
                                         { id: 'all', label: 'All Tracks' },
@@ -354,7 +354,12 @@ const CoursesSection = () => {
                                                 type="button"
                                                 role="tab"
                                                 aria-selected={active}
-                                                onClick={() => setActiveFilter(tab.id)}
+                                                onClick={() => {
+                                                    clearPopupTimers()
+                                                    hoveredPopupRef.current = null
+                                                    setHoveredPopup(null)
+                                                    setActiveFilter(tab.id)
+                                                }}
                                                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${active
                                                     ? 'bg-[#0F172A] text-white shadow-xs'
                                                     : 'text-slate-600 hover:text-[#0F172A]'
@@ -365,84 +370,66 @@ const CoursesSection = () => {
                                         )
                                     })}
                                 </div>
-
-                                {activeFilter === 'all' && (
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsMarqueePaused((p) => !p)}
-                                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFFFFF]/70 backdrop-blur-md border border-white/85 ring-1 ring-slate-200/70 hover:border-[#2572AB]/50 text-xs font-semibold text-[#0F172A] transition-colors cursor-pointer shadow-xs"
-                                        aria-label={isMarqueePaused ? 'Resume course carousel' : 'Pause course carousel'}
-                                    >
-                                        {isMarqueePaused ? (
-                                            <>
-                                                <Play size={13} aria-hidden="true" className="text-[#059669]" />
-                                                <span>Resume</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Pause size={13} aria-hidden="true" className="text-[#2572AB]" />
-                                                <span>Pause</span>
-                                            </>
-                                        )}
-                                    </button>
-                                )}
                             </div>
                         )}
                     </div>
                 </div>
 
-                {loading ? (
-                    <div className="container mx-auto px-4 py-4">
-                        <HomeShimmerStyles />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                            {[1, 2, 3, 4].map((i) => (
-                                <div
-                                    key={i}
-                                    className="bg-[#FFFFFF]/70 backdrop-blur-md h-60 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.10)] border border-white/90 ring-1 ring-slate-200/70 p-6 flex flex-col justify-between"
-                                >
-                                    <div>
-                                        <div className="flex items-center justify-between mb-5">
-                                            <HomeShimmerBlock variant="brand" className="w-13 h-13 rounded-2xl" />
-                                            <HomeShimmerBlock className="w-20 h-5 rounded-full" />
+                {/* Uniform Fixed-Height Showcase Slot (Zero Vertical Jump Across All Categories) */}
+                <div className="h-[292px] flex items-center w-full">
+                    {loading ? (
+                        <div className="w-full overflow-hidden py-6 px-4">
+                            <HomeShimmerStyles />
+                            <div className="mx-auto w-max flex gap-5 md:gap-6">
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div
+                                        key={i}
+                                        className="w-[255px] md:w-[290px] flex-shrink-0 h-[244px] bg-[#FFFFFF]/70 backdrop-blur-md rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.10)] border border-white/90 ring-1 ring-slate-200/70 p-6 flex flex-col justify-between"
+                                    >
+                                        <div>
+                                            <div className="flex items-center justify-between mb-5">
+                                                <HomeShimmerBlock variant="brand" className="w-13 h-13 rounded-2xl" />
+                                                <HomeShimmerBlock className="w-20 h-5 rounded-full" />
+                                            </div>
+                                            <HomeShimmerBlock className="h-5 w-4/5 rounded-lg mb-2.5" />
+                                            <HomeShimmerBlock className="h-3.5 w-full rounded-md mb-1.5" />
+                                            <HomeShimmerBlock className="h-3.5 w-2/3 rounded-md" />
                                         </div>
-                                        <HomeShimmerBlock className="h-5 w-4/5 rounded-lg mb-2.5" />
-                                        <HomeShimmerBlock className="h-3.5 w-full rounded-md mb-1.5" />
-                                        <HomeShimmerBlock className="h-3.5 w-2/3 rounded-md" />
+                                        <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between">
+                                            <HomeShimmerBlock className="h-3 w-20 rounded-md" />
+                                            <HomeShimmerBlock variant="brand" className="h-3.5 w-20 rounded-md" />
+                                        </div>
                                     </div>
-                                    <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between">
-                                        <HomeShimmerBlock className="h-3 w-20 rounded-md" />
-                                        <HomeShimmerBlock variant="brand" className="h-3.5 w-20 rounded-md" />
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ) : activeFilter === 'all' ? (
-                    <div
-                        className="relative w-full overflow-hidden py-6"
-                        onMouseEnter={() => setIsMarqueePaused(true)}
-                        onMouseLeave={() => setIsMarqueePaused(false)}
-                        onFocus={() => setIsMarqueePaused(true)}
-                        onBlur={() => setIsMarqueePaused(false)}
-                    >
-                        <div className="absolute left-0 top-0 bottom-0 w-10 md:w-28 z-20 bg-gradient-to-r from-[#F4F8FD] to-transparent pointer-events-none" />
-                        <div className="absolute right-0 top-0 bottom-0 w-10 md:w-28 z-20 bg-gradient-to-l from-[#F4F8FD] to-transparent pointer-events-none" />
-
+                    ) : activeFilter === 'all' ? (
                         <div
-                            ref={marqueeRef}
-                            className="flex gap-5 md:gap-6 w-fit"
-                            style={{ willChange: 'transform' }}
+                            className="relative w-full overflow-hidden py-6"
+                            onMouseEnter={() => setIsMarqueePaused(true)}
+                            onMouseLeave={() => setIsMarqueePaused(false)}
+                            onFocus={() => setIsMarqueePaused(true)}
+                            onBlur={() => setIsMarqueePaused(false)}
                         >
-                            {marqueeCourses.map((course, index) => renderCourseCard(course, index, `${course.id}-${index}`))}
+                            <div className="absolute left-0 top-0 bottom-0 w-10 md:w-28 z-20 bg-gradient-to-r from-[#F4F8FD] to-transparent pointer-events-none" />
+                            <div className="absolute right-0 top-0 bottom-0 w-10 md:w-28 z-20 bg-gradient-to-l from-[#F4F8FD] to-transparent pointer-events-none" />
+
+                            <div
+                                ref={marqueeRef}
+                                className="flex gap-5 md:gap-6 w-fit"
+                                style={{ willChange: 'transform' }}
+                            >
+                                {marqueeCourses.map((course, index) => renderCourseCard(course, index, `${course.id}-${index}`))}
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="container mx-auto px-4 py-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in duration-200">
-                            {filteredCourses.map((course, index) => renderCourseCard(course, index, `filtered-${course.id}`, true))}
+                    ) : (
+                        <div className="relative w-full overflow-x-auto overflow-y-hidden py-6 px-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                            <div className="mx-auto w-max flex gap-5 md:gap-6 animate-in fade-in duration-200">
+                                {filteredCourses.map((course, index) => renderCourseCard(course, index, `filtered-${course.id}`))}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
 
                 <div className="text-center mt-10 relative z-20">
                     <Link
