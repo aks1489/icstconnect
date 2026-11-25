@@ -1,10 +1,11 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { IconSparkles as Sparkles, IconArrowRight as ArrowRight, IconPlayerPause as Pause, IconPlayerPlay as Play } from '@tabler/icons-react'
 import { animate } from 'animejs'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
 import GeometricBackdrop from './GeometricBackdrop'
+import CourseZoomPopup, { type CourseCardAccent, type HoveredCourseState } from './CourseZoomPopup'
 import type { Course } from '../../../types/course'
 import { HomeShimmerBlock, HomeShimmerStyles } from '../../ui/HomePageSkeleton'
 import { prefersReducedMotion, revealOnScroll } from '../../../lib/motion'
@@ -16,9 +17,14 @@ const CoursesSection = () => {
     const [loading, setLoading] = useState(true)
     const [isMarqueePaused, setIsMarqueePaused] = useState(false)
     const [activeFilter, setActiveFilter] = useState<TrackFilter>('all')
+    const [hoveredPopup, setHoveredPopup] = useState<HoveredCourseState | null>(null)
     const marqueeRef = useRef<HTMLDivElement>(null)
     const animRef = useRef<ReturnType<typeof animate> | null>(null)
     const headerRef = useRef<HTMLDivElement>(null)
+    const popupRef = useRef<HTMLDivElement>(null)
+    const popupCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const hoveredPopupRef = useRef<HoveredCourseState | null>(null)
+    hoveredPopupRef.current = hoveredPopup
 
     useEffect(() => {
         if (headerRef.current) {
@@ -44,14 +50,130 @@ const CoursesSection = () => {
         }
     }, [activeFilter, loading, courses])
 
+    const effectivePaused = isMarqueePaused || hoveredPopup !== null
+
     useEffect(() => {
         if (!animRef.current) return
-        if (isMarqueePaused) {
+        if (effectivePaused) {
             animRef.current.pause()
         } else {
             animRef.current.play()
         }
-    }, [isMarqueePaused])
+    }, [effectivePaused])
+
+    const clearPopupTimers = useCallback(() => {
+        if (popupCloseTimerRef.current !== null) {
+            clearTimeout(popupCloseTimerRef.current)
+            popupCloseTimerRef.current = null
+        }
+    }, [])
+
+    const cancelCloseFor = useCallback(
+        (cardKey: string) => {
+            if (hoveredPopupRef.current?.cardKey !== cardKey) return
+            clearPopupTimers()
+            if (hoveredPopupRef.current.closing) {
+                setHoveredPopup((prev) => (prev && prev.cardKey === cardKey ? { ...prev, closing: false } : prev))
+            }
+        },
+        [clearPopupTimers]
+    )
+
+    const requestClosePopup = useCallback(
+        (expectedCardKey?: string) => {
+            const current = hoveredPopupRef.current
+            if (!current) return
+            if (expectedCardKey && current.cardKey !== expectedCardKey) return
+            if (current.closing) return
+
+            clearPopupTimers()
+            const keyToClose = current.cardKey
+            const nextState = { ...current, closing: true }
+            hoveredPopupRef.current = nextState
+            setHoveredPopup(nextState)
+
+            popupCloseTimerRef.current = setTimeout(() => {
+                setHoveredPopup((prev) => {
+                    if (!prev || prev.cardKey !== keyToClose || !prev.closing) return prev
+                    hoveredPopupRef.current = null
+                    return null
+                })
+            }, 215)
+        },
+        [clearPopupTimers]
+    )
+
+    const handleCardPointerEnter = (
+        e: React.PointerEvent<HTMLAnchorElement>,
+        cardKey: string,
+        course: Course,
+        style: CourseCardAccent,
+        iconType: HoveredCourseState['iconType']
+    ) => {
+        if (e.pointerType === 'touch') return
+        const current = hoveredPopupRef.current
+        if (current && current.cardKey === cardKey && !current.closing) return
+        clearPopupTimers()
+        const r = e.currentTarget.getBoundingClientRect()
+        const nextState: HoveredCourseState = {
+            cardKey,
+            course,
+            style,
+            iconType,
+            rect: { top: r.top, left: r.left, width: r.width, height: r.height },
+            closing: false
+        }
+        hoveredPopupRef.current = nextState
+        setHoveredPopup(nextState)
+    }
+
+    useEffect(() => {
+        if (!hoveredPopup) return
+
+        const onPointerMove = (e: PointerEvent) => {
+            if (e.pointerType === 'touch') return
+            const current = hoveredPopupRef.current
+            if (!current || current.closing) return
+            const popupEl = popupRef.current
+            if (!popupEl) return
+
+            const pr = popupEl.getBoundingClientRect()
+            const or = current.rect
+            const pad = 10
+            const insidePopup =
+                e.clientX >= pr.left - pad &&
+                e.clientX <= pr.right + pad &&
+                e.clientY >= pr.top - pad &&
+                e.clientY <= pr.bottom + pad
+            const insideOrigin =
+                e.clientX >= or.left - 4 &&
+                e.clientX <= or.left + or.width + 4 &&
+                e.clientY >= or.top - 4 &&
+                e.clientY <= or.top + or.height + 4
+
+            if (!insidePopup && !insideOrigin) {
+                requestClosePopup(current.cardKey)
+            }
+        }
+
+        const onScrollOrEsc = (ev: Event) => {
+            if (ev.type === 'keydown' && (ev as KeyboardEvent).key !== 'Escape') return
+            requestClosePopup()
+        }
+
+        window.addEventListener('pointermove', onPointerMove, { passive: true })
+        window.addEventListener('scroll', onScrollOrEsc, { passive: true })
+        window.addEventListener('keydown', onScrollOrEsc)
+        return () => {
+            window.removeEventListener('pointermove', onPointerMove)
+            window.removeEventListener('scroll', onScrollOrEsc)
+            window.removeEventListener('keydown', onScrollOrEsc)
+        }
+    }, [hoveredPopup !== null, requestClosePopup])
+
+    useEffect(() => {
+        return () => clearPopupTimers()
+    }, [clearPopupTimers])
 
     useEffect(() => {
         const fetchAndFilterCourses = async () => {
@@ -132,11 +254,16 @@ const CoursesSection = () => {
 
     const renderCourseCard = (course: Course, index: number, key: string, gridMode = false) => {
         const style = getCardAccent(index)
+        const iconType = getIconType(course.course_name)
+        const isCurrentlyZoomed = hoveredPopup?.cardKey === key && !hoveredPopup.closing
+
         return (
             <Link
                 key={key}
                 to={`/courses/${course.id}`}
-                className={`${gridMode ? 'w-full' : 'w-[255px] md:w-[290px] flex-shrink-0'} group relative bg-[#FFFFFF]/70 hover:bg-[#FFFFFF]/86 backdrop-blur-md rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.12)] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,1),0_24px_46px_-16px_rgba(15,23,42,0.20)] border border-white/90 ring-1 ring-slate-200/70 ${style.hoverBorder} transition-all duration-300 hover:-translate-y-1.5 flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
+                onPointerEnter={(e) => handleCardPointerEnter(e, key, course, style, iconType)}
+                onPointerMove={(e) => handleCardPointerEnter(e, key, course, style, iconType)}
+                className={`${gridMode ? 'w-full' : 'w-[255px] md:w-[290px] flex-shrink-0'} h-[244px] group relative bg-[#FFFFFF]/72 hover:bg-[#FFFFFF]/88 backdrop-blur-md rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.12)] border border-white/90 ring-1 ring-slate-200/70 ${style.hoverBorder} transition-all duration-300 ${isCurrentlyZoomed ? 'scale-[0.98] opacity-55' : 'hover:scale-[1.03]'} flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
             >
                 <div
                     className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"
@@ -153,7 +280,7 @@ const CoursesSection = () => {
                         <div className={`absolute inset-0 ${style.bgClass} rounded-2xl border border-white/80 shadow-xs transition-transform duration-300 group-hover:scale-105`} />
                         <div className="relative z-10 w-7 h-7">
                             <AnimatedCourseIcon
-                                type={getIconType(course.course_name)}
+                                type={iconType}
                                 color={style.iconColor}
                             />
                         </div>
@@ -327,6 +454,13 @@ const CoursesSection = () => {
                     </Link>
                 </div>
             </div>
+
+            <CourseZoomPopup
+                ref={popupRef}
+                state={hoveredPopup}
+                onCancelClose={cancelCloseFor}
+                onRequestClose={requestClosePopup}
+            />
         </section>
     )
 }

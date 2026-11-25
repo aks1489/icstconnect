@@ -1,8 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { IconRosetteDiscountCheck as BadgeCheck, IconUsers as Users, IconArrowRight as ArrowRight, IconMapPin as MapPin } from '@tabler/icons-react'
+import {
+    IconRosetteDiscountCheck as BadgeCheck,
+    IconUsers as Users,
+    IconArrowRight as ArrowRight,
+    IconMapPin as MapPin
+} from '@tabler/icons-react'
 import { mediaService, type SiteMediaItem } from '../../../services/mediaService'
 import { revealOnScroll } from '../../../lib/motion'
+
+const HIGHLIGHTS = [
+    {
+        title: 'Certified Courses',
+        description: 'Industry recognized certifications upon completion.',
+        icon: BadgeCheck,
+        iconBg: 'bg-[#2572AB]/12 border-[#2572AB]/20 text-[#2572AB]',
+        hoverRing: 'hover:ring-[#2572AB]/35',
+        delay: '0s'
+    },
+    {
+        title: 'Expert Mentors',
+        description: 'Learn directly from experienced industry professionals.',
+        icon: Users,
+        iconBg: 'bg-[#059669]/12 border-[#059669]/20 text-[#059669]',
+        hoverRing: 'hover:ring-[#059669]/35',
+        delay: '-3.5s'
+    }
+] as const
 
 const AboutSection = () => {
     const [mediaItem, setMediaItem] = useState<SiteMediaItem>(() =>
@@ -36,39 +60,83 @@ const AboutSection = () => {
     }, [])
 
     return (
-        <section className="py-22 lg:py-28 bg-[#FFFFFF] relative overflow-hidden" id="about">
+        <section
+            id="about"
+            className="py-22 lg:py-28 bg-[#F7FAFE] relative overflow-hidden"
+        >
+            {/* Minimal Looping Ambient Backdrop Blobs (Compositor-Only CSS, Zero JS Loop) */}
+            <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+                <div
+                    className="icst-about-anim absolute -top-20 left-[6%] w-[380px] h-[380px] rounded-full bg-[#38BDF8]/14"
+                    style={{ animation: 'icstLiquidOrbA 18s ease-in-out infinite' }}
+                />
+                <div
+                    className="icst-about-anim absolute -bottom-24 right-[8%] w-[420px] h-[420px] rounded-full bg-[#4F46E5]/10"
+                    style={{ animation: 'icstLiquidOrbB 22s ease-in-out infinite' }}
+                />
+            </div>
+
             <div ref={sectionRef} className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-12 lg:gap-16">
-                    {/* Left Photo Showcase (6 Cols) with Gradient Hairline Mat & Frosted Badge */}
+                    {/* Left Photo Showcase (6 Cols) in Frosted Liquid Glass Lens Frame */}
                     <div className="lg:col-span-6 relative">
-                        <div className="absolute -inset-4 bg-gradient-to-tr from-[#2572AB]/14 via-[#4F46E5]/10 to-[#0EA5E9]/14 rounded-[2.2rem] blur-2xl -z-10" aria-hidden="true" />
-                        <div className="p-[1px] rounded-[1.92rem] bg-gradient-to-br from-slate-200/90 via-[#BAE6FD]/80 to-[#C7D2FE]/80 shadow-[0_28px_60px_-18px_rgba(15,23,42,0.22)]">
-                            <div className="relative w-full aspect-[3/2] overflow-hidden rounded-3xl bg-[#FFFFFF] p-1.5">
-                                <div className="relative w-full h-full overflow-hidden rounded-[1.2rem]">
-                                    <img
-                                        src={mediaItem.cloudinary_url}
-                                        width={mediaItem.recommended_width || 870}
-                                        height={mediaItem.recommended_height || 580}
-                                        loading="lazy"
-                                        className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-700 block"
-                                        alt={mediaItem.alt_text}
-                                        onError={(e) => {
-                                            const fallback = mediaService.getCachedMediaByKey('home.about.feature')
-                                            if (e.currentTarget.src !== fallback.cloudinary_url) {
-                                                e.currentTarget.src = fallback.cloudinary_url
-                                            }
-                                        }}
-                                    />
+                        {/* Subtle Orbiting Liquid Glass Ring Accent */}
+                        <div
+                            className="icst-about-anim hidden sm:block absolute -top-5 -left-5 w-24 h-24 rounded-full border border-[#2572AB]/20 bg-white/40 backdrop-blur-sm -z-10"
+                            style={{ animation: 'icstLiquidFloatA 9s ease-in-out infinite' }}
+                            aria-hidden="true"
+                        />
 
-                                    {/* Overlaid Frosted Institutional Badge */}
-                                    <div className="absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-xs p-3 rounded-2xl bg-[#FFFFFF]/90 backdrop-blur-xl border border-white/85 shadow-[0_14px_30px_-10px_rgba(15,23,42,0.3)] flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#2572AB] to-[#0EA5E9] text-white flex items-center justify-center shrink-0">
-                                            <MapPin size={18} aria-hidden="true" />
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="text-xs font-bold text-[#0F172A] truncate">ICST - Chowberia</div>
-                                            <div className="text-[11px] text-slate-500 truncate">Practical Computer Science Campus</div>
-                                        </div>
+                        <div className="relative rounded-[2rem] bg-white/55 backdrop-blur-md border border-white/95 ring-1 ring-slate-200/75 p-2.5 sm:p-3 shadow-[inset_0_1.5px_2px_rgba(255,255,255,1),0_26px_54px_-18px_rgba(15,23,42,0.16)]">
+                            {/* Continuous subtle top glass specular gleam */}
+                            <div
+                                className="icst-about-anim absolute inset-x-10 top-0 h-px bg-white pointer-events-none"
+                                style={{ animation: 'icstSpecularPulse 6s ease-in-out infinite' }}
+                                aria-hidden="true"
+                            />
+
+                            <div className="relative w-full aspect-[3/2] overflow-hidden rounded-[1.4rem] bg-slate-100">
+                                <img
+                                    src={mediaItem.cloudinary_url}
+                                    width={mediaItem.recommended_width || 870}
+                                    height={mediaItem.recommended_height || 580}
+                                    loading="lazy"
+                                    style={{ animation: 'icstAboutKenBurns 18s ease-in-out infinite' }}
+                                    className="icst-about-anim w-full h-full object-cover block will-change-transform"
+                                    alt={mediaItem.alt_text}
+                                    onError={(e) => {
+                                        const fallback = mediaService.getCachedMediaByKey('home.about.feature')
+                                        if (e.currentTarget.src !== fallback.cloudinary_url) {
+                                            e.currentTarget.src = fallback.cloudinary_url
+                                        }
+                                    }}
+                                />
+
+                                {/* Minimal Looping Liquid Pill Top-Right */}
+                                <div
+                                    style={{ animation: 'icstLiquidFloatA 7.5s ease-in-out infinite' }}
+                                    className="icst-about-anim hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur-md border border-white/95 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_10px_24px_-8px_rgba(15,23,42,0.2)] absolute top-3.5 right-3.5"
+                                >
+                                    <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" aria-hidden="true" />
+                                    <span className="text-[11px] font-semibold text-[#0F172A]">Practical Labs</span>
+                                </div>
+
+                                {/* Overlaid Liquid Glass Campus Lens Card */}
+                                <div
+                                    style={{ animation: 'icstLiquidFloatB 8.5s ease-in-out infinite' }}
+                                    className="icst-about-anim absolute bottom-3 left-3 right-3 sm:right-auto sm:max-w-xs p-3 rounded-2xl bg-white/72 backdrop-blur-md border border-white/95 shadow-[inset_0_1px_1px_rgba(255,255,255,1),0_16px_34px_-10px_rgba(15,23,42,0.24)] flex items-center gap-3 overflow-hidden"
+                                >
+                                    <div
+                                        aria-hidden="true"
+                                        style={{ animation: 'icstGlassSweep 6.5s ease-in-out infinite' }}
+                                        className="icst-about-anim absolute inset-y-0 -left-1/2 w-1/2 bg-white/40 skew-x-[-20deg] pointer-events-none"
+                                    />
+                                    <div className="relative z-10 w-9 h-9 rounded-xl bg-[#2572AB] text-white flex items-center justify-center shrink-0 shadow-xs">
+                                        <MapPin size={18} aria-hidden="true" />
+                                    </div>
+                                    <div className="relative z-10 min-w-0">
+                                        <div className="text-xs font-bold text-[#0F172A] truncate">ICST - Chowberia</div>
+                                        <div className="text-[11px] text-slate-600 truncate">Practical Computer Science Campus</div>
                                     </div>
                                 </div>
                             </div>
@@ -77,9 +145,9 @@ const AboutSection = () => {
 
                     {/* Right Editorial Copy (6 Cols) */}
                     <div className="lg:col-span-6">
-                        <div className="inline-flex items-center gap-2.5 mb-4">
-                            <span className="h-px w-6 bg-[#2572AB]" aria-hidden="true" />
-                            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#2572AB]">
+                        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/75 backdrop-blur-md border border-white/95 ring-1 ring-slate-200/75 shadow-[inset_0_1px_1px_rgba(255,255,255,1),0_6px_16px_-6px_rgba(15,23,42,0.08)] mb-5">
+                            <span className="w-2 h-2 rounded-full bg-[#2572AB] animate-pulse" aria-hidden="true" />
+                            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#2572AB]">
                                 About Us
                             </span>
                         </div>
@@ -99,38 +167,84 @@ const AboutSection = () => {
                             Our mission is to bridge the gap between academic learning and industry requirements. We offer a wide range of courses designed to equip students with the skills needed to succeed in the ever-evolving tech landscape.
                         </p>
 
+                        {/* Minimal Liquid Glass Highlights */}
                         <div className="space-y-3 mb-9">
-                            <div className="group flex items-center gap-4 p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/85 hover:border-[#2572AB]/40 hover:bg-[#FFFFFF] hover:shadow-[0_12px_28px_-14px_rgba(37,114,171,0.22)] transition-all duration-200">
-                                <div className="w-11 h-11 flex-shrink-0 flex items-center justify-center bg-[#2572AB]/10 text-[#2572AB] rounded-xl group-hover:scale-105 transition-transform">
-                                    <BadgeCheck size={22} aria-hidden="true" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="text-sm sm:text-base font-bold text-[#0F172A] mb-0.5">Certified Courses</h3>
-                                    <p className="text-xs sm:text-sm text-[#64748B] leading-snug mb-0">Industry recognized certifications upon completion.</p>
-                                </div>
-                            </div>
-
-                            <div className="group flex items-center gap-4 p-4 rounded-2xl bg-[#F8FAFC] border border-slate-200/85 hover:border-[#059669]/40 hover:bg-[#FFFFFF] hover:shadow-[0_12px_28px_-14px_rgba(5,150,105,0.20)] transition-all duration-200">
-                                <div className="w-11 h-11 flex-shrink-0 flex items-center justify-center bg-[#059669]/10 text-[#059669] rounded-xl group-hover:scale-105 transition-transform">
-                                    <Users size={22} aria-hidden="true" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <h3 className="text-sm sm:text-base font-bold text-[#0F172A] mb-0.5">Expert Mentors</h3>
-                                    <p className="text-xs sm:text-sm text-[#64748B] leading-snug mb-0">Learn directly from experienced industry professionals.</p>
-                                </div>
-                            </div>
+                            {HIGHLIGHTS.map((item) => {
+                                const Icon = item.icon
+                                return (
+                                    <div
+                                        key={item.title}
+                                        className={`group relative overflow-hidden flex items-center gap-4 p-4 rounded-2xl bg-white/68 hover:bg-white/88 backdrop-blur-md border border-white/95 ring-1 ring-slate-200/75 ${item.hoverRing} shadow-[inset_0_1.5px_1px_rgba(255,255,255,1),0_10px_24px_-12px_rgba(15,23,42,0.10)] hover:shadow-[inset_0_1.5px_1px_rgba(255,255,255,1),0_16px_32px_-12px_rgba(37,114,171,0.18)] transition-all duration-300 hover:-translate-y-0.5`}
+                                    >
+                                        <div
+                                            aria-hidden="true"
+                                            style={{ animation: `icstGlassSweep 7s ease-in-out ${item.delay} infinite` }}
+                                            className="icst-about-anim absolute inset-y-0 -left-1/3 w-1/3 bg-white/45 skew-x-[-20deg] pointer-events-none"
+                                        />
+                                        <div
+                                            className={`relative z-10 w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl border ${item.iconBg} shadow-xs group-hover:scale-105 transition-transform duration-200`}
+                                        >
+                                            <Icon size={22} aria-hidden="true" />
+                                        </div>
+                                        <div className="relative z-10 min-w-0 flex-1">
+                                            <h3 className="text-sm sm:text-base font-bold text-[#0F172A] mb-0.5">{item.title}</h3>
+                                            <p className="text-xs sm:text-sm text-[#64748B] leading-snug mb-0">{item.description}</p>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
 
                         <Link
                             to="/about"
-                            className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#2572AB] text-white font-semibold shadow-[0_12px_28px_-8px_rgba(15,23,42,0.32)] hover:-translate-y-0.5 transition-all no-underline group"
+                            className="relative overflow-hidden inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#0F172A] hover:bg-[#2572AB] text-white font-semibold shadow-[0_14px_30px_-8px_rgba(15,23,42,0.32)] hover:-translate-y-0.5 transition-all no-underline group"
                         >
-                            <span>Read More About Us</span>
-                            <ArrowRight size={17} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform" />
+                            <span
+                                aria-hidden="true"
+                                style={{ animation: 'icstGlassSweep 5.5s ease-in-out infinite' }}
+                                className="icst-about-anim absolute inset-y-0 -left-1/2 w-1/2 bg-white/15 skew-x-[-20deg] pointer-events-none"
+                            />
+                            <span className="relative z-10">Read More About Us</span>
+                            <ArrowRight size={17} aria-hidden="true" className="relative z-10 group-hover:translate-x-0.5 transition-transform" />
                         </Link>
                     </div>
                 </div>
             </div>
+
+            <style>{`
+                @keyframes icstLiquidOrbA {
+                    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+                    50% { transform: translate3d(28px, 18px, 0) scale(1.06); }
+                }
+                @keyframes icstLiquidOrbB {
+                    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+                    50% { transform: translate3d(-26px, -20px, 0) scale(1.07); }
+                }
+                @keyframes icstLiquidFloatA {
+                    0%, 100% { transform: translate3d(0, 0, 0); }
+                    50% { transform: translate3d(0, -6px, 0); }
+                }
+                @keyframes icstLiquidFloatB {
+                    0%, 100% { transform: translate3d(0, 0, 0); }
+                    50% { transform: translate3d(4px, -5px, 0); }
+                }
+                @keyframes icstAboutKenBurns {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.035); }
+                }
+                @keyframes icstGlassSweep {
+                    0%, 62% { transform: translate3d(-120%, 0, 0) skewX(-20deg); opacity: 0; }
+                    72% { opacity: 1; }
+                    92%, 100% { transform: translate3d(440%, 0, 0) skewX(-20deg); opacity: 0; }
+                }
+                @keyframes icstSpecularPulse {
+                    0%, 100% { opacity: 0.55; }
+                    50% { opacity: 1; }
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .icst-about-anim { animation: none !important; }
+                }
+            `}</style>
         </section>
     )
 }
