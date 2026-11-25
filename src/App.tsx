@@ -7,6 +7,7 @@ import AdminDomainRedirect from './components/admin/AdminDomainRedirect'
 import AdminBackwardsCompatRedirect from './components/admin/AdminBackwardsCompatRedirect'
 
 import PageSkeleton from './components/ui/PageSkeleton'
+import HomePageSkeleton from './components/ui/HomePageSkeleton'
 
 // Lazy load pages
 const Home = lazy(() => import('./pages/Home'))
@@ -131,6 +132,7 @@ import ScrollToTop from './components/common/ScrollToTop'
 function App() {
   const onAdminSubdomain = isAdminSubdomain()
   const inMainProduction = isMainProductionDomain()
+  const isInitialHomeRoute = !onAdminSubdomain && typeof window !== 'undefined' && window.location.pathname === '/'
 
   const renderAdminChildRoutes = () => (
     <>
@@ -297,16 +299,16 @@ function App() {
   )
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <ToastProvider>
-          <Router>
+    <AuthProvider>
+      <ToastProvider>
+        <Router>
+          <ThemeProvider>
             <ScrollToTop />
             <AppErrorBoundary>
               <ErrorToast />
               <ToastContainer />
 
-              <Suspense fallback={<PageSkeleton />}>
+              <Suspense fallback={isInitialHomeRoute ? <HomePageSkeleton showNavShell /> : <PageSkeleton />}>
                 {onAdminSubdomain ? (
                   <Routes>
                     {/* Admin Subdomain Root Portal Layout with direct subpaths */}
@@ -356,7 +358,11 @@ function App() {
                         <MainLayout><Outlet /></MainLayout>
                       </AppErrorBoundary>
                     }>
-                      <Route path="/" element={<Home />} />
+                      <Route path="/" element={
+                        <Suspense fallback={<HomePageSkeleton />}>
+                          <Home />
+                        </Suspense>
+                      } />
                       <Route path="/courses/:courseId?" element={<CoursesPage />} />
                       <Route path="/enroll/:courseId" element={
                         <Suspense fallback={<PageSkeleton />}>
@@ -569,10 +575,10 @@ function App() {
                 )}
               </Suspense>
           </AppErrorBoundary>
+          </ThemeProvider>
         </Router>
         </ToastProvider>
       </AuthProvider>
-    </ThemeProvider>
   )
 }
 

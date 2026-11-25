@@ -6,9 +6,16 @@
   <script>
     (function() {
       try {
+        var root = document.documentElement;
+        var isAdminHost = window.location.hostname.toLowerCase().indexOf('admin.') === 0;
+        if (!isAdminHost && window.location.pathname === '/') {
+          root.classList.add('light');
+          root.classList.remove('dark');
+          root.setAttribute('data-theme', 'light');
+          return;
+        }
         var saved = localStorage.getItem('icst_theme_preference');
         var isDark = saved === 'dark' || ((!saved || saved === 'system') && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        var root = document.documentElement;
         if (isDark) {
           root.classList.add('dark');
           root.classList.remove('light');

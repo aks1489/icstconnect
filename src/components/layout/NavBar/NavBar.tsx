@@ -16,6 +16,7 @@ import {
     IconX as X 
 } from '@tabler/icons-react'
 import ThemeToggle from '../../ui/ThemeToggle'
+import { isAdminSubdomain } from '../../../utils/subdomain'
 import logo from '../../../assets/logo.jpg'
 
 interface NavigationProps {
@@ -26,6 +27,7 @@ interface NavigationProps {
 export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const location = useLocation();
+    const isHomePage = !isAdminSubdomain() && location.pathname === '/';
 
     // Check if we are on admin or teacher login pages
     const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
@@ -43,6 +45,11 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
     ];
 
     const getLinkClasses = (isActive: boolean) => {
+        if (isHomePage) {
+            return isActive
+                ? 'text-[#2572AB] bg-[#EFF6FF] font-semibold'
+                : 'text-slate-600 hover:text-[#0F172A] hover:bg-slate-100/75';
+        }
         return isActive
             ? 'text-slate-900 dark:text-white font-bold'
             : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white';
@@ -51,7 +58,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
     return (
         <>
             <nav
-                className="fixed top-0 left-0 right-0 z-[1040] bg-white/90 dark:bg-[#0A192F]/90 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/80 shadow-xs py-3 transition-all duration-300"
+                className={`fixed top-0 left-0 right-0 z-[1040] ${isHomePage ? 'bg-white/85 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_0_rgba(15,23,42,0.04)]' : 'bg-white/90 dark:bg-[#0A192F]/90 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/80 shadow-xs'} py-3 transition-all duration-300`}
             >
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-center justify-between">
@@ -65,23 +72,29 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 className="w-10 h-10 rounded-xl object-cover shadow-md group-hover:shadow-blue-500/20 transition-all duration-300"
                             />
                             <div className="flex flex-col">
-                                <span className="font-bold text-lg leading-none tracking-tight transition-colors duration-300 text-[#0A192F] dark:text-white">ICST</span>
-                                <span className="text-[0.65rem] font-medium tracking-wider uppercase transition-colors duration-300 text-slate-500 dark:text-slate-400">Chowberia</span>
+                                <span className={`font-bold text-lg leading-none tracking-tight transition-colors duration-300 ${isHomePage ? 'text-[#0F172A]' : 'text-[#0A192F] dark:text-white'}`}>ICST</span>
+                                <span className={`text-[0.65rem] font-medium tracking-wider uppercase transition-colors duration-300 ${isHomePage ? 'text-slate-500' : 'text-slate-500 dark:text-slate-400'}`}>Chowberia</span>
                             </div>
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden lg:flex items-center gap-6">
-                            <ul className="flex items-center gap-5 mb-0 list-none">
+                        <div className="hidden lg:flex items-center gap-5">
+                            <ul className={`flex items-center ${isHomePage ? 'gap-1.5' : 'gap-5'} mb-0 list-none`}>
                                 {navLinks.map((link) => (
                                     <li key={link.name}>
                                         <Link
                                             to={link.href}
-                                            className={`text-sm font-medium transition-colors relative group py-2 no-underline whitespace-nowrap ${getLinkClasses(location.pathname === link.href)}`}
+                                            className={`text-sm font-medium transition-all relative group no-underline whitespace-nowrap ${
+                                                isHomePage
+                                                    ? `px-3 py-1.5 rounded-lg ${getLinkClasses(location.pathname === link.href)}`
+                                                    : `py-2 ${getLinkClasses(location.pathname === link.href)}`
+                                            }`}
                                         >
                                             {link.name}
-                                            <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full bg-[#2563EB] dark:bg-[#38BDF8] ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
-                                                }`}></span>
+                                            {!isHomePage && (
+                                                <span className={`absolute bottom-0 left-0 h-0.5 transition-all duration-300 group-hover:w-full bg-[#2563EB] dark:bg-[#38BDF8] ${location.pathname === link.href ? 'w-full' : 'w-0 opacity-0 group-hover:opacity-100'
+                                                    }`}></span>
+                                            )}
                                         </Link>
                                     </li>
                                 ))}
@@ -92,7 +105,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                             {user ? (
                                 <Link
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
-                                    className="px-5 py-2 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline"
+                                    className={`px-5 py-2 rounded-xl ${isHomePage ? 'bg-[#0F172A] hover:bg-[#2572AB]' : 'rounded-full bg-[#2563EB] hover:bg-[#1D4ED8]'} text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap no-underline`}
                                 >
                                     <LayoutDashboard size={18} />
                                     <span>Dashboard</span>
@@ -101,7 +114,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 !isRestrictedAuthPage && (
                                     <button
                                         onClick={onLoginClick}
-                                        className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap bg-[#0A192F] hover:bg-[#0F2440] text-white dark:bg-[#2563EB] dark:hover:bg-[#1D4ED8] shadow-sm hover:shadow-md cursor-pointer"
+                                        className={`px-5 py-2 ${isHomePage ? 'rounded-xl bg-[#0F172A] hover:bg-[#2572AB] text-white' : 'rounded-full bg-[#0A192F] hover:bg-[#0F2440] text-white dark:bg-[#2563EB] dark:hover:bg-[#1D4ED8]'} text-sm font-semibold transition-all duration-200 flex items-center gap-2 transform hover:-translate-y-0.5 flex-shrink-0 whitespace-nowrap shadow-sm hover:shadow-md cursor-pointer`}
                                     >
                                         <User size={18} />
                                         <span>Login</span>
@@ -109,7 +122,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 )
                             )}
 
-                            <ThemeToggle />
+                            {!isHomePage && <ThemeToggle />}
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -199,9 +212,11 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
                                 )
                             )}
 
-                            <div className="shrink-0 flex items-center">
-                                <ThemeToggle />
-                            </div>
+                            {!isHomePage && (
+                                <div className="shrink-0 flex items-center">
+                                    <ThemeToggle />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -212,6 +227,7 @@ export const NavigationHeader: React.FC<NavigationProps> = ({ onLoginClick, user
 
 export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user }) => {
     const location = useLocation();
+    const isHomePage = !isAdminSubdomain() && location.pathname === '/';
     const isRestrictedAuthPage = ['/admin/login', '/teacher/login'].includes(location.pathname);
 
     return (
@@ -235,7 +251,7 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                             {user ? (
                                 <Link
                                     to={user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard'}
-                                    className="w-12 h-12 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-lg shadow-blue-600/30 hover:bg-[#1D4ED8] hover:scale-105 active:scale-95 transition-all"
+                                    className={`w-12 h-12 rounded-full ${isHomePage ? 'bg-[#2572AB] hover:bg-[#1E5E91]' : 'bg-[#2563EB] hover:bg-[#1D4ED8]'} text-white flex items-center justify-center shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all`}
                                 >
                                     <LayoutDashboard size={24} />
                                 </Link>
@@ -243,7 +259,7 @@ export const NavigationFooter: React.FC<NavigationProps> = ({ onLoginClick, user
                                 !isRestrictedAuthPage ? (
                                     <button
                                         onClick={onLoginClick}
-                                        className="w-12 h-12 rounded-full bg-[#0A192F] dark:bg-[#2563EB] text-white flex items-center justify-center shadow-lg shadow-slate-900/30 dark:shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                        className={`w-12 h-12 rounded-full ${isHomePage ? 'bg-[#2572AB] hover:bg-[#1E5E91]' : 'bg-[#0A192F] dark:bg-[#2563EB]'} text-white flex items-center justify-center shadow-lg shadow-slate-900/30 dark:shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all cursor-pointer`}
                                         aria-label="Login"
                                     >
                                         <User size={24} />

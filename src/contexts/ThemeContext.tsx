@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import { useLocation } from 'react-router-dom'
+import { isAdminSubdomain } from '../utils/subdomain'
 
 export type Theme = 'light' | 'dark' | 'system'
 export type ResolvedTheme = 'light' | 'dark'
@@ -42,20 +44,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return () => mediaQuery.removeEventListener('change', handleChange)
     }, [])
 
+    const location = useLocation()
+    const isHomePage = !isAdminSubdomain() && location.pathname === '/'
+
     const resolvedTheme: ResolvedTheme = useMemo(() => {
+        if (isHomePage) {
+            return 'light'
+        }
         if (theme === 'system') {
             return systemPreference
         }
         return theme
-    }, [theme, systemPreference])
+    }, [isHomePage, theme, systemPreference])
 
-    // Apply .dark class to root element with smooth transition class
+    // Apply .dark/.light class to root element with smooth transition class
     useEffect(() => {
         const root = document.documentElement
-        
-        // Add smooth transition class temporarily
-        root.classList.add('theme-transitioning')
-        
+        const currentThemeAttr = root.getAttribute('data-theme')
+
+        // Skip transition flash when already aligned (e.g. initial load on home page)
+        if (currentThemeAttr !== resolvedTheme) {
+            root.classList.add('theme-transitioning')
+        }
+
         if (resolvedTheme === 'dark') {
             root.classList.add('dark')
             root.classList.remove('light')

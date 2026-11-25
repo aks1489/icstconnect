@@ -1,63 +1,83 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/icons-react'
+import { IconSparkles as Sparkles, IconArrowRight as ArrowRight, IconPlayerPause as Pause, IconPlayerPlay as Play } from '@tabler/icons-react'
 import { animate } from 'animejs'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
+import GeometricBackdrop from './GeometricBackdrop'
 import type { Course } from '../../../types/course'
+import { HomeShimmerBlock, HomeShimmerStyles } from '../../ui/HomePageSkeleton'
+import { prefersReducedMotion, revealOnScroll } from '../../../lib/motion'
+
+type TrackFilter = 'all' | 'diploma' | 'certificate' | 'programming'
 
 const CoursesSection = () => {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
+    const [isMarqueePaused, setIsMarqueePaused] = useState(false)
+    const [activeFilter, setActiveFilter] = useState<TrackFilter>('all')
     const marqueeRef = useRef<HTMLDivElement>(null)
+    const animRef = useRef<ReturnType<typeof animate> | null>(null)
+    const headerRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if (!marqueeRef.current || loading || courses.length === 0) return
+        if (headerRef.current) {
+            return revealOnScroll(headerRef.current, { translateY: 14, duration: 500 })
+        }
+    }, [])
+
+    useEffect(() => {
+        if (activeFilter !== 'all' || !marqueeRef.current || loading || courses.length === 0 || prefersReducedMotion()) return
         const anim = animate(marqueeRef.current, {
             translateX: ['0%', '-50%'],
-            duration: 80000,
+            duration: 82000,
             ease: 'linear',
             loop: true
         })
-        return () => {
+        animRef.current = anim
+        if (isMarqueePaused) {
             anim.pause()
         }
-    }, [loading, courses])
+        return () => {
+            anim.pause()
+            animRef.current = null
+        }
+    }, [activeFilter, loading, courses])
+
+    useEffect(() => {
+        if (!animRef.current) return
+        if (isMarqueePaused) {
+            animRef.current.pause()
+        } else {
+            animRef.current.play()
+        }
+    }, [isMarqueePaused])
 
     useEffect(() => {
         const fetchAndFilterCourses = async () => {
             try {
                 const allCourses = await courseService.getCourses()
 
-                // Helper for strict/flexible check
                 const findCourse = (keywords: string[]) =>
-                    allCourses.find(c => keywords.some(k => c.course_name.toLowerCase().includes(k.toLowerCase())));
+                    allCourses.find(c => keywords.some(k => c.course_name.toLowerCase().includes(k.toLowerCase())))
 
                 const selectionAttempt = [
-                    // 1. Diploma (3 specific)
                     findCourse(['DITA']),
                     findCourse(['Diploma in Web Designing', 'DWD']),
                     findCourse(['Diploma in Cyber Security', 'DCSEH']),
-
-                    // 2. 6 Month / Certificate (3 specific)
                     findCourse(['Cert. in Data Entry Operator', 'CDEO']),
                     findCourse(['Cert. in Desktop Publishing', 'CDTP']),
                     findCourse(['Cert. in Computer Fundamentals', 'CCF']),
-
-                    // 3. Programming (3 specific)
                     findCourse(['Certificate in Java Programming', 'Java Programming']),
                     findCourse(['Certificate in Python Programming', 'Python Programming']),
                     findCourse(['Certificate in SQL Programming', 'SQL Programming']),
-
-                    // 4. Wildcard (1 specific)
                     findCourse(['Full Stack Web Development'])
-                ];
+                ]
 
-                const finalSelection = selectionAttempt.filter((c): c is Course => !!c);
-
+                const finalSelection = selectionAttempt.filter((c): c is Course => !!c)
                 setCourses(finalSelection)
             } catch (error) {
-                console.error("Failed to fetch courses", error)
+                console.error('Failed to fetch courses', error)
             } finally {
                 setLoading(false)
             }
@@ -66,7 +86,23 @@ const CoursesSection = () => {
         fetchAndFilterCourses()
     }, [])
 
-    const getIconType = (title: string): any => {
+    const getTrackCategory = (title: string): Exclude<TrackFilter, 'all'> => {
+        const t = title.toLowerCase()
+        if (t.includes('java') || t.includes('python') || t.includes('sql') || t.includes('full stack') || t.includes('web designing')) {
+            return 'programming'
+        }
+        if (t.includes('diploma') || t.includes('dita') || t.includes('dcseh')) {
+            return 'diploma'
+        }
+        return 'certificate'
+    }
+
+    const filteredCourses = useMemo(() => {
+        if (activeFilter === 'all') return courses
+        return courses.filter((c) => getTrackCategory(c.course_name) === activeFilter)
+    }, [courses, activeFilter])
+
+    const getIconType = (title: string): 'code' | 'data' | 'finance' | 'hardware' | 'general' | 'design' | 'office' => {
         const t = title.toLowerCase()
         if (t.includes('code') || t.includes('web') || t.includes('java') || t.includes('python')) return 'code'
         if (t.includes('dca') || t.includes('data') || t.includes('adca') || t.includes('dita')) return 'data'
@@ -77,116 +113,220 @@ const CoursesSection = () => {
         return 'general'
     }
 
-    const getColor = (index: number) => {
-        const colors = ['blue', 'purple', 'emerald', 'orange', 'pink', 'cyan']
-        return colors[index % colors.length]
+    const getCardAccent = (index: number) => {
+        const styles = [
+            { iconColor: 'blue', bgClass: 'bg-blue-50', pillClass: 'bg-blue-50 text-[#2572AB]', glowColor: 'rgba(37, 114, 171, 0.14)', hoverBorder: 'hover:border-[#2572AB]/45' },
+            { iconColor: 'indigo', bgClass: 'bg-indigo-50', pillClass: 'bg-indigo-50 text-[#4F46E5]', glowColor: 'rgba(79, 70, 229, 0.14)', hoverBorder: 'hover:border-[#4F46E5]/45' },
+            { iconColor: 'emerald', bgClass: 'bg-emerald-50', pillClass: 'bg-emerald-50 text-[#059669]', glowColor: 'rgba(5, 150, 105, 0.14)', hoverBorder: 'hover:border-[#059669]/45' },
+            { iconColor: 'cyan', bgClass: 'bg-sky-50', pillClass: 'bg-sky-50 text-[#0284C7]', glowColor: 'rgba(2, 132, 199, 0.14)', hoverBorder: 'hover:border-[#0284C7]/45' },
+            { iconColor: 'orange', bgClass: 'bg-amber-50', pillClass: 'bg-amber-50 text-[#B45309]', glowColor: 'rgba(217, 119, 6, 0.14)', hoverBorder: 'hover:border-[#D97706]/45' },
+            { iconColor: 'purple', bgClass: 'bg-violet-50', pillClass: 'bg-violet-50 text-[#6D28D9]', glowColor: 'rgba(109, 40, 217, 0.14)', hoverBorder: 'hover:border-[#6D28D9]/45' }
+        ]
+        return styles[index % styles.length]
     }
 
-    // Marquee Logic: Duplicate list for loop
-    const marqueeCourses = [...courses, ...courses, ...courses, ...courses];
+    const marqueeCourses = useMemo(
+        () => (courses.length >= 8 ? [...courses, ...courses] : [...courses, ...courses, ...courses, ...courses]),
+        [courses]
+    )
+
+    const renderCourseCard = (course: Course, index: number, key: string, gridMode = false) => {
+        const style = getCardAccent(index)
+        return (
+            <Link
+                key={key}
+                to={`/courses/${course.id}`}
+                className={`${gridMode ? 'w-full' : 'w-[255px] md:w-[290px] flex-shrink-0'} group relative bg-[#FFFFFF]/70 hover:bg-[#FFFFFF]/86 backdrop-blur-md rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.12)] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,1),0_24px_46px_-16px_rgba(15,23,42,0.20)] border border-white/90 ring-1 ring-slate-200/70 ${style.hoverBorder} transition-all duration-300 hover:-translate-y-1.5 flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
+            >
+                <div
+                    className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"
+                    aria-hidden="true"
+                />
+                <div
+                    className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-35 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none blur-xl"
+                    style={{ backgroundColor: style.glowColor }}
+                    aria-hidden="true"
+                />
+
+                <div className="w-full flex items-center justify-between mb-5 relative z-10">
+                    <div className="w-13 h-13 relative flex items-center justify-center">
+                        <div className={`absolute inset-0 ${style.bgClass} rounded-2xl border border-white/80 shadow-xs transition-transform duration-300 group-hover:scale-105`} />
+                        <div className="relative z-10 w-7 h-7">
+                            <AnimatedCourseIcon
+                                type={getIconType(course.course_name)}
+                                color={style.iconColor}
+                            />
+                        </div>
+                    </div>
+                    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full ${style.pillClass} border border-white/70 uppercase tracking-wider tabular-nums`}>
+                        {course.duration || '6 Months'}
+                    </span>
+                </div>
+
+                <h3 className="relative z-10 text-base font-bold text-[#0F172A] mb-2 group-hover:text-[#2572AB] transition-colors line-clamp-1 break-words w-full">
+                    {course.course_name}
+                </h3>
+
+                <p className="relative z-10 text-[#475569] text-xs mb-5 line-clamp-2 leading-relaxed h-8">
+                    {course.description || 'Master the skills needed for the future.'}
+                </p>
+
+                <div className="relative z-10 mt-auto w-full pt-3.5 border-t border-slate-200/65 flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-slate-500">ICST Curriculum</span>
+                    <span className="text-xs font-semibold text-[#0F172A] group-hover:text-[#2572AB] flex items-center gap-1 transition-colors">
+                        <span>View Details</span>
+                        <ArrowRight size={13} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform" />
+                    </span>
+                </div>
+            </Link>
+        )
+    }
 
     return (
-        <section className="py-24 bg-slate-50 dark:bg-slate-950 transition-colors duration-300 relative overflow-hidden" id="courses">
-            {/* Background Decorations */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-20 right-0 w-96 h-96 bg-blue-100/50 dark:bg-blue-900/10 rounded-full blur-3xl opacity-60"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-100/50 dark:bg-purple-900/10 rounded-full blur-3xl opacity-60"></div>
-            </div>
+        <section
+            id="courses"
+            className="py-22 lg:py-26 bg-[#F4F8FD] border-y border-slate-200/75 relative overflow-hidden"
+        >
+            <GeometricBackdrop />
 
             <div className="container-fluid px-0 relative z-10 overflow-hidden">
-                <div className="container mx-auto px-4 mb-16 text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow-sm">
-                        <Sparkles size={14} className="text-yellow-500" />
-                        Career Oriented Training
+                <div ref={headerRef} className="container mx-auto px-4 mb-10">
+                    <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                        <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
+                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFFFFF] border border-slate-200/90 text-[#0F172A] rounded-full text-[11px] font-semibold uppercase tracking-[0.14em] mb-4 shadow-xs">
+                                <Sparkles size={13} className="text-[#2572AB]" aria-hidden="true" />
+                                <span>Career Oriented Training</span>
+                            </div>
+
+                            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] mb-3 tracking-[-0.025em]">
+                                Explore Popular{' '}
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2572AB] via-[#4F46E5] to-[#0EA5E9]">
+                                    Courses
+                                </span>
+                            </h2>
+
+                            <p className="text-[#475569] text-base sm:text-lg leading-relaxed mb-0">
+                                Hand-picked courses designed for students in West Bengal to build a successful career in IT and Digital sectors.
+                            </p>
+                        </div>
+
+                        {/* Interactive Track Tabs + Marquee Control */}
+                        {!loading && courses.length > 0 && (
+                            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2">
+                                <div className="inline-flex p-1 rounded-xl bg-[#FFFFFF]/70 backdrop-blur-md border border-white/85 ring-1 ring-slate-200/70 shadow-xs" role="tablist" aria-label="Filter courses by track">
+                                    {([
+                                        { id: 'all', label: 'All Tracks' },
+                                        { id: 'diploma', label: 'Diplomas' },
+                                        { id: 'programming', label: 'Coding' },
+                                        { id: 'certificate', label: 'Certificates' }
+                                    ] as const).map((tab) => {
+                                        const active = activeFilter === tab.id
+                                        return (
+                                            <button
+                                                key={tab.id}
+                                                type="button"
+                                                role="tab"
+                                                aria-selected={active}
+                                                onClick={() => setActiveFilter(tab.id)}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${active
+                                                    ? 'bg-[#0F172A] text-white shadow-xs'
+                                                    : 'text-slate-600 hover:text-[#0F172A]'
+                                                    }`}
+                                            >
+                                                {tab.label}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+
+                                {activeFilter === 'all' && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsMarqueePaused((p) => !p)}
+                                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFFFFF]/70 backdrop-blur-md border border-white/85 ring-1 ring-slate-200/70 hover:border-[#2572AB]/50 text-xs font-semibold text-[#0F172A] transition-colors cursor-pointer shadow-xs"
+                                        aria-label={isMarqueePaused ? 'Resume course carousel' : 'Pause course carousel'}
+                                    >
+                                        {isMarqueePaused ? (
+                                            <>
+                                                <Play size={13} aria-hidden="true" className="text-[#059669]" />
+                                                <span>Resume</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Pause size={13} aria-hidden="true" className="text-[#2572AB]" />
+                                                <span>Pause</span>
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
-                    <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight transition-colors">
-                        Explore Popular <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Courses</span>
-                    </h2>
-                    <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed transition-colors">
-                        Hand-picked courses designed for students in West Bengal to build a successful career in IT and Digital sectors.
-                    </p>
                 </div>
 
                 {loading ? (
-                    <div className="flex gap-8 overflow-hidden px-4">
-                        {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="min-w-[240px] md:min-w-[280px] bg-white dark:bg-slate-900 h-72 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between animate-pulse">
-                                <div className="space-y-3">
-                                    <div className="h-6 w-24 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-                                    <div className="h-8 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
-                                    <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                    <div className="container mx-auto px-4 py-4">
+                        <HomeShimmerStyles />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div
+                                    key={i}
+                                    className="bg-[#FFFFFF]/70 backdrop-blur-md h-60 rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.10)] border border-white/90 ring-1 ring-slate-200/70 p-6 flex flex-col justify-between"
+                                >
+                                    <div>
+                                        <div className="flex items-center justify-between mb-5">
+                                            <HomeShimmerBlock variant="brand" className="w-13 h-13 rounded-2xl" />
+                                            <HomeShimmerBlock className="w-20 h-5 rounded-full" />
+                                        </div>
+                                        <HomeShimmerBlock className="h-5 w-4/5 rounded-lg mb-2.5" />
+                                        <HomeShimmerBlock className="h-3.5 w-full rounded-md mb-1.5" />
+                                        <HomeShimmerBlock className="h-3.5 w-2/3 rounded-md" />
+                                    </div>
+                                    <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between">
+                                        <HomeShimmerBlock className="h-3 w-20 rounded-md" />
+                                        <HomeShimmerBlock variant="brand" className="h-3.5 w-20 rounded-md" />
+                                    </div>
                                 </div>
-                                <div className="h-10 w-full bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                ) : (
-                    <div className="relative w-full overflow-hidden py-10">
-                        {/* Gradient Masks */}
-                        <div className="absolute left-0 top-0 bottom-0 w-12 md:w-32 z-20 bg-gradient-to-r from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
-                        <div className="absolute right-0 top-0 bottom-0 w-12 md:w-32 z-20 bg-gradient-to-l from-slate-50 dark:from-slate-950 to-transparent pointer-events-none"></div>
+                ) : activeFilter === 'all' ? (
+                    <div
+                        className="relative w-full overflow-hidden py-6"
+                        onMouseEnter={() => setIsMarqueePaused(true)}
+                        onMouseLeave={() => setIsMarqueePaused(false)}
+                        onFocus={() => setIsMarqueePaused(true)}
+                        onBlur={() => setIsMarqueePaused(false)}
+                    >
+                        <div className="absolute left-0 top-0 bottom-0 w-10 md:w-28 z-20 bg-gradient-to-r from-[#F4F8FD] to-transparent pointer-events-none" />
+                        <div className="absolute right-0 top-0 bottom-0 w-10 md:w-28 z-20 bg-gradient-to-l from-[#F4F8FD] to-transparent pointer-events-none" />
 
                         <div
                             ref={marqueeRef}
-                            className="flex gap-5 md:gap-8 w-fit"
+                            className="flex gap-5 md:gap-6 w-fit"
                             style={{ willChange: 'transform' }}
                         >
-                            {marqueeCourses.map((course, index) => {
-                                const color = getColor(index);
-                                const key = `${course.id}-${index}`;
-
-                                return (
-                                    <Link
-                                        key={key}
-                                        to={`/courses/${course.id}`}
-                                        className="w-[240px] md:w-[280px] flex-shrink-0 group relative bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm hover:shadow-xl border border-slate-100 dark:border-slate-800 hover:border-blue-100 dark:hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 flex flex-col items-center text-center cursor-pointer select-none no-underline text-inherit"
-                                    >
-                                        <div className={`w-14 h-14 md:w-16 md:h-16 mb-4 relative flex items-center justify-center`}>
-                                            <div className={`absolute inset-0 bg-${color}-50 dark:bg-${color}-950/40 rounded-2xl rotate-6 group-hover:rotate-12 transition-transform duration-300`}></div>
-                                            <div className={`relative z-10 w-8 h-8 md:w-10 md:h-10`}>
-                                                <AnimatedCourseIcon
-                                                    type={getIconType(course.course_name)}
-                                                    color={`text-${color}-500`}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <h3 className="text-sm md:text-base font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1 break-words w-full px-2">
-                                            {course.course_name}
-                                        </h3>
-
-                                        <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs mb-3 line-clamp-2 leading-relaxed h-8">
-                                            {course.description || "Master the skills needed for the future."}
-                                        </p>
-
-                                        <div className="mt-auto w-full pt-3 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
-                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 uppercase tracking-wide`}>
-                                                {course.duration || '6 Months'}
-                                            </span>
-                                            <span className="text-[10px] md:text-xs font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 flex items-center gap-1 transition-colors">
-                                                View Details
-                                            </span>
-                                        </div>
-                                    </Link>
-                                );
-                            })}
+                            {marqueeCourses.map((course, index) => renderCourseCard(course, index, `${course.id}-${index}`))}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="container mx-auto px-4 py-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in duration-200">
+                            {filteredCourses.map((course, index) => renderCourseCard(course, index, `filtered-${course.id}`, true))}
                         </div>
                     </div>
                 )}
 
-
-                {/* View All Button */}
-                <div className="text-center mt-12 relative z-20">
+                <div className="text-center mt-10 relative z-20">
                     <Link
                         to="/courses"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 dark:bg-sky-600 text-white rounded-2xl font-bold hover:bg-black dark:hover:bg-sky-500 transition-all hover:-translate-y-1 shadow-xl shadow-slate-900/10 group no-underline"
+                        className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#0F172A] hover:bg-[#2572AB] text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-[0_14px_28px_-8px_rgba(15,23,42,0.32)] group no-underline"
                     >
                         <span>View All Courses</span>
-                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight size={18} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" />
                     </Link>
                 </div>
             </div>
-
         </section>
     )
 }
