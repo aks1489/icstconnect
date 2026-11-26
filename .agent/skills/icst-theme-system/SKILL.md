@@ -242,6 +242,10 @@ className="relative overflow-hidden rounded-2xl p-6 transition-all duration-300
    - Always wrap transforms and animations in `motion-safe:` or ensure `@media (prefers-reduced-motion: reduce)` overrides animation duration to `0.01ms`.
 4. **Zero Cumulative Layout Shift (CLS):**
    - Explicit dimensions (`width`, `height`, or aspect ratio) must be set on all imagery, avatars, and icons.
+   - Viewport-lazy sections must use `LazySection` (`IntersectionObserver` prefetch margin + reserved `minHeightClass` + `OrbSectionLoader` from `thinking-orbs`) and `decoding="async"` on below-the-fold raster images.
+5. **Zero-Request Icon Delivery & Offscreen Pause:**
+   - Static tech/brand icons use bundled minified SVG data URIs (`src/data/techIcons.ts`, split into `tech-icons` chunk) with `warmupTechIcons()` idle decoding and `decoding="sync"` so icon swaps never fire per-render CDN fetches.
+   - Infinite marquee/rAF loops (e.g., `OrbitalLabCarousel`, `CoursesSection`) must pause off-screen via `IntersectionObserver`.
 
 ---
 

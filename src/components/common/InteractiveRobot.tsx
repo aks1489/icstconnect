@@ -3,30 +3,31 @@ import type { ComponentType } from 'react';
 import { Link } from 'react-router-dom';
 import { IconArrowRight as ArrowRight, IconBriefcase as Briefcase } from '@tabler/icons-react';
 import { prefersReducedMotion } from '../../lib/motion';
+import { getTechIconUrl, warmupTechIcons } from '../../data/techIcons';
 
 const APPS = [
-    { name: "React", desc: "A JavaScript library for building user interfaces", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
-    { name: "JavaScript", desc: "The programming language of the Web", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
-    { name: "TypeScript", desc: "JavaScript with syntax for types", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
-    { name: "Python", desc: "Powerful programming language", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
-    { name: "Java", desc: "High-level, class-based, object-oriented", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
-    { name: "C++", desc: "General-purpose programming language", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" },
-    { name: "HTML5", desc: "Standard markup language for documents", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" },
-    { name: "CSS3", desc: "Style sheet language", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" },
-    { name: "Node.js", desc: "JavaScript runtime built on Chrome's V8", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
-    { name: "VS Code", desc: "Code editor redefined", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" },
-    { name: "Git", desc: "Distributed version control system", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
-    { name: "GitHub", desc: "Platform for hosting and collaborating", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
-    { name: "Docker", desc: "Develop, ship, and run applications", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
-    { name: "MongoDB", desc: "The developer data platform", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
-    { name: "Next.js", desc: "The React Framework for the Web", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
-    { name: "MS Word", desc: "Word processing software", url: "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_word.svg" },
-    { name: "MS Excel", desc: "Spreadsheet software", url: "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_excel.svg" },
-    { name: "MS PowerPoint", desc: "Presentation software", url: "https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_powerpoint.svg" },
-    { name: "TailwindCSS", desc: "Utility-first CSS design framework", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" },
-    { name: "Bootstrap", desc: "Responsive mobile-first UI grid", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg" },
-    { name: "MySQL", desc: "Relational database management system", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
-    { name: "Linux", desc: "Open-source OS & server fundamentals", url: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" }
+    { name: "React", desc: "A JavaScript library for building user interfaces", url: getTechIconUrl('tech:react') },
+    { name: "JavaScript", desc: "The programming language of the Web", url: getTechIconUrl('tech:javascript') },
+    { name: "TypeScript", desc: "JavaScript with syntax for types", url: getTechIconUrl('tech:typescript') },
+    { name: "Python", desc: "Powerful programming language", url: getTechIconUrl('tech:python') },
+    { name: "Java", desc: "High-level, class-based, object-oriented", url: getTechIconUrl('tech:java') },
+    { name: "C++", desc: "General-purpose programming language", url: getTechIconUrl('tech:cplusplus') },
+    { name: "HTML5", desc: "Standard markup language for documents", url: getTechIconUrl('tech:html5') },
+    { name: "CSS3", desc: "Style sheet language", url: getTechIconUrl('tech:css3') },
+    { name: "Node.js", desc: "JavaScript runtime built on Chrome's V8", url: getTechIconUrl('tech:nodejs') },
+    { name: "VS Code", desc: "Code editor redefined", url: getTechIconUrl('tech:vscode') },
+    { name: "Git", desc: "Distributed version control system", url: getTechIconUrl('tech:git') },
+    { name: "GitHub", desc: "Platform for hosting and collaborating", url: getTechIconUrl('tech:github') },
+    { name: "Docker", desc: "Develop, ship, and run applications", url: getTechIconUrl('tech:docker') },
+    { name: "MongoDB", desc: "The developer data platform", url: getTechIconUrl('tech:mongodb') },
+    { name: "Next.js", desc: "The React Framework for the Web", url: getTechIconUrl('tech:nextjs') },
+    { name: "MS Word", desc: "Word processing software", url: getTechIconUrl('tech:word') },
+    { name: "MS Excel", desc: "Spreadsheet software", url: getTechIconUrl('tech:excel') },
+    { name: "MS PowerPoint", desc: "Presentation software", url: getTechIconUrl('tech:powerpoint') },
+    { name: "TailwindCSS", desc: "Utility-first CSS design framework", url: getTechIconUrl('tech:tailwindcss') },
+    { name: "Bootstrap", desc: "Responsive mobile-first UI grid", url: getTechIconUrl('tech:bootstrap') },
+    { name: "MySQL", desc: "Relational database management system", url: getTechIconUrl('tech:mysql') },
+    { name: "Linux", desc: "Open-source OS & server fundamentals", url: getTechIconUrl('tech:linux') }
 ];
 
 const SPAWN_ACCENTS = [
@@ -88,6 +89,10 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const [isInView, setIsInView] = useState(true);
     const [selectedRoleIdx, setSelectedRoleIdx] = useState(0);
+
+    useEffect(() => {
+        warmupTechIcons();
+    }, []);
 
     useEffect(() => {
         setSelectedRoleIdx(0);
@@ -345,6 +350,7 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                                 aria-hidden="true"
                                 width={14}
                                 height={14}
+                                decoding="sync"
                                 className="w-3.5 h-3.5 object-contain shrink-0"
                             />
                             <span>{activeTech.name} · {activeTech.tag}</span>
@@ -389,7 +395,7 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                                             className="w-full h-full object-contain"
                                             width={64}
                                             height={64}
-                                            loading="lazy"
+                                            decoding="sync"
                                         />
 
                                         {hoveredIcon === item.id && (
@@ -682,6 +688,7 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                                                     aria-hidden="true"
                                                     width={14}
                                                     height={14}
+                                                    decoding="sync"
                                                     className="w-3.5 h-3.5 object-contain"
                                                 />
                                             </span>

@@ -90,6 +90,7 @@ const AboutSection = () => {
                                     width={mediaItem.recommended_width || 870}
                                     height={mediaItem.recommended_height || 580}
                                     loading="lazy"
+                                    decoding="async"
                                     onLoad={() => setIsImageLoaded(true)}
                                     className={`w-full h-full object-cover block transition-opacity duration-300 ${
                                         isImageLoaded ? 'opacity-100' : 'opacity-0'

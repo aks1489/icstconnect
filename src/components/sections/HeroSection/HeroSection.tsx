@@ -33,18 +33,7 @@ import {
 } from '@tabler/icons-react'
 import InteractiveRobot, { type HeroTechItem } from '../../common/InteractiveRobot'
 import { revealOnScroll } from '../../../lib/motion'
-
-const TALLY_BADGE_SVG =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#0F766E"/><path d="M5 7.5h14v2.6h-5.6V18h-2.8v-7.9H5V7.5z" fill="#FFFFFF"/><circle cx="17.5" cy="16.5" r="2" fill="#FBBF24"/></svg>'
-    )
-
-const CHATGPT_BADGE_SVG =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#10A37F"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5a3 3 0 0 1 2.6 1.5l2.6 4.5a3 3 0 0 1 0 3l-2.6 4.5a3 3 0 0 1-5.2 0L6.8 14.5a3 3 0 0 1 0-3l2.6-4.5A3 3 0 0 1 12 5.5z"/><circle cx="12" cy="12" r="2.1"/></g></svg>'
-    )
+import { getTechIconUrl } from '../../../data/techIcons'
 
 const GROUP_SIZE = 8
 
@@ -69,7 +58,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'React',
         tag: 'UI Architecture',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+        iconUrl: getTechIconUrl('tech:react'),
         careerPaths: [
             { label: 'Frontend Dev', icon: IconBrowser },
             { label: 'UI Engineer', icon: IconComponents },
@@ -81,7 +70,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Python',
         tag: 'AI & Scripting',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
+        iconUrl: getTechIconUrl('tech:python'),
         careerPaths: [
             { label: 'Python Dev', icon: Terminal2 },
             { label: 'Data & AI', icon: IconCpu },
@@ -93,7 +82,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Java',
         tag: 'OOP & Backend',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+        iconUrl: getTechIconUrl('tech:java'),
         careerPaths: [
             { label: 'Java Dev', icon: IconCode },
             { label: 'Backend Eng', icon: IconServer },
@@ -105,7 +94,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Node.js',
         tag: 'Server Runtime',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg',
+        iconUrl: getTechIconUrl('tech:nodejs'),
         careerPaths: [
             { label: 'Backend API', icon: IconApi },
             { label: 'Server Dev', icon: IconDatabase },
@@ -117,7 +106,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'HTML/CSS',
         tag: 'Web Foundations',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg',
+        iconUrl: getTechIconUrl('tech:html5'),
         careerPaths: [
             { label: 'Web Designer', icon: IconPalette },
             { label: 'UI Markup', icon: IconFileCode },
@@ -129,7 +118,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Tailwind',
         tag: 'Design Tokens',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg',
+        iconUrl: getTechIconUrl('tech:tailwindcss'),
         careerPaths: [
             { label: 'UI Designer', icon: IconBrush },
             { label: 'Design Sys', icon: IconLayoutGrid },
@@ -141,7 +130,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Bootstrap',
         tag: 'Responsive Grid',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg',
+        iconUrl: getTechIconUrl('tech:bootstrap'),
         careerPaths: [
             { label: 'Web Builder', icon: IconLayoutGrid },
             { label: 'Theme Dev', icon: IconTemplate },
@@ -153,7 +142,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Tally/DCA',
         tag: 'Office & GST',
-        iconUrl: TALLY_BADGE_SVG,
+        iconUrl: getTechIconUrl('tech:tally'),
         careerPaths: [
             { label: 'Accounts Exec', icon: IconCalculator },
             { label: 'GST Operator', icon: IconFileInvoice },
@@ -165,7 +154,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Next.js',
         tag: 'Full Stack SSR',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg',
+        iconUrl: getTechIconUrl('tech:nextjs'),
         careerPaths: [
             { label: 'Full Stack', icon: IconStack2 },
             { label: 'React Lead', icon: IconBrowser },
@@ -177,7 +166,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'TypeScript',
         tag: 'Typed JavaScript',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
+        iconUrl: getTechIconUrl('tech:typescript'),
         careerPaths: [
             { label: 'Frontend Eng', icon: IconCode },
             { label: 'Full Stack', icon: IconStack2 },
@@ -189,7 +178,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'JavaScript',
         tag: 'Web Core',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
+        iconUrl: getTechIconUrl('tech:javascript'),
         careerPaths: [
             { label: 'Web Developer', icon: IconWorld },
             { label: 'Frontend Dev', icon: IconBrowser },
@@ -201,7 +190,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'MongoDB',
         tag: 'NoSQL Database',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
+        iconUrl: getTechIconUrl('tech:mongodb'),
         careerPaths: [
             { label: 'Backend Dev', icon: IconServer },
             { label: 'DB Engineer', icon: IconDatabase },
@@ -213,7 +202,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'MySQL',
         tag: 'Relational SQL',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+        iconUrl: getTechIconUrl('tech:mysql'),
         careerPaths: [
             { label: 'SQL Developer', icon: IconDatabase },
             { label: 'Data Analyst', icon: IconChartBar },
@@ -225,7 +214,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'C++',
         tag: 'DSA & Systems',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg',
+        iconUrl: getTechIconUrl('tech:cplusplus'),
         careerPaths: [
             { label: 'Software Dev', icon: IconCode },
             { label: 'DSA Trainee', icon: IconCpu },
@@ -237,7 +226,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Git',
         tag: 'Version Control',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg',
+        iconUrl: getTechIconUrl('tech:git'),
         careerPaths: [
             { label: 'Software Dev', icon: IconGitBranch },
             { label: 'Team Coder', icon: IconCode },
@@ -249,7 +238,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'GitHub',
         tag: 'Code Hosting',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg',
+        iconUrl: getTechIconUrl('tech:github'),
         careerPaths: [
             { label: 'Portfolio Dev', icon: IconGitBranch },
             { label: 'Open Source', icon: IconWorld },
@@ -261,7 +250,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Docker',
         tag: 'Containers',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg',
+        iconUrl: getTechIconUrl('tech:docker'),
         careerPaths: [
             { label: 'DevOps Eng', icon: IconCloud },
             { label: 'Cloud Dev', icon: IconServer },
@@ -273,7 +262,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Linux',
         tag: 'OS & Servers',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg',
+        iconUrl: getTechIconUrl('tech:linux'),
         careerPaths: [
             { label: 'Sys Admin', icon: IconServer },
             { label: 'Cloud Trainee', icon: IconCloud },
@@ -285,7 +274,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Flutter',
         tag: 'Mobile UI',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg',
+        iconUrl: getTechIconUrl('tech:flutter'),
         careerPaths: [
             { label: 'Mobile Dev', icon: IconDeviceMobile },
             { label: 'App Builder', icon: IconComponents },
@@ -297,7 +286,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Django',
         tag: 'Python Backend',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg',
+        iconUrl: getTechIconUrl('tech:django'),
         careerPaths: [
             { label: 'Python Backend', icon: IconServer },
             { label: 'Web API Dev', icon: IconApi },
@@ -309,7 +298,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'PyTorch',
         tag: 'Deep Learning',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg',
+        iconUrl: getTechIconUrl('tech:pytorch'),
         careerPaths: [
             { label: 'ML Trainee', icon: IconCpu },
             { label: 'AI Developer', icon: IconRobot },
@@ -321,7 +310,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'ChatGPT',
         tag: 'Applied AI',
-        iconUrl: CHATGPT_BADGE_SVG,
+        iconUrl: getTechIconUrl('tech:chatgpt'),
         careerPaths: [
             { label: 'Prompt Eng', icon: IconRobot },
             { label: 'AI Assistant', icon: IconBolt },
@@ -333,7 +322,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'Gemini AI',
         tag: 'Multimodal AI',
-        iconUrl: 'https://cdn.simpleicons.org/googlegemini/4285F4',
+        iconUrl: getTechIconUrl('company:googlegemini'),
         careerPaths: [
             { label: 'AI Builder', icon: IconRobot },
             { label: 'Automation', icon: IconBolt },
@@ -345,7 +334,7 @@ const HERO_TECHNOLOGIES = [
     {
         name: 'MS Excel',
         tag: 'MIS & Data',
-        iconUrl: 'https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_excel.svg',
+        iconUrl: getTechIconUrl('tech:excel'),
         careerPaths: [
             { label: 'MIS Executive', icon: IconChartBar },
             { label: 'Data Operator', icon: IconFileSpreadsheet },

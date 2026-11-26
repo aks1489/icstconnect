@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import TechPopup, { type TechPopupAnchorRect, type TechCompanyUsage } from '../../ui/TechPopup'
+import { getTechIconUrl, warmupTechIcons } from '../../../data/techIcons'
 
 interface TechItem {
     name: string
@@ -12,62 +13,44 @@ interface TechItem {
     usedBy: TechCompanyUsage[]
 }
 
-const TALLY_BADGE_SVG =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#0F766E"/><path d="M5 7.5h14v2.6h-5.6V18h-2.8v-7.9H5V7.5z" fill="#FFFFFF"/><circle cx="17.5" cy="16.5" r="2" fill="#FBBF24"/></svg>'
-    )
-
-const CHATGPT_BADGE_SVG =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#10A37F"/><g fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.5a3 3 0 0 1 2.6 1.5l2.6 4.5a3 3 0 0 1 0 3l-2.6 4.5a3 3 0 0 1-5.2 0L6.8 14.5a3 3 0 0 1 0-3l2.6-4.5A3 3 0 0 1 12 5.5z"/><circle cx="12" cy="12" r="2.1"/></g></svg>'
-    )
-
-const MICROSOFT_BADGE_SVG =
-    'data:image/svg+xml;utf8,' +
-    encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="2" y="2" width="9" height="9" fill="#F25022"/><rect x="13" y="2" width="9" height="9" fill="#7FBA00"/><rect x="2" y="13" width="9" height="9" fill="#00A4EF"/><rect x="13" y="13" width="9" height="9" fill="#FFB900"/></svg>'
-    )
-
 const COMPANIES = {
-    meta: { name: 'Meta', iconUrl: 'https://cdn.simpleicons.org/meta/0467DF' },
-    google: { name: 'Google', iconUrl: 'https://cdn.simpleicons.org/google/4285F4' },
-    microsoft: { name: 'Microsoft', iconUrl: MICROSOFT_BADGE_SVG },
-    apple: { name: 'Apple', iconUrl: 'https://cdn.simpleicons.org/apple/000000' },
-    netflix: { name: 'Netflix', iconUrl: 'https://cdn.simpleicons.org/netflix/E50914' },
-    uber: { name: 'Uber', iconUrl: 'https://cdn.simpleicons.org/uber/000000' },
-    airbnb: { name: 'Airbnb', iconUrl: 'https://cdn.simpleicons.org/airbnb/FF5A5F' },
-    spotify: { name: 'Spotify', iconUrl: 'https://cdn.simpleicons.org/spotify/1DB954' },
-    stripe: { name: 'Stripe', iconUrl: 'https://cdn.simpleicons.org/stripe/635BFF' },
-    shopify: { name: 'Shopify', iconUrl: 'https://cdn.simpleicons.org/shopify/7AB55C' },
-    vercel: { name: 'Vercel', iconUrl: 'https://cdn.simpleicons.org/vercel/000000' },
-    tesla: { name: 'Tesla', iconUrl: 'https://cdn.simpleicons.org/tesla/CC0000' },
-    nvidia: { name: 'NVIDIA', iconUrl: 'https://cdn.simpleicons.org/nvidia/76B900' },
-    discord: { name: 'Discord', iconUrl: 'https://cdn.simpleicons.org/discord/5865F2' },
-    paypal: { name: 'PayPal', iconUrl: 'https://cdn.simpleicons.org/paypal/003087' },
-    paytm: { name: 'Paytm', iconUrl: 'https://cdn.simpleicons.org/paytm/00BAF2' },
-    razorpay: { name: 'Razorpay', iconUrl: 'https://cdn.simpleicons.org/razorpay/0C2451' },
-    zoho: { name: 'Zoho', iconUrl: 'https://cdn.simpleicons.org/zoho/C8202F' },
-    zomato: { name: 'Zomato', iconUrl: 'https://cdn.simpleicons.org/zomato/E23744' },
-    swiggy: { name: 'Swiggy', iconUrl: 'https://cdn.simpleicons.org/swiggy/FC8019' },
-    dropbox: { name: 'Dropbox', iconUrl: 'https://cdn.simpleicons.org/dropbox/0061FF' },
-    pinterest: { name: 'Pinterest', iconUrl: 'https://cdn.simpleicons.org/pinterest/BD081C' },
-    gitlab: { name: 'GitLab', iconUrl: 'https://cdn.simpleicons.org/gitlab/FC6D26' },
-    atlassian: { name: 'Atlassian', iconUrl: 'https://cdn.simpleicons.org/atlassian/0052CC' },
-    intel: { name: 'Intel', iconUrl: 'https://cdn.simpleicons.org/intel/0071C5' },
-    youtube: { name: 'YouTube', iconUrl: 'https://cdn.simpleicons.org/youtube/FF0000' },
-    instagram: { name: 'Instagram', iconUrl: 'https://cdn.simpleicons.org/instagram/E4405F' },
-    reddit: { name: 'Reddit', iconUrl: 'https://cdn.simpleicons.org/reddit/FF4500' },
-    notion: { name: 'Notion', iconUrl: 'https://cdn.simpleicons.org/notion/000000' },
-    infosys: { name: 'Infosys', iconUrl: 'https://cdn.simpleicons.org/infosys/007CC3' },
-    tata: { name: 'Tata Group', iconUrl: 'https://cdn.simpleicons.org/tata/486AAA' }
+    meta: { name: 'Meta', iconUrl: getTechIconUrl('company:meta') },
+    google: { name: 'Google', iconUrl: getTechIconUrl('company:google') },
+    microsoft: { name: 'Microsoft', iconUrl: getTechIconUrl('company:microsoft') },
+    apple: { name: 'Apple', iconUrl: getTechIconUrl('company:apple') },
+    netflix: { name: 'Netflix', iconUrl: getTechIconUrl('company:netflix') },
+    uber: { name: 'Uber', iconUrl: getTechIconUrl('company:uber') },
+    airbnb: { name: 'Airbnb', iconUrl: getTechIconUrl('company:airbnb') },
+    spotify: { name: 'Spotify', iconUrl: getTechIconUrl('company:spotify') },
+    stripe: { name: 'Stripe', iconUrl: getTechIconUrl('company:stripe') },
+    shopify: { name: 'Shopify', iconUrl: getTechIconUrl('company:shopify') },
+    vercel: { name: 'Vercel', iconUrl: getTechIconUrl('company:vercel') },
+    tesla: { name: 'Tesla', iconUrl: getTechIconUrl('company:tesla') },
+    nvidia: { name: 'NVIDIA', iconUrl: getTechIconUrl('company:nvidia') },
+    discord: { name: 'Discord', iconUrl: getTechIconUrl('company:discord') },
+    paypal: { name: 'PayPal', iconUrl: getTechIconUrl('company:paypal') },
+    paytm: { name: 'Paytm', iconUrl: getTechIconUrl('company:paytm') },
+    razorpay: { name: 'Razorpay', iconUrl: getTechIconUrl('company:razorpay') },
+    zoho: { name: 'Zoho', iconUrl: getTechIconUrl('company:zoho') },
+    zomato: { name: 'Zomato', iconUrl: getTechIconUrl('company:zomato') },
+    swiggy: { name: 'Swiggy', iconUrl: getTechIconUrl('company:swiggy') },
+    dropbox: { name: 'Dropbox', iconUrl: getTechIconUrl('company:dropbox') },
+    pinterest: { name: 'Pinterest', iconUrl: getTechIconUrl('company:pinterest') },
+    gitlab: { name: 'GitLab', iconUrl: getTechIconUrl('company:gitlab') },
+    atlassian: { name: 'Atlassian', iconUrl: getTechIconUrl('company:atlassian') },
+    intel: { name: 'Intel', iconUrl: getTechIconUrl('company:intel') },
+    youtube: { name: 'YouTube', iconUrl: getTechIconUrl('company:youtube') },
+    instagram: { name: 'Instagram', iconUrl: getTechIconUrl('company:instagram') },
+    reddit: { name: 'Reddit', iconUrl: getTechIconUrl('company:reddit') },
+    notion: { name: 'Notion', iconUrl: getTechIconUrl('company:notion') },
+    infosys: { name: 'Infosys', iconUrl: getTechIconUrl('company:infosys') },
+    tata: { name: 'Tata Group', iconUrl: getTechIconUrl('company:tata') }
 } as const
 
 const TECH_ITEMS: TechItem[] = [
     {
         name: 'React',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+        iconUrl: getTechIconUrl('tech:react'),
         color: '#0284C7',
         chipBg: 'rgba(2, 132, 199, 0.10)',
         description: 'The most popular library for building modern, interactive user interfaces.',
@@ -77,7 +60,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Next.js',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg',
+        iconUrl: getTechIconUrl('tech:nextjs'),
         color: '#0F172A',
         chipBg: 'rgba(15, 23, 42, 0.07)',
         description: 'The React Framework for the Web. Used by some of the world\'s largest companies.',
@@ -87,7 +70,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'JavaScript',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
+        iconUrl: getTechIconUrl('tech:javascript'),
         color: '#CA8A04',
         chipBg: 'rgba(234, 179, 8, 0.14)',
         description: 'The core programming language powering interactive websites and web applications.',
@@ -97,7 +80,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'TypeScript',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
+        iconUrl: getTechIconUrl('tech:typescript'),
         color: '#2572AB',
         chipBg: 'rgba(37, 114, 171, 0.10)',
         description: 'JavaScript with syntax for types. Adds safety and scalability to your code.',
@@ -107,7 +90,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'HTML5',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg',
+        iconUrl: getTechIconUrl('tech:html5'),
         color: '#EA580C',
         chipBg: 'rgba(234, 88, 12, 0.10)',
         description: 'Semantic markup foundation structuring every modern webpage and web application.',
@@ -117,7 +100,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'CSS3',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg',
+        iconUrl: getTechIconUrl('tech:css3'),
         color: '#2563EB',
         chipBg: 'rgba(37, 99, 235, 0.10)',
         description: 'Visual styling engine for responsive grids, Flexbox, and fluid web animations.',
@@ -127,7 +110,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'TailwindCSS',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg',
+        iconUrl: getTechIconUrl('tech:tailwindcss'),
         color: '#0891B2',
         chipBg: 'rgba(8, 145, 178, 0.10)',
         description: 'A utility-first CSS framework for rapidly building custom user interfaces.',
@@ -137,7 +120,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Bootstrap',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg',
+        iconUrl: getTechIconUrl('tech:bootstrap'),
         color: '#6D28D9',
         chipBg: 'rgba(109, 40, 217, 0.10)',
         description: 'The world\'s most popular framework for building responsive, mobile-first sites.',
@@ -147,7 +130,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Node.js',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg',
+        iconUrl: getTechIconUrl('tech:nodejs'),
         color: '#059669',
         chipBg: 'rgba(5, 150, 105, 0.10)',
         description: 'Execute JavaScript on the server-side to build scalable network applications.',
@@ -157,7 +140,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Express',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg',
+        iconUrl: getTechIconUrl('tech:express'),
         color: '#D97706',
         chipBg: 'rgba(217, 119, 6, 0.10)',
         description: 'Fast, unopinionated, minimalist web framework for Node.js.',
@@ -167,7 +150,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'MongoDB',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
+        iconUrl: getTechIconUrl('tech:mongodb'),
         color: '#16A34A',
         chipBg: 'rgba(22, 163, 74, 0.10)',
         description: 'The most popular database for modern apps. Flexible, scalable, and powerful.',
@@ -177,7 +160,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'MySQL',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+        iconUrl: getTechIconUrl('tech:mysql'),
         color: '#2572AB',
         chipBg: 'rgba(37, 114, 171, 0.10)',
         description: 'Industry-standard relational database management system for structured enterprise data.',
@@ -187,7 +170,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Python',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
+        iconUrl: getTechIconUrl('tech:python'),
         color: '#2572AB',
         chipBg: 'rgba(37, 114, 171, 0.10)',
         description: 'Versatile programming language for automation, data analysis, and AI workflows.',
@@ -197,7 +180,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Java',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+        iconUrl: getTechIconUrl('tech:java'),
         color: '#EA580C',
         chipBg: 'rgba(234, 88, 12, 0.10)',
         description: 'Enterprise-grade object-oriented language powering software, APIs, and Android.',
@@ -207,7 +190,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'C',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg',
+        iconUrl: getTechIconUrl('tech:c'),
         color: '#1D4ED8',
         chipBg: 'rgba(29, 78, 216, 0.10)',
         description: 'Foundational procedural programming language teaching core memory & system logic.',
@@ -217,7 +200,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'C++',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg',
+        iconUrl: getTechIconUrl('tech:cplusplus'),
         color: '#1E40AF',
         chipBg: 'rgba(30, 64, 175, 0.10)',
         description: 'High-performance object-oriented programming language for software & algorithms.',
@@ -227,7 +210,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Git',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg',
+        iconUrl: getTechIconUrl('tech:git'),
         color: '#DC2626',
         chipBg: 'rgba(220, 38, 38, 0.10)',
         description: 'Essential distributed version control system for tracking every line of team code.',
@@ -237,7 +220,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'GitHub',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg',
+        iconUrl: getTechIconUrl('tech:github'),
         color: '#0F172A',
         chipBg: 'rgba(15, 23, 42, 0.08)',
         description: 'Global platform for hosting repositories, pull requests, and developer portfolios.',
@@ -247,7 +230,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'VS Code',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg',
+        iconUrl: getTechIconUrl('tech:vscode'),
         color: '#0284C7',
         chipBg: 'rgba(2, 132, 199, 0.10)',
         description: 'The industry-standard extensible code editor for debugging, linting, and Git.',
@@ -257,7 +240,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Docker',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg',
+        iconUrl: getTechIconUrl('tech:docker'),
         color: '#0284C7',
         chipBg: 'rgba(2, 132, 199, 0.10)',
         description: 'Container platform to package, ship, and deploy applications consistently anywhere.',
@@ -267,7 +250,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Linux',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg',
+        iconUrl: getTechIconUrl('tech:linux'),
         color: '#D97706',
         chipBg: 'rgba(217, 119, 6, 0.10)',
         description: 'Open-source operating system powering cloud servers, shells, and cybersecurity labs.',
@@ -277,7 +260,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'MS Word',
-        iconUrl: 'https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_word.svg',
+        iconUrl: getTechIconUrl('tech:word'),
         color: '#1D4ED8',
         chipBg: 'rgba(29, 78, 216, 0.10)',
         description: 'Professional document formatting, mail merge, and executive reporting suite.',
@@ -287,7 +270,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'MS Excel',
-        iconUrl: 'https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_excel.svg',
+        iconUrl: getTechIconUrl('tech:excel'),
         color: '#15803D',
         chipBg: 'rgba(21, 128, 61, 0.10)',
         description: 'Spreadsheet mastery including VLOOKUP, Pivot Tables, formulas, and MIS reporting.',
@@ -297,7 +280,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'MS PowerPoint',
-        iconUrl: 'https://raw.githubusercontent.com/vscode-icons/vscode-icons/master/icons/file_type_powerpoint.svg',
+        iconUrl: getTechIconUrl('tech:powerpoint'),
         color: '#C2410C',
         chipBg: 'rgba(194, 65, 12, 0.10)',
         description: 'Visual slide deck creation, SmartArt, and interactive business presentations.',
@@ -307,7 +290,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'TallyPrime',
-        iconUrl: TALLY_BADGE_SVG,
+        iconUrl: getTechIconUrl('tech:tally'),
         color: '#0F766E',
         chipBg: 'rgba(15, 118, 110, 0.10)',
         description: 'India\'s leading accounting and GST compliance platform for modern finance careers.',
@@ -317,7 +300,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'ChatGPT',
-        iconUrl: CHATGPT_BADGE_SVG,
+        iconUrl: getTechIconUrl('tech:chatgpt'),
         color: '#10A37F',
         chipBg: 'rgba(16, 163, 127, 0.10)',
         description: 'Conversational AI assistant for prompt engineering, coding, and office productivity.',
@@ -327,7 +310,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Gemini AI',
-        iconUrl: 'https://cdn.simpleicons.org/googlegemini/4285F4',
+        iconUrl: getTechIconUrl('company:googlegemini'),
         color: '#2563EB',
         chipBg: 'rgba(66, 133, 244, 0.12)',
         description: 'Google\'s multimodal AI model built for research, coding, and workspace automation.',
@@ -337,7 +320,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Claude AI',
-        iconUrl: 'https://cdn.simpleicons.org/claude/D97757',
+        iconUrl: getTechIconUrl('company:claude'),
         color: '#C2410C',
         chipBg: 'rgba(217, 119, 87, 0.12)',
         description: 'Advanced AI assistant for deep reasoning, structured analysis, and software architecture.',
@@ -347,7 +330,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Hugging Face',
-        iconUrl: 'https://cdn.simpleicons.org/huggingface/FFD21E',
+        iconUrl: getTechIconUrl('company:huggingface'),
         color: '#B45309',
         chipBg: 'rgba(255, 210, 30, 0.18)',
         description: 'Open-source hub for machine learning models, datasets, and transformer pipelines.',
@@ -357,7 +340,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'TensorFlow',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg',
+        iconUrl: getTechIconUrl('tech:tensorflow'),
         color: '#EA580C',
         chipBg: 'rgba(234, 88, 12, 0.10)',
         description: 'End-to-end machine learning framework for training neural networks and vision models.',
@@ -367,7 +350,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'PyTorch',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg',
+        iconUrl: getTechIconUrl('tech:pytorch'),
         color: '#DC2626',
         chipBg: 'rgba(220, 38, 38, 0.10)',
         description: 'Dynamic deep learning framework widely used in AI research and production systems.',
@@ -377,7 +360,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Jupyter',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jupyter/jupyter-original.svg',
+        iconUrl: getTechIconUrl('tech:jupyter'),
         color: '#EA580C',
         chipBg: 'rgba(234, 88, 12, 0.10)',
         description: 'Interactive computing notebooks for Python analytics, visualizations, and AI experiments.',
@@ -387,7 +370,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Pandas',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pandas/pandas-original.svg',
+        iconUrl: getTechIconUrl('tech:pandas'),
         color: '#1E3A8A',
         chipBg: 'rgba(30, 58, 138, 0.10)',
         description: 'Fast Python data manipulation toolkit for spreadsheets, CSVs, and tabular analysis.',
@@ -397,7 +380,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'NumPy',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/numpy/numpy-original.svg',
+        iconUrl: getTechIconUrl('tech:numpy'),
         color: '#0284C7',
         chipBg: 'rgba(2, 132, 199, 0.10)',
         description: 'Fundamental scientific computing library for high-speed numerical arrays in Python.',
@@ -407,7 +390,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Vue.js',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg',
+        iconUrl: getTechIconUrl('tech:vuejs'),
         color: '#059669',
         chipBg: 'rgba(5, 150, 105, 0.10)',
         description: 'Approachable, high-performance JavaScript framework for reactive web interfaces.',
@@ -417,7 +400,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Angular',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angular/angular-original.svg',
+        iconUrl: getTechIconUrl('tech:angular'),
         color: '#DC2626',
         chipBg: 'rgba(220, 38, 38, 0.10)',
         description: 'Structured TypeScript framework for enterprise web applications at scale.',
@@ -427,7 +410,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Flutter',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg',
+        iconUrl: getTechIconUrl('tech:flutter'),
         color: '#0284C7',
         chipBg: 'rgba(2, 132, 199, 0.10)',
         description: 'Cross-platform UI toolkit for compiling native mobile, web, and desktop apps.',
@@ -437,7 +420,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Django',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg',
+        iconUrl: getTechIconUrl('tech:django'),
         color: '#065F46',
         chipBg: 'rgba(6, 95, 70, 0.10)',
         description: 'Batteries-included Python web framework with built-in ORM, admin, and security.',
@@ -447,7 +430,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Spring Boot',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
+        iconUrl: getTechIconUrl('tech:spring'),
         color: '#16A34A',
         chipBg: 'rgba(22, 163, 74, 0.10)',
         description: 'Production-ready Java framework for microservices, REST APIs, and enterprise systems.',
@@ -457,7 +440,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Vite',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg',
+        iconUrl: getTechIconUrl('tech:vitejs'),
         color: '#6D28D9',
         chipBg: 'rgba(109, 40, 217, 0.10)',
         description: 'Next-generation frontend build tool offering instant HMR and optimized bundling.',
@@ -467,7 +450,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'PHP',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg',
+        iconUrl: getTechIconUrl('tech:php'),
         color: '#4F46E5',
         chipBg: 'rgba(79, 70, 229, 0.10)',
         description: 'Server-side scripting language powering dynamic websites, CMS portals, and backends.',
@@ -477,7 +460,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Go',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original.svg',
+        iconUrl: getTechIconUrl('tech:go'),
         color: '#0891B2',
         chipBg: 'rgba(8, 145, 178, 0.10)',
         description: 'Fast compiled language designed for concurrent cloud services and scalable APIs.',
@@ -487,7 +470,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Kotlin',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg',
+        iconUrl: getTechIconUrl('tech:kotlin'),
         color: '#7C3AED',
         chipBg: 'rgba(124, 58, 237, 0.10)',
         description: 'Modern, concise JVM programming language and official language for Android apps.',
@@ -497,7 +480,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'PostgreSQL',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg',
+        iconUrl: getTechIconUrl('tech:postgresql'),
         color: '#2572AB',
         chipBg: 'rgba(37, 114, 171, 0.10)',
         description: 'Advanced open-source relational database supporting JSON, indexing, and analytics.',
@@ -507,7 +490,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Firebase',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-original.svg',
+        iconUrl: getTechIconUrl('tech:firebase'),
         color: '#D97706',
         chipBg: 'rgba(217, 119, 6, 0.10)',
         description: 'Google backend platform offering realtime databases, authentication, and hosting.',
@@ -517,7 +500,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'IntelliJ IDEA',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/intellij/intellij-original.svg',
+        iconUrl: getTechIconUrl('tech:intellij'),
         color: '#1D4ED8',
         chipBg: 'rgba(29, 78, 216, 0.10)',
         description: 'Intelligent Java & Kotlin IDE with smart refactoring, debugging, and build tools.',
@@ -527,7 +510,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'PyCharm',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pycharm/pycharm-original.svg',
+        iconUrl: getTechIconUrl('tech:pycharm'),
         color: '#059669',
         chipBg: 'rgba(5, 150, 105, 0.10)',
         description: 'Dedicated Python IDE for virtual environments, Django backends, and data science.',
@@ -537,7 +520,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Android Studio',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/androidstudio/androidstudio-original.svg',
+        iconUrl: getTechIconUrl('tech:androidstudio'),
         color: '#15803D',
         chipBg: 'rgba(21, 128, 61, 0.10)',
         description: 'Official IDE for designing, testing, and debugging native Android applications.',
@@ -547,7 +530,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Postman',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg',
+        iconUrl: getTechIconUrl('tech:postman'),
         color: '#EA580C',
         chipBg: 'rgba(234, 88, 12, 0.10)',
         description: 'Industry-standard API platform for testing endpoints, headers, and automated suites.',
@@ -557,7 +540,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Photoshop',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/photoshop/photoshop-original.svg',
+        iconUrl: getTechIconUrl('tech:photoshop'),
         color: '#1D4ED8',
         chipBg: 'rgba(29, 78, 216, 0.10)',
         description: 'Professional raster image editing, banner design, and digital retouching suite.',
@@ -567,7 +550,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Illustrator',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/illustrator/illustrator-original.svg',
+        iconUrl: getTechIconUrl('tech:illustrator'),
         color: '#C2410C',
         chipBg: 'rgba(194, 65, 12, 0.10)',
         description: 'Precision vector graphics software for logos, branding icons, and print media.',
@@ -577,7 +560,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Figma',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg',
+        iconUrl: getTechIconUrl('tech:figma'),
         color: '#7C3AED',
         chipBg: 'rgba(124, 58, 237, 0.10)',
         description: 'Collaborative interface design and interactive prototyping tool for web & mobile UI.',
@@ -587,7 +570,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Canva',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/canva/canva-original.svg',
+        iconUrl: getTechIconUrl('tech:canva'),
         color: '#0891B2',
         chipBg: 'rgba(8, 145, 178, 0.10)',
         description: 'Accessible visual design studio for posters, social graphics, and quick presentations.',
@@ -597,7 +580,7 @@ const TECH_ITEMS: TechItem[] = [
     },
     {
         name: 'Windows 11',
-        iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/windows11/windows11-original.svg',
+        iconUrl: getTechIconUrl('tech:windows11'),
         color: '#0284C7',
         chipBg: 'rgba(2, 132, 199, 0.10)',
         description: 'Modern desktop operating system covering file management, shortcuts, and OS utilities.',
@@ -625,6 +608,7 @@ const TechTickerSection = () => {
     } | null>(null)
 
     useEffect(() => {
+        warmupTechIcons()
         setOrderedTechs(shuffleTechItems(TECH_ITEMS))
     }, [])
 
@@ -694,7 +678,7 @@ const TechTickerSection = () => {
                                             aria-hidden="true"
                                             width={18}
                                             height={18}
-                                            loading="lazy"
+                                            decoding="sync"
                                             className="w-4.5 h-4.5 object-contain"
                                         />
                                     </span>

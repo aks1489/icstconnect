@@ -46,6 +46,7 @@ const LearningHubPreview = () => {
                                     width={60}
                                     height={60}
                                     loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-contain"
                                 />
                             </div>
@@ -75,6 +76,7 @@ const LearningHubPreview = () => {
                                         width={18}
                                         height={18}
                                         loading="lazy"
+                                        decoding="async"
                                         className="w-4.5 h-4.5 object-contain"
                                     />
                                 </span>

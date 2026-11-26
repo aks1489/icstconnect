@@ -1,13 +1,17 @@
+import { lazy } from 'react'
 import HeroSection from '../components/sections/HeroSection'
 import TechTickerSection from '../components/sections/TechTickerSection'
-import LearningHubPreview from '../components/sections/LearningHubPreview'
-import ScholarshipPromoSection from '../components/sections/ScholarshipPromoSection'
-import FeaturesSection from '../components/sections/FeaturesSection'
-import AboutSection from '../components/sections/AboutSection'
-import CoursesSection from '../components/sections/CoursesSection'
-import GallerySection from '../components/sections/GallerySection'
-import TestSection from '../components/sections/TestSection'
+import LazySection from '../components/common/LazySection'
 import SEOHead from '../components/common/SEOHead'
+
+// Code-split below-the-fold sections so `/` initial bundle & data fetching stay fast
+const LearningHubPreview = lazy(() => import('../components/sections/LearningHubPreview'))
+const ScholarshipPromoSection = lazy(() => import('../components/sections/ScholarshipPromoSection'))
+const AboutSection = lazy(() => import('../components/sections/AboutSection'))
+const CoursesSection = lazy(() => import('../components/sections/CoursesSection'))
+const FeaturesSection = lazy(() => import('../components/sections/FeaturesSection'))
+const GallerySection = lazy(() => import('../components/sections/GallerySection'))
+const TestSection = lazy(() => import('../components/sections/TestSection'))
 
 const Home = () => {
     return (
@@ -46,13 +50,61 @@ const Home = () => {
             />
             <HeroSection />
             <TechTickerSection />
-            <LearningHubPreview />
-            <ScholarshipPromoSection />
-            <AboutSection />
-            <CoursesSection />
-            <FeaturesSection />
-            <GallerySection />
-            <TestSection />
+            <LazySection
+                anchorId="learning-hub"
+                minHeightClass="min-h-[560px]"
+                bgClassName="bg-[#F4F8FD]"
+                loadingLabel="Loading ICST Labs showcase"
+            >
+                <LearningHubPreview />
+            </LazySection>
+            <LazySection
+                minHeightClass="min-h-[580px]"
+                bgClassName="bg-[#F7FAFE]"
+                loadingLabel="Loading Class X Scholarship spotlight"
+            >
+                <ScholarshipPromoSection />
+            </LazySection>
+            <LazySection
+                anchorId="about"
+                minHeightClass="min-h-[640px]"
+                bgClassName="bg-[#F7FAFE]"
+                loadingLabel="Loading campus overview"
+            >
+                <AboutSection />
+            </LazySection>
+            <LazySection
+                anchorId="courses"
+                minHeightClass="min-h-[580px]"
+                bgClassName="bg-[#F4F8FD]"
+                loadingLabel="Loading certified courses"
+            >
+                <CoursesSection />
+            </LazySection>
+            <LazySection
+                anchorId="features"
+                minHeightClass="min-h-[500px]"
+                bgClassName="bg-[#FFFFFF]"
+                loadingLabel="Loading ICST advantages"
+            >
+                <FeaturesSection />
+            </LazySection>
+            <LazySection
+                anchorId="gallery"
+                minHeightClass="min-h-[700px]"
+                bgClassName="bg-[#F8FAFC]"
+                loadingLabel="Loading campus gallery"
+            >
+                <GallerySection />
+            </LazySection>
+            <LazySection
+                anchorId="onlinetest"
+                minHeightClass="min-h-[400px]"
+                bgClassName="bg-[#FFFFFF]"
+                loadingLabel="Loading online assessment"
+            >
+                <TestSection />
+            </LazySection>
         </>
     )
 }

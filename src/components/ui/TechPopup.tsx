@@ -133,7 +133,7 @@ const TechPopup: React.FC<TechPopupProps> = ({
                             aria-hidden="true"
                             width={20}
                             height={20}
-                            loading="lazy"
+                            decoding="sync"
                             className="w-5 h-5 object-contain"
                         />
                     </div>
@@ -189,7 +189,7 @@ const TechPopup: React.FC<TechPopupProps> = ({
                                     aria-hidden="true"
                                     width={14}
                                     height={14}
-                                    loading="lazy"
+                                    decoding="sync"
                                     className="w-3.5 h-3.5 object-contain shrink-0"
                                 />
                                 <span>{company.name}</span>

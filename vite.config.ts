@@ -25,6 +25,9 @@ export default defineConfig({
           if (id.includes('node_modules/@supabase/supabase-js')) {
             return 'vendor-supabase';
           }
+          if (id.includes('src/data/techIcons') || id.includes('src\\data\\techIcons')) {
+            return 'tech-icons';
+          }
         }
       }
     }

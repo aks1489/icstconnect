@@ -135,8 +135,10 @@ const OrbitalLabCarousel = () => {
     } | null>(null)
     const isCoastingRef = useRef(false)
     const suppressNextClickRef = useRef(false)
+    const isInViewRef = useRef(true)
 
     const [activeIndex, setActiveIndex] = useState(0)
+    const [isStageInView, setIsStageInView] = useState(true)
     const [holdingDirection, setHoldingDirection] = useState<1 | -1 | null>(null)
 
     const applyOrbitPositions = useCallback((angle: number) => {
@@ -188,10 +190,28 @@ const OrbitalLabCarousel = () => {
         updateStageSize()
         const ro = new ResizeObserver(updateStageSize)
         ro.observe(stage)
-        return () => ro.disconnect()
+
+        const io = new IntersectionObserver(
+            ([entry]) => {
+                const visible = entry.isIntersecting
+                isInViewRef.current = visible
+                setIsStageInView(visible)
+            },
+            { rootMargin: '120px 0px', threshold: 0 }
+        )
+        io.observe(stage)
+
+        return () => {
+            ro.disconnect()
+            io.disconnect()
+        }
     }, [applyOrbitPositions])
 
     useEffect(() => {
+        if (!isStageInView) {
+            lastTimeRef.current = null
+            return
+        }
         const reduced = prefersReducedMotion()
 
         const tick = (now: number) => {
@@ -259,7 +279,7 @@ const OrbitalLabCarousel = () => {
         return () => {
             if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
         }
-    }, [applyOrbitPositions])
+    }, [applyOrbitPositions, isStageInView])
 
     const stopHoldSpin = useCallback(() => {
         const hold = holdStateRef.current
@@ -319,9 +339,10 @@ const OrbitalLabCarousel = () => {
     })
 
     useEffect(() => {
-        if (prefersReducedMotion()) return
+        if (prefersReducedMotion() || !isStageInView) return
         const interval = setInterval(() => {
             if (
+                isInViewRef.current &&
                 !isPausedRef.current &&
                 !isDraggingRef.current &&
                 !holdStateRef.current &&
@@ -331,7 +352,7 @@ const OrbitalLabCarousel = () => {
             }
         }, 4000)
         return () => clearInterval(interval)
-    }, [stepOrbit])
+    }, [stepOrbit, isStageInView])
 
     const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
         if (e.button !== 0) return
@@ -460,6 +481,7 @@ const OrbitalLabCarousel = () => {
                                 width={slide.width}
                                 height={slide.height}
                                 loading="lazy"
+                                decoding="async"
                                 draggable={false}
                                 onLoad={() => markSlideLoaded(slide.id)}
                                 onError={() => markSlideLoaded(slide.id)}

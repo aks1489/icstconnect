@@ -16,8 +16,10 @@ const CoursesSection = () => {
     const [courses, setCourses] = useState<Course[]>([])
     const [loading, setLoading] = useState(true)
     const [isMarqueePaused, setIsMarqueePaused] = useState(false)
+    const [isMarqueeInView, setIsMarqueeInView] = useState(true)
     const [activeFilter, setActiveFilter] = useState<TrackFilter>('all')
     const [hoveredPopup, setHoveredPopup] = useState<HoveredCourseState | null>(null)
+    const sectionViewportRef = useRef<HTMLElement>(null)
     const marqueeRef = useRef<HTMLDivElement>(null)
     const animRef = useRef<ReturnType<typeof animate> | null>(null)
     const headerRef = useRef<HTMLDivElement>(null)
@@ -33,6 +35,17 @@ const CoursesSection = () => {
     }, [])
 
     useEffect(() => {
+        const el = sectionViewportRef.current
+        if (!el || typeof window === 'undefined' || !('IntersectionObserver' in window)) return
+        const observer = new IntersectionObserver(
+            ([entry]) => setIsMarqueeInView(entry.isIntersecting),
+            { rootMargin: '120px 0px', threshold: 0 }
+        )
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
+    useEffect(() => {
         if (activeFilter !== 'all' || !marqueeRef.current || loading || courses.length === 0 || prefersReducedMotion()) return
         const anim = animate(marqueeRef.current, {
             translateX: ['0%', '-50%'],
@@ -41,7 +54,7 @@ const CoursesSection = () => {
             loop: true
         })
         animRef.current = anim
-        if (isMarqueePaused) {
+        if (isMarqueePaused || !isMarqueeInView) {
             anim.pause()
         }
         return () => {
@@ -50,7 +63,7 @@ const CoursesSection = () => {
         }
     }, [activeFilter, loading, courses])
 
-    const effectivePaused = isMarqueePaused || hoveredPopup !== null
+    const effectivePaused = isMarqueePaused || hoveredPopup !== null || !isMarqueeInView
 
     useEffect(() => {
         if (!animRef.current) return
@@ -297,6 +310,7 @@ const CoursesSection = () => {
 
     return (
         <section
+            ref={sectionViewportRef}
             id="courses"
             className="py-22 lg:py-26 bg-[#F4F8FD] border-y border-slate-200/75 relative overflow-hidden"
         >
