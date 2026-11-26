@@ -5,34 +5,28 @@ import { IconBrandFacebook as Facebook, IconBrandInstagram as Instagram, IconMap
 const Footer: React.FC = () => {
     return (
         <footer className="bg-[#0A192F] text-slate-300 py-12 lg:py-16 relative overflow-hidden border-t border-slate-800/80">
-            {/* Background Tech Glow Pattern */}
-            <div className="absolute inset-0 opacity-10 pointer-events-none">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle,_rgba(6,182,212,0.15)_0%,_transparent_70%)]"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[radial-gradient(circle,_rgba(37,99,235,0.15)_0%,_transparent_70%)]"></div>
-            </div>
-
             <div className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                     {/* Brand Column */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white text-xl font-bold shadow-md shadow-blue-500/20">
+                            <div className="w-10 h-10 rounded-xl bg-[#2572AB] flex items-center justify-center text-white text-xl font-semibold">
                                 I
                             </div>
                             <div className="flex flex-col">
-                                <span className="font-bold text-white text-lg leading-none">ICST</span>
-                                <span className="text-slate-400 text-[0.65rem] font-medium tracking-wider uppercase">Chowberia</span>
+                                <span className="font-semibold text-white text-lg leading-none">ICST</span>
+                                <span className="text-slate-400 text-xs font-medium">Chowberia</span>
                             </div>
                         </div>
                         <p className="text-sm text-slate-400 leading-relaxed">
                             Empowering students with cutting-edge computer science education and technical skills for a brighter future.
                         </p>
-                        <div className="flex gap-4 pt-2">
-                            <a href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all hover:scale-110 hover:rotate-6 active:scale-95" aria-label="Facebook">
-                                <Facebook size={18} />
+                        <div className="flex gap-3 pt-2">
+                            <a href="https://www.facebook.com/icstconnect" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/8 flex items-center justify-center hover:bg-[#2572AB] hover:text-white transition-colors duration-150" aria-label="Facebook">
+                                <Facebook size={17} />
                             </a>
-                            <a href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/20 hover:text-white transition-all hover:scale-110 hover:-rotate-6 active:scale-95" aria-label="Instagram">
-                                <Instagram size={18} />
+                            <a href="https://www.instagram.com/icstconnect/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/8 flex items-center justify-center hover:bg-[#2572AB] hover:text-white transition-colors duration-150" aria-label="Instagram">
+                                <Instagram size={17} />
                             </a>
                         </div>
                     </div>
@@ -85,7 +79,7 @@ const Footer: React.FC = () => {
                                 </li>
                                 <li className="flex items-center gap-3">
                                     <MapPin size={18} className="text-slate-400 shrink-0" />
-                                    <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 transition-colors no-underline font-medium">Find us on Google Maps!</a>
+                                    <a href="https://maps.app.goo.gl/5AE3yZ6ry1mntPsM7" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 transition-colors no-underline font-medium">View on Google Maps</a>
                                 </li>
                             </ul>
                         </div>

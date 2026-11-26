@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { IconSparkles as Sparkles, IconArrowRight as ArrowRight } from '@tabler/icons-react'
+import { IconArrowRight as ArrowRight } from '@tabler/icons-react'
 import { animate } from 'animejs'
 import { courseService } from '../../../services/courseService'
 import AnimatedCourseIcon from '../../common/AnimatedCourseIcon'
 import GeometricBackdrop from './GeometricBackdrop'
 import CourseZoomPopup, { type CourseCardAccent, type HoveredCourseState } from './CourseZoomPopup'
 import type { Course } from '../../../types/course'
-import { HomeShimmerBlock, HomeShimmerStyles } from '../../ui/HomePageSkeleton'
+import { OrbSectionLoader } from '../../ui/HomePageSkeleton'
 import { prefersReducedMotion, revealOnScroll } from '../../../lib/motion'
 
 type TrackFilter = 'all' | 'diploma' | 'certificate' | 'programming'
@@ -235,17 +235,13 @@ const CoursesSection = () => {
         return 'general'
     }
 
-    const getCardAccent = (index: number) => {
-        const styles = [
-            { iconColor: 'blue', bgClass: 'bg-blue-50', pillClass: 'bg-blue-50 text-[#2572AB]', glowColor: 'rgba(37, 114, 171, 0.14)', hoverBorder: 'hover:border-[#2572AB]/45' },
-            { iconColor: 'indigo', bgClass: 'bg-indigo-50', pillClass: 'bg-indigo-50 text-[#4F46E5]', glowColor: 'rgba(79, 70, 229, 0.14)', hoverBorder: 'hover:border-[#4F46E5]/45' },
-            { iconColor: 'emerald', bgClass: 'bg-emerald-50', pillClass: 'bg-emerald-50 text-[#059669]', glowColor: 'rgba(5, 150, 105, 0.14)', hoverBorder: 'hover:border-[#059669]/45' },
-            { iconColor: 'cyan', bgClass: 'bg-sky-50', pillClass: 'bg-sky-50 text-[#0284C7]', glowColor: 'rgba(2, 132, 199, 0.14)', hoverBorder: 'hover:border-[#0284C7]/45' },
-            { iconColor: 'orange', bgClass: 'bg-amber-50', pillClass: 'bg-amber-50 text-[#B45309]', glowColor: 'rgba(217, 119, 6, 0.14)', hoverBorder: 'hover:border-[#D97706]/45' },
-            { iconColor: 'purple', bgClass: 'bg-violet-50', pillClass: 'bg-violet-50 text-[#6D28D9]', glowColor: 'rgba(109, 40, 217, 0.14)', hoverBorder: 'hover:border-[#6D28D9]/45' }
-        ]
-        return styles[index % styles.length]
-    }
+    const getCardAccent = (_index: number): CourseCardAccent => ({
+        iconColor: 'blue',
+        bgClass: 'bg-[#2572AB]/8 border-[#2572AB]/15',
+        pillClass: 'bg-[#2572AB]/8 text-[#2572AB]',
+        glowColor: 'transparent',
+        hoverBorder: 'hover:border-[#2572AB]/45'
+    })
 
     const marqueeCourses = useMemo(
         () => (courses.length >= 8 ? [...courses, ...courses] : [...courses, ...courses, ...courses, ...courses]),
@@ -263,21 +259,11 @@ const CoursesSection = () => {
                 to={`/courses/${course.id}`}
                 onPointerEnter={(e) => handleCardPointerEnter(e, key, course, style, iconType)}
                 onPointerMove={(e) => handleCardPointerEnter(e, key, course, style, iconType)}
-                className={`w-[255px] md:w-[290px] flex-shrink-0 h-[244px] group relative bg-[#FFFFFF]/72 hover:bg-[#FFFFFF]/88 backdrop-blur-md rounded-2xl p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.12)] border border-white/90 ring-1 ring-slate-200/70 ${style.hoverBorder} transition-all duration-300 ${isCurrentlyZoomed ? 'scale-[0.98] opacity-55' : 'hover:scale-[1.03]'} flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
+                className={`w-[255px] md:w-[290px] flex-shrink-0 h-[244px] group relative bg-[#FFFFFF]/88 hover:bg-[#FFFFFF] backdrop-blur-md rounded-2xl p-6 shadow-[0_10px_24px_-14px_rgba(15,23,42,0.12)] border border-slate-200/90 ${style.hoverBorder} transition-[transform,opacity,border-color,background-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] ${isCurrentlyZoomed ? 'scale-[0.98] opacity-55' : 'hover:-translate-y-0.5'} flex flex-col items-start text-left cursor-pointer select-none no-underline text-inherit overflow-hidden`}
             >
-                <div
-                    className="absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"
-                    aria-hidden="true"
-                />
-                <div
-                    className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-35 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none blur-xl"
-                    style={{ backgroundColor: style.glowColor }}
-                    aria-hidden="true"
-                />
-
                 <div className="w-full flex items-center justify-between mb-5 relative z-10">
                     <div className="w-13 h-13 relative flex items-center justify-center">
-                        <div className={`absolute inset-0 ${style.bgClass} rounded-2xl border border-white/80 shadow-xs transition-transform duration-300 group-hover:scale-105`} />
+                        <div className={`absolute inset-0 ${style.bgClass} rounded-2xl border`} />
                         <div className="relative z-10 w-7 h-7">
                             <AnimatedCourseIcon
                                 type={iconType}
@@ -285,12 +271,12 @@ const CoursesSection = () => {
                             />
                         </div>
                     </div>
-                    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full ${style.pillClass} border border-white/70 uppercase tracking-wider tabular-nums`}>
+                    <span className={`text-[11px] font-medium px-2.5 py-1 rounded-full ${style.pillClass} tabular-nums`}>
                         {course.duration || '6 Months'}
                     </span>
                 </div>
 
-                <h3 className="relative z-10 text-base font-bold text-[#0F172A] mb-2 group-hover:text-[#2572AB] transition-colors line-clamp-1 break-words w-full">
+                <h3 className="relative z-10 text-base font-semibold text-[#0F172A] mb-2 group-hover:text-[#2572AB] transition-colors duration-150 line-clamp-1 break-words w-full">
                     {course.course_name}
                 </h3>
 
@@ -298,11 +284,11 @@ const CoursesSection = () => {
                     {course.description || 'Master the skills needed for the future.'}
                 </p>
 
-                <div className="relative z-10 mt-auto w-full pt-3.5 border-t border-slate-200/65 flex items-center justify-between">
+                <div className="relative z-10 mt-auto w-full pt-3.5 border-t border-slate-200/75 flex items-center justify-between">
                     <span className="text-[11px] font-medium text-slate-500">ICST Curriculum</span>
-                    <span className="text-xs font-semibold text-[#0F172A] group-hover:text-[#2572AB] flex items-center gap-1 transition-colors">
+                    <span className="text-xs font-semibold text-[#0F172A] group-hover:text-[#2572AB] flex items-center gap-1 transition-colors duration-150">
                         <span>View Details</span>
-                        <ArrowRight size={13} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform" />
+                        <ArrowRight size={13} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform duration-150" />
                     </span>
                 </div>
             </Link>
@@ -320,16 +306,13 @@ const CoursesSection = () => {
                 <div ref={headerRef} className="container mx-auto px-4 mb-10">
                     <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
                         <div className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
-                            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#FFFFFF] border border-slate-200/90 text-[#0F172A] rounded-full text-[11px] font-semibold uppercase tracking-[0.14em] mb-4 shadow-xs">
-                                <Sparkles size={13} className="text-[#2572AB]" aria-hidden="true" />
+                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFFFFF] border border-slate-200/90 text-[#2572AB] rounded-full text-xs font-medium mb-4">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#2572AB]" aria-hidden="true" />
                                 <span>Career Oriented Training</span>
                             </div>
 
-                            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0F172A] mb-3 tracking-[-0.025em]">
-                                Explore Popular{' '}
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#2572AB] via-[#4F46E5] to-[#0EA5E9]">
-                                    Courses
-                                </span>
+                            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-[#0F172A] mb-3 tracking-[-0.025em]">
+                                Explore Popular <span className="text-[#2572AB]">Courses</span>
                             </h2>
 
                             <p className="text-[#475569] text-base sm:text-lg leading-relaxed mb-0">
@@ -340,7 +323,7 @@ const CoursesSection = () => {
                         {/* Interactive Track Tabs */}
                         {!loading && courses.length > 0 && (
                             <div className="flex flex-wrap items-center justify-center lg:justify-end">
-                                <div className="inline-flex p-1 rounded-xl bg-[#FFFFFF]/70 backdrop-blur-md border border-white/85 ring-1 ring-slate-200/70 shadow-xs" role="tablist" aria-label="Filter courses by track">
+                                <div className="inline-flex p-1 rounded-xl bg-[#FFFFFF]/90 backdrop-blur-md border border-slate-200/90" role="tablist" aria-label="Filter courses by track">
                                     {([
                                         { id: 'all', label: 'All Tracks' },
                                         { id: 'diploma', label: 'Diplomas' },
@@ -360,8 +343,8 @@ const CoursesSection = () => {
                                                     setHoveredPopup(null)
                                                     setActiveFilter(tab.id)
                                                 }}
-                                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${active
-                                                    ? 'bg-[#0F172A] text-white shadow-xs'
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors duration-150 cursor-pointer ${active
+                                                    ? 'bg-[#0F172A] text-white'
                                                     : 'text-slate-600 hover:text-[#0F172A]'
                                                     }`}
                                             >
@@ -378,30 +361,13 @@ const CoursesSection = () => {
                 {/* Uniform Fixed-Height Showcase Slot (Zero Vertical Jump Across All Categories) */}
                 <div className="h-[292px] flex items-center w-full">
                     {loading ? (
-                        <div className="w-full overflow-hidden py-6 px-4">
-                            <HomeShimmerStyles />
-                            <div className="mx-auto w-max flex gap-5 md:gap-6">
-                                {[1, 2, 3, 4].map((i) => (
-                                    <div
-                                        key={i}
-                                        className="w-[255px] md:w-[290px] flex-shrink-0 h-[244px] bg-[#FFFFFF]/70 backdrop-blur-md rounded-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.95),0_12px_30px_-12px_rgba(15,23,42,0.10)] border border-white/90 ring-1 ring-slate-200/70 p-6 flex flex-col justify-between"
-                                    >
-                                        <div>
-                                            <div className="flex items-center justify-between mb-5">
-                                                <HomeShimmerBlock variant="brand" className="w-13 h-13 rounded-2xl" />
-                                                <HomeShimmerBlock className="w-20 h-5 rounded-full" />
-                                            </div>
-                                            <HomeShimmerBlock className="h-5 w-4/5 rounded-lg mb-2.5" />
-                                            <HomeShimmerBlock className="h-3.5 w-full rounded-md mb-1.5" />
-                                            <HomeShimmerBlock className="h-3.5 w-2/3 rounded-md" />
-                                        </div>
-                                        <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between">
-                                            <HomeShimmerBlock className="h-3 w-20 rounded-md" />
-                                            <HomeShimmerBlock variant="brand" className="h-3.5 w-20 rounded-md" />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="w-full h-full flex items-center justify-center px-4">
+                            <OrbSectionLoader
+                                state="searching"
+                                size={64}
+                                label="Loading featured ICST courses"
+                                sublabel="Syncing diplomas, coding & career tracks"
+                            />
                         </div>
                     ) : activeFilter === 'all' ? (
                         <div
@@ -434,10 +400,10 @@ const CoursesSection = () => {
                 <div className="text-center mt-10 relative z-20">
                     <Link
                         to="/courses"
-                        className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#0F172A] hover:bg-[#2572AB] text-white rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-[0_14px_28px_-8px_rgba(15,23,42,0.32)] group no-underline"
+                        className="inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#0F172A] hover:bg-[#2572AB] text-white rounded-xl font-semibold transition-[background-color,transform,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 shadow-[0_12px_24px_-10px_rgba(15,23,42,0.28)] group no-underline"
                     >
                         <span>View All Courses</span>
-                        <ArrowRight size={18} aria-hidden="true" className="group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight size={18} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform duration-150" />
                     </Link>
                 </div>
             </div>

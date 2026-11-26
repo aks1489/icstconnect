@@ -13,37 +13,25 @@ const FeaturesSection = () => {
             num: '01',
             title: 'Expert Faculty',
             description: 'Learn from industry experts with years of real-world experience.',
-            icon: UserCheck,
-            iconStyle: 'bg-[#2572AB]/10 text-[#2572AB]',
-            spotlight: 'rgba(37, 114, 171, 0.10)',
-            hoverRing: 'hover:border-[#2572AB]/45'
+            icon: UserCheck
         },
         {
             num: '02',
             title: 'Hands-on Training',
             description: 'Practical learning with live projects and assignments.',
-            icon: Laptop,
-            iconStyle: 'bg-[#4F46E5]/10 text-[#4F46E5]',
-            spotlight: 'rgba(79, 70, 229, 0.10)',
-            hoverRing: 'hover:border-[#4F46E5]/45'
+            icon: Laptop
         },
         {
             num: '03',
             title: 'Placement Assistance',
             description: 'Dedicated support to help you land your dream job.',
-            icon: Briefcase,
-            iconStyle: 'bg-[#059669]/10 text-[#059669]',
-            spotlight: 'rgba(5, 150, 105, 0.10)',
-            hoverRing: 'hover:border-[#059669]/45'
+            icon: Briefcase
         },
         {
             num: '04',
             title: 'Flexible Learning',
             description: 'Online and offline classes to suit your schedule.',
-            icon: Clock,
-            iconStyle: 'bg-[#D97706]/10 text-[#D97706]',
-            spotlight: 'rgba(217, 119, 6, 0.10)',
-            hoverRing: 'hover:border-[#D97706]/45'
+            icon: Clock
         }
     ]
 
@@ -84,13 +72,13 @@ const FeaturesSection = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
                     {/* Left Sticky Editorial Narrative (4 Cols) */}
                     <div ref={headerRef} className="lg:col-span-4 lg:sticky lg:top-28 text-center lg:text-left">
-                        <div className="inline-flex items-center gap-2.5 mb-4">
+                        <div className="inline-flex items-center gap-2 mb-4">
                             <span className="h-px w-6 bg-[#2572AB] hidden lg:inline-block" aria-hidden="true" />
-                            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#2572AB]">
+                            <span className="text-xs font-medium text-[#2572AB]">
                                 ICST Advantage
                             </span>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold mb-4 text-[#0F172A] tracking-[-0.025em] leading-[1.1]">
+                        <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-semibold mb-4 text-[#0F172A] tracking-[-0.025em] leading-[1.1]">
                             Why Choose Us?
                         </h2>
                         <p className="text-base sm:text-lg text-[#475569] leading-relaxed mb-0">
@@ -105,29 +93,29 @@ const FeaturesSection = () => {
                                 <div
                                     onMouseMove={(e) => handleCardMouseMove(e, index)}
                                     onMouseLeave={() => setHoveredIndex(null)}
-                                    className={`relative bg-[#F8FAFC] hover:bg-[#FFFFFF] rounded-2xl p-7 h-full border border-slate-200/85 ${feature.hoverRing} shadow-[0_2px_8px_rgba(15,23,42,0.03)] hover:shadow-[0_22px_44px_-16px_rgba(15,23,42,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden`}
+                                    className="relative bg-[#F8FAFC] hover:bg-[#FFFFFF] rounded-2xl p-7 h-full border border-slate-200/85 hover:border-[#2572AB]/45 shadow-[0_2px_8px_rgba(15,23,42,0.03)] hover:shadow-[0_18px_36px_-16px_rgba(15,23,42,0.12)] hover:-translate-y-0.5 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col justify-between overflow-hidden"
                                 >
-                                    {/* Interactive Cursor-Tracking Radial Spotlight */}
+                                    {/* Interactive Cursor-Tracking Hairline Wash */}
                                     <div
                                         aria-hidden="true"
-                                        className="pointer-events-none absolute -inset-px rounded-2xl transition-opacity duration-300"
+                                        className="pointer-events-none absolute -inset-px rounded-2xl transition-opacity duration-200"
                                         style={{
                                             opacity: hoveredIndex === index ? 1 : 0,
-                                            background: `radial-gradient(320px circle at ${spotlightPos.x}px ${spotlightPos.y}px, ${feature.spotlight}, transparent 65%)`
+                                            background: `radial-gradient(320px circle at ${spotlightPos.x}px ${spotlightPos.y}px, rgba(37, 114, 171, 0.07), transparent 65%)`
                                         }}
                                     />
 
                                     <div className="relative z-10 flex items-start justify-between mb-8">
-                                        <div className={`w-13 h-13 flex items-center justify-center rounded-2xl ${feature.iconStyle} transition-transform duration-300 group-hover:scale-105`}>
-                                            <feature.icon size={26} aria-hidden="true" />
+                                        <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2572AB]/10 text-[#2572AB]">
+                                            <feature.icon size={24} aria-hidden="true" />
                                         </div>
-                                        <span className="text-xs font-bold text-slate-300 group-hover:text-slate-400 tabular-nums transition-colors">
+                                        <span className="text-xs font-medium text-slate-400 group-hover:text-slate-600 tabular-nums transition-colors duration-150">
                                             {feature.num}
                                         </span>
                                     </div>
 
                                     <div className="relative z-10">
-                                        <h3 className="text-lg font-bold mb-2 text-[#0F172A] tracking-tight">
+                                        <h3 className="text-lg font-semibold mb-2 text-[#0F172A] tracking-tight">
                                             {feature.title}
                                         </h3>
                                         <p className="text-[#64748B] text-sm leading-relaxed mb-0">

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { IconChevronLeft, IconChevronRight, IconExternalLink } from '@tabler/icons-react'
+import { ThinkingOrb } from 'thinking-orbs'
 import labPortalImg from '../../assets/labs/lab-portal.webp'
 import labFormEntryImg from '../../assets/labs/lab-form-entry.webp'
 import labExcelLedgerImg from '../../assets/labs/lab-excel-ledger.webp'
@@ -369,6 +370,20 @@ const OrbitalLabCarousel = () => {
     }
 
     const activeSlide = LAB_SLIDES[activeIndex]
+    const [loadedSlides, setLoadedSlides] = useState<Record<string, boolean>>({})
+    const slideImgRefs = useRef<Record<string, HTMLImageElement | null>>({})
+
+    const markSlideLoaded = (id: string) => {
+        setLoadedSlides((prev) => (prev[id] ? prev : { ...prev, [id]: true }))
+    }
+
+    useEffect(() => {
+        Object.entries(slideImgRefs.current).forEach(([id, el]) => {
+            if (el?.complete && el.naturalWidth > 0) {
+                markSlideLoaded(id)
+            }
+        })
+    }, [])
 
     return (
         <div
@@ -411,6 +426,7 @@ const OrbitalLabCarousel = () => {
 
                 {LAB_SLIDES.map((slide, idx) => {
                     const isActive = idx === activeIndex
+                    const slideLoaded = Boolean(loadedSlides[slide.id])
                     return (
                         <button
                             key={slide.id}
@@ -424,14 +440,31 @@ const OrbitalLabCarousel = () => {
                                 : 'border border-slate-200/90 shadow-[0_14px_30px_-14px_rgba(15,23,42,0.18)]'
                                 }`}
                         >
+                            {!slideLoaded && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-[#F8FAFC] pointer-events-none">
+                                    <ThinkingOrb
+                                        state="composing"
+                                        size={32}
+                                        theme="light"
+                                        color="#2572AB"
+                                        aria-label={`Loading ${slide.title}`}
+                                    />
+                                </div>
+                            )}
                             <img
+                                ref={(el) => {
+                                    slideImgRefs.current[slide.id] = el
+                                }}
                                 src={slide.image}
                                 alt={slide.alt}
                                 width={slide.width}
                                 height={slide.height}
                                 loading="lazy"
                                 draggable={false}
-                                className={`w-full h-full object-cover ${slide.id === 'finger-guide' ? 'object-center' : 'object-top'} block pointer-events-none`}
+                                onLoad={() => markSlideLoaded(slide.id)}
+                                onError={() => markSlideLoaded(slide.id)}
+                                className={`w-full h-full object-cover ${slide.id === 'finger-guide' ? 'object-center' : 'object-top'} block pointer-events-none transition-opacity duration-300 ${slideLoaded ? 'opacity-100' : 'opacity-0'
+                                    }`}
                             />
                             {/* Atmospheric depth haze for background cards on light background */}
                             <div
@@ -445,25 +478,25 @@ const OrbitalLabCarousel = () => {
                 })}
             </div>
 
-            {/* Active Caption & Smooth Controls (matches orbital video hierarchy in light theme) */}
+            {/* Active Caption & Smooth Controls */}
             <div className="mt-2 sm:mt-3 flex flex-col items-center text-center px-2">
-                <div key={activeSlide.id} className="animate-in fade-in slide-in-from-bottom-1 duration-300">
-                    <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.18em] text-[#2572AB] mb-1">
+                <div key={activeSlide.id} className="animate-in fade-in duration-200">
+                    <div className="text-xs font-medium text-[#2572AB] mb-1">
                         {activeSlide.category}
                     </div>
-                    <h3 className="text-lg sm:text-xl font-bold text-[#0F172A] tracking-tight mb-3">
+                    <h3 className="text-lg sm:text-xl font-semibold text-[#0F172A] tracking-tight mb-3">
                         {activeSlide.title}
                     </h3>
                 </div>
 
-                {/* Minimal Light Glass Controls + Direct Lab Link */}
-                <div className="inline-flex items-center gap-2.5 p-1.5 rounded-full bg-[#FFFFFF]/90 border border-slate-200/85 shadow-sm backdrop-blur-md">
+                {/* Controls + Direct Lab Link */}
+                <div className="inline-flex items-center gap-2.5 p-1.5 rounded-full bg-[#FFFFFF] border border-slate-200/90 shadow-xs">
                     <button
                         type="button"
                         {...getControlButtonProps(-1)}
                         aria-label="Previous lab preview (hold to spin)"
-                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer touch-none ${holdingDirection === -1
-                            ? 'bg-[#2572AB] text-white border-[#2572AB] ring-4 ring-[#2572AB]/20 scale-95'
+                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors duration-150 cursor-pointer touch-none ${holdingDirection === -1
+                            ? 'bg-[#2572AB] text-white border-[#2572AB] ring-2 ring-[#2572AB]/25'
                             : 'bg-slate-50 hover:bg-[#EFF6FF] text-[#0F172A] hover:text-[#2572AB] border-slate-200/80'
                             }`}
                     >
@@ -481,7 +514,7 @@ const OrbitalLabCarousel = () => {
                                     aria-selected={selected}
                                     aria-label={`View ${slide.title}`}
                                     onClick={() => orbitToIndex(idx)}
-                                    className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${selected
+                                    className={`h-2 rounded-full transition-[width,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${selected
                                         ? 'w-6 bg-[#2572AB]'
                                         : 'w-2 bg-slate-300 hover:bg-slate-400'
                                         }`}
@@ -494,8 +527,8 @@ const OrbitalLabCarousel = () => {
                         type="button"
                         {...getControlButtonProps(1)}
                         aria-label="Next lab preview (hold to spin faster)"
-                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer touch-none ${holdingDirection === 1
-                            ? 'bg-[#2572AB] text-white border-[#2572AB] ring-4 ring-[#2572AB]/20 scale-95'
+                        className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors duration-150 cursor-pointer touch-none ${holdingDirection === 1
+                            ? 'bg-[#2572AB] text-white border-[#2572AB] ring-2 ring-[#2572AB]/25'
                             : 'bg-slate-50 hover:bg-[#EFF6FF] text-[#0F172A] hover:text-[#2572AB] border-slate-200/80'
                             }`}
                     >
@@ -506,7 +539,7 @@ const OrbitalLabCarousel = () => {
                         href="https://labs.icstconnect.in"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hidden sm:inline-flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 rounded-full bg-[#EFF6FF] hover:bg-[#2572AB] text-[#2572AB] hover:text-white text-xs font-semibold border border-[#BFDBFE]/80 transition-colors no-underline"
+                        className="hidden sm:inline-flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 rounded-full bg-[#EFF6FF] hover:bg-[#2572AB] text-[#2572AB] hover:text-white text-xs font-medium border border-[#BFDBFE]/80 transition-colors duration-150 no-underline"
                     >
                         <span>Open Lab</span>
                         <IconExternalLink size={12} aria-hidden="true" />

@@ -6,6 +6,12 @@ import { apiDevPlugin } from './vite-api-plugin'
 export default defineConfig({
   plugins: [react(), apiDevPlugin()],
   server: { host: true, port: 5173 },
+  resolve: {
+    dedupe: ['react', 'react-dom']
+  },
+  optimizeDeps: {
+    include: ['thinking-orbs']
+  },
   build: {
     rollupOptions: {
       output: {

@@ -611,7 +611,7 @@ function shuffleTechItems(items: TechItem[]): TechItem[] {
     const arr = [...items]
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
-        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+            ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
     return arr
 }
@@ -677,7 +677,7 @@ const TechTickerSection = () => {
                                 <button
                                     key={key}
                                     type="button"
-                                    className="flex items-center gap-2.5 whitespace-nowrap group cursor-pointer relative px-3.5 py-2 rounded-full bg-[#FFFFFF] hover:shadow-[0_10px_24px_-8px_rgba(15,23,42,0.14)] transition-all duration-200 border border-slate-200/85 hover:border-slate-300"
+                                    className="flex items-center gap-2.5 whitespace-nowrap group cursor-pointer relative px-3.5 py-2 rounded-full bg-[#FFFFFF] hover:shadow-[0_8px_18px_-8px_rgba(15,23,42,0.12)] transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] border border-slate-200/85 hover:border-slate-300"
                                     onMouseEnter={(e) => openPopupForButton(e.currentTarget, key, tech)}
                                     onMouseLeave={closePopup}
                                     onFocus={(e) => openPopupForButton(e.currentTarget, key, tech)}
@@ -685,7 +685,7 @@ const TechTickerSection = () => {
                                     onClick={(e) => handleClick(e.currentTarget, key, tech)}
                                 >
                                     <span
-                                        className="w-7 h-7 rounded-full flex items-center justify-center transition-transform duration-200 group-hover:scale-110 shrink-0"
+                                        className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
                                         style={{ backgroundColor: tech.chipBg }}
                                     >
                                         <img
@@ -698,7 +698,7 @@ const TechTickerSection = () => {
                                             className="w-4.5 h-4.5 object-contain"
                                         />
                                     </span>
-                                    <span className="font-semibold text-sm text-[#0F172A] transition-colors duration-200">
+                                    <span className="font-medium text-sm text-[#0F172A]">
                                         {tech.name}
                                     </span>
                                 </button>

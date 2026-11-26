@@ -83,32 +83,27 @@ const CourseZoomPopup = forwardRef<HTMLDivElement, CourseZoomPopupProps>(
                 <Link
                     to={`/courses/${course.id}`}
                     onClick={() => onRequestClose(cardKey)}
-                    className="group relative block w-full rounded-3xl bg-[#FFFFFF]/95 backdrop-blur-2xl p-6 border border-white ring-1 ring-[#2572AB]/25 shadow-[inset_0_1.5px_1.5px_rgba(255,255,255,1),0_34px_76px_-16px_rgba(15,23,42,0.34)] no-underline text-inherit overflow-hidden"
+                    className="group relative block w-full rounded-3xl bg-[#FFFFFF]/96 backdrop-blur-xl p-6 border border-slate-200/90 shadow-[0_28px_64px_-16px_rgba(15,23,42,0.28)] no-underline text-inherit overflow-hidden"
                 >
-                    <div
-                        className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none"
-                        aria-hidden="true"
-                    />
-
                     {/* Top Header */}
                     <div className="flex items-start justify-between gap-3 mb-4">
                         <div className="flex items-center gap-3.5 min-w-0">
                             <div className="w-13 h-13 relative flex items-center justify-center shrink-0">
-                                <div className={`absolute inset-0 ${style.bgClass} rounded-2xl border border-white shadow-xs`} />
+                                <div className={`absolute inset-0 ${style.bgClass} rounded-2xl border`} />
                                 <div className="relative z-10 w-7 h-7">
                                     <AnimatedCourseIcon type={iconType} color={style.iconColor} />
                                 </div>
                             </div>
                             <div className="min-w-0">
-                                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400 block mb-0.5 truncate">
+                                <span className="text-[11px] font-medium text-slate-500 block mb-0.5 truncate">
                                     {course.category || 'ICST Program'}
                                 </span>
-                                <h3 className="text-lg font-extrabold text-[#0F172A] leading-snug tracking-tight">
+                                <h3 className="text-lg font-semibold text-[#0F172A] leading-snug tracking-tight">
                                     {course.course_name}
                                 </h3>
                             </div>
                         </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0 ${style.pillClass} uppercase tracking-wider tabular-nums`}>
+                        <span className={`text-[11px] font-medium px-2.5 py-1 rounded-full shrink-0 ${style.pillClass} tabular-nums`}>
                             {course.duration || '6 Months'}
                         </span>
                     </div>
@@ -121,8 +116,8 @@ const CourseZoomPopup = forwardRef<HTMLDivElement, CourseZoomPopupProps>(
                     {/* Key Topics */}
                     {topics.length > 0 && (
                         <div className="mb-4">
-                            <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
-                                What You Will Learn
+                            <div className="text-[11px] font-medium text-slate-500 mb-2">
+                                What you will learn
                             </div>
                             <div className="grid grid-cols-2 gap-1.5">
                                 {topics.map((topic) => (
@@ -130,7 +125,7 @@ const CourseZoomPopup = forwardRef<HTMLDivElement, CourseZoomPopupProps>(
                                         key={topic}
                                         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50/95 border border-slate-200/75 text-[11px] font-medium text-[#0F172A] min-w-0"
                                     >
-                                        <Check size={12} className="text-[#059669] shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                                        <Check size={12} className="text-[#2572AB] shrink-0" strokeWidth={2.25} aria-hidden="true" />
                                         <span className="truncate">{topic}</span>
                                     </div>
                                 ))}
@@ -146,14 +141,14 @@ const CourseZoomPopup = forwardRef<HTMLDivElement, CourseZoomPopupProps>(
                                 {course.careerPathways?.[0] || course.credential || 'Verified Certification'}
                             </span>
                             {feeLabel && (
-                                <span className={`ml-1 font-bold shrink-0 px-2 py-0.5 rounded-md ${style.pillClass} tabular-nums`}>
+                                <span className={`ml-1 font-semibold shrink-0 px-2 py-0.5 rounded-md ${style.pillClass} tabular-nums`}>
                                     {feeLabel}
                                 </span>
                             )}
                         </div>
-                        <span className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0F172A] group-hover:bg-[#2572AB] text-white text-xs font-semibold transition-colors shadow-xs">
+                        <span className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0F172A] group-hover:bg-[#2572AB] text-white text-xs font-semibold transition-colors duration-150">
                             <span>View Details</span>
-                            <ArrowRight size={13} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform" />
+                            <ArrowRight size={13} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform duration-150" />
                         </span>
                     </div>
                 </Link>

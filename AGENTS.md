@@ -4,6 +4,8 @@ This workspace enforces strict architecture, performance, and SEO quality rules:
 
 - [.agent/rules/seo-quality.md](file:///.agent/rules/seo-quality.md): Mandatory SEO & Site Architecture Quality Mandate.
 - [.agent/rules/seo-performance.md](file:///.agent/rules/seo-performance.md): Mandatory Quality & Performance Invariants.
+- [.agent/rules/home-architecture.md](file:///.agent/rules/home-architecture.md): Approved Home Page (`/`) Layout, Interactive Patterns & Theme Invariants.
+- [.agent/rules/unslop-quality-gate.md](file:///.agent/rules/unslop-quality-gate.md): Mandatory Pre-Creation & Post-Creation Unslop Verification Gate.
 
 ## Core Mandates
 1. **Single H1 Rule:** Exactly one semantic `<h1>` on every public view.
@@ -12,3 +14,4 @@ This workspace enforces strict architecture, performance, and SEO quality rules:
 4. **Zero CLS & Optimized Assets:** Explicit dimensions/aspect ratios, descriptive alt text, lazy loading on imagery.
 5. **Portals Index Protection:** All `/admin/*`, `/teacher/*`, `/student/*`, auth gateways, and assessment sessions strictly marked `noindex, nofollow` and blocked in `robots.txt`.
 6. **Code Splitting:** Dynamic imports via `React.lazy()` for internal portals and heavy views to preserve fast initial page loads.
+7. **Unslop Pre-Creation Gate:** Verify every new UI page, component, or section against `.agent/rules/unslop-quality-gate.md` and `.agents/skills/unslop/SKILL.md` before writing code and before completion.

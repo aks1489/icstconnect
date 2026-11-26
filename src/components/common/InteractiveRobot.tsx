@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ComponentType } from 'react';
+import { Link } from 'react-router-dom';
+import { IconArrowRight as ArrowRight, IconBriefcase as Briefcase } from '@tabler/icons-react';
 import { prefersReducedMotion } from '../../lib/motion';
 
 const APPS = [
@@ -28,10 +30,7 @@ const APPS = [
 ];
 
 const SPAWN_ACCENTS = [
-    'border-sky-200 hover:border-[#0284C7] hover:shadow-[0_14px_28px_-6px_rgba(2,132,199,0.28)]',
-    'border-indigo-200 hover:border-[#4F46E5] hover:shadow-[0_14px_28px_-6px_rgba(79,70,229,0.28)]',
-    'border-emerald-200 hover:border-[#059669] hover:shadow-[0_14px_28px_-6px_rgba(5,150,105,0.28)]',
-    'border-amber-200 hover:border-[#D97706] hover:shadow-[0_14px_28px_-6px_rgba(217,119,6,0.26)]'
+    'border-slate-200 hover:border-[#2572AB]/50 hover:shadow-[0_12px_24px_-8px_rgba(15,23,42,0.16)]'
 ];
 
 const SPAWN_SLOTS = [
@@ -51,13 +50,18 @@ interface SpawnedApp {
     yEnd: number;
 }
 
+export interface CareerPathOption {
+    label: string;
+    icon: ComponentType<{ size?: number; stroke?: number; className?: string; 'aria-hidden'?: boolean | 'true' | 'false' }>;
+}
+
 export interface HeroTechItem {
     name: string;
     tag: string;
-    color: string;
-    bgTint: string;
-    borderTint: string;
-    icon: ComponentType<{ size?: number; style?: React.CSSProperties }>;
+    iconUrl: string;
+    careerPaths: CareerPathOption[];
+    courseTrack: string;
+    outcomeSummary: string;
 }
 
 interface InteractiveRobotProps {
@@ -65,19 +69,35 @@ interface InteractiveRobotProps {
     technologies?: HeroTechItem[];
     activeIndex?: number;
     onSelectTech?: (idx: number) => void;
+    groupIndex?: number;
+    groupCount?: number;
+    onSelectGroup?: (groupIdx: number) => void;
+    isAutoRotatePaused?: boolean;
 }
 
 const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
     activeTech,
     technologies,
     activeIndex = 0,
-    onSelectTech
+    onSelectTech,
+    groupIndex = 0,
+    groupCount = 1,
+    onSelectGroup,
+    isAutoRotatePaused = false
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isInView, setIsInView] = useState(true);
+    const [selectedRoleIdx, setSelectedRoleIdx] = useState(0);
+
+    useEffect(() => {
+        setSelectedRoleIdx(0);
+    }, [activeIndex]);
 
     const [pupilPos, setPupilPos] = useState({ x: 0, y: 0 });
     const [headRotation, setHeadRotation] = useState(0);
+    const [headOffset, setHeadOffset] = useState({ x: 0, y: 0 });
+    const [isPointerTracking, setIsPointerTracking] = useState(false);
+    const lastPointerAtRef = useRef(0);
 
     const [spawnedIcons, setSpawnedIcons] = useState<SpawnedApp[]>([]);
     const [hoveredIcon, setHoveredIcon] = useState<number | null>(null);
@@ -99,19 +119,22 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
     }, []);
 
     useEffect(() => {
-        if (!isInView) return;
+        if (!isInView || prefersReducedMotion()) return;
 
         let animationFrameId: number;
 
         const handleMouseMove = (e: MouseEvent) => {
+            lastPointerAtRef.current = Date.now();
+            setIsPointerTracking(true);
             cancelAnimationFrame(animationFrameId);
             animationFrameId = requestAnimationFrame(() => {
                 const rawX = (e.clientX / window.innerWidth) * 2 - 1;
                 const rawY = (e.clientY / window.innerHeight) * 2 - 1;
                 const clampedX = Math.max(-1, Math.min(1, rawX));
                 const clampedY = Math.max(-1, Math.min(1, rawY));
-                setPupilPos({ x: clampedX * 8, y: clampedY * 8 });
-                setHeadRotation(clampedX * 5);
+                setPupilPos({ x: clampedX * 8, y: clampedY * 7 });
+                setHeadRotation(clampedX * 6);
+                setHeadOffset({ x: clampedX * 3.5, y: clampedY * 2.5 });
             });
         };
 
@@ -121,6 +144,66 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
             cancelAnimationFrame(animationFrameId);
         };
     }, [isInView]);
+
+    // Organic autonomous head curiosity, eye saccades & posture shifts when cursor is idle
+    useEffect(() => {
+        if (!isInView || prefersReducedMotion()) {
+            setHeadRotation(0);
+            setHeadOffset({ x: 0, y: 0 });
+            setPupilPos({ x: 0, y: 0 });
+            return;
+        }
+
+        const IDLE_POSES = [
+            { tilt: -5.5, dx: -3.5, dy: -1, px: -5.5, py: -1.5 }, // Look left toward Hero headline
+            { tilt: 4.5, dx: 3, dy: -1.5, px: 5, py: -2 },        // Curious right look
+            { tilt: -2.5, dx: -1.5, dy: 2.5, px: -2, py: 4.5 },   // Glance toward Career Paths
+            { tilt: 5.5, dx: 2.5, dy: 1.5, px: 4.5, py: 3 },      // Nod/inspect lower right
+            { tilt: 0, dx: 0, dy: -2, px: 0, py: -1 },            // Perky attentive center
+            { tilt: -4, dx: -2.5, dy: 1, px: -4, py: 2 }          // Soft tilt toward visitor
+        ];
+
+        let poseTimer: ReturnType<typeof setTimeout> | null = null;
+        let cancelled = false;
+        let step = 0;
+
+        const scheduleNextLook = (initialDelay?: number) => {
+            const delay = initialDelay ?? (1500 + Math.random() * 1700);
+            poseTimer = setTimeout(() => {
+                if (cancelled) return;
+                const idleFor = Date.now() - lastPointerAtRef.current;
+                if (lastPointerAtRef.current === 0 || idleFor > 1800) {
+                    setIsPointerTracking(false);
+                    const pose = IDLE_POSES[step % IDLE_POSES.length];
+                    step += 1 + (Math.random() > 0.65 ? 1 : 0);
+                    setHeadRotation(pose.tilt);
+                    setHeadOffset({ x: pose.dx, y: pose.dy });
+                    setPupilPos({ x: pose.px, y: pose.py });
+                }
+                scheduleNextLook();
+            }, delay);
+        };
+
+        scheduleNextLook(450);
+
+        return () => {
+            cancelled = true;
+            if (poseTimer) clearTimeout(poseTimer);
+        };
+    }, [isInView]);
+
+    // Subtle alive reaction when the active skill / career tab switches while cursor is idle
+    useEffect(() => {
+        if (!isInView || prefersReducedMotion()) return;
+        const idleFor = Date.now() - lastPointerAtRef.current;
+        if (lastPointerAtRef.current !== 0 && idleFor <= 1800) return;
+
+        const colOffset = (activeIndex % 4) - 1.5;
+        setIsPointerTracking(false);
+        setHeadRotation(colOffset * 2.4);
+        setHeadOffset({ x: colOffset * 1.8, y: 2.2 });
+        setPupilPos({ x: colOffset * 2.8, y: 4.8 });
+    }, [activeIndex, isInView]);
 
     // Natural human-like spontaneous blinking in randomized 1, 2, or 3-blink bursts
     useEffect(() => {
@@ -237,48 +320,48 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
     const isEvenThrow = interactionCount % 2 === 0;
 
     return (
-        <div className="relative p-[1px] rounded-[2.08rem] bg-gradient-to-br from-slate-200/90 via-[#BAE6FD]/70 to-[#C7D2FE]/80 shadow-[0_32px_70px_-20px_rgba(15,23,42,0.18)]">
+        <div className="relative rounded-[1.75rem] border border-slate-200/90 bg-[#FFFFFF] shadow-[0_22px_48px_-20px_rgba(15,23,42,0.13)]">
             <div
                 ref={containerRef}
-                className="relative w-full mx-auto bg-gradient-to-br from-[#F8FAFC] via-[#FFFFFF] to-[#EFF6FF] rounded-[2rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.95)] flex flex-col items-center justify-between p-5 sm:p-6 overflow-visible"
+                className="relative w-full mx-auto bg-gradient-to-b from-[#FFFFFF] to-[#F8FAFC] rounded-[1.75rem] flex flex-col items-center justify-between p-4 sm:p-5 overflow-visible"
             >
-                {/* Studio Aurora & Rotating Orbital Halo */}
-                <div className="absolute inset-0 rounded-[2rem] overflow-hidden pointer-events-none" aria-hidden="true">
-                    <div
-                        className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-35 blur-2xl motion-safe:animate-[spin_20s_linear_infinite]"
-                        style={{
-                            background: 'conic-gradient(from 0deg, #38BDF8, #4F46E5, #0EA5E9, #34D399, #38BDF8)'
-                        }}
-                    />
-                    <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-68 h-68 rounded-full border border-slate-200/75" />
-                    <div className="absolute top-[38%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-92 h-92 rounded-full border border-dashed border-slate-200/55" />
+                {/* Clean Architectural Orbital Rings */}
+                <div className="absolute inset-0 rounded-[1.75rem] overflow-hidden pointer-events-none" aria-hidden="true">
+                    <div className="absolute top-[33%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-60 h-60 rounded-full border border-slate-200/80" />
+                    <div className="absolute top-[33%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-84 h-84 rounded-full border border-dashed border-slate-200/60" />
                 </div>
 
                 {/* Stage Top Header */}
-                <div className="relative z-10 w-full flex flex-wrap items-center justify-between gap-2 mb-1">
-                    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFFFFF]/90 backdrop-blur-md border border-slate-200/90 text-[11px] font-semibold text-[#0F172A] shadow-xs">
-                        <span className="w-2 h-2 rounded-full bg-[#059669] animate-pulse" aria-hidden="true" />
+                <div className="relative z-10 w-full flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#FFFFFF] border border-slate-200/90 text-[11px] font-medium text-[#0F172A]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#2572AB]" aria-hidden="true" />
                         Tap ICST Bot to launch skills
                     </span>
-                    <div className="hidden sm:inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md border border-slate-200/80 shadow-xs text-[10px] font-semibold text-slate-600">
-                        <span className="inline-flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#2572AB]" aria-hidden="true" />
+                    {activeTech ? (
+                        <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EFF6FF] border border-[#BFDBFE]/80 text-[11px] font-medium text-[#2572AB]">
+                            <img
+                                src={activeTech.iconUrl}
+                                alt=""
+                                aria-hidden="true"
+                                width={14}
+                                height={14}
+                                className="w-3.5 h-3.5 object-contain shrink-0"
+                            />
+                            <span>{activeTech.name} · {activeTech.tag}</span>
+                        </span>
+                    ) : (
+                        <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-full bg-[#FFFFFF] border border-slate-200/80 text-[11px] font-medium text-slate-600">
                             100% Practical
                         </span>
-                        <span className="w-px h-3 bg-slate-200" aria-hidden="true" />
-                        <span className="inline-flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#4F46E5]" aria-hidden="true" />
-                            AI &amp; Web Ready
-                        </span>
-                    </div>
+                    )}
                 </div>
 
-                {/* Robot Pedestal */}
+                {/* Compact Robot Pedestal */}
                 <div
-                    className="flex items-center justify-center w-full py-3 relative"
+                    className="flex items-center justify-center w-full py-1 relative"
                     style={{ containerType: 'inline-size' }}
                 >
-                    <div className="relative w-64 h-76 flex justify-center items-end pb-5">
+                    <div className="relative w-64 h-68 flex justify-center items-end pb-2">
                         {/* Floating Icons Container (Positioned strictly along upper/mid flanks — never overlaps bottom dock) */}
                         <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40 w-0 h-0 overflow-visible">
                             {spawnedIcons.map((item, index) => (
@@ -299,7 +382,7 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                                     }}
                                     onMouseLeave={() => setHoveredIcon(null)}
                                 >
-                                    <div className={`w-13 h-13 sm:w-15 sm:h-15 bg-[#FFFFFF]/95 backdrop-blur-md rounded-2xl flex items-center justify-center p-2.5 sm:p-3 relative shadow-lg border ${SPAWN_ACCENTS[index % SPAWN_ACCENTS.length]} transition-all duration-200 hover:scale-115 hover:z-50 cursor-pointer`}>
+                                    <div className={`w-13 h-13 sm:w-15 sm:h-15 bg-[#FFFFFF] rounded-2xl flex items-center justify-center p-2.5 sm:p-3 relative shadow-md border ${SPAWN_ACCENTS[index % SPAWN_ACCENTS.length]} transition-[transform,border-color,box-shadow] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:z-50 cursor-pointer`}>
                                         <img
                                             src={item.url}
                                             alt={item.name}
@@ -344,68 +427,77 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                             }}
                             className="relative z-10 flex flex-col items-center cursor-pointer select-none active:scale-95 transition-transform bg-transparent border-0 p-0 focus-visible:outline-2 focus-visible:outline-[#2572AB] focus-visible:outline-offset-4 rounded-3xl"
                         >
-                            {/* Head */}
+                            {/* Head & Attached Antenna Pivot */}
                             <div
                                 style={{
-                                    transform: `rotate(${headRotation}deg)`
+                                    transform: `translate3d(${headOffset.x}px, ${headOffset.y}px, 0) rotate(${headRotation}deg)`,
+                                    transition: isPointerTracking
+                                        ? 'transform 160ms cubic-bezier(0.22, 1, 0.36, 1)'
+                                        : 'transform 620ms cubic-bezier(0.22, 1, 0.36, 1)'
                                 }}
-                                className="w-38 h-30 bg-gradient-to-tr from-[#0F2D4A] via-[#2572AB] to-[#0EA5E9] rounded-3xl relative p-4 shadow-[0_20px_35px_-10px_rgba(37,114,171,0.45)] border-4 border-white z-20 transition-transform duration-150 ease-out overflow-hidden"
+                                className="relative z-20 will-change-transform"
                             >
-                                {/* Specular Visor Glare */}
-                                <div className="absolute -top-6 -left-6 w-28 h-24 bg-white/15 rounded-full rotate-12 pointer-events-none" aria-hidden="true" />
-
-                                {/* Eyes with Human-like Upper & Lower Eyelid Blink */}
-                                <div className="flex justify-between items-center h-full px-3.5 pt-1.5 relative z-10">
-                                    {(['left', 'right'] as const).map((eye) => {
-                                        const lidTransition = isBlinking
-                                            ? 'transform 75ms cubic-bezier(0.55, 0.05, 0.9, 0.35)'
-                                            : 'transform 125ms cubic-bezier(0.16, 1, 0.3, 1)';
-                                        return (
-                                            <div
-                                                key={eye}
-                                                className="w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-inner relative overflow-hidden ring-4 ring-[#0F172A]/10"
-                                            >
-                                                <div
-                                                    style={{
-                                                        transform: `translate3d(${pupilPos.x}px, ${pupilPos.y}px, 0) scaleY(${isBlinking ? 0.85 : 1})`
-                                                    }}
-                                                    className="w-4.5 h-4.5 bg-[#0F172A] rounded-full transition-transform duration-75 ease-out"
-                                                />
-                                                <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-80" />
-
-                                                {/* Upper Eyelid */}
-                                                <div
-                                                    aria-hidden="true"
-                                                    style={{
-                                                        transform: isBlinking ? 'translateY(0%)' : 'translateY(-106%)',
-                                                        transition: lidTransition
-                                                    }}
-                                                    className="absolute inset-x-0 top-0 h-[82%] bg-gradient-to-b from-[#0F2D4A] via-[#1B4D7A] to-[#2572AB] border-b-2 border-[#0F172A]/45 rounded-b-lg z-20 pointer-events-none will-change-transform"
-                                                />
-                                                {/* Lower Eyelid */}
-                                                <div
-                                                    aria-hidden="true"
-                                                    style={{
-                                                        transform: isBlinking ? 'translateY(0%)' : 'translateY(106%)',
-                                                        transition: lidTransition
-                                                    }}
-                                                    className="absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-t from-[#0F2D4A] to-[#1B4D7A] border-t border-[#38BDF8]/30 rounded-t-lg z-20 pointer-events-none will-change-transform"
-                                                />
-                                            </div>
-                                        );
-                                    })}
+                                {/* Antenna (attached to head pivot) */}
+                                <div
+                                    style={{
+                                        animation: isInView ? 'robotAntenna 4s ease-in-out infinite' : 'none'
+                                    }}
+                                    className="absolute -top-9 left-1/2 -translate-x-1/2 flex flex-col items-center z-30"
+                                >
+                                    <div className="w-1.5 h-5 bg-slate-500 rounded-full" />
+                                    <div className="w-4.5 h-4.5 bg-gradient-to-tr from-[#0EA5E9] to-[#38BDF8] rounded-full shadow-[0_0_16px_rgba(14,165,233,0.75)] animate-pulse border-2 border-white" />
                                 </div>
-                            </div>
 
-                            {/* Antenna (outside overflow-hidden head) */}
-                            <div
-                                style={{
-                                    animation: isInView ? 'robotAntenna 4s ease-in-out infinite' : 'none'
-                                }}
-                                className="absolute -top-9 left-1/2 -translate-x-1/2 flex flex-col items-center z-30"
-                            >
-                                <div className="w-1.5 h-5 bg-slate-500 rounded-full" />
-                                <div className="w-4.5 h-4.5 bg-gradient-to-tr from-[#0EA5E9] to-[#38BDF8] rounded-full shadow-[0_0_16px_rgba(14,165,233,0.75)] animate-pulse border-2 border-white" />
+                                {/* Head */}
+                                <div className="w-38 h-30 bg-gradient-to-tr from-[#0F2D4A] via-[#2572AB] to-[#0EA5E9] rounded-3xl relative p-4 shadow-[0_20px_35px_-10px_rgba(37,114,171,0.45)] border-4 border-white overflow-hidden">
+                                    {/* Specular Visor Glare */}
+                                    <div className="absolute -top-6 -left-6 w-28 h-24 bg-white/15 rounded-full rotate-12 pointer-events-none" aria-hidden="true" />
+
+                                    {/* Eyes with Human-like Upper & Lower Eyelid Blink */}
+                                    <div className="flex justify-between items-center h-full px-3.5 pt-1.5 relative z-10">
+                                        {(['left', 'right'] as const).map((eye) => {
+                                            const lidTransition = isBlinking
+                                                ? 'transform 75ms cubic-bezier(0.55, 0.05, 0.9, 0.35)'
+                                                : 'transform 125ms cubic-bezier(0.16, 1, 0.3, 1)';
+                                            return (
+                                                <div
+                                                    key={eye}
+                                                    className="w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-inner relative overflow-hidden ring-4 ring-[#0F172A]/10"
+                                                >
+                                                    <div
+                                                        style={{
+                                                            transform: `translate3d(${pupilPos.x}px, ${pupilPos.y}px, 0) scaleY(${isBlinking ? 0.85 : 1})`,
+                                                            transition: isPointerTracking
+                                                                ? 'transform 80ms ease-out'
+                                                                : 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1)'
+                                                        }}
+                                                        className="w-4.5 h-4.5 bg-[#0F172A] rounded-full"
+                                                    />
+                                                    <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-80" />
+
+                                                    {/* Upper Eyelid */}
+                                                    <div
+                                                        aria-hidden="true"
+                                                        style={{
+                                                            transform: isBlinking ? 'translateY(0%)' : 'translateY(-106%)',
+                                                            transition: lidTransition
+                                                        }}
+                                                        className="absolute inset-x-0 top-0 h-[82%] bg-gradient-to-b from-[#0F2D4A] via-[#1B4D7A] to-[#2572AB] border-b-2 border-[#0F172A]/45 rounded-b-lg z-20 pointer-events-none will-change-transform"
+                                                    />
+                                                    {/* Lower Eyelid */}
+                                                    <div
+                                                        aria-hidden="true"
+                                                        style={{
+                                                            transform: isBlinking ? 'translateY(0%)' : 'translateY(106%)',
+                                                            transition: lidTransition
+                                                        }}
+                                                        className="absolute inset-x-0 bottom-0 h-[28%] bg-gradient-to-t from-[#0F2D4A] to-[#1B4D7A] border-t border-[#38BDF8]/30 rounded-t-lg z-20 pointer-events-none will-change-transform"
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Body & Interactive Chest Pocket */}
@@ -476,59 +568,159 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                     </div>
                 </div>
 
-                {/* Unified Glassmorphic Curriculum Dock */}
-                {activeTech && technologies && onSelectTech && (
-                    <div className="relative z-10 w-full rounded-2xl bg-[#FFFFFF]/90 backdrop-blur-xl border border-slate-200/90 p-3.5 shadow-[0_12px_28px_-12px_rgba(15,23,42,0.12)]">
-                        <div
-                            key={activeTech.name}
-                            className="flex items-center justify-between gap-3 mb-3 animate-in fade-in slide-in-from-bottom-1 duration-200"
-                        >
-                            <div className="flex items-center gap-3 min-w-0">
+                {/* Compact Integrated Career Path & Skill Bar (Merged into Bot Base) */}
+                {activeTech && technologies && onSelectTech && (() => {
+                    const selectedRole =
+                        activeTech.careerPaths[selectedRoleIdx] || activeTech.careerPaths[0];
+                    const SelectedRoleIcon = selectedRole?.icon;
+                    return (
+                        <div className="relative z-10 w-full pt-3 mt-1 border-t border-slate-200/80">
+                            {/* Hairline Cycle Indicator */}
+                            <div className="absolute -top-[1.5px] inset-x-0 h-[1.5px] overflow-hidden" aria-hidden="true">
                                 <div
-                                    className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
-                                    style={{ backgroundColor: activeTech.bgTint, borderColor: activeTech.borderTint }}
-                                >
-                                    <activeTech.icon size={22} style={{ color: activeTech.color }} />
+                                    key={activeTech.name}
+                                    style={{
+                                        animation: isAutoRotatePaused ? 'none' : 'icstCycleBar 2.4s linear both',
+                                        transformOrigin: 'left center'
+                                    }}
+                                    className="h-full w-full bg-[#2572AB]/65 motion-reduce:animate-none!"
+                                />
+                            </div>
+
+                            {/* Integrated Career Path Chooser After Connecting with ICST */}
+                            <div
+                                key={activeTech.name}
+                                className="flex flex-col gap-2 mb-2.5 animate-[icstDockSwap_200ms_cubic-bezier(0.22,1,0.36,1)_both]"
+                            >
+                                <div className="flex items-center justify-between gap-2 text-left">
+                                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-600">
+                                        <Briefcase size={13} className="text-[#2572AB] shrink-0" aria-hidden="true" />
+                                        <span>
+                                            After ICST (<strong className="font-semibold text-[#0F172A]">{activeTech.courseTrack}</strong>)
+                                        </span>
+                                    </span>
+                                    {selectedRole && (
+                                        <Link
+                                            to="/courses"
+                                            className="shrink-0 inline-flex items-center gap-1 text-[11px] font-semibold text-[#2572AB] hover:text-[#1E5E91] transition-colors duration-150 no-underline group"
+                                        >
+                                            {SelectedRoleIcon && <SelectedRoleIcon size={12} aria-hidden="true" />}
+                                            <span>{selectedRole.label}</span>
+                                            <ArrowRight
+                                                size={12}
+                                                aria-hidden="true"
+                                                className="group-hover:translate-x-0.5 transition-transform duration-150"
+                                            />
+                                        </Link>
+                                    )}
                                 </div>
-                                <div className="text-left min-w-0">
-                                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400 block leading-none mb-1">
-                                        Learning
-                                    </span>
-                                    <span className="text-base font-bold text-[#0F172A] truncate block leading-none">
-                                        {activeTech.name}
-                                    </span>
+
+                                <div
+                                    className="flex flex-wrap items-center gap-1.5"
+                                    role="radiogroup"
+                                    aria-label={`Choose career path for ${activeTech.name}`}
+                                >
+                                    {activeTech.careerPaths.map((role, roleIdx) => {
+                                        const picked = roleIdx === selectedRoleIdx;
+                                        const RoleIcon = role.icon;
+                                        return (
+                                            <button
+                                                key={role.label}
+                                                type="button"
+                                                role="radio"
+                                                aria-checked={picked}
+                                                onClick={() => setSelectedRoleIdx(roleIdx)}
+                                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-[background-color,color,border-color] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer whitespace-nowrap ${
+                                                    picked
+                                                        ? 'bg-[#2572AB] text-white border-[#2572AB]'
+                                                        : 'bg-[#FFFFFF] text-slate-600 border-slate-200/90 hover:border-[#2572AB]/45 hover:text-[#0F172A]'
+                                                }`}
+                                            >
+                                                <RoleIcon
+                                                    size={13}
+                                                    stroke={1.85}
+                                                    aria-hidden="true"
+                                                    className={picked ? 'text-white shrink-0' : 'text-[#2572AB] shrink-0'}
+                                                />
+                                                <span>{role.label}</span>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
-                            <span
-                                className="text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0"
-                                style={{ backgroundColor: activeTech.bgTint, color: activeTech.color }}
-                            >
-                                {activeTech.tag}
-                            </span>
-                        </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2.5 border-t border-slate-100" role="tablist" aria-label="Featured technologies">
-                            {technologies.map((tech, idx) => {
-                                const active = idx === activeIndex
-                                return (
-                                    <button
-                                        key={tech.name}
-                                        type="button"
-                                        role="tab"
-                                        aria-selected={active}
-                                        onClick={() => onSelectTech(idx)}
-                                        className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer truncate ${active
-                                                ? 'bg-[#0F172A] text-white shadow-xs'
-                                                : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-[#0F172A]'
+                            {/* Compact 8-Skill Selector with Original Icons (Zero Truncation) */}
+                            <div
+                                key={groupIndex}
+                                className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-2.5 border-t border-slate-200/70 animate-[icstDockSwap_220ms_cubic-bezier(0.22,1,0.36,1)_both]"
+                                role="tablist"
+                                aria-label="Featured technologies"
+                            >
+                                {technologies.map((tech, idx) => {
+                                    const active = idx === activeIndex;
+                                    return (
+                                        <button
+                                            key={tech.name}
+                                            type="button"
+                                            role="tab"
+                                            aria-selected={active}
+                                            onClick={() => onSelectTech(idx)}
+                                            className={`inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-[background-color,color,border-color] duration-150 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer whitespace-nowrap border ${
+                                                active
+                                                    ? 'bg-[#0F172A] text-white border-[#0F172A]'
+                                                    : 'bg-[#FFFFFF] text-slate-600 border-slate-200/80 hover:border-slate-300 hover:text-[#0F172A]'
                                             }`}
-                                    >
-                                        {tech.name}
-                                    </button>
-                                )
-                            })}
+                                        >
+                                            <span
+                                                className={`w-4 h-4 rounded-sm flex items-center justify-center shrink-0 ${
+                                                    active ? 'bg-white/95 p-0.5' : ''
+                                                }`}
+                                            >
+                                                <img
+                                                    src={tech.iconUrl}
+                                                    alt=""
+                                                    aria-hidden="true"
+                                                    width={14}
+                                                    height={14}
+                                                    className="w-3.5 h-3.5 object-contain"
+                                                />
+                                            </span>
+                                            <span>{tech.name}</span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {groupCount > 1 && onSelectGroup && (
+                                <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-200/50">
+                                    <span className="text-[10px] font-medium text-slate-500 tabular-nums">
+                                        Stack {groupIndex + 1} of {groupCount}
+                                    </span>
+                                    <div className="flex items-center gap-1.5" role="tablist" aria-label="Technology stack group">
+                                        {Array.from({ length: groupCount }).map((_, gIdx) => {
+                                            const activeGroup = gIdx === groupIndex;
+                                            return (
+                                                <button
+                                                    key={gIdx}
+                                                    type="button"
+                                                    role="tab"
+                                                    aria-selected={activeGroup}
+                                                    aria-label={`Show technology group ${gIdx + 1}`}
+                                                    onClick={() => onSelectGroup(gIdx)}
+                                                    className={`h-1.5 rounded-full transition-[width,background-color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
+                                                        activeGroup
+                                                            ? 'w-5 bg-[#2572AB]'
+                                                            : 'w-2 bg-slate-300 hover:bg-slate-400'
+                                                    }`}
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    </div>
-                )}
+                    );
+                })()}
 
                 <style>{`
                     @keyframes robotFloat {
@@ -612,6 +804,29 @@ const InteractiveRobot: React.FC<InteractiveRobotProps> = ({
                         100% {
                             opacity: 1;
                             transform: translate(-50%, 0) scale(1);
+                        }
+                    }
+                    @keyframes icstDockSwap {
+                        0% {
+                            opacity: 0;
+                            transform: translateY(5px);
+                        }
+                        100% {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    @keyframes icstCycleBar {
+                        0% {
+                            transform: scaleX(0);
+                        }
+                        100% {
+                            transform: scaleX(1);
+                        }
+                    }
+                    @media (prefers-reduced-motion: reduce) {
+                        @keyframes icstDockSwap {
+                            0%, 100% { opacity: 1; transform: none; }
                         }
                     }
                 `}</style>

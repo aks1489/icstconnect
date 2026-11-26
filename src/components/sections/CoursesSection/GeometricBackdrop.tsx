@@ -20,7 +20,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '24s',
         delay: '0s',
         variant: 'driftA',
-        color: 'rgba(37, 114, 171, 0.20)'
+        color: 'rgba(37, 114, 171, 0.14)'
     },
     {
         id: 'ring-tr',
@@ -31,7 +31,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '28s',
         delay: '-5s',
         variant: 'driftB',
-        color: 'rgba(14, 165, 233, 0.22)'
+        color: 'rgba(100, 116, 139, 0.14)'
     },
     {
         id: 'diamond-mid-l',
@@ -42,7 +42,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '22s',
         delay: '-3s',
         variant: 'driftC',
-        color: 'rgba(79, 70, 229, 0.18)'
+        color: 'rgba(37, 114, 171, 0.12)'
     },
     {
         id: 'tri-top-c',
@@ -53,7 +53,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '26s',
         delay: '-8s',
         variant: 'driftB',
-        color: 'rgba(5, 150, 105, 0.18)'
+        color: 'rgba(100, 116, 139, 0.12)'
     },
     {
         id: 'sq-mid-r',
@@ -64,7 +64,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '27s',
         delay: '-11s',
         variant: 'driftA',
-        color: 'rgba(37, 114, 171, 0.19)'
+        color: 'rgba(37, 114, 171, 0.14)'
     },
     {
         id: 'hex-bl',
@@ -75,7 +75,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '30s',
         delay: '-6s',
         variant: 'driftC',
-        color: 'rgba(79, 70, 229, 0.16)'
+        color: 'rgba(100, 116, 139, 0.13)'
     },
     {
         id: 'tri-br',
@@ -86,7 +86,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '23s',
         delay: '-4s',
         variant: 'driftA',
-        color: 'rgba(217, 119, 6, 0.18)'
+        color: 'rgba(37, 114, 171, 0.12)'
     },
     {
         id: 'cross-mid',
@@ -97,7 +97,7 @@ const GEO_SHAPES: GeoShape[] = [
         duration: '20s',
         delay: '-2s',
         variant: 'driftB',
-        color: 'rgba(100, 116, 139, 0.24)'
+        color: 'rgba(100, 116, 139, 0.16)'
     }
 ]
 

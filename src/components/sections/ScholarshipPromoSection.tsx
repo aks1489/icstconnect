@@ -1,9 +1,22 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { IconSchool as GraduationCap, IconArrowRight as ArrowRight, IconTrophy as Trophy } from '@tabler/icons-react'
+import {
+    IconSchool as GraduationCap,
+    IconArrowRight as ArrowRight,
+    IconTrophy as Trophy,
+    IconAward as Award,
+    IconFileCheck as FileCheck,
+    IconCalendarEvent as CalendarEvent
+} from '@tabler/icons-react'
 import { scholarshipService } from '../../services/scholarshipService'
 import type { ScholarshipSettings } from '../../types/scholarship'
 import { revealOnScroll } from '../../lib/motion'
+
+const SCHOLARSHIP_HIGHLIGHTS = [
+    { label: 'Position Holders', icon: Award },
+    { label: 'Scholarship Criteria', icon: FileCheck },
+    { label: 'Exam Registration', icon: CalendarEvent }
+] as const
 
 export default function ScholarshipPromoSection() {
     const [settings, setSettings] = useState<ScholarshipSettings | null>(null)
@@ -42,38 +55,58 @@ export default function ScholarshipPromoSection() {
     }
 
     return (
-        <section className="py-14 px-4 md:px-6 bg-[#FFFFFF]">
-            <div ref={bannerRef} className="max-w-7xl mx-auto">
-                {/* 1px Gradient Hairline Frame */}
-                <div className="p-[1px] rounded-[1.92rem] bg-gradient-to-r from-[#F59E0B]/55 via-slate-200/80 to-[#2572AB]/45 shadow-[0_22px_54px_-18px_rgba(15,23,42,0.12)]">
-                    <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFFFFF] to-[#F8FAFC] p-8 md:p-12">
-                        <div className="absolute -top-20 -right-20 w-80 h-80 bg-[radial-gradient(circle,rgba(245,158,11,0.15)_0%,transparent_65%)] pointer-events-none" aria-hidden="true" />
-                        <div className="absolute -bottom-24 left-1/3 w-72 h-72 bg-[radial-gradient(circle,rgba(37,114,171,0.08)_0%,transparent_65%)] pointer-events-none" aria-hidden="true" />
-
-                        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                            <div className="space-y-4 text-center md:text-left max-w-2xl">
-                                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FEF3C7]/85 text-[#92400E] border border-[#F59E0B]/30 text-[11px] font-semibold uppercase tracking-[0.12em]">
-                                    <Trophy size={13} className="text-[#D97706]" aria-hidden="true" />
-                                    <span>ICST Scholarship Program</span>
-                                </div>
-
-                                <h2 className="text-3xl md:text-4xl font-extrabold tracking-[-0.025em] text-[#0F172A] leading-tight">
-                                    Empowering Young Minds Through Education.
-                                </h2>
-
-                                <p className="text-[#475569] text-sm md:text-base leading-relaxed">
-                                    Discover past position holders, scholarship criteria, and exam registration details. We support exceptional talent across computer applications and academic excellence.
-                                </p>
+        <section className="py-16 lg:py-20 px-4 md:px-6 bg-gradient-to-b from-[#F8FAFC] via-[#F5F9FD] to-[#F7FAFE] relative overflow-hidden">
+            <div ref={bannerRef} className="container mx-auto max-w-7xl relative z-10">
+                {/* Refined Frosted Card Preserving Blended Section Continuity */}
+                <div className="relative rounded-3xl bg-[#FFFFFF]/88 backdrop-blur-md border border-slate-200/90 shadow-[0_24px_56px_-22px_rgba(15,23,42,0.12)] overflow-hidden p-7 sm:p-10 lg:px-12 lg:py-11">
+                    <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8 lg:gap-12">
+                        {/* Left Editorial Copy */}
+                        <div className="space-y-4 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8FAFC] text-[#2572AB] border border-slate-200/90 text-xs font-medium">
+                                <Trophy size={13} className="text-[#2572AB]" aria-hidden="true" />
+                                <span>ICST Scholarship Program</span>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
+                            <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.025em] text-[#0F172A] leading-[1.12]">
+                                Empowering Young Minds <span className="text-[#2572AB]">Through Education</span>
+                            </h2>
+
+                            <p className="text-[#475569] text-sm sm:text-base leading-relaxed mb-0">
+                                Discover past position holders, scholarship criteria, and exam registration details. We support exceptional talent across computer applications and academic excellence.
+                            </p>
+
+                            {/* Feature Pills */}
+                            <div className="pt-1 flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                                {SCHOLARSHIP_HIGHLIGHTS.map(({ label, icon: ItemIcon }) => (
+                                    <span
+                                        key={label}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F8FAFC] border border-slate-200/80 text-xs font-medium text-slate-700"
+                                    >
+                                        <ItemIcon size={14} className="text-[#2572AB]" aria-hidden="true" />
+                                        <span>{label}</span>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right Merit Portal Action Card */}
+                        <div className="shrink-0 mx-auto lg:mx-0 w-full max-w-xs sm:max-w-sm lg:w-auto">
+                            <div className="rounded-2xl bg-[#F8FAFC] border border-slate-200/90 p-4 sm:p-5 flex flex-col items-center lg:items-stretch gap-3">
+                                <div className="w-full flex items-center justify-between gap-4 text-xs font-medium text-slate-500 px-0.5">
+                                    <span className="inline-flex items-center gap-1.5 text-[#0F172A]">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#2572AB]" aria-hidden="true" />
+                                        Merit Excellence Portal
+                                    </span>
+                                    <span className="text-[#2572AB]">Official Track</span>
+                                </div>
+
                                 <Link
                                     to="/scholarships"
-                                    className="px-7 py-4 bg-[#0F172A] hover:bg-[#1E293B] text-white font-semibold text-sm rounded-xl shadow-[0_14px_28px_-8px_rgba(15,23,42,0.35)] hover:shadow-[0_18px_36px_-8px_rgba(217,119,6,0.35)] flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 no-underline border border-slate-800 group"
+                                    className="w-full px-7 py-3.5 bg-[#0F172A] hover:bg-[#2572AB] text-white font-semibold text-sm sm:text-base rounded-xl shadow-[0_12px_24px_-10px_rgba(15,23,42,0.28)] hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2.5 transition-[background-color,transform,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] no-underline group"
                                 >
-                                    <GraduationCap size={19} className="text-[#FBBF24]" aria-hidden="true" />
+                                    <GraduationCap size={18} className="text-white/90" aria-hidden="true" />
                                     <span>Explore Scholarship</span>
-                                    <ArrowRight size={17} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform" />
+                                    <ArrowRight size={17} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform duration-150" />
                                 </Link>
                             </div>
                         </div>
